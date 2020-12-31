@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: yzl-crm_customer-server
+  profiles:
+    active: dev
