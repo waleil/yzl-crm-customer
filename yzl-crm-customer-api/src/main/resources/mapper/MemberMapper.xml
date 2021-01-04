@@ -35,35 +35,38 @@
         <result column="media_type_name" property="mediaTypeName" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
-    id, member_card, member_name, nick_name, age, sex, adver_code, m_grade_id, is_active,
-    member_status, activity, region_code, province_code, city_code, total_amount, qq,
-    wechat, email, source, address, birthday, job_id, first_order_time, last_order_time,
+    id, member_card, member_name, nick_name, age, sex, adver_code, m_grade_code, is_active,
+    member_status, activity, region_code, province_code, city_code, total_amount, qq,id_card,
+
+    wechat, email, source, address, birthday, job_code, first_order_time, last_order_time,
     master_card, first_order_staff_no, first_order_am, order_num, media_name, media_type_code,
-    media_type_name
+    media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag
   </sql>
 
     <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.Member" >
     insert into member (id, member_card, member_name,
                         nick_name, age, sex, adver_code,
-                        m_grade_id, is_active, member_status,
+                        m_grade_code, is_active, member_status,
                         activity, region_code, province_code,
                         city_code, total_amount, qq,
                         wechat, email, source,
-                        address, birthday, job_id,
+                        address, birthday, job_code,
                         first_order_time, last_order_time, master_card,
                         first_order_staff_no, first_order_am, order_num,
-                        media_name, media_type_code, media_type_name
+                        media_name, media_type_code, media_type_name,
+                        intro_no,intro_name,intro_type,source_type,vip_flag
     )
     values (#{id,jdbcType=INTEGER}, #{memberCard,jdbcType=VARCHAR}, #{memberName,jdbcType=VARCHAR},
             #{nickName,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{sex,jdbcType=BIT}, #{adverCode,jdbcType=INTEGER},
-            #{mGradeId,jdbcType=BIT}, #{isActive,jdbcType=SMALLINT}, #{memberStatus,jdbcType=TINYINT},
+            #{mGradeCode,jdbcType=BIT}, #{isActive,jdbcType=SMALLINT}, #{memberStatus,jdbcType=TINYINT},
             #{activity,jdbcType=BIT}, #{regionCode,jdbcType=INTEGER}, #{provinceCode,jdbcType=INTEGER},
             #{cityCode,jdbcType=INTEGER}, #{totalAmount,jdbcType=INTEGER}, #{qq,jdbcType=INTEGER},
             #{wechat,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER},
-            #{address,jdbcType=VARCHAR}, #{birthday,jdbcType=TIMESTAMP}, #{jobId,jdbcType=INTEGER},
+            #{address,jdbcType=VARCHAR}, #{birthday,jdbcType=TIMESTAMP}, #{jobCode,jdbcType=INTEGER},
             #{firstOrderTime,jdbcType=TIMESTAMP}, #{lastOrderTime,jdbcType=TIMESTAMP}, #{masterCard,jdbcType=INTEGER},
             #{firstOrderStaffNo,jdbcType=INTEGER}, #{firstOrderAm,jdbcType=INTEGER}, #{orderNum,jdbcType=INTEGER},
-            #{mediaName,jdbcType=VARCHAR}, #{mediaTypeCode,jdbcType=INTEGER}, #{mediaTypeName,jdbcType=VARCHAR}
+            #{mediaName,jdbcType=VARCHAR}, #{mediaTypeCode,jdbcType=INTEGER}, #{mediaTypeName,jdbcType=VARCHAR},
+            #{intro_no},#{intro_name},#{intro_type},#{source_type},#{vip_flag}
            )
   </insert>
 
@@ -75,7 +78,7 @@
                 adver_code = #{adverCode,jdbcType=INTEGER},
             </if>
             <if test="mGradeId != null" >
-                m_grade_id = #{mGradeId,jdbcType=BIT},
+                m_grade_code = #{mGradeCode,jdbcType=BIT},
             </if>
             <if test="isActive != null" >
                 is_active = #{isActive,jdbcType=SMALLINT},
@@ -117,7 +120,7 @@
                 birthday = #{birthday,jdbcType=TIMESTAMP},
             </if>
             <if test="jobId != null" >
-                job_id = #{jobId,jdbcType=INTEGER},
+                job_code = #{jobCode,jdbcType=INTEGER},
             </if>
             <if test="firstOrderTime != null" >
                 first_order_time = #{firstOrderTime,jdbcType=TIMESTAMP},
@@ -212,7 +215,7 @@
                 and m.member_status = #{memberStatus}
             </if>
             <if test="mGradeId != null and mGradeId != ''">
-                and m.m_grade_id = #{mGradeId}
+                and m.m_grade_code = #{mGradeCode}
             </if>
             <if test="lastOrderTimeStart != null and lastOrderTimeStart != ''">
                 and m.last_order_time <![CDATA[ >= ]]> #{lastOrderTimeStart}

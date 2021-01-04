@@ -52,7 +52,7 @@ public class CustomerController {
     }
 
     @ApiOperation(value="根据顾客号查询顾客基本信息")
-    @PostMapping("/getMember")
+    @GetMapping("v1/getMember")
     public GeneralResult<Member> getMember(@RequestParam("memberCard") String  memberCard) {
         Member memberEntity = memberService.selectMemberByCard(memberCard);
         return GeneralResult.success(memberEntity);

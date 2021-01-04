@@ -27,7 +27,7 @@ public class Member {
     @ApiModelProperty(value = "广告id")
     private Integer adverCode;
     @ApiModelProperty(value = "会员级别id  1 黄金，2 铂金")
-    private String mGradeId;
+    private String mGradeCode;
     @ApiModelProperty(value = "0未发卡1已发卡未激活2已激活")
     private Short isActive;
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
@@ -56,7 +56,7 @@ public class Member {
     @ApiModelProperty(value = "会员生日")
     private Date birthday;
     @ApiModelProperty(value = "所属行业")
-    private Integer jobId;
+    private Integer jobCode;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "首单下单时间")
     private Date firstOrderTime;
@@ -77,5 +77,19 @@ public class Member {
     private Integer mediaTypeCode;
     @ApiModelProperty(value = "媒体类型名称（冗余，暂定第一次进线）")
     private String mediaTypeName;
+
+    @ApiModelProperty(value = "是否vip")
+    private boolean vip_flag;
+    @ApiModelProperty(value = "0表示系统自动创建，1 坐席添加")
+    private int source_type;
+    @ApiModelProperty(value = "介绍是member_card,如果是员工介绍就是staff_no")
+    private String intro_no;
+    @ApiModelProperty(value = "介绍人姓名")
+    private String intro_name;
+    @ApiModelProperty(value = "介绍人类型，1员工，2顾客")
+    private int intro_type;
+
+
+
 
 }
