@@ -26,6 +26,12 @@
             <artifactId>yzl-common</artifactId>
             <version>1.0-RELEASE</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.pagehelper</groupId>
+                    <artifactId>pagehelper-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- 包含了jsr 303的很多注解 -->
         <dependency>
