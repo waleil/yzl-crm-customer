@@ -203,7 +203,7 @@
         member m left join member_disease d on m.member_card = d.member_card
         <where>
             <if test="memberName != null and memberName != ''">
-                and (m.member_card = #{memberName} or m.member_name like "%"#{memberName}"%")
+                and (m.member_card = #{memberName} or m.member_name = #{memberName})
             </if>
             <if test="source != null and source != ''">
                 and m.source = #{source}
@@ -220,12 +220,12 @@
             <if test="lastOrderTimeEnd != null and lastOrderTimeEnd != ''">
                 and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeStart}
             </if>
-            <if test="diseaseId != null and diseaseId != '' ">
-                and d.disease_id = #{diseaseId}
-            </if>
-            <if test="diseasePid != null and diseasePid != '' and (diseaseId == null or diseaseId == '' )">
-                and d.disease_id = #{diseasePid}
-            </if>
+<!--            <if test="diseaseId != null and diseaseId != '' ">-->
+<!--                and d.disease_id = #{diseaseId}-->
+<!--            </if>-->
+<!--            <if test="diseasePid != null and diseasePid != '' and (diseaseId == null or diseaseId == '' )">-->
+<!--                and d.disease_id = #{diseasePid}-->
+<!--            </if>-->
         </where>
     </select>
     <!--根据顾客号查询顾客基本信息 -->

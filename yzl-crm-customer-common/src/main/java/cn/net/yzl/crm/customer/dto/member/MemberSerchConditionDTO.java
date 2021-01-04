@@ -18,10 +18,10 @@ public class MemberSerchConditionDTO extends PageDTO {
     private Integer source;
 
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
-    private Short memberStatus;
+    private Integer memberStatus;
 
     @ApiModelProperty(value = "顾客级别  1 黄金，2 铂金")
-    private String mGradeId;
+    private Integer mGradeId;
 
 
     @ApiModelProperty(value = "最后一次下单时间起始时间")
@@ -31,10 +31,10 @@ public class MemberSerchConditionDTO extends PageDTO {
     @ApiModelProperty(value = "最后一次下单时间结束时间")
     private Date lastOrderTimeEnd;
 
-    @ApiModelProperty(value = "病症id")
-    private Integer diseaseId;
-
-    @ApiModelProperty(value = "病症分类")
-    private Integer diseasePid;
+//    @ApiModelProperty(value = "病症id")
+//    private Integer diseaseId;
+//
+//    @ApiModelProperty(value = "病症分类")
+//    private Integer diseasePid;
 
 }

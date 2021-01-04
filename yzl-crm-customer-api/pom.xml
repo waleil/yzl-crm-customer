@@ -138,8 +138,14 @@
             <artifactId>yzl-logger</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>cn.net.yzl</groupId>
+            <artifactId>yzl-common</artifactId>
+            <version>1.0-RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
 
-<!--        <dependency>-->
+        <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
 <!--            <artifactId>spring-boot-starter-data-mongodb</artifactId>-->
 <!--        </dependency>-->

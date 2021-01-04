@@ -1,10 +1,13 @@
 package cn.net.yzl.crm.customer.service.impl;
 
+import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
 import cn.net.yzl.crm.customer.service.MemberService;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cn.net.yzl.crm.customer.model.*;
@@ -28,8 +31,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> findPageByCondition(MemberSerchConditionDTO dto) {
-        return memberMapper.findPageByCondition(dto);
+    public Page<Member> findPageByCondition(MemberSerchConditionDTO dto) {
+        if (dto.getCurrentPage() == null) {
+            dto.setCurrentPage(1);
+        }
+        if (dto.getPageSize() == null) {
+            dto.setPageSize(10);
+        }
+        PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
+        List<Member> list = memberMapper.findPageByCondition(dto);
+        Page<Member> page = AssemblerResultUtil.resultAssembler(list);
+
+        return page;
     }
 
     @Override
