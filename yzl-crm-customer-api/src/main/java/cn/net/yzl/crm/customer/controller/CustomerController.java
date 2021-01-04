@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
-@Api("顾客服务")
+@Api(value="CustomerController",tags = {"顾客服务"})
 @RestController
 @RequestMapping("member")
 public class CustomerController {
@@ -21,7 +21,7 @@ public class CustomerController {
     MemberService memberService;
 
     @ApiOperation("获取顾客列表")
-    @GetMapping("v1/getMemberInfo")
+    @PostMapping("v1/getMemberListByPage")
     public GeneralResult<Page<Member>> getCustomerInfo(@RequestBody MemberSerchConditionDTO dto) {
         Page<Member> memberPage = memberService.findPageByCondition(dto);
         return GeneralResult.success(memberPage);
@@ -29,7 +29,7 @@ public class CustomerController {
     }
 
     @ApiOperation(value="保存会员基本信息")
-    @PostMapping("/save")
+    @PostMapping("v1/save")
     public GeneralResult<Boolean> save(@RequestBody Member dto) {
         int result = memberService.insert(dto);
         if(result == 1){
@@ -40,7 +40,7 @@ public class CustomerController {
 
     }
     @ApiOperation(value="更新会员基本信息")
-    @PostMapping("/updateByMemberCart")
+    @PostMapping("v1/updateByMemberCart")
     public GeneralResult<Boolean> updateByMemberCart(@RequestBody Member dto) {
 
         int result = memberService.updateByMemberCardSelective(dto);
