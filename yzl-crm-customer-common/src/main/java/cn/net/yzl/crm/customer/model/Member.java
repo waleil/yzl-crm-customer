@@ -33,7 +33,7 @@ public class Member {
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
     private Byte memberStatus;
     @ApiModelProperty(value = "活跃度 1 活跃 2 冷淡 3 一般")
-    private Boolean activity;
+    private int activity;
     @ApiModelProperty(value = "所属区")
     private String regionCode;
     @ApiModelProperty(value = "所属省份")
