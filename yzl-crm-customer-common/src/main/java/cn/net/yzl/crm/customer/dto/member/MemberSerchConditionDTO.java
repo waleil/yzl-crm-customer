@@ -21,7 +21,7 @@ public class MemberSerchConditionDTO extends PageDTO {
     private Integer memberStatus;
 
     @ApiModelProperty(value = "顾客级别  1 黄金，2 铂金")
-    private Integer mGradeId;
+    private Integer mGradeCode;
 
 
     @ApiModelProperty(value = "最后一次下单时间起始时间")

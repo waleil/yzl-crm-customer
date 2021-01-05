@@ -32,10 +32,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Page<Member> findPageByCondition(MemberSerchConditionDTO dto) {
-        if (dto.getCurrentPage() == null) {
+        if (dto.getCurrentPage() == null || dto.getCurrentPage()==0) {
             dto.setCurrentPage(1);
         }
-        if (dto.getPageSize() == null) {
+        if (dto.getPageSize() == null || dto.getPageSize()==0) {
             dto.setPageSize(10);
         }
         PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
