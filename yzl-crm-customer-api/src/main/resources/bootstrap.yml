@@ -1,5 +1,5 @@
 spring:
   application:
-    name: yzl-crm-customer-server
+    name: yzl-crm-customer-api
   profiles:
     active: dev

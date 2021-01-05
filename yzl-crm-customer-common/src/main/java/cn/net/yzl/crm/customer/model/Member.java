@@ -23,10 +23,10 @@ public class Member {
     @ApiModelProperty(value = "年龄")
     private Integer age;
     @ApiModelProperty(value = "性别：0代表男，1代表女")
-    private Boolean sex;
+    private int sex;
     @ApiModelProperty(value = "广告id")
     private Integer adver_code;
-    @ApiModelProperty(value = "会员级别id  1 黄金，2 铂金")
+    @ApiModelProperty(value = "顾客级别  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
     private String m_grade_code;
     @ApiModelProperty(value = "0未发卡1已发卡未激活2已激活")
     private Short is_active;
@@ -43,7 +43,7 @@ public class Member {
     @ApiModelProperty(value = "累计消费金额")
     private Integer total_amount;
     @ApiModelProperty(value = "qq")
-    private Integer qq;
+    private String qq;
     @ApiModelProperty(value = "微信")
     private String wechat;
     @ApiModelProperty(value = "邮箱")

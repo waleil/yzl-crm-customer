@@ -22,7 +22,7 @@ public class CustomerController {
 
     @ApiOperation("获取顾客列表")
     @PostMapping("v1/getMemberListByPage")
-    public GeneralResult<Page<Member>> getCustomerInfo(@RequestBody MemberSerchConditionDTO dto) {
+    public GeneralResult<Page<Member>> getMemberListByPage(@RequestBody MemberSerchConditionDTO dto) {
         Page<Member> memberPage = memberService.findPageByCondition(dto);
         return GeneralResult.success(memberPage);
 

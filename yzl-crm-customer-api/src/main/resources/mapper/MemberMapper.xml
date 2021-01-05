@@ -63,9 +63,9 @@
             #{city_code,jdbcType=INTEGER}, #{total_amount,jdbcType=INTEGER}, #{qq,jdbcType=VARCHAR},
             #{wechat,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER},
             #{address,jdbcType=VARCHAR}, #{birthday,jdbcType=TIMESTAMP}, #{job_code,jdbcType=INTEGER},
-            #{first_orderTime,jdbcType=TIMESTAMP}, #{lastOrderTime,jdbcType=TIMESTAMP}, #{masterCard,jdbcType=INTEGER},
-            #{firstOrderStaffNo,jdbcType=VARCHAR}, #{firstOrderAm,jdbcType=INTEGER}, #{orderNum,jdbcType=INTEGER},
-            #{mediaName,jdbcType=VARCHAR}, #{mediaTypeCode,jdbcType=VARCHAR}, #{mediaTypeName,jdbcType=VARCHAR},
+            #{first_order_time,jdbcType=TIMESTAMP}, #{last_order_time,jdbcType=TIMESTAMP}, #{master_card,jdbcType=INTEGER},
+            #{first_order_staff_no,jdbcType=VARCHAR}, #{first_order_am,jdbcType=INTEGER}, #{order_num,jdbcType=INTEGER},
+            #{media_name,jdbcType=VARCHAR}, #{media_type_code,jdbcType=VARCHAR}, #{media_type_name,jdbcType=VARCHAR},
             #{intro_no},#{intro_name},#{intro_type},#{source_type},#{vip_flag}
            )
   </insert>
@@ -230,8 +230,11 @@
             <if test="memberName != null and memberName != ''">
                 and (m.member_card = #{memberName} or m.member_name = #{memberName})
             </if>
-            <if test="source != null and source != ''">
-                and m.source = #{source}
+            <if test="media_id != null and media_id != ''">
+                and m.media_id = #{media_id}
+            </if>
+            <if test="adver_code != null and adver_code != ''">
+                and m.adver_code = #{adver_code}
             </if>
             <if test="memberStatus != null and memberStatus != ''">
                 and m.member_status = #{memberStatus}
