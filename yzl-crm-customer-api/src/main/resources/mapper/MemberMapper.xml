@@ -40,7 +40,7 @@
 
     wechat, email, source, address, birthday, job_code, first_order_time, last_order_time,
     master_card, first_order_staff_no, first_order_am, order_num, media_name, media_type_code,
-    media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag
+    media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag,member_type
   </sql>
 
     <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.Member" >
@@ -275,12 +275,21 @@
     </select>
 
     <!--根据顾客手机号查询顾客基本信息 ，用来判断手机号是否被注册，如果注册，则返回注册顾客的实体-->
-    <select id="getMemberByPhone" parameterType="String" resultType="cn.net.yzl.crm.customer.model.Member">
+    <select id="getMemberByPhone" resultType="cn.net.yzl.crm.customer.model.Member">
         select
         <include refid="Base_Column_List" />
         from member where member_card=
             (
-            select member_card from member_phone where phone_number in(#{phone1},#{phone2}) limit 1
+
+            select member_card
+            from member_phone
+            where phone_number in
+                <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+             limit 1
+
+
             )
     </select>
 

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cn.net.yzl.crm.customer.model.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -72,7 +73,11 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public Member getMemberByPhone(String phone) {
-        return memberMapper.getMemberByPhone(phone, "0" + phone); //因为手机号或许有前缀0，所以要加0的判断
+        List<String> phoneList=new ArrayList<>();
+        phoneList.add(phone);
+        phoneList.add("0"+phone);
+        phoneList.add("00"+phone);
+        return memberMapper.getMemberByPhone(phoneList); //因为手机号或许有前缀0，所以要加0的判断
     }
 
     /**

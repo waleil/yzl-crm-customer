@@ -97,7 +97,7 @@ public class CustomerController {
             @ApiParam(name = "phone", value = "手机号", required = true)
                     String phone) {
         Member member = memberService.getMemberByPhone(phone);
-        return GeneralResult.success(phone);
+        return GeneralResult.success(member);
     }
 
     /**

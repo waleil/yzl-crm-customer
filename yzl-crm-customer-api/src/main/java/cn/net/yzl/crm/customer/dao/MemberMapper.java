@@ -25,7 +25,7 @@ public interface MemberMapper {
 
     List<MemberPhone> getMemberPhoneList(String member_card);
 
-    Member getMemberByPhone(String phone1,String phone2);
+    Member getMemberByPhone(List<String> phoneList);
 
     void setMemberToVip(String member_card);
 }
