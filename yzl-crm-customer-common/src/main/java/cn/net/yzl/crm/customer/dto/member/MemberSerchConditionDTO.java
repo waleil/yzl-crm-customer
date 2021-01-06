@@ -15,10 +15,10 @@ public class MemberSerchConditionDTO extends PageDTO {
     private String memberName;
 
     @ApiModelProperty(value = "媒体id")
-    private Integer media_id;
+    private String media_id;
 
     @ApiModelProperty(value = "广告id")
-    private Integer adver_code;
+    private String adver_code;
 
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
     private Integer memberStatus;

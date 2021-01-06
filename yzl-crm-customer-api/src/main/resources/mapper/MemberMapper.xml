@@ -230,10 +230,10 @@
             <if test="memberName != null and memberName != ''">
                 and (m.member_card = #{memberName} or m.member_name = #{memberName})
             </if>
-            <if test="media_id != null and media_id != ''">
+            <if test="media_id != null and media_id != 0">
                 and m.media_id = #{media_id}
             </if>
-            <if test="adver_code != null and adver_code != ''">
+            <if test="adver_code != null and adver_code != 0">
                 and m.adver_code = #{adver_code}
             </if>
             <if test="memberStatus != null and memberStatus != ''">
