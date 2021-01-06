@@ -266,5 +266,25 @@
     <select id="getMemberGrad" resultType="cn.net.yzl.crm.customer.model.MemberGrad" >
         select id,no,name from member_type
     </select>
+    <!--根据顾客号查询顾客手机号信息 -->
+    <select id="getMemberPhoneList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberPhone">
+        select id,member_card,phone_number,service_provider,phone_type
+        from member_phone
+        where enabled=1  and member_card=#{member_card}
 
+    </select>
+
+    <!--根据顾客手机号查询顾客基本信息 ，用来判断手机号是否被注册，如果注册，则返回注册顾客的实体-->
+    <select id="getMemberByPhone" parameterType="String" resultType="cn.net.yzl.crm.customer.model.Member">
+        select
+        <include refid="Base_Column_List" />
+        from member where member_card=
+            (
+            select member_card from member_phone where phone_number in(#{phone1},#{phone2}) limit 1
+            )
+    </select>
+
+    <update id="setMemberToVip" parameterType="String" >
+        update member set vip_flag=1 where member_card=#{member_card}
+    </update>
 </mapper>

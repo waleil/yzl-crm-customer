@@ -32,10 +32,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Page<Member> findPageByCondition(MemberSerchConditionDTO dto) {
-        if (dto.getCurrentPage() == null || dto.getCurrentPage()==0) {
+        if (dto.getCurrentPage() == null || dto.getCurrentPage() == 0) {
             dto.setCurrentPage(1);
         }
-        if (dto.getPageSize() == null || dto.getPageSize()==0) {
+        if (dto.getPageSize() == null || dto.getPageSize() == 0) {
             dto.setPageSize(10);
         }
         PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
@@ -54,4 +54,35 @@ public class MemberServiceImpl implements MemberService {
     public Member selectMemberByCard(String memberCard) {
         return memberMapper.selectMemberByCard(memberCard);
     }
+
+    /**
+     * 获取顾客联系方式信息，包括手机号，座机号
+     * @param member_card
+     * @return
+     */
+    @Override
+    public List<MemberPhone> getMemberPhoneList(String member_card) {
+        return memberMapper.getMemberPhoneList(member_card);
+    }
+
+    /**
+     * 根据手机号获取顾客信息（可用来判断手机号是否被注册，如果被注册则返回注册顾客实体）
+     * @param phone
+     * @return
+     */
+    @Override
+    public Member getMemberByPhone(String phone) {
+        return memberMapper.getMemberByPhone(phone, "0" + phone); //因为手机号或许有前缀0，所以要加0的判断
+    }
+
+    /**
+     * 设置顾客为会员
+     * @param member_card
+     */
+    @Override
+    public void setMemberToVip(String member_card) {
+        memberMapper.setMemberToVip(member_card);
+    }
+
+
 }

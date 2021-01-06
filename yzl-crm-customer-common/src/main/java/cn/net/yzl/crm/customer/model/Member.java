@@ -7,6 +7,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
+import java.util.List;
 
 @ApiModel(value="会员基础信息vo类",description="会员基础信息vo类" )
 @Data
@@ -95,5 +96,7 @@ public class Member {
     @ApiModelProperty("广告名称")
     private String adver_name;
 
-
+    private List<MemberPhone> memberPhoneList;
+    @ApiModelProperty("建档时间")
+    private  String create_time;
 }

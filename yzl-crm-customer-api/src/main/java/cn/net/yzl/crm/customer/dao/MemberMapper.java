@@ -5,6 +5,7 @@ import cn.net.yzl.crm.customer.config.db.DynamicDataSourceEnum;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
+import cn.net.yzl.crm.customer.model.MemberPhone;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,5 +21,11 @@ public interface MemberMapper {
 
     int updateByMemberCardSelective(Member dto);
 
-    Member  selectMemberByCard(String  memberCard);
+    Member selectMemberByCard(String memberCard);
+
+    List<MemberPhone> getMemberPhoneList(String member_card);
+
+    Member getMemberByPhone(String phone1,String phone2);
+
+    void setMemberToVip(String member_card);
 }
