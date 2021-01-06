@@ -246,7 +246,7 @@
                 and m.last_order_time <![CDATA[ >= ]]> #{lastOrderTimeStart}
             </if>
             <if test="lastOrderTimeEnd != null and lastOrderTimeEnd != ''">
-                and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeStart}
+                and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeEnd}
             </if>
 <!--            <if test="diseaseId != null and diseaseId != '' ">-->
 <!--                and d.disease_id = #{diseaseId}-->

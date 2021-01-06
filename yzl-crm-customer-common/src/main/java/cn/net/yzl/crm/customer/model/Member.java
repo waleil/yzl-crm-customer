@@ -54,15 +54,15 @@ public class Member {
     private String address;
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty(value = "会员生日")
-    private Date birthday;
+    private String birthday;
     @ApiModelProperty(value = "所属行业")
     private String job_code;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "首单下单时间")
-    private Date first_order_time;
+    private String first_order_time;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "最后一次下单时间")
-    private Date last_order_time;
+    private String last_order_time;
     @ApiModelProperty(value = "主客户会员卡号")
     private Integer master_card;
     @ApiModelProperty(value = "首单下单员工")
