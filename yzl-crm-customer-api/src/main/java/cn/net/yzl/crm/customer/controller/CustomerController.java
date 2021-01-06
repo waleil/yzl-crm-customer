@@ -46,7 +46,7 @@ public class CustomerController {
 
     @ApiOperation(value = "更新会员基本信息")
     @PostMapping("v1/updateByMemberCard")
-    public GeneralResult<Boolean> updateByMemberCart(@RequestBody Member dto) {
+    public GeneralResult<Boolean> updateByMemberCard(@RequestBody Member dto) {
 
         int result = memberService.updateByMemberCardSelective(dto);
         if (result == 1) {
