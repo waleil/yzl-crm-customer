@@ -2,9 +2,7 @@ package cn.net.yzl.crm.customer.service;
 
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
-import cn.net.yzl.crm.customer.model.Member;
-import cn.net.yzl.crm.customer.model.MemberGrad;
-import cn.net.yzl.crm.customer.model.MemberPhone;
+import cn.net.yzl.crm.customer.model.*;
 
 import java.util.List;
 
@@ -24,4 +22,10 @@ public interface MemberService {
     Member getMemberByPhone(String phone);
 
     void setMemberToVip(String member_card);
+
+    List<MemberProductEffect> getMemberProductEffectList(String member_card);
+
+    List<ProductConsultation> getProductConsultationList(String member_card);
+
+    List<MemberDisease> getMemberDisease(String member_card);
 }
