@@ -2,10 +2,12 @@ package cn.net.yzl.crm.customer.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.util.Date;
 
 @ApiModel("顾客购买商品效果")
+@Data
 public class MemberProductEffect {
 
     private int id;
@@ -15,6 +17,12 @@ public class MemberProductEffect {
 
     @ApiModelProperty("订单号")
     private String order_no;
+
+    @ApiModelProperty("商品编号")
+    private String product_code;
+
+    @ApiModelProperty("商品名称")
+    private String product_name;
 
     @ApiModelProperty("每天吃多少")
     private int eating_perday;

@@ -299,19 +299,19 @@
 
     <select id="getMemberProductEffectList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberProductEffect">
         select  member_card,order_no,product_code,eating_perday,product_last_num,
-                due_date,taking_state,taking_effect,product_count
+                due_date,taking_state,taking_effect,product_count,product_code,product_name
          from   member_product_effect
          where  member_card=#{member_card}
                 and due_date  <![CDATA[ > ]]> now()
     </select>
 
     <select id="getProductConsultationList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.ProductConsultation">
-        select  id,member_card,product_code
+        select  id,member_card,product_code,product_name
         from product_consultation where member_card=#{member_card}
     </select>
 
     <select id="getMemberDisease" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberDisease">
-        select member_card,old_id as disease_id,disease_name
+        select id, member_card,disease_id,disease_name
         from   member_disease
         where  member_card=#{member_card}
 
