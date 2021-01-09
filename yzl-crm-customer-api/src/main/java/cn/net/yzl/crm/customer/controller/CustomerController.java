@@ -5,6 +5,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.service.MemberService;
+import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -166,4 +167,88 @@ public class CustomerController {
         List<MemberDisease> memberDiseaseList = memberService.getMemberDisease(member_card);
         return GeneralResult.success(memberDiseaseList);
     }
+
+    @ApiOperation("保存收货地址")
+    @PostMapping("/v1/saveReveiverAddress")
+    public GeneralResult saveReveiverAddress(@RequestBody ReveiverAddress reveiverAddress) {
+        if (reveiverAddress == null) return GeneralResult.errorWithMessage(101, "参数空");
+
+        // member_card为空表示是新增
+        if (StringUtil.isNullOrEmpty(reveiverAddress.getMember_card())) {
+
+            //todo 生成 Reveiver_address_code
+
+            //   reveiverAddress.setReveiver_address_code();
+            memberService.saveReveiverAddress(reveiverAddress);
+        } else {
+            memberService.updateReveiverAddress(reveiverAddress);
+        }
+        return GeneralResult.success();
+    }
+
+    @ApiOperation("获取顾客收货地址")
+    @GetMapping("/v1/getReveiverAddress")
+    public GeneralResult getReveiverAddress(
+            @RequestParam("member_card")
+            @NotBlank(message = "member_card不能为空")
+            @ApiParam(name = "member_card", value = "会员卡号", required = true)
+                    String member_card
+    ) {
+        List<ReveiverAddress> reveiverAddressList = memberService.getReveiverAddress(member_card);
+        return GeneralResult.success(reveiverAddressList);
+    }
+
+
+    @ApiOperation("获取顾客购买能力")
+    @GetMapping("/v1/getMemberOrderStat")
+    public GeneralResult getMemberOrderStat(
+            @RequestParam("member_card")
+            @NotBlank(message = "member_card不能为空")
+            @ApiParam(name = "member_card", value = "会员卡号", required = true)
+                    String member_card
+    ) {
+        MemberOrderStat memberOrderStat = memberService.getMemberOrderStat(member_card);
+        return GeneralResult.success(memberOrderStat);
+    }
+
+    @ApiOperation("保存顾客购买能力")
+    @PostMapping("/v1/saveMemberOrderStat")
+    public GeneralResult saveMemberOrderStat(@RequestBody MemberOrderStat memberOrderStat) {
+        if (memberOrderStat == null) return GeneralResult.errorWithMessage(101, "参数空");
+        if (StringUtil.isNullOrEmpty(memberOrderStat.getMember_card())) {
+            //todo 生成code码
+            memberService.addMemberOrderStat(memberOrderStat);
+        } else {
+            memberService.updateMemberOrderStat(memberOrderStat);
+        }
+        return GeneralResult.success();
+    }
+
+    @ApiOperation("保存顾客行为偏好")
+    @PostMapping("/v1/getMemberAction")
+    public GeneralResult saveMemberAction(@RequestBody MemberAction memberAction) {
+        if (memberAction == null) return GeneralResult.errorWithMessage(101, "参数空");
+        if (StringUtil.isNullOrEmpty(memberAction.getMember_card())) {
+            //todo 生成code码
+            memberService.saveMemberAction(memberAction);
+        } else {
+            memberService.updateMemberAction(memberAction);
+        }
+        return GeneralResult.success();
+    }
+
+
+    @ApiOperation("获取顾客行为偏好")
+    @PostMapping("/v1/getMemberAction")
+    public GeneralResult getMemberAction(
+            @RequestParam("member_card")
+            @NotBlank(message = "member_card不能为空")
+            @ApiParam(name = "member_card", value = "会员卡号", required = true)
+                    String member_card
+
+    ) {
+        MemberAction memberAction = memberService.getMemberAction(member_card);
+        return GeneralResult.success(memberAction);
+    }
+
 }

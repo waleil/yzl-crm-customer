@@ -109,5 +109,63 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.getMemberDisease(member_card);
     }
 
+    @Override
+    public void saveReveiverAddress(ReveiverAddress reveiverAddress) {
+        memberMapper.saveReveiverAddress(reveiverAddress);
+    }
+
+    @Override
+    public void updateReveiverAddress(ReveiverAddress reveiverAddress) {
+        memberMapper.updateReveiverAddress(reveiverAddress);
+    }
+
+    @Override
+    public List<ReveiverAddress> getReveiverAddress(String member_card) {
+        return memberMapper.getReveiverAddress(member_card);
+    }
+
+    @Override
+    public MemberOrderStat getMemberOrderStat(String member_card) {
+        return memberMapper.getMemberOrderStat(member_card);
+    }
+
+    /**
+     * 保存顾客购买能力
+     * @param memberOrderStat
+     */
+    @Override
+    public void addMemberOrderStat(MemberOrderStat memberOrderStat) {
+        memberMapper.addMemberOrderStat(memberOrderStat);
+    }
+
+    /**
+     * 修改顾客购买能力
+     * @param memberOrderStat
+     */
+    @Override
+    public void updateMemberOrderStat(MemberOrderStat memberOrderStat) {
+        memberMapper.updateMemberOrderStat(memberOrderStat);
+    }
+
+    /**
+     * 获取顾客行为偏好
+     * @param member_card
+     * @return
+     */
+    @Override
+    public MemberAction getMemberAction(String member_card) {
+        return memberMapper.getMemberAction(member_card);
+    }
+
+    @Override
+    public void saveMemberAction(MemberAction memberAction) {
+        memberMapper.saveMemberAction(memberAction);
+    }
+
+    @Override
+    public void updateMemberAction(MemberAction memberAction) {
+        memberMapper.updateMemberAction(memberAction);
+    }
+
 
 }

@@ -316,4 +316,157 @@
         where  member_card=#{member_card}
 
     </select>
+
+    <insert id="saveReveiverAddress" parameterType="cn.net.yzl.crm.customer.model.ReveiverAddress" >
+        insert into reveiver_address(reveiver_address_code,member_card,member_name,member_mobile,
+        member_province_no,member_province_name,
+        member_city_no,member_city_name,
+        member_county_no,member_county_name,
+        member_street_no,member_street_name,
+        member_address,create_code,update_code
+        )
+        values(
+        #{reveiver_address_code},#{member_card},#{member_name},#{member_mobile},
+        #{member_province_no},#{member_province_name},
+        #{member_city_no},#{member_city_name},
+        #{member_county_no},#{member_county_name},
+        #{member_street_no},#{member_street_name},
+        #{member_address},#{create_code},#{update_code}
+        )
+    </insert>
+
+    <update id="updateReveiverAddress" parameterType="cn.net.yzl.crm.customer.model.ReveiverAddress" >
+        update reveiver_address
+        set member_mobile=#{member_mobile},
+            member_province_no=#{member_province_no},
+            member_province_name=#{member_province_name},
+            member_city_no=#{member_city_no},
+            member_city_name=#{member_city_name},
+            member_county_no=#{member_county_no},
+            member_county_name=#{member_county_name},
+            member_street_no=#{member_street_no},
+            member_street_name=#{member_street_name},
+            member_address=#{member_address},
+            create_code=#{create_code},
+            update_code=#{update_code}
+        where reveiver_address_code=#{reveiver_address_code}
+
+    </update>
+
+    <select id="getReveiverAddress" parameterType="String" resultType="cn.net.yzl.crm.customer.model.ReveiverAddress" >
+            select
+                    reveiver_address_code,member_card,member_name,member_mobile,
+                    member_province_no,member_province_name,
+                    member_city_no,member_city_name,
+                    member_county_no,member_county_name,
+                    member_street_no,member_street_name,
+                    member_address,create_code,update_code
+
+            from reveiver_address where member_card=#{member_card}
+    </select>
+
+    <select id="getMemberOrderStat" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberOrderStat">
+        select member_card,total_counsum_amount,total_invest_amount,first_order_time,last_order_time,last_buy_product_code,
+            first_order_staff_no,first_order_no,first_buy_product_code,first_order_am,order_high_am,order_low_am,
+            order_avg_am,product_type_cnt,buy_count,day_avg_count,year_avg_count,return_goods_rate
+        from member_order_stat
+        where member_card=#{member_card}
+
+    </select>
+
+    <insert id="addMemberOrderStat" parameterType="cn.net.yzl.crm.customer.model.MemberOrderStat" >
+        insert into member_order_stat(
+        member_card,
+        total_counsum_amount,
+        total_invest_amount,
+        first_order_time,
+        last_order_time,
+        last_buy_product_code,
+        first_order_staff_no,
+        first_order_no,
+        first_buy_product_code,
+        first_order_am,
+        order_high_am,
+        order_low_am,
+        order_avg_am,
+        product_type_cnt,
+        buy_count,
+        day_avg_count,
+        year_avg_count,
+        return_goods_rate
+        )
+        values(
+        #{member_card},
+        #{total_counsum_amount},
+        #{total_invest_amount},
+        #{first_order_time},
+        #{last_order_time},
+        #{last_buy_product_code},
+        #{first_order_staff_no},
+        #{first_order_no},
+        #{first_buy_product_code},
+        #{first_order_am},
+        #{order_high_am},
+        #{order_low_am},
+        #{order_avg_am},
+        #{product_type_cnt},
+        #{buy_count},
+        #{day_avg_count},
+        #{year_avg_count},
+        #{return_goods_rate}
+        )
+    </insert>
+
+    <update id="updateMemberOrderStat" parameterType="cn.net.yzl.crm.customer.model.MemberOrderStat">
+        update member_order_stat
+        set  total_counsum_amount=#{total_counsum_amount},
+            total_invest_amount=#{total_invest_amount},
+            first_order_time=#{first_order_time},
+            last_order_time=#{last_order_time},
+            last_buy_product_code=#{last_buy_product_code},
+            first_order_staff_no=#{first_order_staff_no},
+            first_order_no=#{first_order_no},
+            first_buy_product_code=#{first_buy_product_code},
+            first_order_am=#{first_order_am},
+            order_high_am=#{order_high_am},
+            order_low_am=#{order_low_am},
+            order_avg_am=#{order_avg_am},
+            product_type_cnt=#{product_type_cnt},
+            buy_count=#{buy_count},
+            day_avg_count=#{day_avg_count},
+            year_avg_count=#{year_avg_count},
+            return_goods_rate=#{return_goods_rate}
+        where member_card=#{member_card}
+    </update>
+    
+    <select id="getMemberAction" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberAction">
+        select  member_card,
+                phone_time,nature,
+                response_time,
+                action,
+                order_action,
+                active
+        from member_action
+        where member_card=#{member_card}
+    </select>
+    
+    <insert id="saveMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction" >
+        insert into member_action(
+                member_card,
+                phone_time,nature,
+                response_time,
+                action,
+                order_action,
+                active
+        )
+        values(
+                #{member_card},
+                #{phone_time,nature},
+                #{response_time},
+                #{action},
+                #{order_action},
+                #{active}
+        )
+    </insert>
+
 </mapper>
