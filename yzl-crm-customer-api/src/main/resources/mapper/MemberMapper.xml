@@ -441,7 +441,8 @@
     
     <select id="getMemberAction" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberAction">
         select  member_card,
-                phone_time,nature,
+                phone_time,
+                nature,
                 response_time,
                 action,
                 order_action,
@@ -453,7 +454,8 @@
     <insert id="saveMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction" >
         insert into member_action(
                 member_card,
-                phone_time,nature,
+                phone_time,
+                nature,
                 response_time,
                 action,
                 order_action,
@@ -461,12 +463,25 @@
         )
         values(
                 #{member_card},
-                #{phone_time,nature},
+                #{phone_time},
+                #{nature},
                 #{response_time},
                 #{action},
                 #{order_action},
                 #{active}
         )
     </insert>
+
+    <update id="updateMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction">
+        update member_action
+               set
+                phone_time=phone_time +','+ #{phone_time},
+                nature=nature+ ','+ #{nature},
+                response_time=response_time + ','+ #{response_time},
+                action=action+ ','+ #{action},
+                order_action=order_action + ','+ #{order_action},
+                active= active + ','+ #{active}
+        where member_card=#{member_card}
+    </update>
 
 </mapper>

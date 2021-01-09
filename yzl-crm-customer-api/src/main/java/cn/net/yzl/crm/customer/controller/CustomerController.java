@@ -225,7 +225,7 @@ public class CustomerController {
     }
 
     @ApiOperation("保存顾客行为偏好")
-    @PostMapping("/v1/getMemberAction")
+    @PostMapping("/v1/saveMemberAction")
     public GeneralResult saveMemberAction(@RequestBody MemberAction memberAction) {
         if (memberAction == null) return GeneralResult.errorWithMessage(101, "参数空");
         if (StringUtil.isNullOrEmpty(memberAction.getMember_card())) {
