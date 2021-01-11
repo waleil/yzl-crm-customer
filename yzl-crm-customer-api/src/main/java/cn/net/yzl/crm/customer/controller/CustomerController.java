@@ -266,7 +266,7 @@ public class CustomerController {
     }
 
     @ApiOperation("根据一批会员卡号获取会员信息，会员卡号用英文逗号分隔")
-    @PostMapping("/v1/getMemberList")
+    @GetMapping("/v1/getMemberList")
     public ComResponse getMemberList(
             @RequestParam("member_cards")
             @NotBlank(message = "member_cards不能为空")
