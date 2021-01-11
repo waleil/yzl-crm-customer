@@ -17,6 +17,9 @@ public class MemberPhone {
     @ApiModelProperty("电话号")
     private String phone_number;
 
+    @ApiModelProperty("手机归属地")
+    private String phone_place;
+
     @ApiModelProperty("服务提供商，1 移动，2联通，3电信")
     private int service_provider;
     @ApiModelProperty("1 移动电话，2座机")

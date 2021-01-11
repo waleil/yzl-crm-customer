@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.service;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 
 import java.util.List;
 
@@ -68,4 +69,6 @@ public interface MemberService {
     void saveMemberAction(MemberAction memberAction);
 
     void updateMemberAction(MemberAction memberAction);
+
+    List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
 }

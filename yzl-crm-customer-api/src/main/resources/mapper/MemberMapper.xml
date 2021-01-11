@@ -268,7 +268,7 @@
     </select>
     <!--根据顾客号查询顾客手机号信息 -->
     <select id="getMemberPhoneList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberPhone">
-        select id,member_card,phone_number,service_provider,phone_type
+        select id,member_card,phone_number,phone_place,service_provider,phone_type
         from member_phone
         where enabled=1  and member_card=#{member_card}
 
@@ -483,5 +483,31 @@
                 active= active + ','+ #{active}
         where member_card=#{member_card}
     </update>
+
+    <select id="getMemberList" resultType="cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel" >
+        select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code, is_active,
+    member_status, activity, region_code, province_code, city_code, total_amount, qq,id_card,
+    wechat, email, source, address, birthday, job_code, m.first_order_time, m.last_order_time,
+    master_card, m.first_order_staff_no, m.first_order_am, order_num, media_name, media_type_code,
+    media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag,member_type,
+     total_counsum_amount,
+        total_invest_amount,
+        last_buy_product_code,
+        first_order_no,
+        first_buy_product_code,
+        order_high_am,
+        order_low_am,
+        order_avg_am,
+        product_type_cnt,
+        buy_count,
+        day_avg_count,
+        year_avg_count,
+        return_goods_rate
+        from member m inner join member_order_stat o on m.member_card= o.member_card
+        where m.member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 
 </mapper>

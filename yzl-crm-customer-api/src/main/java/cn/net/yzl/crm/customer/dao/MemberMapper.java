@@ -4,6 +4,7 @@ import cn.net.yzl.crm.customer.config.db.DataSourceSelector;
 import cn.net.yzl.crm.customer.config.db.DynamicDataSourceEnum;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -85,4 +86,6 @@ public interface MemberMapper {
     void saveMemberAction(MemberAction memberAction);
 
     void updateMemberAction(MemberAction memberAction);
+
+    List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
 }

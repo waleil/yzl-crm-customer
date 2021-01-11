@@ -7,6 +7,7 @@ import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
 import cn.net.yzl.crm.customer.service.MemberService;
+import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -165,6 +166,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void updateMemberAction(MemberAction memberAction) {
         memberMapper.updateMemberAction(memberAction);
+    }
+
+    @Override
+    public List<MemberOrderStatViewModel> getMemberList(List<String> member_cards) {
+        return memberMapper.getMemberList(member_cards);
     }
 
 
