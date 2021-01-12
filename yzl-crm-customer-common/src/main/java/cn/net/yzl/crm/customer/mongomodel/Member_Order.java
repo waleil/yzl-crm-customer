@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel("顾客订单数据实体类")
-public class MemberOrderMongo {
+public class Member_Order {
     @ApiModelProperty("支付方式")
     private List<String> pay_type;
 

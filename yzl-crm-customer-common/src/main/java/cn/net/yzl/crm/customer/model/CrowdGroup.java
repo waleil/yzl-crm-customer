@@ -4,10 +4,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @ApiModel("人群圈选实体类")
 @Data
 public class CrowdGroup {
-    private int id;
+    private String id;
 
     @ApiModelProperty("群组名称")
     private String name;
@@ -41,9 +43,13 @@ public class CrowdGroup {
     @ApiModelProperty("修改人")
     private String update_code;
 
-    private String label_condition;
 
     @ApiModelProperty("群组人数")
     private int person_count;
+
+
+
+
+
 
 }

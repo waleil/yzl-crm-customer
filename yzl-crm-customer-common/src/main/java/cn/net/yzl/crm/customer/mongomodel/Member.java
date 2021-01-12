@@ -1,14 +1,11 @@
 package cn.net.yzl.crm.customer.mongomodel;
-
 import cn.net.yzl.crm.customer.model.MemberBaseAttr;
 import cn.net.yzl.crm.customer.model.MemberPhone;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
-
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
-
-public class MemberMongo {
+public class Member {
     @ApiModelProperty(value = "主键")
     private Integer id;
     @ApiModelProperty(value = "会员卡号")
@@ -53,6 +50,8 @@ public class MemberMongo {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty(value = "会员生日")
     private String birthday;
+    @ApiModelProperty("生日月份")
+    private int member_month;
     @ApiModelProperty(value = "所属行业")
     private String job_code;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -75,7 +74,6 @@ public class MemberMongo {
     private Integer media_type_code;
     @ApiModelProperty(value = "媒体类型名称（冗余，暂定第一次进线）")
     private String media_type_name;
-
     @ApiModelProperty(value = "是否vip")
     private boolean vip_flag;
     @ApiModelProperty(value = "0表示系统自动创建，1 坐席添加")
@@ -86,48 +84,33 @@ public class MemberMongo {
     private String intro_name;
     @ApiModelProperty(value = "介绍人类型，1员工，2顾客")
     private int intro_type;
-
     @ApiModelProperty("所属区")
     private String region_name;
-
     @ApiModelProperty("广告名称")
     private String adver_name;
-
     private List<MemberPhone> memberPhoneList;
     @ApiModelProperty("建档时间")
     private  String create_time;
     @ApiModelProperty("顾客类型")
     private String member_type;
-
     @ApiModelProperty("累计消费金额")
     private int total_counsum_amount;
-
     @ApiModelProperty("累计充值金额")
     private int total_invest_amount;
-
-
     @ApiModelProperty("最后一次购买商品")
     private String last_buy_product_code;
-
-
-
     @ApiModelProperty("首单订单编号")
     private String first_order_no;
-
     @ApiModelProperty("首次购买商品")
     private String first_buy_product_code;
-
-
     @ApiModelProperty("订单最高金额")
     private int order_high_am;
     @ApiModelProperty("订单最低金额")
     private int order_low_am;
     @ApiModelProperty("订单平均金额")
     private int order_avg_am;
-
     @ApiModelProperty("购买产品种类个数")
     private int product_type_cnt;
-
     @ApiModelProperty("累计购买次数")
     private int buy_count;
     @ApiModelProperty("总平均购买天数")
@@ -136,16 +119,18 @@ public class MemberMongo {
     private int year_avg_count;
     @ApiModelProperty("退货率")
     private String return_goods_rate;
-
     @ApiModelProperty("顾客基本属性")
     private MemberBaseAttr memberBaseAttr;
-
     @ApiModelProperty("累计订单总金额")
     private int total_order_amount;
-
     @ApiModelProperty("订单应收总金额")
     private int order_rec_amount;
-
-    @ApiModelProperty("是否下过订单")
+    @ApiModelProperty("是否下过订单 1是，0否，-1 不做统计查询")
     private int have_order;
+
+    @ApiModelProperty("订单总金额")
+    private int order_total_amount;
+
+
+
 }
