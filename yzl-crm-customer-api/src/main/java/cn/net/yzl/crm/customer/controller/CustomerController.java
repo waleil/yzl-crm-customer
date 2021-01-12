@@ -107,6 +107,12 @@ public class CustomerController {
         return GeneralResult.success(member);
     }
 
+//    @GetMapping("getMemberByPHone1")
+//    public GeneralResult getMemberByPHone1(){
+//        GeneralResult<Member> result= this.getMemberByPhone("13832955330");
+//        return result;
+//    }
+
     /**
      * 设置顾客为会员
      *
@@ -312,5 +318,7 @@ public class CustomerController {
         Page<CrowdGroup> page = memberService.getCrowdGroupByPage(crowdGroupDTO);
         return ComResponse.success(page);
     }
+
+
 
 }
