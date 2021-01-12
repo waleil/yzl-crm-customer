@@ -4,6 +4,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.mongomodel.Member_Crowd_Group;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 
 import java.util.List;
@@ -87,4 +88,6 @@ public interface MemberService {
     List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds);
 
     Page<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
+
+    void saveMemberCrowdGroup(Member_Crowd_Group member_crowd_group);
 }

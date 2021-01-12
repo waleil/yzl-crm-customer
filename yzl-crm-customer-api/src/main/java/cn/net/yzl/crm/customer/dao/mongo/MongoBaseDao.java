@@ -1,4 +1,4 @@
-package cn.net.yzl.crm.customer.config.mongodb;
+package cn.net.yzl.crm.customer.dao.mongo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

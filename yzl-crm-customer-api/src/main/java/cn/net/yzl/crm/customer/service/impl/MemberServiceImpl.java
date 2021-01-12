@@ -3,10 +3,12 @@ package cn.net.yzl.crm.customer.service.impl;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
+import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
+import cn.net.yzl.crm.customer.mongomodel.Member_Crowd_Group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import com.github.pagehelper.PageHelper;
@@ -22,6 +24,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberMapper memberMapper;
+    @Autowired
+    MemberCrowdGroupDao memberCrowdGroupDao;
 
     @Override
     public List<MemberGrad> getMemberGrad() {
@@ -202,6 +206,15 @@ public class MemberServiceImpl implements MemberService {
         Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
 
         return page;
+    }
+
+    /**
+     * 保存顾客圈选
+     * @param member_crowd_group
+     */
+    @Override
+    public void saveMemberCrowdGroup(Member_Crowd_Group member_crowd_group) {
+        memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
     }
 
 

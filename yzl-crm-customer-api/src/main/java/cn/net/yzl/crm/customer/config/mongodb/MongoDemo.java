@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.config.mongodb;
 
+import cn.net.yzl.crm.customer.dao.mongo.MongoBaseDao;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

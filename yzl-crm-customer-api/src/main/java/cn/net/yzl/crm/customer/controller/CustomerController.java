@@ -7,6 +7,7 @@ import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.mongomodel.Member_Crowd_Group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -305,10 +306,10 @@ public class CustomerController {
 
     @ApiOperation("保存圈选")
     @PostMapping("/v1/addCrowdGroup")
-    public ComResponse addCrowdGroup(CrowdGroup crowdGroup) {
+    public ComResponse addCrowdGroup(@RequestBody Member_Crowd_Group crowdGroup) {
         if (crowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
-        int crowId = memberService.addCrowdGroup(crowdGroup);
-        return ComResponse.success(crowId);
+        memberService.saveMemberCrowdGroup(crowdGroup);
+        return ComResponse.success();
     }
 
     @ApiOperation("分页获取群组列表")
