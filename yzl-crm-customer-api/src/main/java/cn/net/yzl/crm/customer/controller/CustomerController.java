@@ -3,9 +3,11 @@ package cn.net.yzl.crm.customer.controller;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.service.MemberService;
+import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
@@ -285,12 +287,23 @@ public class CustomerController {
             @RequestParam("crowdGroupIds")
             @NotBlank(message = "crowdGroupIds不能为空")
             @ApiParam(name = "crowdGroupIds", value = "群组id", required = true)
-            String crowdGroupIds){
+                    String crowdGroupIds) {
 
-        List<Integer> groupIds=Arrays.asList(crowdGroupIds.split(",")).
+        List<Integer> groupIds = Arrays.asList(crowdGroupIds.split(",")).
                 stream().map(Integer::parseInt).collect(Collectors.toList());
-        List<CrowdGroup> crowdGroupList=memberService.getCrowdGroupByIds(groupIds);
+        List<CrowdGroup> crowdGroupList = memberService.getCrowdGroupByIds(groupIds);
         return ComResponse.success(crowdGroupList);
 
     }
+
+    @ApiOperation("保存圈选")
+    @PostMapping("/v1/addCrowdGroup")
+    public ComResponse addCrowdGroup(CrowdGroup crowdGroup) {
+        if (crowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        int crowId = memberService.addCrowdGroup(crowdGroup);
+        return ComResponse.success(crowId);
+    }
+
+
+
 }
