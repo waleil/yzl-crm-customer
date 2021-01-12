@@ -510,4 +510,87 @@
         </foreach>
     </select>
 
+    <insert id="addCrowdGroup" useGeneratedKeys="true" keyProperty="id" parameterType="cn.net.yzl.crm.customer.model.CrowdGroup">
+        insert into crowd_group(
+        name,
+        description,
+        enabled,
+        effective_date,
+        expire_date,
+        del,
+        create_code,
+        create_name,
+        update_code,
+        update_name,
+        person_count
+        )
+        values(
+         #{name},
+        #{description},
+        #{enabled},
+        #{effective_date},
+        #{expire_date},
+        #{del},
+        #{create_code},
+        #{create_name},
+        #{update_code},
+        #{update_name},
+        #{person_count}
+        )
+    </insert>
+
+    <select id="getCrowdGroupByPage" parameterType="cn.net.yzl.crm.customer.dto.CrowdGroupDTO" resultType="cn.net.yzl.crm.customer.model.CrowdGroup">
+
+        select
+            id,
+            name,
+            description,
+            enabled,
+            effective_date,
+            expire_date,
+            create_time,
+            create_code,
+            create_name,
+            update_time,
+            update_name,
+            person_count
+        from crowd_group
+        <where>
+            del=0
+            <if test="name != null and name !=''">
+                and name =#{name}
+            </if>
+            <if test="enable != -1">
+                and enable=#{enable}
+            </if>
+            <if test="lastOrderTimeStart != null and lastOrderTimeStart != ''">
+                and m.create_time <![CDATA[ >= ]]> #{start_date}
+            </if>
+            <if test="lastOrderTimeEnd != null and lastOrderTimeEnd != ''">
+                and m.create_time <![CDATA[ <= ]]> #{end_date}
+            </if>
+        </where>
+    </select>
+    
+    <select id="getCrowdGroupByIds" resultType="cn.net.yzl.crm.customer.model.CrowdGroup" >
+         select
+            id,
+            name,
+            description,
+            enabled,
+            effective_date,
+            expire_date,
+            create_time,
+            create_code,
+            create_name,
+            update_time,
+            update_name,
+            person_count
+        from crowd_group
+        where id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
 </mapper>

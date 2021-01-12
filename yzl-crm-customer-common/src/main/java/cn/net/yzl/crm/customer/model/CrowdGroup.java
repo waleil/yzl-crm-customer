@@ -15,8 +15,8 @@ public class CrowdGroup {
     @ApiModelProperty("群组描述")
     private String description;
 
-    @ApiModelProperty("是否启用 true 启用，false未启用")
-    private  boolean enabled;
+    @ApiModelProperty("是否启用:0=否，1=是")
+    private  int enabled;
     @ApiModelProperty("生效时间")
     private String effective_date;
 
@@ -29,8 +29,11 @@ public class CrowdGroup {
     @ApiModelProperty("创建时间")
     private  String create_time;
 
-    @ApiModelProperty("创建人")
+    @ApiModelProperty("创建人编码")
     private String create_code;
+
+    @ApiModelProperty("创建人姓名")
+    private String create_name;
 
     @ApiModelProperty("修改时间")
     private String update_time;

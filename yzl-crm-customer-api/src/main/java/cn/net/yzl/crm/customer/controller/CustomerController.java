@@ -18,6 +18,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(value="CustomerController",tags = {"顾客服务"})
 @RestController
@@ -276,5 +277,20 @@ public class CustomerController {
         List<String> list = Arrays.asList(member_cards.split(","));
         List<MemberOrderStatViewModel> memberOrderStatViewModels = memberService.getMemberList(list);
         return ComResponse.success(memberOrderStatViewModels);
+    }
+
+    @ApiOperation("根据一批顾客群组id获取群组信息,用英文逗号分隔")
+    @GetMapping("/v1/getCrowdGroupList")
+    public ComResponse getCrowdGroupList(
+            @RequestParam("crowdGroupIds")
+            @NotBlank(message = "crowdGroupIds不能为空")
+            @ApiParam(name = "crowdGroupIds", value = "群组id", required = true)
+            String crowdGroupIds){
+
+        List<Integer> groupIds=Arrays.asList(crowdGroupIds.split(",")).
+                stream().map(Integer::parseInt).collect(Collectors.toList());
+        List<CrowdGroup> crowdGroupList=memberService.getCrowdGroupByIds(groupIds);
+        return ComResponse.success(crowdGroupList);
+
     }
 }

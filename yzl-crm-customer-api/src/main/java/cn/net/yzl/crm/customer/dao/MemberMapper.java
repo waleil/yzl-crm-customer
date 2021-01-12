@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.config.db.DataSourceSelector;
 import cn.net.yzl.crm.customer.config.db.DynamicDataSourceEnum;
+import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -88,4 +89,19 @@ public interface MemberMapper {
     void updateMemberAction(MemberAction memberAction);
 
     List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
+
+    /**
+     *  添加顾客群组
+     * @param crowdGroup
+     * @return
+     */
+    int addCrowdGroup(CrowdGroup crowdGroup);
+
+    List<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
+
+    /**
+     * 根据圈选id批量获取圈选
+     * @return
+     */
+    List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds);
 }

@@ -173,5 +173,20 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.getMemberList(member_cards);
     }
 
+    /**
+     * 添加顾客圈选
+     * @param crowdGroup
+     * @return
+     */
+    @Override
+    public int addCrowdGroup(CrowdGroup crowdGroup) {
+        return memberMapper.addCrowdGroup(crowdGroup);
+    }
+
+    @Override
+    public List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds) {
+        return memberMapper.getCrowdGroupByIds(groupIds);
+    }
+
 
 }

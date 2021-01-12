@@ -140,6 +140,12 @@ public class MemberMongo {
     @ApiModelProperty("顾客基本属性")
     private MemberBaseAttr memberBaseAttr;
 
+    @ApiModelProperty("累计订单总金额")
+    private int total_order_amount;
 
+    @ApiModelProperty("订单应收总金额")
+    private int order_rec_amount;
 
+    @ApiModelProperty("是否下过订单")
+    private int have_order;
 }

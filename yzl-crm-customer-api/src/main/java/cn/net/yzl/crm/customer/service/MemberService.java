@@ -71,4 +71,17 @@ public interface MemberService {
     void updateMemberAction(MemberAction memberAction);
 
     List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
+
+    /**
+     *  添加顾客群组
+     * @param crowdGroup
+     * @return
+     */
+    int addCrowdGroup(CrowdGroup crowdGroup);
+
+    /**
+     * 根据圈选id批量获取圈选
+     * @return
+     */
+    List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds);
 }
