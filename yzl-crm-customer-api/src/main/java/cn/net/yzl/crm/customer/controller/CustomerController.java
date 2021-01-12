@@ -257,7 +257,7 @@ public class CustomerController {
     }
 
     @ApiOperation("获取顾客行为偏好")
-    @PostMapping("/v1/getMemberAction")
+    @GetMapping("/v1/getMemberAction")
     public GeneralResult getMemberAction(
             @RequestParam("member_card")
             @NotBlank(message = "member_card不能为空")
