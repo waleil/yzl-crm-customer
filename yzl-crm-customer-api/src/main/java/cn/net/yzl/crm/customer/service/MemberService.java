@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.service;
 
 import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -84,4 +85,6 @@ public interface MemberService {
      * @return
      */
     List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds);
+
+    Page<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
 }

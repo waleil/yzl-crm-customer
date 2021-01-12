@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.service.impl;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
+import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
@@ -186,6 +187,21 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds) {
         return memberMapper.getCrowdGroupByIds(groupIds);
+    }
+
+    @Override
+    public Page<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
+        if (crowdGroupDTO.getCurrentPage() == null || crowdGroupDTO.getCurrentPage() == 0) {
+            crowdGroupDTO.setCurrentPage(1);
+        }
+        if (crowdGroupDTO.getPageSize() == null || crowdGroupDTO.getPageSize() == 0) {
+            crowdGroupDTO.setPageSize(10);
+        }
+        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
+        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
+        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
+
+        return page;
     }
 
 

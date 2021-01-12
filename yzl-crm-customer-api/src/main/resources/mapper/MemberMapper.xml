@@ -545,7 +545,7 @@
             id,
             name,
             description,
-            enabled,
+            enable,
             effective_date,
             expire_date,
             create_time,
@@ -563,10 +563,10 @@
             <if test="enable != -1">
                 and enable=#{enable}
             </if>
-            <if test="lastOrderTimeStart != null and lastOrderTimeStart != ''">
+            <if test="start_date != null and start_date != ''">
                 and m.create_time <![CDATA[ >= ]]> #{start_date}
             </if>
-            <if test="lastOrderTimeEnd != null and lastOrderTimeEnd != ''">
+            <if test="end_date != null and end_date != ''">
                 and m.create_time <![CDATA[ <= ]]> #{end_date}
             </if>
         </where>
@@ -577,7 +577,7 @@
             id,
             name,
             description,
-            enabled,
+            enable,
             effective_date,
             expire_date,
             create_time,
