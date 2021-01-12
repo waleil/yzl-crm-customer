@@ -8,7 +8,7 @@ import java.util.List;
 
 @ApiModel("顾客圈选实体类")
 @Data
-public class Crowd_Group {
+public class Member_Crowd_Group {
     @ApiModelProperty("群组id")
     private String crowd_id;
     @ApiModelProperty("群组名称")
