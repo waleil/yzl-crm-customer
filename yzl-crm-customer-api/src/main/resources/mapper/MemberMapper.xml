@@ -527,7 +527,7 @@
         values(
          #{name},
         #{description},
-        #{enabled},
+        #{enable},
         #{effective_date},
         #{expire_date},
         #{del},

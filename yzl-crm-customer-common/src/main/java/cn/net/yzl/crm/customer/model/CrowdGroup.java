@@ -16,7 +16,7 @@ public class CrowdGroup {
     private String description;
 
     @ApiModelProperty("是否启用:0=否，1=是")
-    private  int enabled;
+    private  int enable;
     @ApiModelProperty("生效时间")
     private String effective_date;
 
