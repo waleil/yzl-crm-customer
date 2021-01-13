@@ -39,8 +39,8 @@ public class member_crowd_group {
 
     @ApiModelProperty("群组人数")
     private int person_count;
-    @ApiModelProperty("性别")
-    private List<String> sex;
+    @ApiModelProperty("性别： 0男，1女，-1不做条件判断")
+    private int sex;
     @ApiModelProperty("顾客年龄段")
     private List<Member_Age> age;
     @ApiModelProperty("顾客圈选地区")
@@ -91,8 +91,8 @@ public class member_crowd_group {
     private List<crowd_member_action> active_like;
 
 
-    @ApiModelProperty("支付方式：0=货到付款，1=款到发货")
-    private List<Integer> pay_type;
+    @ApiModelProperty("支付方式：0=货到付款，1=款到发货，-1不做条件判断")
+    private int pay_type;
     @ApiModelProperty("支付形式：0=快递待办，1=微信转账、2=支付宝转账、3=银行卡转账、4=客户账户扣款")
     private List<Integer> pay_form;
     @ApiModelProperty("签收时间截止今日，-1表示不做条件统计")
