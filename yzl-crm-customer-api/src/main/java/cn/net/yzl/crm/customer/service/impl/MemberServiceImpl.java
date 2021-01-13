@@ -227,5 +227,10 @@ public class MemberServiceImpl implements MemberService {
         return memberCrowdGroupDao.getMemberCrowdGroup(crowdId);
     }
 
+    @Override
+    public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
+        memberCrowdGroupDao.updateMemberCrowdGroup(member_crowd_group);
+    }
+
 
 }

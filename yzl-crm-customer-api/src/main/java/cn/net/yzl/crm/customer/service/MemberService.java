@@ -97,4 +97,6 @@ public interface MemberService {
      * @return
      */
     member_crowd_group getMemberCrowdGroup(String crowdId);
+
+    void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception;
 }

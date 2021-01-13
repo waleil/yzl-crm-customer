@@ -314,8 +314,13 @@ public class CustomerController {
     @PostMapping("/v1/updateCrowdGroup")
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
-
-        return ComResponse.success();
+        try {
+            memberService.updateMemberCrowdGroup(memberCrowdGroup);
+            return ComResponse.success();
+        }
+        catch (Exception exc){
+            return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE);
+        }
     }
 
 
