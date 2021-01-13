@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.mongomodel;
 
+import cn.net.yzl.crm.customer.annotations.FieldForMongo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,6 +10,8 @@ import java.util.List;
 @ApiModel("顾客圈选实体类")
 @Data
 public class member_crowd_group {
+
+    @FieldForMongo(PrimaryKey = "crowd_id")
     @ApiModelProperty("群组id")
     private String crowd_id;
     @ApiModelProperty("群组名称")
@@ -126,6 +129,8 @@ public class member_crowd_group {
     private int order_high_am;
     @ApiModelProperty("订单最低金额")
     private int order_low_am;
+    @ApiModelProperty("是否下单: 1是，0否，-1不做条件判断")
+    private int have_order;
     @ApiModelProperty("圈选病症")
     private List<crowd_disease> diseases;
 
