@@ -38,19 +38,15 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         return mongoTemplate.findOne(query, member_crowd_group.class);
     }
 
+    /**
+     * 修改顾客群圈选
+     * @param member_crowd_group
+     * @throws Exception
+     */
     public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
         if(member_crowd_group==null || StringUtil.isNullOrEmpty(member_crowd_group.getCrowd_id()))
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         QueryUpdate queryUpdate= MongoQueryUtil.getMongoQueryForUpdate(member_crowd_group);
-
-//        query.addCriteria(Criteria.where("crowd_id").is(member_crowd_group.getCrowd_id()));
-//        if(StringUtil.isNullOrEmpty(member_crowd_group.getCrowd_name())){
-//            update.set("crowd_name", member_crowd_group.getCrowd_name());
-//        }
-
-
         mongoTemplate.updateFirst(queryUpdate.getQuery(),queryUpdate.getUpdate(),this.getEntityClass());
     }
-
-
 }
