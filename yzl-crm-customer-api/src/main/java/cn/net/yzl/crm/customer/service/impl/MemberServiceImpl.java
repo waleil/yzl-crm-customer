@@ -8,7 +8,7 @@ import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
-import cn.net.yzl.crm.customer.mongomodel.Member_Crowd_Group;
+import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import com.github.pagehelper.PageHelper;
@@ -213,8 +213,18 @@ public class MemberServiceImpl implements MemberService {
      * @param member_crowd_group
      */
     @Override
-    public void saveMemberCrowdGroup(Member_Crowd_Group member_crowd_group) {
+    public void saveMemberCrowdGroup(member_crowd_group member_crowd_group) {
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
+    }
+
+    /**
+     * 获取一个圈选
+     * @param crowdId
+     * @return
+     */
+    @Override
+    public member_crowd_group getMemberCrowdGroup(String crowdId) {
+        return memberCrowdGroupDao.getMemberCrowdGroup(crowdId);
     }
 
 

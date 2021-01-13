@@ -15,5 +15,5 @@ public class Member_Area {
     @ApiModelProperty("省名称")
     private String province_name;
     @ApiModelProperty("要排除的城市")
-    private List<String> except_city_ids;
+    private List<crowd_city> except_citys;
 }

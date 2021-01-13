@@ -4,7 +4,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
-import cn.net.yzl.crm.customer.mongomodel.Member_Crowd_Group;
+import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 
 import java.util.List;
@@ -89,5 +89,12 @@ public interface MemberService {
 
     Page<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
 
-    void saveMemberCrowdGroup(Member_Crowd_Group member_crowd_group);
+    void saveMemberCrowdGroup(member_crowd_group member_crowd_group);
+
+    /**
+     * 根据crowd_id获取一个圈选
+     * @param crowdId
+     * @return
+     */
+    member_crowd_group getMemberCrowdGroup(String crowdId);
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 @ApiModel("顾客圈选实体类")
 @Data
-public class Member_Crowd_Group {
+public class member_crowd_group {
     @ApiModelProperty("群组id")
     private String crowd_id;
     @ApiModelProperty("群组名称")
@@ -33,7 +33,7 @@ public class Member_Crowd_Group {
     private String update_time;
     @ApiModelProperty("修改人")
     private String update_code;
-    private String label_condition;
+
     @ApiModelProperty("群组人数")
     private int person_count;
     @ApiModelProperty("性别")
@@ -45,7 +45,7 @@ public class Member_Crowd_Group {
     @ApiModelProperty("圈选顾客级别")
     private List<String> member_grade;
     @ApiModelProperty("活跃度")
-    private List<String> actives;
+    private List<Integer> actives;
     @ApiModelProperty("首次下单时间距离今天多少天")
     private int first_order_to_days;
     @ApiModelProperty(value = "真正首单金额")
@@ -61,7 +61,7 @@ public class Member_Crowd_Group {
     @ApiModelProperty("是否有邮箱，1有，0没有")
     private int email;
     @ApiModelProperty("获客媒体")
-    private List<String> mideaList;
+    private List<crowd_media> mediaList;
     @ApiModelProperty("是否为会员，1是，0不是")
     private int vip;
     @ApiModelProperty("是否拥有红包，1是，0不是，-1不统计")
@@ -73,14 +73,22 @@ public class Member_Crowd_Group {
     @ApiModelProperty("是否拥有储值金额，1是，0不是，-1不统计")
     private int recharge;
     @ApiModelProperty("方便接电话时间")
-    private List<Integer> phone_time;
+    private List<crowd_member_action> phone_time;
     @ApiModelProperty("性格偏好")
-    private List<Integer> nature;
+    private List<crowd_member_action> nature;
     @ApiModelProperty("响应时间")
-    private List<Integer> response_time;
+    private List<crowd_member_action> response_time;
     @ApiModelProperty("坐席性格偏好：0男，1女")
-    private List<Integer> staff_sex;
-    @ApiModelProperty("支付方式：0=货到付款，1=款到发货 ,支付形式：1=银行卡 2=微信支付 3=支付宝支付 4=现金")
+    private List<crowd_member_action> staff_sex;
+    @ApiModelProperty("综合行为")
+    private List<crowd_member_action> actions;
+    @ApiModelProperty("下单行为")
+    private List<crowd_member_action> order_action;
+    @ApiModelProperty("活动偏好")
+    private List<crowd_member_action> active_like;
+
+
+    @ApiModelProperty("支付方式：0=货到付款，1=款到发货")
     private List<Integer> pay_type;
     @ApiModelProperty("支付形式：0=快递待办，1=微信转账、2=支付宝转账、3=银行卡转账、4=客户账户扣款")
     private List<Integer> pay_form;
@@ -90,14 +98,18 @@ public class Member_Crowd_Group {
     private List<String> order_state;
     @ApiModelProperty("是否活动订单，1是，0否，-1不做统计查询")
     private int active_order;
-    @ApiModelProperty("活动id")
-    private List<String> active_ids;
-    @ApiModelProperty("活动类型")
-    private List<String> active_type;
+//    @ApiModelProperty("活动")
+//    private List<String> active_ids;
+//    @ApiModelProperty("活动类型")
+//    private List<String> active_type;
+
+    @ApiModelProperty("活动")
+    private List<crowd_active> activeList;
+
     @ApiModelProperty("订单来源: 0=电销事业中心，1=OTC ，2=淘宝 ，3=京东 ，4=自建app")
     private List<Integer> order_source;
-    @ApiModelProperty("商品Id")
-    private List<Integer> product_nos;
+    @ApiModelProperty("商品")
+    private List<crowd_product> products;
     @ApiModelProperty("支付状态：1已支付，0未支付，-1表示不做统计查询")
     private int pay_state;
     @ApiModelProperty("物流状态，-1不做统计查询")
@@ -115,7 +127,7 @@ public class Member_Crowd_Group {
     @ApiModelProperty("订单最低金额")
     private int order_low_am;
     @ApiModelProperty("圈选病症")
-    private List<Integer> disease_ids;
+    private List<crowd_disease> diseases;
 
 
 }
