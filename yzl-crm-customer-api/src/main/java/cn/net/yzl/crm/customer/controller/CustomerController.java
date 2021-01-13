@@ -305,15 +305,15 @@ public class CustomerController {
 
     @ApiOperation("添加圈选")
     @PostMapping("/v1/addCrowdGroup")
-    public ComResponse addCrowdGroup(@RequestBody member_crowd_group crowdGroup) {
-        if (crowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
-        memberService.saveMemberCrowdGroup(crowdGroup);
+    public ComResponse addCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
+        if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        memberService.saveMemberCrowdGroup(memberCrowdGroup);
         return ComResponse.success();
     }
     @ApiOperation("修改圈选")
     @PostMapping("/v1/updateCrowdGroup")
-    public ComResponse updateCrowdGroup(@RequestBody member_crowd_group crowdGroup) {
-        if (crowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+    public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
+        if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
 
         return ComResponse.success();
     }
