@@ -8,6 +8,7 @@ import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
+import cn.net.yzl.crm.customer.mongomodel.crowd_member_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -230,6 +231,16 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
         memberCrowdGroupDao.updateMemberCrowdGroup(member_crowd_group);
+    }
+
+    @Override
+    public List<crowd_member_action> getmemberActions() {
+        return memberMapper.getmemberActions();
+    }
+
+    @Override
+    public void delMemberCrowdGroup(String crowdId) {
+        memberCrowdGroupDao.delMemberCrowdGroup(crowdId);
     }
 
 

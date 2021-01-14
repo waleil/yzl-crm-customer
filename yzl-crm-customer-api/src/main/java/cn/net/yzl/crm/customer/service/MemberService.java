@@ -4,6 +4,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.mongomodel.crowd_member_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 
@@ -99,4 +100,16 @@ public interface MemberService {
     member_crowd_group getMemberCrowdGroup(String crowdId);
 
     void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception;
+
+    /**
+     * 获取顾客行为偏好字典数据
+     * @return
+     */
+    List<crowd_member_action> getmemberActions();
+
+    /**
+     * 删除圈选
+     * @param crowdId
+     */
+    void delMemberCrowdGroup(String crowdId);
 }

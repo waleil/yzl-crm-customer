@@ -5,6 +5,7 @@ import cn.net.yzl.crm.customer.config.db.DynamicDataSourceEnum;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.mongomodel.crowd_member_action;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import org.springframework.stereotype.Component;
 
@@ -104,4 +105,10 @@ public interface MemberMapper {
      * @return
      */
     List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds);
+
+    /**
+     * 获取顾客行为偏好字典数据
+     * @return
+     */
+    List<crowd_member_action> getmemberActions();
 }

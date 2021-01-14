@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("行为偏好")
+@ApiModel("顾客行为偏好")
 @Data
 public class crowd_member_action {
 

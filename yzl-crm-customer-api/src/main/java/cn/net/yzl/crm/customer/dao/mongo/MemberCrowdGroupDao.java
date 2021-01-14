@@ -49,4 +49,19 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         QueryUpdate queryUpdate= MongoQueryUtil.getMongoQueryForUpdate(member_crowd_group);
         mongoTemplate.updateFirst(queryUpdate.getQuery(),queryUpdate.getUpdate(),this.getEntityClass());
     }
+
+    /**
+     *  删除 顾客圈选，只是更改删除状态
+     * @param crowdId
+     */
+    public void delMemberCrowdGroup(String crowdId){
+        if(StringUtil.isNullOrEmpty(crowdId))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        Query query=new Query();
+        Update update=new Update();
+        query.addCriteria(Criteria.where("crowd_id").is(crowdId));
+        update.set("del",true);
+       mongoTemplate.updateFirst(query,update,member_crowd_group.class);
+    }
+
 }

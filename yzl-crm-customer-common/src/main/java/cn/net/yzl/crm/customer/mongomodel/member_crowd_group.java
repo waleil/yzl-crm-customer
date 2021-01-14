@@ -47,6 +47,8 @@ public class member_crowd_group {
     private List<Member_Area> areas;
     @ApiModelProperty("圈选顾客级别")
     private List<String> member_grade;
+    @ApiModelProperty("顾客类型")
+    private List<String> member_type;
     @ApiModelProperty("活跃度")
     private List<Integer> actives;
     @ApiModelProperty("首次下单时间距离今天多少天")

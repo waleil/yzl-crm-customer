@@ -7,6 +7,7 @@ import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.mongomodel.crowd_member_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -342,5 +343,23 @@ public class CustomerController {
         if (StringUtil.isNullOrEmpty(crowdId)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         member_crowd_group member_crowd_group = memberService.getMemberCrowdGroup(crowdId);
         return ComResponse.success(member_crowd_group);
+    }
+
+    @ApiOperation("获取顾客行为偏好字典数据")
+    @GetMapping("/v1/getMemberActions")
+    public ComResponse getMemberActions(){
+        List<crowd_member_action> list=memberService.getmemberActions();
+        return ComResponse.success(list);
+    }
+
+    @ApiOperation("删除顾客圈选")
+    @GetMapping("/v1/delMemberCrowdGroup")
+    public ComResponse delMemberCrowdGroup(
+            @RequestParam("crowdId")
+            @NotBlank(message = "crowdId不能为空")
+            @ApiParam(name = "crowdId", value = "圈选id", required = true)
+            String crowdId) {
+        memberService.delMemberCrowdGroup(crowdId);
+        return ComResponse.success();
     }
 }
