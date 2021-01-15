@@ -8,7 +8,7 @@ import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
-import cn.net.yzl.crm.customer.mongomodel.crowd_member_action;
+import cn.net.yzl.crm.customer.mongomodel.crowd_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -248,7 +248,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public List<crowd_member_action> getmemberActions() {
+    public List<crowd_action> getmemberActions() {
         return memberMapper.getmemberActions();
     }
 

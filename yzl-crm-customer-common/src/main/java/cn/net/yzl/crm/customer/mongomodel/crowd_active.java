@@ -16,4 +16,7 @@ public class crowd_active {
 
     @ApiModelProperty("活动类型")
     private int active_type;
+
+    @ApiModelProperty("是否包含，1是，0否")
+    private int include;
 }

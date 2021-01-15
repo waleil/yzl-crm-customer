@@ -2,16 +2,14 @@ package cn.net.yzl.crm.customer.mongomodel;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
-@ApiModel("圈选商品信息")
-@Data
-public class crowd_product {
+@ApiModel("支付方式  0=货到付款，1=款到发货，-1不做条件判断")
+public class crowd_pay_type {
 
-    @ApiModelProperty("商品编码")
-    private String id;
+    @ApiModelProperty("id")
+    private int id;
 
-    @ApiModelProperty("商品名称")
+    @ApiModelProperty("名称")
     private String name;
 
     @ApiModelProperty("是否包含，1是，0否")

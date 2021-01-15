@@ -4,10 +4,11 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.common.util.DateHelper;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
-import cn.net.yzl.crm.customer.mongomodel.crowd_member_action;
+import cn.net.yzl.crm.customer.mongomodel.crowd_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Api(value="CustomerController",tags = {"顾客服务"})
 @RestController
@@ -303,20 +303,24 @@ public class CustomerController {
 
     }
 
-    @ApiOperation("添加圈选")
+    @ApiOperation("添加顾客圈选")
     @PostMapping("/v1/addCrowdGroup")
     public ComResponse addCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        memberCrowdGroup.setCreate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd hh:mm:ss"));
         memberService.saveMemberCrowdGroup(memberCrowdGroup);
+        //todo 圈选人
         return ComResponse.success();
     }
 
-    @ApiOperation("修改圈选")
+    @ApiOperation("修改顾客圈选")
     @PostMapping("/v1/updateCrowdGroup")
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         try {
+            memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd hh:mm:ss"));
             memberService.updateMemberCrowdGroup(memberCrowdGroup);
+            //todo 圈选人
             return ComResponse.success();
         } catch (Exception exc) {
             return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE);
@@ -324,7 +328,7 @@ public class CustomerController {
     }
 
 
-    @ApiOperation("分页获取群组列表")
+    @ApiOperation("分页获取圈选列表")
     @PostMapping("/v1/getCrowdGroupByPage")
     public ComResponse getCrowdGroupByPage(@RequestBody CrowdGroupDTO crowdGroupDTO) {
         if (crowdGroupDTO == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
@@ -347,7 +351,7 @@ public class CustomerController {
     @ApiOperation("获取顾客行为偏好字典数据")
     @GetMapping("/v1/getMemberActions")
     public ComResponse getMemberActions() {
-        List<crowd_member_action> list = memberService.getmemberActions();
+        List<crowd_action> list = memberService.getmemberActions();
         return ComResponse.success(list);
     }
 

@@ -16,4 +16,7 @@ public class crowd_disease {
 
     @ApiModelProperty("所属上级id")
     private int pid;
+
+    @ApiModelProperty("是否包含，1是，0否")
+    private int include;
 }

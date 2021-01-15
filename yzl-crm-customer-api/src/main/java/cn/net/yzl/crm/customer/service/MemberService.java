@@ -4,7 +4,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
-import cn.net.yzl.crm.customer.mongomodel.crowd_member_action;
+import cn.net.yzl.crm.customer.mongomodel.crowd_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 
@@ -107,7 +107,7 @@ public interface MemberService {
      *
      * @return
      */
-    List<crowd_member_action> getmemberActions();
+    List<crowd_action> getmemberActions();
 
     /**
      * 删除圈选

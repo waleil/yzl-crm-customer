@@ -593,7 +593,7 @@
         </foreach>
     </select>
 
-    <select id="getmemberActions" resultType="cn.net.yzl.crm.customer.mongomodel.crowd_member_action">
+    <select id="getmemberActions" resultType="cn.net.yzl.crm.customer.mongomodel.crowd_action">
         select id,name,ltype from member_base_attr
     </select>
 

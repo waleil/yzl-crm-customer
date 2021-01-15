@@ -14,4 +14,7 @@ public class crowd_city {
     @ApiModelProperty("城市名称")
     private String name;
 
+    @ApiModelProperty("是否包含，1是，0否")
+    private int include;
+
 }

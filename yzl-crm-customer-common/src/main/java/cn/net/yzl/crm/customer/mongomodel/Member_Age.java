@@ -16,5 +16,8 @@ public class Member_Age {
     @ApiModelProperty("结束年龄")
     private int end_age;
 
+    @ApiModelProperty("是否包含，1是，0否")
+    private int include;
+
 
 }
