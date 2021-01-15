@@ -26,7 +26,7 @@ import java.util.List;
 
 @Component
 public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
-private String COLLECTION_NAME="member_crowd_group";
+    private String COLLECTION_NAME = "member_crowd_group";
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -46,7 +46,7 @@ private String COLLECTION_NAME="member_crowd_group";
     public member_crowd_group getMemberCrowdGroup(String crowdId) {
         if (StringUtil.isNullOrEmpty(crowdId)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         Query query = new Query();
-        query.addCriteria(Criteria.where("crowd_id").is(crowdId));
+        query.addCriteria(Criteria.where("crowd_id").is(crowdId).and("del").is(false));
         return mongoTemplate.findOne(query, member_crowd_group.class);
     }
 
@@ -80,26 +80,27 @@ private String COLLECTION_NAME="member_crowd_group";
 
     /**
      * 批量获取圈选
+     *
      * @param crowdIds
      * @return
      */
     public List<CrowdGroup> getMemberCrowdGroupByIds(List<String> crowdIds) {
-       // Query query = MongoQueryUtil.getBatchQuery(crowdIds,CrowdGroup.class);
-        List<CrowdGroup> crowdGroupList=new ArrayList<>();
+        // Query query = MongoQueryUtil.getBatchQuery(crowdIds,CrowdGroup.class);
+        List<CrowdGroup> crowdGroupList = new ArrayList<>();
 
-        for (String crowdId:crowdIds
-             ) {
-            Query query=new Query();
-            query.addCriteria(Criteria.where("crowd_id").is(crowdId));
-            CrowdGroup group= mongoTemplate.findOne(query,CrowdGroup.class,COLLECTION_NAME);
-            if(group!=null) crowdGroupList.add(group);
+        for (String crowdId : crowdIds
+        ) {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("crowd_id").is(crowdId).and("del").is(false));
+            CrowdGroup group = mongoTemplate.findOne(query, CrowdGroup.class, COLLECTION_NAME);
+            if (group != null) crowdGroupList.add(group);
         }
 
-      //  mongoTemplate.find(query,CrowdGroup.class,"member_crowd_group");
+        //  mongoTemplate.find(query,CrowdGroup.class,"member_crowd_group");
         return crowdGroupList;
     }
 
-    public  Page<CrowdGroup> findCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
+    public Page<CrowdGroup> findCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
 
         Criteria criatira = new Criteria();
 
