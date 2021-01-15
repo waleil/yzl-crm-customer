@@ -246,35 +246,35 @@ public class CustomerController {
         return GeneralResult.success();
     }
 
-    @ApiOperation("添加顾客行为偏好")
-    @PostMapping("/v1/addMemberAction")
-    public GeneralResult addMemberAction(@RequestBody MemberAction memberAction) {
-        if (memberAction == null) return GeneralResult.errorWithMessage(101, "参数空");
-        memberService.saveMemberAction(memberAction);
-        return GeneralResult.success();
-    }
+//    @ApiOperation("添加顾客行为偏好")
+//    @PostMapping("/v1/addMemberAction")
+//    public GeneralResult addMemberAction(@RequestBody MemberAction memberAction) {
+//        if (memberAction == null) return GeneralResult.errorWithMessage(101, "参数空");
+//        memberService.saveMemberAction(memberAction);
+//        return GeneralResult.success();
+//    }
 
 
-    @ApiOperation("修改顾客行为偏好")
-    @PostMapping("/v1/updateMemberAction")
-    public GeneralResult updateMemberAction(@RequestBody MemberAction memberAction) {
-        if (memberAction == null || StringUtil.isNullOrEmpty(memberAction.getMember_card()))
-            return GeneralResult.errorWithMessage(101, "参数空");
-        memberService.updateMemberAction(memberAction);
-        return GeneralResult.success();
-    }
-
-    @ApiOperation("获取顾客行为偏好")
-    @GetMapping("/v1/getMemberAction")
-    public GeneralResult getMemberAction(
-            @RequestParam("member_card")
-            @NotBlank(message = "member_card不能为空")
-            @ApiParam(name = "member_card", value = "会员卡号", required = true)
-                    String member_card
-    ) {
-        MemberAction memberAction = memberService.getMemberAction(member_card);
-        return GeneralResult.success(memberAction);
-    }
+//    @ApiOperation("修改顾客行为偏好")
+//    @PostMapping("/v1/updateMemberAction")
+//    public GeneralResult updateMemberAction(@RequestBody MemberAction memberAction) {
+//        if (memberAction == null || StringUtil.isNullOrEmpty(memberAction.getMember_card()))
+//            return GeneralResult.errorWithMessage(101, "参数空");
+//        memberService.updateMemberAction(memberAction);
+//        return GeneralResult.success();
+//    }
+//
+//    @ApiOperation("获取顾客行为偏好")
+//    @GetMapping("/v1/getMemberAction")
+//    public GeneralResult getMemberAction(
+//            @RequestParam("member_card")
+//            @NotBlank(message = "member_card不能为空")
+//            @ApiParam(name = "member_card", value = "会员卡号", required = true)
+//                    String member_card
+//    ) {
+//        MemberAction memberAction = memberService.getMemberAction(member_card);
+//        return GeneralResult.success(memberAction);
+//    }
 
     @ApiOperation("根据一批会员卡号获取会员信息，会员卡号用英文逗号分隔")
     @GetMapping("/v1/getMemberList")
@@ -351,7 +351,7 @@ public class CustomerController {
     @ApiOperation("获取顾客行为偏好字典数据")
     @GetMapping("/v1/getMemberActions")
     public ComResponse getMemberActions() {
-        List<crowd_action> list = memberService.getmemberActions();
+        List<MemberBaseAttr> list = memberService.getmemberActions();
         return ComResponse.success(list);
     }
 

@@ -123,7 +123,7 @@ public class member_crowd_group {
     @ApiModelProperty("响应时间")
     private List<crowd_action> response_time;
 
-    @ApiModelProperty("坐席性格偏好：0男，1女")
+    @ApiModelProperty("坐席性格偏好")
     private List<crowd_action> staff_sex;
 
     @ApiModelProperty("综合行为")

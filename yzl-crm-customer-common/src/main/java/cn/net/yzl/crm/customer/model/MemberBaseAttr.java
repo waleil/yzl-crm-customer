@@ -14,9 +14,6 @@ public class MemberBaseAttr {
     @ApiModelProperty("名称")
     private String name;
 
-    @ApiModelProperty("上级id")
-    private int pid;
-
     @ApiModelProperty("类型 ： 1 行为偏好")
     private int ltype;
 }

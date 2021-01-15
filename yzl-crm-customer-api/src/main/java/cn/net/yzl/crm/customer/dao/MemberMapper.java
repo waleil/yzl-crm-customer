@@ -74,20 +74,20 @@ public interface MemberMapper {
      */
     void updateMemberOrderStat(MemberOrderStat memberOrderStat);
 
-    /**
-     * 获取顾客行为偏好
-     * @param member_card
-     * @return
-     */
-    MemberAction getMemberAction(String member_card);
-
-    /**
-     * 新增顾客行为偏好
-     * @param memberAction
-     */
-    void saveMemberAction(MemberAction memberAction);
-
-    void updateMemberAction(MemberAction memberAction);
+//    /**
+//     * 获取顾客行为偏好
+//     * @param member_card
+//     * @return
+//     */
+//    MemberAction getMemberAction(String member_card);
+//
+//    /**
+//     * 新增顾客行为偏好
+//     * @param memberAction
+//     */
+//    void saveMemberAction(MemberAction memberAction);
+//
+//    void updateMemberAction(MemberAction memberAction);
 
     List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
 
@@ -110,5 +110,5 @@ public interface MemberMapper {
      * 获取顾客行为偏好字典数据
      * @return
      */
-    List<crowd_action> getmemberActions();
+    List<MemberBaseAttr> getmemberActions();
 }

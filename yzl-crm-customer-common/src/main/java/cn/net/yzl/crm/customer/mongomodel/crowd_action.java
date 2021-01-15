@@ -4,8 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("顾客行为偏好")
 @Data
+@ApiModel("顾客行为偏好")
 public class crowd_action {
 
     private int id;
@@ -18,4 +18,5 @@ public class crowd_action {
 
     @ApiModelProperty("是否包含，1是，0否")
     private int include;
+
 }

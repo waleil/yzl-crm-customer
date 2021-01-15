@@ -8,7 +8,6 @@ import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
-import cn.net.yzl.crm.customer.mongomodel.crowd_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -160,26 +159,26 @@ public class MemberServiceImpl implements MemberService {
         memberMapper.updateMemberOrderStat(memberOrderStat);
     }
 
-    /**
-     * 获取顾客行为偏好
-     *
-     * @param member_card
-     * @return
-     */
-    @Override
-    public MemberAction getMemberAction(String member_card) {
-        return memberMapper.getMemberAction(member_card);
-    }
-
-    @Override
-    public void saveMemberAction(MemberAction memberAction) {
-        memberMapper.saveMemberAction(memberAction);
-    }
-
-    @Override
-    public void updateMemberAction(MemberAction memberAction) {
-        memberMapper.updateMemberAction(memberAction);
-    }
+//    /**
+//     * 获取顾客行为偏好
+//     *
+//     * @param member_card
+//     * @return
+//     */
+//    @Override
+//    public MemberAction getMemberAction(String member_card) {
+//        return memberMapper.getMemberAction(member_card);
+//    }
+//
+//    @Override
+//    public void saveMemberAction(MemberAction memberAction) {
+//        memberMapper.saveMemberAction(memberAction);
+//    }
+//
+//    @Override
+//    public void updateMemberAction(MemberAction memberAction) {
+//        memberMapper.updateMemberAction(memberAction);
+//    }
 
     @Override
     public List<MemberOrderStatViewModel> getMemberList(List<String> member_cards) {
@@ -248,7 +247,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public List<crowd_action> getmemberActions() {
+    public List<MemberBaseAttr> getmemberActions() {
         return memberMapper.getmemberActions();
     }
 

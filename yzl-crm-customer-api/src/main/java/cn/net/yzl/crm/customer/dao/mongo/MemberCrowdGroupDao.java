@@ -90,9 +90,9 @@ private String COLLECTION_NAME="member_crowd_group";
         for (String crowdId:crowdIds
              ) {
             Query query=new Query();
-            query.addCriteria(Criteria.where("crowd_id").is(crowdIds.get(0)));
+            query.addCriteria(Criteria.where("crowd_id").is(crowdId));
             CrowdGroup group= mongoTemplate.findOne(query,CrowdGroup.class,COLLECTION_NAME);
-            crowdGroupList.add(group);
+            if(group!=null) crowdGroupList.add(group);
         }
 
       //  mongoTemplate.find(query,CrowdGroup.class,"member_crowd_group");

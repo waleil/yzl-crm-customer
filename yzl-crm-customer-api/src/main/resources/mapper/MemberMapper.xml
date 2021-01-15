@@ -439,50 +439,50 @@
         where member_card=#{member_card}
     </update>
     
-    <select id="getMemberAction" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberAction">
-        select  member_card,
-                phone_time,
-                nature,
-                response_time,
-                action,
-                order_action,
-                active
-        from member_action
-        where member_card=#{member_card}
-    </select>
-    
-    <insert id="saveMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction" >
-        insert into member_action(
-                member_card,
-                phone_time,
-                nature,
-                response_time,
-                action,
-                order_action,
-                active
-        )
-        values(
-                #{member_card},
-                #{phone_time},
-                #{nature},
-                #{response_time},
-                #{action},
-                #{order_action},
-                #{active}
-        )
-    </insert>
+<!--    <select id="getMemberAction" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberAction">-->
+<!--        select  member_card,-->
+<!--                phone_time,-->
+<!--                nature,-->
+<!--                response_time,-->
+<!--                action,-->
+<!--                order_action,-->
+<!--                active-->
+<!--        from member_action-->
+<!--        where member_card=#{member_card}-->
+<!--    </select>-->
+<!--    -->
+<!--    <insert id="saveMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction" >-->
+<!--        insert into member_action(-->
+<!--                member_card,-->
+<!--                phone_time,-->
+<!--                nature,-->
+<!--                response_time,-->
+<!--                action,-->
+<!--                order_action,-->
+<!--                active-->
+<!--        )-->
+<!--        values(-->
+<!--                #{member_card},-->
+<!--                #{phone_time},-->
+<!--                #{nature},-->
+<!--                #{response_time},-->
+<!--                #{action},-->
+<!--                #{order_action},-->
+<!--                #{active}-->
+<!--        )-->
+<!--    </insert>-->
 
-    <update id="updateMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction">
-        update member_action
-               set
-                phone_time=phone_time +','+ #{phone_time},
-                nature=nature+ ','+ #{nature},
-                response_time=response_time + ','+ #{response_time},
-                action=action+ ','+ #{action},
-                order_action=order_action + ','+ #{order_action},
-                active= active + ','+ #{active}
-        where member_card=#{member_card}
-    </update>
+<!--    <update id="updateMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction">-->
+<!--        update member_action-->
+<!--               set-->
+<!--                phone_time=phone_time +','+ #{phone_time},-->
+<!--                nature=nature+ ','+ #{nature},-->
+<!--                response_time=response_time + ','+ #{response_time},-->
+<!--                action=action+ ','+ #{action},-->
+<!--                order_action=order_action + ','+ #{order_action},-->
+<!--                active= active + ','+ #{active}-->
+<!--        where member_card=#{member_card}-->
+<!--    </update>-->
 
     <select id="getMemberList" resultType="cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel" >
         select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code, is_active,
@@ -593,7 +593,7 @@
         </foreach>
     </select>
 
-    <select id="getmemberActions" resultType="cn.net.yzl.crm.customer.mongomodel.crowd_action">
+    <select id="getmemberActions" resultType="cn.net.yzl.crm.customer.model.MemberBaseAttr">
         select id,name,ltype from member_base_attr
     </select>
 
