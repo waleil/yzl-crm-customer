@@ -4,11 +4,13 @@ import cn.net.yzl.crm.customer.annotations.FieldForMongo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
 @ApiModel("顾客圈选实体类")
 
+@Document(collection="member_crowd_group")
 public class member_crowd_group {
 
     @FieldForMongo(PrimaryKey = "crowd_id")

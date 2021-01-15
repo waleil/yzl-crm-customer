@@ -19,7 +19,7 @@ public interface MemberService {
 
     int updateByMemberCardSelective(Member dto);
 
-    Member  selectMemberByCard(String  memberCard);
+    Member selectMemberByCard(String memberCard);
 
     List<MemberPhone> getMemberPhoneList(String member_card);
 
@@ -41,6 +41,7 @@ public interface MemberService {
 
     /**
      * 获取购买能力
+     *
      * @param member_card
      * @return
      */
@@ -48,18 +49,21 @@ public interface MemberService {
 
     /**
      * 保存购买能力
+     *
      * @param memberOrderStat
      */
     void addMemberOrderStat(MemberOrderStat memberOrderStat);
 
     /**
      * 修改购买能力
+     *
      * @param memberOrderStat
      */
     void updateMemberOrderStat(MemberOrderStat memberOrderStat);
 
     /**
      * 获取顾客行为偏好
+     *
      * @param member_card
      * @return
      */
@@ -67,6 +71,7 @@ public interface MemberService {
 
     /**
      * 新增顾客行为偏好
+     *
      * @param memberAction
      */
     void saveMemberAction(MemberAction memberAction);
@@ -76,17 +81,12 @@ public interface MemberService {
     List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
 
     /**
-     *  添加顾客群组
-     * @param crowdGroup
-     * @return
+     * //     * 根据圈选id批量获取圈选
+     * //     * @return
+     * //
      */
-    int addCrowdGroup(CrowdGroup crowdGroup);
+    List<CrowdGroup> getCrowdGroupByIds(List<String> groupIds);
 
-    /**
-     * 根据圈选id批量获取圈选
-     * @return
-     */
-    List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds);
 
     Page<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
 
@@ -94,6 +94,7 @@ public interface MemberService {
 
     /**
      * 根据crowd_id获取一个圈选
+     *
      * @param crowdId
      * @return
      */
@@ -103,12 +104,14 @@ public interface MemberService {
 
     /**
      * 获取顾客行为偏好字典数据
+     *
      * @return
      */
     List<crowd_member_action> getmemberActions();
 
     /**
      * 删除圈选
+     *
      * @param crowdId
      */
     void delMemberCrowdGroup(String crowdId);

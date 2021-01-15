@@ -65,6 +65,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 获取顾客联系方式信息，包括手机号，座机号
+     *
      * @param member_card
      * @return
      */
@@ -75,20 +76,22 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 根据手机号获取顾客信息（可用来判断手机号是否被注册，如果被注册则返回注册顾客实体）
+     *
      * @param phone
      * @return
      */
     @Override
     public Member getMemberByPhone(String phone) {
-        List<String> phoneList=new ArrayList<>();
+        List<String> phoneList = new ArrayList<>();
         phoneList.add(phone);
-        phoneList.add("0"+phone);
-        phoneList.add("00"+phone);
+        phoneList.add("0" + phone);
+        phoneList.add("00" + phone);
         return memberMapper.getMemberByPhone(phoneList); //因为手机号或许有前缀0，所以要加0的判断
     }
 
     /**
      * 设置顾客为会员
+     *
      * @param member_card
      */
     @Override
@@ -103,6 +106,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 获取咨询商品
+     *
      * @param member_card
      * @return
      */
@@ -138,6 +142,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 保存顾客购买能力
+     *
      * @param memberOrderStat
      */
     @Override
@@ -147,6 +152,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 修改顾客购买能力
+     *
      * @param memberOrderStat
      */
     @Override
@@ -156,6 +162,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 获取顾客行为偏好
+     *
      * @param member_card
      * @return
      */
@@ -179,19 +186,9 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.getMemberList(member_cards);
     }
 
-    /**
-     * 添加顾客圈选
-     * @param crowdGroup
-     * @return
-     */
     @Override
-    public int addCrowdGroup(CrowdGroup crowdGroup) {
-        return memberMapper.addCrowdGroup(crowdGroup);
-    }
-
-    @Override
-    public List<CrowdGroup> getCrowdGroupByIds(List<Integer> groupIds) {
-        return memberMapper.getCrowdGroupByIds(groupIds);
+    public List<CrowdGroup> getCrowdGroupByIds(List<String> groupIds) {
+        return memberCrowdGroupDao.getMemberCrowdGroupByIds(groupIds);
     }
 
     @Override
@@ -202,15 +199,19 @@ public class MemberServiceImpl implements MemberService {
         if (crowdGroupDTO.getPageSize() == null || crowdGroupDTO.getPageSize() == 0) {
             crowdGroupDTO.setPageSize(10);
         }
-        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
-        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
-        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
 
-        return page;
+        return memberCrowdGroupDao.findCrowdGroupByPage(crowdGroupDTO);
+
+//        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
+//        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
+//        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
+//
+//        return page;
     }
 
     /**
-     * 保存顾客圈选
+     * 添加顾客圈选
+     *
      * @param member_crowd_group
      */
     @Override
@@ -220,6 +221,7 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 获取一个圈选
+     *
      * @param crowdId
      * @return
      */
@@ -228,16 +230,33 @@ public class MemberServiceImpl implements MemberService {
         return memberCrowdGroupDao.getMemberCrowdGroup(crowdId);
     }
 
+    /**
+     * 修改顾客圈选
+     *
+     * @param member_crowd_group
+     * @throws Exception
+     */
+
     @Override
     public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
         memberCrowdGroupDao.updateMemberCrowdGroup(member_crowd_group);
     }
 
+    /**
+     * 获取顾客行为偏好基础数据
+     *
+     * @return
+     */
     @Override
     public List<crowd_member_action> getmemberActions() {
         return memberMapper.getmemberActions();
     }
 
+    /**
+     * 根据crowdId 删除顾客圈选
+     *
+     * @param crowdId
+     */
     @Override
     public void delMemberCrowdGroup(String crowdId) {
         memberCrowdGroupDao.delMemberCrowdGroup(crowdId);

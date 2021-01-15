@@ -297,8 +297,7 @@ public class CustomerController {
             @ApiParam(name = "crowdGroupIds", value = "群组id", required = true)
                     String crowdGroupIds) {
 
-        List<Integer> groupIds = Arrays.asList(crowdGroupIds.split(",")).
-                stream().map(Integer::parseInt).collect(Collectors.toList());
+        List<String> groupIds = Arrays.asList(crowdGroupIds.split(","));
         List<CrowdGroup> crowdGroupList = memberService.getCrowdGroupByIds(groupIds);
         return ComResponse.success(crowdGroupList);
 
@@ -311,6 +310,7 @@ public class CustomerController {
         memberService.saveMemberCrowdGroup(memberCrowdGroup);
         return ComResponse.success();
     }
+
     @ApiOperation("修改圈选")
     @PostMapping("/v1/updateCrowdGroup")
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
@@ -318,8 +318,7 @@ public class CustomerController {
         try {
             memberService.updateMemberCrowdGroup(memberCrowdGroup);
             return ComResponse.success();
-        }
-        catch (Exception exc){
+        } catch (Exception exc) {
             return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE);
         }
     }
@@ -347,8 +346,8 @@ public class CustomerController {
 
     @ApiOperation("获取顾客行为偏好字典数据")
     @GetMapping("/v1/getMemberActions")
-    public ComResponse getMemberActions(){
-        List<crowd_member_action> list=memberService.getmemberActions();
+    public ComResponse getMemberActions() {
+        List<crowd_member_action> list = memberService.getmemberActions();
         return ComResponse.success(list);
     }
 
@@ -358,7 +357,7 @@ public class CustomerController {
             @RequestParam("crowdId")
             @NotBlank(message = "crowdId不能为空")
             @ApiParam(name = "crowdId", value = "圈选id", required = true)
-            String crowdId) {
+                    String crowdId) {
         memberService.delMemberCrowdGroup(crowdId);
         return ComResponse.success();
     }
