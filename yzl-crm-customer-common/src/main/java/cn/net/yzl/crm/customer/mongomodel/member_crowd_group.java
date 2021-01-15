@@ -3,8 +3,10 @@ package cn.net.yzl.crm.customer.mongomodel;
 import cn.net.yzl.crm.customer.annotations.FieldForMongo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 
 @ApiModel("顾客圈选实体类")
@@ -12,6 +14,7 @@ import java.util.List;
 @Document(collection="member_crowd_group")
 public class member_crowd_group {
 
+    @Indexed
     @FieldForMongo(PrimaryKey = "crowd_id")
     @ApiModelProperty("群组id")
     private String crowd_id;
@@ -26,16 +29,16 @@ public class member_crowd_group {
     private  Integer enable;
 
     @ApiModelProperty("生效时间")
-    private String effective_date;
+    private Date effective_date;
 
     @ApiModelProperty("失效时间")
-    private String expire_date;
+    private Date expire_date;
 
     @ApiModelProperty("是否删除，true删除，false未删除")
     private boolean del;
 
     @ApiModelProperty("创建时间")
-    private String create_time;
+    private Date create_time;
 
     @ApiModelProperty("创建人编码")
     private String create_code;
@@ -45,7 +48,7 @@ public class member_crowd_group {
     private String create_name;
 
     @ApiModelProperty("修改时间")
-    private String update_time;
+    private Date update_time;
 
     @ApiModelProperty("修改人")
     private String update_code;
@@ -193,6 +196,31 @@ public class member_crowd_group {
     @ApiModelProperty("圈选病症")
     private List<crowd_disease> diseases;
 
+
+    public Date getEffective_date() {
+        return effective_date;
+    }
+
+    public void setEffective_date(Date effective_date) {
+        this.effective_date = effective_date;
+    }
+
+    public Date getExpire_date() {
+        return expire_date;
+    }
+
+    public void setExpire_date(Date expire_date) {
+        this.expire_date = expire_date;
+    }
+
+    public Date getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(Date create_time) {
+        this.create_time = create_time;
+    }
+
     public List<crowd_area> getAreas() {
         return areas;
     }
@@ -285,36 +313,12 @@ public class member_crowd_group {
         this.enable = enable;
     }
 
-    public String getEffective_date() {
-        return effective_date;
-    }
-
-    public void setEffective_date(String effective_date) {
-        this.effective_date = effective_date;
-    }
-
-    public String getExpire_date() {
-        return expire_date;
-    }
-
-    public void setExpire_date(String expire_date) {
-        this.expire_date = expire_date;
-    }
-
     public boolean isDel() {
         return del;
     }
 
     public void setDel(boolean del) {
         this.del = del;
-    }
-
-    public String getCreate_time() {
-        return create_time;
-    }
-
-    public void setCreate_time(String create_time) {
-        this.create_time = create_time;
     }
 
     public String getCreate_code() {
@@ -333,11 +337,11 @@ public class member_crowd_group {
         this.create_name = create_name;
     }
 
-    public String getUpdate_time() {
+    public Date getUpdate_time() {
         return update_time;
     }
 
-    public void setUpdate_time(String update_time) {
+    public void setUpdate_time(Date update_time) {
         this.update_time = update_time;
     }
 

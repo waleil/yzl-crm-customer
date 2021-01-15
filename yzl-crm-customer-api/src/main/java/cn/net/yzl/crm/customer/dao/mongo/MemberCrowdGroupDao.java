@@ -111,15 +111,17 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         if (crowdGroupDTO.getEnable() != -1) {
             criatira.and("enable").is(crowdGroupDTO.getEnable());
         }
-        if (!StringUtil.isNullOrEmpty(crowdGroupDTO.getStart_date())) {
-            Date date = MongoDateHelper.dateToISODate(crowdGroupDTO.getStart_date());
-            criatira.and("create_time").gte(date);
+        String startTime = StringUtil.isNullOrEmpty(crowdGroupDTO.getStart_date()) ? "" : crowdGroupDTO.getStart_date();
+        String endTime = StringUtil.isNullOrEmpty(crowdGroupDTO.getEnd_date()) ? "" : crowdGroupDTO.getEnd_date();
+        if (!startTime.equals("") && endTime.equals("")) {
+            criatira.and("create_time").gte(startTime);
+        } else if (startTime == null && endTime != null) {
+            criatira.and("create_time").lte(endTime);
+        } else if (startTime != null && endTime != null) {
+            criatira.andOperator(
+                    Criteria.where("create_time").gte(startTime),
+                    Criteria.where("create_time").lte(endTime));
         }
-        if (!StringUtil.isNullOrEmpty(crowdGroupDTO.getEnd_date())) {
-            Date date = MongoDateHelper.dateToISODate(crowdGroupDTO.getEnd_date());
-            criatira.and("create_time").lte(date);
-        }
-
         Query query = new Query();
         query.addCriteria(criatira);
 

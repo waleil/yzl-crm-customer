@@ -307,7 +307,7 @@ public class CustomerController {
     @PostMapping("/v1/addCrowdGroup")
     public ComResponse addCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
-        memberCrowdGroup.setCreate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd HH:mm:ss"));
+        memberCrowdGroup.setCreate_time(DateHelper.getCurrentDate());
         memberService.saveMemberCrowdGroup(memberCrowdGroup);
         //todo 圈选人
         return ComResponse.success();
@@ -318,7 +318,8 @@ public class CustomerController {
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         try {
-            memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd hh:mm:ss"));
+           // memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd hh:mm:ss"));
+            memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDate());
             memberService.updateMemberCrowdGroup(memberCrowdGroup);
             //todo 圈选人
             return ComResponse.success();
