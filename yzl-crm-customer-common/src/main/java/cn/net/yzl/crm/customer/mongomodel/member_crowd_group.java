@@ -60,7 +60,7 @@ public class member_crowd_group {
     private List<Member_Age> age;
 
     @ApiModelProperty("顾客圈选地区")
-    private List<Member_Area> areas;
+    private List<crowd_area> areas;
 
     @ApiModelProperty("圈选顾客级别")
     private List<crowd_base_value> member_grade;
@@ -193,6 +193,13 @@ public class member_crowd_group {
     @ApiModelProperty("圈选病症")
     private List<crowd_disease> diseases;
 
+    public List<crowd_area> getAreas() {
+        return areas;
+    }
+
+    public void setAreas(List<crowd_area> areas) {
+        this.areas = areas;
+    }
 
     public List<crowd_base_value> getOrder_source() {
         return order_source;
@@ -364,14 +371,6 @@ public class member_crowd_group {
 
     public void setAge(List<Member_Age> age) {
         this.age = age;
-    }
-
-    public List<Member_Area> getAreas() {
-        return areas;
-    }
-
-    public void setAreas(List<Member_Area> areas) {
-        this.areas = areas;
     }
 
     public Integer getFirst_order_to_days() {
