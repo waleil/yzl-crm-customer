@@ -2,11 +2,15 @@ package cn.net.yzl.crm.customer.viewmodel;
 
 import cn.net.yzl.crm.customer.model.MemberPhone;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
+@ApiModel("顾客基本信息")
+@Data
 public class MemberOrderStatViewModel {
     @ApiModelProperty(value = "主键")
     private Integer id;

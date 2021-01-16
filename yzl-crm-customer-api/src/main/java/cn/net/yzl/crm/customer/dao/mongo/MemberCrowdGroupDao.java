@@ -130,17 +130,17 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
 
         Pageable pageable = PageRequest.of(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize(), sort);
 
-
-
-
-
         Query query = new Query();
         query.addCriteria(criatira);
-        query.skip((crowdGroupDTO.getCurrentPage()-1)*crowdGroupDTO.getPageSize()).skip(crowdGroupDTO.getPageSize());
+
+        int total = (int) mongoTemplate.count(query, CrowdGroup.class, COLLECTION_NAME); //先求总数
+
+        int skip=(crowdGroupDTO.getCurrentPage()-1)*crowdGroupDTO.getPageSize();
+        query.skip(skip).limit(crowdGroupDTO.getPageSize());
         List<CrowdGroup> crowdGroupList = mongoTemplate.find(query, CrowdGroup.class);
 
         //mongoTemplate.count计算总数
-        int total = (int) mongoTemplate.count(query, CrowdGroup.class, COLLECTION_NAME);
+
         Page page = new Page();
 
         PageParam pageParam = new PageParam();
