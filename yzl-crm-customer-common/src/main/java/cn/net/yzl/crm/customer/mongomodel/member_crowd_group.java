@@ -170,10 +170,10 @@ public class member_crowd_group {
     private Integer pay_state;
 
     @ApiModelProperty("物流状态，-1不做统计查询")
-    private Integer logistics_state;
+    private List<crowd_base_value> logistics_state;
 
     @ApiModelProperty("物流公司")
-    private Integer logistics_company_id;
+    private List<crowd_base_value> logistics_company_id;
 
     @ApiModelProperty(value = "累计消费金额")
     private Integer total_amount;
@@ -570,22 +570,6 @@ public class member_crowd_group {
 
     public void setPay_state(Integer pay_state) {
         this.pay_state = pay_state;
-    }
-
-    public Integer getLogistics_state() {
-        return logistics_state;
-    }
-
-    public void setLogistics_state(Integer logistics_state) {
-        this.logistics_state = logistics_state;
-    }
-
-    public Integer getLogistics_company_id() {
-        return logistics_company_id;
-    }
-
-    public void setLogistics_company_id(Integer logistics_company_id) {
-        this.logistics_company_id = logistics_company_id;
     }
 
     public Integer getTotal_amount() {

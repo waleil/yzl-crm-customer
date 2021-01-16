@@ -36,7 +36,6 @@ public class LabelServiceImpl implements LabelService {
 
     public void saveCrowd(CrowdGroup crowdGroup){
         crowdGroupRepository.save(new member_crowd_group());
-
     }
 
     @Override
