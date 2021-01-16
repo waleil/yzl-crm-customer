@@ -152,10 +152,6 @@ public class member_crowd_group {
 
     @ApiModelProperty("是否活动订单，1是，0否，-1不做统计查询")
     private Integer active_order;
-    @ApiModelProperty("活动")
-    private List<crowd_active> crowd_active;
-//    @ApiModelProperty("活动类型")
-//    private List<String> active_type;
 
     @ApiModelProperty("活动")
     private List<crowd_active> activeList;
@@ -195,14 +191,6 @@ public class member_crowd_group {
 
     @ApiModelProperty("圈选病症")
     private List<crowd_disease> diseases;
-
-    public List<cn.net.yzl.crm.customer.mongomodel.crowd_active> getCrowd_active() {
-        return crowd_active;
-    }
-
-    public void setCrowd_active(List<cn.net.yzl.crm.customer.mongomodel.crowd_active> crowd_active) {
-        this.crowd_active = crowd_active;
-    }
 
     public List<crowd_base_value> getLogistics_state() {
         return logistics_state;
