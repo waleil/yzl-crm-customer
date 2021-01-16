@@ -318,7 +318,7 @@ public class CustomerController {
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         try {
-           // memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd hh:mm:ss"));
+            // memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd hh:mm:ss"));
             memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDate());
             memberService.updateMemberCrowdGroup(memberCrowdGroup);
             //todo 圈选人
@@ -365,5 +365,19 @@ public class CustomerController {
                     String crowdId) {
         memberService.delMemberCrowdGroup(crowdId);
         return ComResponse.success();
+    }
+
+    @ApiOperation("顾客一批顾客卡号获取顾客病症(卡号用英文逗号分隔)")
+    @GetMapping("/v1/getMemberDiseaseByMemberCards")
+    public ComResponse getMemberDiseaseByMemberCards(
+            @RequestParam("member_cards")
+            @NotBlank(message = "member_cards不能为空")
+            @ApiParam(name = "member_cards", value = "一批顾客卡号", required = true)
+                    String member_cards) {
+
+        if (StringUtil.isNullOrEmpty(member_cards)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        List<String> memberCardList = Arrays.asList(member_cards.split(","));
+        List<MemberDisease> list = memberService.getMemberDiseaseByMemberCards(memberCardList);
+        return ComResponse.success(list);
     }
 }

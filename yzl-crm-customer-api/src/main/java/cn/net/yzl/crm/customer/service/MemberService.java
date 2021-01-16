@@ -115,4 +115,11 @@ public interface MemberService {
      * @param crowdId
      */
     void delMemberCrowdGroup(String crowdId);
+
+    /**
+     * 根据一批顾客卡号获取病症信息
+     * @param member_cards
+     * @return
+     */
+    List<MemberDisease> getMemberDiseaseByMemberCards(List<String> member_cards);
 }

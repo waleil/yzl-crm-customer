@@ -13,6 +13,9 @@ import cn.net.yzl.crm.customer.utils.MongoQueryUtil;
 import cn.net.yzl.crm.customer.utils.QueryUpdate;
 import io.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
@@ -111,9 +114,9 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         if (crowdGroupDTO.getEnable() != -1) {
             criatira.and("enable").is(crowdGroupDTO.getEnable());
         }
-        String startTime = StringUtil.isNullOrEmpty(crowdGroupDTO.getStart_date()) ? "" : crowdGroupDTO.getStart_date();
-        String endTime = StringUtil.isNullOrEmpty(crowdGroupDTO.getEnd_date()) ? "" : crowdGroupDTO.getEnd_date();
-        if (!startTime.equals("") && endTime.equals("")) {
+        Date startTime = crowdGroupDTO.getStart_date();
+        Date endTime =crowdGroupDTO.getEnd_date();
+        if (startTime !=null && endTime==null) {
             criatira.and("create_time").gte(startTime);
         } else if (startTime == null && endTime != null) {
             criatira.and("create_time").lte(endTime);
@@ -122,9 +125,18 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
                     Criteria.where("create_time").gte(startTime),
                     Criteria.where("create_time").lte(endTime));
         }
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "create_time");
+
+        Pageable pageable = PageRequest.of(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize(), sort);
+
+
+
+
+
         Query query = new Query();
         query.addCriteria(criatira);
-
+        query.skip((crowdGroupDTO.getCurrentPage()-1)*crowdGroupDTO.getPageSize()).skip(crowdGroupDTO.getPageSize());
         List<CrowdGroup> crowdGroupList = mongoTemplate.find(query, CrowdGroup.class);
 
         //mongoTemplate.count计算总数

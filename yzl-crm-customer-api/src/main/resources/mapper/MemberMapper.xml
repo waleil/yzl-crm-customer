@@ -317,6 +317,18 @@
 
     </select>
 
+    <select id="getMemberDiseaseByMemberCards"  resultType="cn.net.yzl.crm.customer.model.MemberDisease">
+        select id, member_card,disease_id,disease_name
+        from   member_disease
+        where  member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+
+
     <insert id="saveReveiverAddress" parameterType="cn.net.yzl.crm.customer.model.ReveiverAddress" >
         insert into reveiver_address(reveiver_address_code,member_card,member_name,member_mobile,
         member_province_no,member_province_name,

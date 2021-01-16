@@ -261,5 +261,15 @@ public class MemberServiceImpl implements MemberService {
         memberCrowdGroupDao.delMemberCrowdGroup(crowdId);
     }
 
+    /**
+     * 根据一批顾客卡号获取顾客病症信息
+     * @param member_cards
+     * @return
+     */
+    @Override
+    public List<MemberDisease> getMemberDiseaseByMemberCards(List<String> member_cards) {
+        return memberMapper.getMemberDiseaseByMemberCards(member_cards);
+    }
+
 
 }

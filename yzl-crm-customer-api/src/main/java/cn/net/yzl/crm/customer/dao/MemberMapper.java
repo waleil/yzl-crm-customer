@@ -36,6 +36,8 @@ public interface MemberMapper {
 
     List<MemberDisease> getMemberDisease(String member_card);
 
+    List<MemberDisease> getMemberDiseaseByMemberCards(List<String> member_cards);
+
     /**
      * 新增收获地址
      * @param reveiverAddress
