@@ -122,4 +122,13 @@ public interface MemberService {
      * @return
      */
     List<MemberDisease> getMemberDiseaseByMemberCards(List<String> member_cards);
+
+    /**
+     * 添加顾客圈选到mysql
+     * @param crowdGroup
+     * @return
+     */
+    int addCrowdGroup(CrowdGroup crowdGroup);
+
+    void updateCrowdGroup(CrowdGroup crowdGroup);
 }

@@ -199,13 +199,13 @@ public class MemberServiceImpl implements MemberService {
             crowdGroupDTO.setPageSize(10);
         }
 
-        return memberCrowdGroupDao.findCrowdGroupByPage(crowdGroupDTO);
+        // return memberCrowdGroupDao.findCrowdGroupByPage(crowdGroupDTO); 从mongo读取，因为日期有问题，暂停使用
 
-//        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
-//        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
-//        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
-//
-//        return page;
+        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
+        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
+        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
+
+        return page;
     }
 
     /**
@@ -269,6 +269,16 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<MemberDisease> getMemberDiseaseByMemberCards(List<String> member_cards) {
         return memberMapper.getMemberDiseaseByMemberCards(member_cards);
+    }
+
+    @Override
+    public int addCrowdGroup(CrowdGroup crowdGroup) {
+        return memberMapper.addCrowdGroup(crowdGroup);
+    }
+
+    @Override
+    public void updateCrowdGroup(CrowdGroup crowdGroup) {
+        memberMapper.updateCrowdGroup(crowdGroup);
     }
 
 

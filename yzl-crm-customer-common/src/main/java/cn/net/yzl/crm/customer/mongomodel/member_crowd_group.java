@@ -1,16 +1,19 @@
 package cn.net.yzl.crm.customer.mongomodel;
 
 import cn.net.yzl.crm.customer.annotations.FieldForMongo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
 
 @ApiModel("顾客圈选实体类")
-
+@Data
 @Document(collection="member_crowd_group")
 public class member_crowd_group {
 
@@ -29,15 +32,18 @@ public class member_crowd_group {
     private  Integer enable;
 
     @ApiModelProperty("生效时间")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date effective_date;
 
     @ApiModelProperty("失效时间")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date expire_date;
 
     @ApiModelProperty("是否删除，true删除，false未删除")
     private boolean del;
 
     @ApiModelProperty("创建时间")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date create_time;
 
     @ApiModelProperty("创建人编码")
@@ -48,10 +54,14 @@ public class member_crowd_group {
     private String create_name;
 
     @ApiModelProperty("修改时间")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date update_time;
 
     @ApiModelProperty("修改人")
     private String update_code;
+
+    @ApiModelProperty("修改人姓名")
+    private String update_name;
 
     @ApiModelProperty("群组人数")
     private Integer person_count;

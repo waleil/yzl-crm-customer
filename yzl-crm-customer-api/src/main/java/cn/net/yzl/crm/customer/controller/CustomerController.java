@@ -307,7 +307,20 @@ public class CustomerController {
     @PostMapping("/v1/addCrowdGroup")
     public ComResponse addCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+
+        CrowdGroup crowdGroup = new CrowdGroup();
+//        crowdGroup.setCreate_code();
+//        crowdGroup.setCreate_name();
+        crowdGroup.setName(memberCrowdGroup.getCrowd_name());
+        crowdGroup.setDescription(memberCrowdGroup.getDescription());
+        crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-MM-dd HH:mm:ss"));
+        crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(),"yyyy-MM-dd HH:mm:ss"));
+        crowdGroup.setEnable(memberCrowdGroup.getEnable());
+        crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
+        int insertRows = memberService.addCrowdGroup(crowdGroup);
+
         memberCrowdGroup.setCreate_time(DateHelper.getCurrentDate());
+        memberCrowdGroup.setCrowd_id(crowdGroup.getId()+"");
         memberService.saveMemberCrowdGroup(memberCrowdGroup);
         //todo 圈选人
         return ComResponse.success();
@@ -318,8 +331,21 @@ public class CustomerController {
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         try {
-            // memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDateStr("yyyy-MM-dd hh:mm:ss"));
+
+            CrowdGroup crowdGroup = new CrowdGroup();
+            crowdGroup.setId(Integer.parseInt(memberCrowdGroup.getCrowd_id()));
+            crowdGroup.setUpdate_code(memberCrowdGroup.getUpdate_code());
+            crowdGroup.setUpdate_name(memberCrowdGroup.getUpdate_name());
+            crowdGroup.setName(memberCrowdGroup.getCrowd_name());
+            crowdGroup.setDescription(memberCrowdGroup.getDescription());
+            crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-mm-dd HH:mm:ss"));
+            crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date()));
+            crowdGroup.setEnable(memberCrowdGroup.getEnable());
+            crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
+
             memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDate());
+
+            memberService.updateCrowdGroup(crowdGroup);
             memberService.updateMemberCrowdGroup(memberCrowdGroup);
             //todo 圈选人
             return ComResponse.success();

@@ -522,11 +522,11 @@
         </foreach>
     </select>
 
-    <insert id="addCrowdGroup" useGeneratedKeys="true" keyProperty="id" parameterType="cn.net.yzl.crm.customer.model.CrowdGroup">
+    <insert id="addCrowdGroup" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="cn.net.yzl.crm.customer.model.CrowdGroup">
         insert into crowd_group(
         name,
         description,
-        enabled,
+        enable,
         effective_date,
         expire_date,
         del,
@@ -576,13 +576,27 @@
                 and enable=#{enable}
             </if>
             <if test="start_date != null and start_date != ''">
-                and m.create_time <![CDATA[ >= ]]> #{start_date}
+                and create_time <![CDATA[ >= ]]> #{start_date}
             </if>
             <if test="end_date != null and end_date != ''">
-                and m.create_time <![CDATA[ <= ]]> #{end_date}
+                and create_time <![CDATA[ <= ]]> #{end_date}
             </if>
         </where>
     </select>
+    
+    <update id="updateCrowdGroup" parameterType="cn.net.yzl.crm.customer.model.CrowdGroup">
+         update crowd_group
+            set name=#{name},
+            description=#{description},
+            enable=#{enable},
+            effective_date=#{effective_date},
+            expire_date=#{expire_date},
+            update_time=CURRENT_TIMESTAMP,
+            update_code=#{update_code},
+            update_name=#{update_name},
+            person_count=#{person_count}
+          where id=#{id}
+    </update>
     
     <select id="getCrowdGroupByIds" resultType="cn.net.yzl.crm.customer.model.CrowdGroup" >
          select

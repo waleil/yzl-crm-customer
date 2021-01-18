@@ -4,7 +4,9 @@ import cn.net.yzl.crm.customer.annotations.FieldForMongo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
@@ -13,13 +15,14 @@ import java.util.List;
 @Document(collection="member_crowd_group")
 public class CrowdGroup {
 
-    private String _id;
+    private int id;
 
     @FieldForMongo(PrimaryKey = "crowd_id")
     @ApiModelProperty("群组id")
     private String crowd_id;
     @ApiModelProperty("群组名称")
-    private String crowd_name;
+    @Field("crowd_name")
+    private String name;
     @ApiModelProperty("群组描述")
     private String description;
     @ApiModelProperty("是否启用:0=否，1=是")
@@ -40,6 +43,9 @@ public class CrowdGroup {
     private String update_time;
     @ApiModelProperty("修改人")
     private String update_code;
+
+    @ApiModelProperty("修改人姓名")
+    private String update_name;
 
     @ApiModelProperty("群组人数")
     private Integer person_count;

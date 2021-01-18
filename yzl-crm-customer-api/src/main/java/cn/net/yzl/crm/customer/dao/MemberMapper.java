@@ -94,7 +94,7 @@ public interface MemberMapper {
     List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
 
     /**
-     *  添加顾客群组
+     *  添加顾客圈选
      * @param crowdGroup
      * @return
      */
@@ -113,4 +113,6 @@ public interface MemberMapper {
      * @return
      */
     List<MemberBaseAttr> getmemberActions();
+
+    void updateCrowdGroup(CrowdGroup crowdGroup);
 }

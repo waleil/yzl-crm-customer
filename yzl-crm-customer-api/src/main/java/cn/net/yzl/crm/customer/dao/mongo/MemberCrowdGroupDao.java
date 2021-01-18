@@ -114,20 +114,19 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         if (crowdGroupDTO.getEnable() != -1) {
             criatira.and("enable").is(crowdGroupDTO.getEnable());
         }
-        Date startTime = crowdGroupDTO.getStart_date();
-        Date endTime =crowdGroupDTO.getEnd_date();
-        if (startTime !=null && endTime==null) {
-            criatira.and("create_time").gte(startTime);
-        } else if (startTime == null && endTime != null) {
-            criatira.and("create_time").lte(endTime);
-        } else if (startTime != null && endTime != null) {
-            criatira.andOperator(
-                    Criteria.where("create_time").gte(startTime),
-                    Criteria.where("create_time").lte(endTime));
-        }
+//        Date startTime = crowdGroupDTO.getStart_date();
+//        Date endTime =crowdGroupDTO.getEnd_date();
+//        if (startTime !=null && endTime==null) {
+//            criatira.and("create_time").gte(startTime);
+//        } else if (startTime == null && endTime != null) {
+//            criatira.and("create_time").lte(endTime);
+//        } else if (startTime != null && endTime != null) {
+//            criatira.andOperator(
+//                    Criteria.where("create_time").gte(startTime),
+//                    Criteria.where("create_time").lte(endTime));
+//        }
 
         Sort sort = Sort.by(Sort.Direction.DESC, "create_time");
-
         Pageable pageable = PageRequest.of(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize(), sort);
 
         Query query = new Query();
