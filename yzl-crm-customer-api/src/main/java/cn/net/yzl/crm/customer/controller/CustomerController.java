@@ -338,8 +338,8 @@ public class CustomerController {
             crowdGroup.setUpdate_name(memberCrowdGroup.getUpdate_name());
             crowdGroup.setName(memberCrowdGroup.getCrowd_name());
             crowdGroup.setDescription(memberCrowdGroup.getDescription());
-            crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-mm-dd HH:mm:ss"));
-            crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date()));
+            crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-MM-dd HH:mm:ss"));
+            crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(), "yyyy-MM-dd HH:mm:ss"));
             crowdGroup.setEnable(memberCrowdGroup.getEnable());
             crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
 
