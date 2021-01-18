@@ -389,7 +389,8 @@ public class CustomerController {
             @NotBlank(message = "crowdId不能为空")
             @ApiParam(name = "crowdId", value = "圈选id", required = true)
                     String crowdId) {
-        memberService.delMemberCrowdGroup(crowdId);
+        //   memberService.delMemberCrowdGroup(crowdId);
+        memberService.delCrowdGroupById(Integer.parseInt(crowdId));
         return ComResponse.success();
     }
 

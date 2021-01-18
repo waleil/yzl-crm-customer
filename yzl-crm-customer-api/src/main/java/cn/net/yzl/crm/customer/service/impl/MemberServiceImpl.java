@@ -281,5 +281,10 @@ public class MemberServiceImpl implements MemberService {
         memberMapper.updateCrowdGroup(crowdGroup);
     }
 
+    @Override
+    public void delCrowdGroupById(int id) {
+        memberMapper.delCrowdGroupById(id);
+    }
+
 
 }

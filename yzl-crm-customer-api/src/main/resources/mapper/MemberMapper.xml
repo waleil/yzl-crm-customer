@@ -624,4 +624,8 @@
         select id,name,ltype from member_base_attr
     </select>
 
+    <update id="delCrowdGroupById"  >
+        update crowd_group set del=1 where id=#{id}
+    </update>
+
 </mapper>

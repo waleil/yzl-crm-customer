@@ -131,4 +131,6 @@ public interface MemberService {
     int addCrowdGroup(CrowdGroup crowdGroup);
 
     void updateCrowdGroup(CrowdGroup crowdGroup);
+
+    void delCrowdGroupById(int id);
 }

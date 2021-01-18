@@ -115,4 +115,6 @@ public interface MemberMapper {
     List<MemberBaseAttr> getmemberActions();
 
     void updateCrowdGroup(CrowdGroup crowdGroup);
+
+    void delCrowdGroupById(int id);
 }
