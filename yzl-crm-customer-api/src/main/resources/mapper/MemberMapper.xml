@@ -555,6 +555,7 @@
 
         select
             id,
+            id as crowd_id,
             name,
             description,
             enable,
