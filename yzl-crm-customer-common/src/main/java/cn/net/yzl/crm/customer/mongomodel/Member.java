@@ -2,12 +2,22 @@ package cn.net.yzl.crm.customer.mongomodel;
 import cn.net.yzl.crm.customer.model.MemberBaseAttr;
 import cn.net.yzl.crm.customer.model.MemberPhone;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
+
+@Data
+@ApiModel("顾客宽表实体类")
+@Document(collection="member")
 public class Member {
-    @ApiModelProperty(value = "主键")
-    private Integer id;
+//    @ApiModelProperty(value = "主键")
+//    private String id;
+    @Indexed
     @ApiModelProperty(value = "会员卡号")
     @NotEmpty
     private String member_card;
@@ -31,10 +41,28 @@ public class Member {
     private int activity;
     @ApiModelProperty(value = "所属区")
     private String region_code;
-    @ApiModelProperty(value = "所属省份")
+
+    @ApiModelProperty("所属区")
+    private String region_name;
+
+    @ApiModelProperty(value = "所属省份id")
     private Integer province_code;
+
+    @ApiModelProperty(value = "所属省份名称")
+    private String province_name;
+
     @ApiModelProperty(value = "所属城市id")
     private Integer city_code;
+
+    @ApiModelProperty("所属城市名称")
+    private Integer city_name;
+
+    @ApiModelProperty("区县id")
+    private Integer area_code;
+
+    @ApiModelProperty("区县名称")
+    private String area_name;
+
     @ApiModelProperty(value = "累计消费金额")
     private Integer total_amount;
     @ApiModelProperty(value = "qq")
@@ -84,8 +112,7 @@ public class Member {
     private String intro_name;
     @ApiModelProperty(value = "介绍人类型，1员工，2顾客")
     private int intro_type;
-    @ApiModelProperty("所属区")
-    private String region_name;
+
     @ApiModelProperty("广告名称")
     private String adver_name;
     private List<MemberPhone> memberPhoneList;
@@ -130,6 +157,26 @@ public class Member {
 
     @ApiModelProperty("订单总金额")
     private int order_total_amount;
+
+    @ApiModelProperty("方便接电话时间")
+    private List<Integer> phone_time;
+
+    @ApiModelProperty("坐席偏好")
+    private List<Integer> staff_sex;
+
+    @ApiModelProperty("综合行为")
+    private List<Integer> actions;
+
+    @ApiModelProperty("下单行为")
+    private List<Integer> order_action;
+
+    @ApiModelProperty("活动偏好")
+    private List<Integer> active_like;
+
+
+    @ApiModelProperty("顾客疾病")
+   private List<Integer> disease;
+
 
 
 
