@@ -497,7 +497,7 @@
 <!--    </update>-->
 
     <select id="getMemberList" resultType="cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel" >
-        select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code, is_active,
+        select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code,  mt.`name` as m_grade_name, is_active,
     member_status, activity, region_code, province_code, city_code, total_amount, qq,id_card,
     wechat, email, source, address, birthday, job_code, m.first_order_time, m.last_order_time,
     master_card, m.first_order_staff_no, m.first_order_am, order_num, media_name, media_type_code,
@@ -515,7 +515,7 @@
         day_avg_count,
         year_avg_count,
         return_goods_rate
-        from member m inner join member_order_stat o on m.member_card= o.member_card
+        from member m inner join member_order_stat o on m.member_card= o.member_card LEFT JOIN member_type mt on m.m_grade_code=mt.`no`
         where m.member_card in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}

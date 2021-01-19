@@ -29,6 +29,10 @@ public class MemberOrderStatViewModel {
     private Integer adver_code;
     @ApiModelProperty(value = "顾客级别  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
     private String m_grade_code;
+
+    @ApiModelProperty(value = "顾客级别名称  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
+    private String m_grade_name;
+
     @ApiModelProperty(value = "0未发卡1已发卡未激活2已激活")
     private Short is_active;
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
