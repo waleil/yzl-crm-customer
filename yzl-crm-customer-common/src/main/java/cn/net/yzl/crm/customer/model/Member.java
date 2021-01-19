@@ -101,4 +101,7 @@ public class Member {
     private  String create_time;
     @ApiModelProperty("顾客类型")
     private String member_type;
+
+    @ApiModelProperty("收货地址")
+    private List<ReveiverAddress> receive_address_list;
 }

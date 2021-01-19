@@ -69,6 +69,8 @@ public class CustomerController {
     public GeneralResult<Member> getMember(@RequestParam("memberCard") String memberCard) {
         Member memberEntity = memberService.selectMemberByCard(memberCard);
         List<MemberPhone> memberPhoneList = memberService.getMemberPhoneList(memberCard);
+        List<ReveiverAddress> addressList=memberService.getReveiverAddress(memberCard);
+        memberEntity.setReceive_address_list(addressList);
         memberEntity.setMemberPhoneList(memberPhoneList);
         return GeneralResult.success(memberEntity);
     }
