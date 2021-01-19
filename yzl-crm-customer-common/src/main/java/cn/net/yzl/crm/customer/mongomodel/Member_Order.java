@@ -3,11 +3,13 @@ package cn.net.yzl.crm.customer.mongomodel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel("顾客订单数据实体类")
+@Data
 public class Member_Order {
     @ApiModelProperty("支付方式")
     private List<String> pay_type;
