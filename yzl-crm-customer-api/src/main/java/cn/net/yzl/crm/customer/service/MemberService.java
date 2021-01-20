@@ -135,4 +135,6 @@ public interface MemberService {
     void delCrowdGroupById(int id);
 
     List getMemberAmount(List<String> member_cards);
+
+    Page<cn.net.yzl.crm.customer.mongomodel.Member> selectFullMemberByPage(int currentPage,int pageSize);
 }

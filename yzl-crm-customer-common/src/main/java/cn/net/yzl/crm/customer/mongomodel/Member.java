@@ -9,13 +9,14 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @ApiModel("顾客宽表实体类")
 @Document(collection="member")
 public class Member {
-//    @ApiModelProperty(value = "主键")
+    //    @ApiModelProperty(value = "主键")
 //    private String id;
     @Indexed
     @ApiModelProperty(value = "会员卡号")
@@ -37,7 +38,7 @@ public class Member {
     private Short is_active;
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
     private Byte member_status;
-    @ApiModelProperty(value = "活跃度 1 活跃 2 冷淡 3 一般")
+    @ApiModelProperty(value = " 1高 2 中 3 低")
     private int activity;
     @ApiModelProperty(value = "所属区")
     private String region_code;
@@ -96,6 +97,10 @@ public class Member {
     private Integer first_order_am;
     @ApiModelProperty(value = "订购次数")
     private Integer order_num;
+
+    @ApiModelProperty("媒体id")
+    private int media_id;
+
     @ApiModelProperty(value = "媒体名称（冗余，暂定第一次进线）")
     private String media_name;
     @ApiModelProperty(value = "媒体类型id")
@@ -117,7 +122,7 @@ public class Member {
     private String adver_name;
     private List<MemberPhone> memberPhoneList;
     @ApiModelProperty("建档时间")
-    private  String create_time;
+    private String create_time;
     @ApiModelProperty("顾客类型")
     private String member_type;
     @ApiModelProperty("累计消费金额")
@@ -159,10 +164,10 @@ public class Member {
     private int order_total_amount;
 
     @ApiModelProperty("方便接电话时间")
-    private List<Integer> phone_time;
+    private List<Integer> phone_time = new ArrayList<>();
 
-    @ApiModelProperty("坐席偏好")
-    private List<Integer> staff_sex;
+    @ApiModelProperty("坐席偏好 0男 1女 -1不限性别")
+    private Integer staff_sex;
 
     @ApiModelProperty("综合行为")
     private List<Integer> actions;
@@ -173,11 +178,20 @@ public class Member {
     @ApiModelProperty("活动偏好")
     private List<Integer> active_like;
 
-
     @ApiModelProperty("顾客疾病")
-   private List<Integer> disease;
+    private List<Integer> disease;
 
+    @ApiModelProperty("余积分")
+    private int last_integral;
 
+    @ApiModelProperty("余红包")
+    private int last_red_bag;
+
+    @ApiModelProperty("余券")
+    private int last_coupon;
+
+    @ApiModelProperty("总剩余金额")
+    private int total_money;
 
 
 }

@@ -6,6 +6,7 @@ import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.DateHelper;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.model.CrowdGroup;
+import cn.net.yzl.crm.customer.mongomodel.Member;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
@@ -134,7 +135,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
 
         int total = (int) mongoTemplate.count(query, CrowdGroup.class, COLLECTION_NAME); //先求总数
 
-        int skip=(crowdGroupDTO.getCurrentPage()-1)*crowdGroupDTO.getPageSize();
+        int skip = (crowdGroupDTO.getCurrentPage() - 1) * crowdGroupDTO.getPageSize();
         query.skip(skip).limit(crowdGroupDTO.getPageSize());
         List<CrowdGroup> crowdGroupList = mongoTemplate.find(query, CrowdGroup.class);
 
@@ -153,5 +154,41 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         return page;
     }
 
+
+    /**
+     * 根据member_card 从mongo获取顾客信息
+     *
+     * @param member_card
+     * @return
+     */
+    public Member getMemberFromMongo(String member_card) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("member_card").is(member_card));
+        return mongoTemplate.findOne(query, Member.class);
+    }
+
+    /**
+     * 保存顾客信息到mongo
+     *
+     * @param member
+     */
+    public void saveMemberToMongo(Member member) {
+        if (member == null || StringUtil.isNullOrEmpty(member.getMember_card()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        mongoTemplate.save(member);
+    }
+
+    /**
+     * 修改mongo顾客信息
+     * @param member
+     */
+    public void updateMemberToMongo(Member member) throws Exception {
+        if (member == null || StringUtil.isNullOrEmpty(member.getMember_card()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+
+        QueryUpdate queryUpdate = MongoQueryUtil.getMongoQueryForUpdate(member);
+        mongoTemplate.updateFirst(queryUpdate.getQuery(), queryUpdate.getUpdate(), this.getEntityClass());
+
+    }
 
 }

@@ -304,5 +304,14 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.getMemberAmount(member_cards);
     }
 
+    @Override
+    public Page<cn.net.yzl.crm.customer.mongomodel.Member> selectFullMemberByPage(int currentPage, int pageSize) {
+        PageHelper.startPage(currentPage, pageSize);
+        List<cn.net.yzl.crm.customer.mongomodel.Member> list = memberMapper.selectFullMemberByPage();
+        Page<cn.net.yzl.crm.customer.mongomodel.Member> page = AssemblerResultUtil.resultAssembler(list);
+
+        return page;
+    }
+
 
 }

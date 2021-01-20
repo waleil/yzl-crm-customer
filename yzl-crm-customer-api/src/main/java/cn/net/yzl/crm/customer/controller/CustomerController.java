@@ -416,4 +416,12 @@ public class CustomerController {
         List<MemberDisease> list = memberService.getMemberDiseaseByMemberCards(memberCardList);
         return ComResponse.success(list);
     }
+
+
+    public void  syncMemberToMongo(){
+        for(int i=1;i<=100;i++) {
+            Page<cn.net.yzl.crm.customer.mongomodel.Member> memberList = memberService.selectFullMemberByPage(i,1000);
+
+        }
+    }
 }

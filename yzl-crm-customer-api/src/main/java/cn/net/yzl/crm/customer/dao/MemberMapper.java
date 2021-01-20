@@ -119,4 +119,6 @@ public interface MemberMapper {
     void delCrowdGroupById(int id);
 
     List getMemberAmount(List<String> member_cards);
+
+    List<cn.net.yzl.crm.customer.mongomodel.Member> selectFullMemberByPage();
 }
