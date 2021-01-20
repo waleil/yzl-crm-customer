@@ -421,8 +421,8 @@ public class CustomerController {
     @ApiOperation("syncMemberToMongo")
     @GetMapping("syncMemberToMongo")
     public void syncMemberToMongo() throws Exception {
-        for (int i = 1; i <= 100; i++) {
-            Page<member_wide> pageMember = memberService.selectFullMemberByPage(i, 1000);
+        for (int i = 1; i <= 10; i++) {
+            Page<member_wide> pageMember = memberService.selectFullMemberByPage(i, 100);
             for (member_wide member : pageMember.getItems()
             ) {
                 member_wide mongoMember = memberService.getMemberFromMongo(member.getMember_card());
