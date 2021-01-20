@@ -117,4 +117,6 @@ public interface MemberMapper {
     void updateCrowdGroup(CrowdGroup crowdGroup);
 
     void delCrowdGroupById(int id);
+
+    List getMemberAmount(List<String> member_cards);
 }

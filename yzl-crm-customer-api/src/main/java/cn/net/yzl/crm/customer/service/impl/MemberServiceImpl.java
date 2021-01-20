@@ -276,14 +276,32 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.addCrowdGroup(crowdGroup);
     }
 
+    /**
+     * 修改圈选
+     * @param crowdGroup
+     */
     @Override
     public void updateCrowdGroup(CrowdGroup crowdGroup) {
         memberMapper.updateCrowdGroup(crowdGroup);
     }
 
+    /**
+     * 删除圈选
+     * @param id
+     */
     @Override
     public void delCrowdGroupById(int id) {
         memberMapper.delCrowdGroupById(id);
+    }
+
+    /**
+     * 根据一批顾客卡号获取顾客账户信息
+     * @param member_cards
+     * @return
+     */
+    @Override
+    public List getMemberAmount(List<String> member_cards) {
+        return memberMapper.getMemberAmount(member_cards);
     }
 
 

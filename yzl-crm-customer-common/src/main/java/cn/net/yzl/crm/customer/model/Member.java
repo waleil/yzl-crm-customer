@@ -104,4 +104,8 @@ public class Member {
 
     @ApiModelProperty("收货地址")
     private List<ReveiverAddress> receive_address_list;
+
+    @ApiModelProperty("顾客账户")
+    private MemberAmount member_amount;
+
 }

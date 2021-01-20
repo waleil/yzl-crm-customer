@@ -39,7 +39,7 @@
     member_status, activity, region_code, province_code, city_code, total_amount, qq,id_card,
 
     wechat, email, source, address, birthday, job_code, first_order_time, last_order_time,
-    master_card, first_order_staff_no, first_order_am, order_num, media_name, media_type_code,
+    master_card, first_order_staff_no, first_order_am, order_num,media_id, media_name, media_type_code,
     media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag,member_type
   </sql>
 
@@ -627,5 +627,15 @@
     <update id="delCrowdGroupById"  >
         update crowd_group set del=1 where id=#{id}
     </update>
+    
+    <select id="getMemberAmount"  resultType="cn.net.yzl.crm.customer.model.MemberAmount">
+        select
+        member_card,last_integral,last_red_bag,last_coupon,total_money,frozen_amount,frozen_ticket,frozen_red_bag,frozen_integral
+        from member_amount
+        where member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 
 </mapper>

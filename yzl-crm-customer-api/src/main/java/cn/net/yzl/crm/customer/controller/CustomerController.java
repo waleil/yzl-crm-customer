@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,8 +69,14 @@ public class CustomerController {
     @GetMapping("v1/getMember")
     public GeneralResult<Member> getMember(@RequestParam("memberCard") String memberCard) {
         Member memberEntity = memberService.selectMemberByCard(memberCard);
-        List<MemberPhone> memberPhoneList = memberService.getMemberPhoneList(memberCard);
-        List<ReveiverAddress> addressList=memberService.getReveiverAddress(memberCard);
+        List<MemberPhone> memberPhoneList = memberService.getMemberPhoneList(memberCard); //获取联系方式
+        List<ReveiverAddress> addressList = memberService.getReveiverAddress(memberCard); //获取收获地址
+        List<String> member_cards = new ArrayList<>();
+        member_cards.add(memberCard);
+        List<MemberAmount> memberAmountList = memberService.getMemberAmount(member_cards); //获取顾客账户信息
+        if (memberAmountList != null && memberAmountList.size() > 0) {
+            memberEntity.setMember_amount(memberAmountList.get(0));
+        }
         memberEntity.setReceive_address_list(addressList);
         memberEntity.setMemberPhoneList(memberPhoneList);
         return GeneralResult.success(memberEntity);
@@ -316,13 +323,13 @@ public class CustomerController {
         crowdGroup.setName(memberCrowdGroup.getCrowd_name());
         crowdGroup.setDescription(memberCrowdGroup.getDescription());
         crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-MM-dd HH:mm:ss"));
-        crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(),"yyyy-MM-dd HH:mm:ss"));
+        crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(), "yyyy-MM-dd HH:mm:ss"));
         crowdGroup.setEnable(memberCrowdGroup.getEnable());
         crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
         int insertRows = memberService.addCrowdGroup(crowdGroup);
 
         memberCrowdGroup.setCreate_time(DateHelper.getCurrentDate());
-        memberCrowdGroup.setCrowd_id(crowdGroup.getId()+"");
+        memberCrowdGroup.setCrowd_id(crowdGroup.getId() + "");
         memberService.saveMemberCrowdGroup(memberCrowdGroup);
         //todo 圈选人
         return ComResponse.success();
