@@ -15,6 +15,7 @@ import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -417,18 +418,19 @@ public class CustomerController {
         return ComResponse.success(list);
     }
 
-
+    @ApiOperation("syncMemberToMongo")
+    @GetMapping("syncMemberToMongo")
     public void syncMemberToMongo() throws Exception {
         for (int i = 1; i <= 100; i++) {
             Page<member_wide> pageMember = memberService.selectFullMemberByPage(i, 1000);
             for (member_wide member : pageMember.getItems()
             ) {
-               member_wide mongoMember=  memberService.getMemberFromMongo(member.getMember_card());
-               if(mongoMember==null){
-                   memberService.saveMemberToMongo(member);
-                   continue;
-               }
-               memberService.updateMemberToMongo(member);
+                member_wide mongoMember = memberService.getMemberFromMongo(member.getMember_card());
+                if (mongoMember == null) {
+                    memberService.saveMemberToMongo(member);
+                    continue;
+                }
+                memberService.updateMemberToMongo(member);
             }
         }
     }

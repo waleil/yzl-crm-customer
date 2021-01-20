@@ -14,7 +14,7 @@ import java.util.List;
 
 @Data
 @ApiModel("顾客宽表实体类")
-@Document(collection="member")
+@Document(collection="member_wide")
 public class member_wide {
     //    @ApiModelProperty(value = "主键")
 //    private String id;
