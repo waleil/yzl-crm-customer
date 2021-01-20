@@ -4,8 +4,8 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
-import cn.net.yzl.crm.customer.mongomodel.crowd_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
+import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 
 import java.util.List;
@@ -136,5 +136,24 @@ public interface MemberService {
 
     List getMemberAmount(List<String> member_cards);
 
-    Page<cn.net.yzl.crm.customer.mongomodel.Member> selectFullMemberByPage(int currentPage,int pageSize);
+    Page<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
+
+    /**
+     * 根据卡号从mongo获取顾客信息
+     * @param member_card
+     * @return
+     */
+    member_wide getMemberFromMongo(String member_card);
+
+    /**
+     * 保存顾客信息到mongo
+     * @param member
+     */
+    void saveMemberToMongo(member_wide member);
+
+    /**
+     * 修改mongo顾客信息
+     * @param member
+     */
+    void updateMemberToMongo(member_wide member) throws Exception;
 }

@@ -638,7 +638,7 @@
         </foreach>
     </select>
 
-    <select id="selectFullMemberByPage" resultType="cn.net.yzl.crm.customer.mongomodel.Member">
+    <select id="selectFullMemberByPage" resultType="cn.net.yzl.crm.customer.mongomodel.member_wide">
             select
             m.member_card,
             member_name, nick_name, age, sex, adver_code, m_grade_code,  is_active,

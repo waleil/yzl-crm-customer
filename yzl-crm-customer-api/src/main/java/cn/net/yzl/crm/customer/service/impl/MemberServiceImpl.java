@@ -9,6 +9,7 @@ import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
+import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import com.github.pagehelper.PageHelper;
@@ -305,12 +306,27 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<cn.net.yzl.crm.customer.mongomodel.Member> selectFullMemberByPage(int currentPage, int pageSize) {
+    public Page<member_wide> selectFullMemberByPage(int currentPage, int pageSize) {
         PageHelper.startPage(currentPage, pageSize);
-        List<cn.net.yzl.crm.customer.mongomodel.Member> list = memberMapper.selectFullMemberByPage();
-        Page<cn.net.yzl.crm.customer.mongomodel.Member> page = AssemblerResultUtil.resultAssembler(list);
+        List<member_wide> list = memberMapper.selectFullMemberByPage();
+        Page<member_wide> page = AssemblerResultUtil.resultAssembler(list);
 
         return page;
+    }
+
+    @Override
+    public member_wide getMemberFromMongo(String member_card) {
+        return memberCrowdGroupDao.getMemberFromMongo(member_card);
+    }
+
+    @Override
+    public void saveMemberToMongo(member_wide member) {
+        memberCrowdGroupDao.saveMemberToMongo(member);
+    }
+
+    @Override
+    public void updateMemberToMongo(member_wide member) throws Exception {
+        memberCrowdGroupDao.updateMemberToMongo(member);
     }
 
 

@@ -3,13 +3,11 @@ package cn.net.yzl.crm.customer.dao.mongo;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.entity.PageParam;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
-import cn.net.yzl.common.util.DateHelper;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.model.CrowdGroup;
-import cn.net.yzl.crm.customer.mongomodel.Member;
+import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.sys.BizException;
-import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.MongoQueryUtil;
 import cn.net.yzl.crm.customer.utils.QueryUpdate;
 import io.netty.util.internal.StringUtil;
@@ -19,13 +17,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -161,10 +157,10 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      * @param member_card
      * @return
      */
-    public Member getMemberFromMongo(String member_card) {
+    public member_wide getMemberFromMongo(String member_card) {
         Query query = new Query();
         query.addCriteria(Criteria.where("member_card").is(member_card));
-        return mongoTemplate.findOne(query, Member.class);
+        return mongoTemplate.findOne(query, member_wide.class);
     }
 
     /**
@@ -172,7 +168,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      *
      * @param member
      */
-    public void saveMemberToMongo(Member member) {
+    public void saveMemberToMongo(member_wide member) {
         if (member == null || StringUtil.isNullOrEmpty(member.getMember_card()))
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         mongoTemplate.save(member);
@@ -182,7 +178,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      * 修改mongo顾客信息
      * @param member
      */
-    public void updateMemberToMongo(Member member) throws Exception {
+    public void updateMemberToMongo(member_wide member) throws Exception {
         if (member == null || StringUtil.isNullOrEmpty(member.getMember_card()))
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
 

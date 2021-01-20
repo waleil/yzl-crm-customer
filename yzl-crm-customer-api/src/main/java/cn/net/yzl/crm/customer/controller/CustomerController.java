@@ -8,8 +8,8 @@ import cn.net.yzl.common.util.DateHelper;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
-import cn.net.yzl.crm.customer.mongomodel.crowd_action;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
+import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -418,10 +418,18 @@ public class CustomerController {
     }
 
 
-    public void  syncMemberToMongo(){
-        for(int i=1;i<=100;i++) {
-            Page<cn.net.yzl.crm.customer.mongomodel.Member> memberList = memberService.selectFullMemberByPage(i,1000);
-
+    public void syncMemberToMongo() throws Exception {
+        for (int i = 1; i <= 100; i++) {
+            Page<member_wide> pageMember = memberService.selectFullMemberByPage(i, 1000);
+            for (member_wide member : pageMember.getItems()
+            ) {
+               member_wide mongoMember=  memberService.getMemberFromMongo(member.getMember_card());
+               if(mongoMember==null){
+                   memberService.saveMemberToMongo(member);
+                   continue;
+               }
+               memberService.updateMemberToMongo(member);
+            }
         }
     }
 }
