@@ -12,4 +12,4 @@ spring:
         password: crm123456!
         namespace: ca2511dc-ae29-40f0-b1d9-8daca30a7e9c
         file-extension: yaml
-        prefix: yzl-customer-server-dev
+        prefix: yzl-customer-server-test
