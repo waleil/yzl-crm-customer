@@ -306,12 +306,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<member_wide> selectFullMemberByPage(int currentPage, int pageSize) {
-        PageHelper.startPage(currentPage, pageSize);
-        List<member_wide> list = memberMapper.selectFullMemberByPage();
-        Page<member_wide> page = AssemblerResultUtil.resultAssembler(list);
+    public List<member_wide> selectFullMemberByPage(int currentPage, int pageSize) {
+      //  PageHelper.startPage(currentPage, pageSize);
+        List<member_wide> list = memberMapper.selectFullMemberByPage(currentPage*pageSize, pageSize);
+       // Page<member_wide> page = AssemblerResultUtil.resultAssembler(list);
 
-        return page;
+        return list;
     }
 
     @Override

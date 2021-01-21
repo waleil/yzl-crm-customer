@@ -136,7 +136,7 @@ public interface MemberService {
 
     List getMemberAmount(List<String> member_cards);
 
-    Page<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
+    List<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
 
     /**
      * 根据卡号从mongo获取顾客信息

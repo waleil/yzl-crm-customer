@@ -120,5 +120,5 @@ public interface MemberMapper {
 
     List getMemberAmount(List<String> member_cards);
 
-    List<member_wide> selectFullMemberByPage();
+    List<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
 }

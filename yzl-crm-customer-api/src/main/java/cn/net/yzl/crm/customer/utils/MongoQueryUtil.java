@@ -28,11 +28,15 @@ public class MongoQueryUtil {
         Field[] fields = tClass.getDeclaredFields();
         for (Field f : fields) {
             FieldForMongo filed_annotation = f.getAnnotation(FieldForMongo.class); //获取主键字段，可能存在多个字段确定唯一
-            String methodName = "";
-            if (f.getName().toLowerCase().equals("del")) // del 生成的方法特殊处理
-                methodName = "isDel";
-            else
-                methodName = "get" + getMethodName(f.getName());
+            String methodName = getMethodName(f.getName());
+//            if (f.getName().toLowerCase().equals("del"))
+//                methodName = "isDel";
+//            else if (f.getName().toLowerCase().equals("vip_flag")) {
+//                methodName = "isVip_flag";
+//            } else
+//                methodName = "get" + getMethodName(f.getName());
+
+
             Method m = (Method) model.getClass().getMethod(methodName);
             Object val = m.invoke(model);// 调用getter方法获取属性值
             if (filed_annotation != null) {
@@ -81,6 +85,13 @@ public class MongoQueryUtil {
     private static String getMethodName(String fildeName) throws Exception {
         byte[] items = fildeName.getBytes();
         items[0] = (byte) ((char) items[0] - 'a' + 'A');
-        return new String(items);
+        String item = new String(items);
+
+        if (item.toLowerCase().equals("del"))
+            return "isDel";
+        else if (item.toLowerCase().equals("vip_flag")) {
+            return "isVip_flag";
+        } else
+            return "get" + getMethodName(item);
     }
 }

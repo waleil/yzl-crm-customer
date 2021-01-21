@@ -92,7 +92,7 @@ public class member_wide {
     @ApiModelProperty(value = "主客户会员卡号")
     private Integer master_card;
     @ApiModelProperty(value = "首单下单员工")
-    private Integer first_order_staff_no;
+    private String first_order_staff_no;
     @ApiModelProperty(value = "真正首单金额")
     private Integer first_order_am;
     @ApiModelProperty(value = "订购次数")
@@ -194,4 +194,11 @@ public class member_wide {
     private int total_money;
 
 
+    public boolean isVip_flag() {
+        return vip_flag;
+    }
+
+    public void setVip_flag(boolean vip_flag) {
+        this.vip_flag = vip_flag;
+    }
 }
