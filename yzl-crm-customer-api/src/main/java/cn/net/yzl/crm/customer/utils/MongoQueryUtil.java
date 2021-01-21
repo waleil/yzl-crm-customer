@@ -29,14 +29,6 @@ public class MongoQueryUtil {
         for (Field f : fields) {
             FieldForMongo filed_annotation = f.getAnnotation(FieldForMongo.class); //获取主键字段，可能存在多个字段确定唯一
             String methodName = getMethodName(f.getName());
-//            if (f.getName().toLowerCase().equals("del"))
-//                methodName = "isDel";
-//            else if (f.getName().toLowerCase().equals("vip_flag")) {
-//                methodName = "isVip_flag";
-//            } else
-//                methodName = "get" + getMethodName(f.getName());
-
-
             Method m = (Method) model.getClass().getMethod(methodName);
             Object val = m.invoke(model);// 调用getter方法获取属性值
             if (filed_annotation != null) {
