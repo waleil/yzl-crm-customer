@@ -17,7 +17,7 @@ import java.util.List;
 public class member_crowd_group extends BaseObject {
 
     @ApiModelProperty("群组id")
-    private String crowd_id;
+    private String _id;
 
     @ApiModelProperty("群组名称")
     private String crowd_name;
