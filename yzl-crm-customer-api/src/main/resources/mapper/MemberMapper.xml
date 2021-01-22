@@ -498,7 +498,7 @@
 
     <select id="getMemberList" resultType="cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel" >
         select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code,  mt.`name` as m_grade_name, is_active,
-    member_status, activity, region_code, province_code, city_code, total_amount, qq,id_card,
+    member_status, activity, region_code,region_name, province_code, city_code, total_amount, qq,id_card,
     wechat, email, source, address, birthday, job_code, m.first_order_time, m.last_order_time,
     master_card, m.first_order_staff_no, m.first_order_am, order_num, media_id,media_name, media_type_code,
     media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag,member_type,
