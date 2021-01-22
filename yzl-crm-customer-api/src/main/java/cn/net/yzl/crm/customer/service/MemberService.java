@@ -85,10 +85,10 @@ public interface MemberService {
      * //     * @return
      * //
      */
-    List<CrowdGroup> getCrowdGroupByIds(List<String> groupIds);
+    List<member_crowd_group> getCrowdGroupByIds(List<String> groupIds);
 
 
-    Page<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
+    Page<member_crowd_group> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
 
     void saveMemberCrowdGroup(member_crowd_group member_crowd_group);
 

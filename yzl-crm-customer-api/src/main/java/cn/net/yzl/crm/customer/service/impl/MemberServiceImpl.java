@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import cn.net.yzl.crm.customer.model.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -187,12 +188,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<CrowdGroup> getCrowdGroupByIds(List<String> groupIds) {
+    public List<member_crowd_group> getCrowdGroupByIds(List<String> groupIds) {
         return memberCrowdGroupDao.getMemberCrowdGroupByIds(groupIds);
     }
 
     @Override
-    public Page<CrowdGroup> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
+    public Page<member_crowd_group> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
         if (crowdGroupDTO.getCurrentPage() == null || crowdGroupDTO.getCurrentPage() == 0) {
             crowdGroupDTO.setCurrentPage(1);
         }
@@ -200,13 +201,13 @@ public class MemberServiceImpl implements MemberService {
             crowdGroupDTO.setPageSize(10);
         }
 
-        // return memberCrowdGroupDao.findCrowdGroupByPage(crowdGroupDTO); 从mongo读取，因为日期有问题，暂停使用
+         return memberCrowdGroupDao.findCrowdGroupByPage(crowdGroupDTO);
 
-        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
-        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
-        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
-
-        return page;
+//        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
+//        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
+//        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
+//
+//        return page;
     }
 
     /**
@@ -216,6 +217,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public void saveMemberCrowdGroup(member_crowd_group member_crowd_group) {
+        member_crowd_group.setCreate_time(new Date());
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
     }
 
@@ -239,7 +241,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
-        memberCrowdGroupDao.updateMemberCrowdGroup(member_crowd_group);
+        member_crowd_group old = getMemberCrowdGroup(member_crowd_group.get_id());
+        member_crowd_group.setCreate_time(old.getCreate_time());
+        member_crowd_group.setCreate_code(old.getCreate_code());
+        member_crowd_group.setUpdate_time(new Date());
+        memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
     }
 
     /**

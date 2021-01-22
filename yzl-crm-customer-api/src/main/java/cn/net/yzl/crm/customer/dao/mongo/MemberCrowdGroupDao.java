@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -38,7 +39,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
 
 
     public void saveMemberCrowdGroup(member_crowd_group member_crowd_group) {
-        if (member_crowd_group == null || StringUtil.isNullOrEmpty(member_crowd_group.getCrowd_id()))
+        if (member_crowd_group == null )
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         mongoTemplate.save(member_crowd_group);
     }
@@ -46,7 +47,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
     public member_crowd_group getMemberCrowdGroup(String crowdId) {
         if (StringUtil.isNullOrEmpty(crowdId)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         Query query = new Query();
-        query.addCriteria(Criteria.where("crowd_id").is(crowdId).and("del").is(false));
+        query.addCriteria(Criteria.where("_id").is(crowdId).and("del").is(false));
         return mongoTemplate.findOne(query, member_crowd_group.class);
     }
 
@@ -57,7 +58,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      * @throws Exception
      */
     public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
-        if (member_crowd_group == null || StringUtil.isNullOrEmpty(member_crowd_group.getCrowd_id()))
+        if (member_crowd_group == null )
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         QueryUpdate queryUpdate = MongoQueryUtil.getMongoQueryForUpdate(member_crowd_group);
         mongoTemplate.updateFirst(queryUpdate.getQuery(), queryUpdate.getUpdate(), this.getEntityClass());
@@ -84,15 +85,15 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      * @param crowdIds
      * @return
      */
-    public List<CrowdGroup> getMemberCrowdGroupByIds(List<String> crowdIds) {
+    public List<member_crowd_group> getMemberCrowdGroupByIds(List<String> crowdIds) {
         // Query query = MongoQueryUtil.getBatchQuery(crowdIds,CrowdGroup.class);
-        List<CrowdGroup> crowdGroupList = new ArrayList<>();
+        List<member_crowd_group> crowdGroupList = new ArrayList<>();
 
         for (String crowdId : crowdIds
         ) {
             Query query = new Query();
-            query.addCriteria(Criteria.where("crowd_id").is(crowdId).and("del").is(false));
-            CrowdGroup group = mongoTemplate.findOne(query, CrowdGroup.class, COLLECTION_NAME);
+            query.addCriteria(Criteria.where("_id").is(crowdId).and("del").is(false));
+            member_crowd_group group = mongoTemplate.findOne(query, member_crowd_group.class, COLLECTION_NAME);
             if (group != null) crowdGroupList.add(group);
         }
 
@@ -100,7 +101,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         return crowdGroupList;
     }
 
-    public Page<CrowdGroup> findCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
+    public Page<member_crowd_group> findCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
 
         Criteria criatira = new Criteria();
 
@@ -108,32 +109,39 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         if (!StringUtil.isNullOrEmpty(crowdGroupDTO.getName())) {
             criatira.and("crowd_name").is(crowdGroupDTO.getName());
         }
-        if (crowdGroupDTO.getEnable() != -1) {
+        if (crowdGroupDTO.getEnable() != null) {
             criatira.and("enable").is(crowdGroupDTO.getEnable());
         }
-//        Date startTime = crowdGroupDTO.getStart_date();
-//        Date endTime =crowdGroupDTO.getEnd_date();
-//        if (startTime !=null && endTime==null) {
-//            criatira.and("create_time").gte(startTime);
-//        } else if (startTime == null && endTime != null) {
-//            criatira.and("create_time").lte(endTime);
-//        } else if (startTime != null && endTime != null) {
-//            criatira.andOperator(
-//                    Criteria.where("create_time").gte(startTime),
-//                    Criteria.where("create_time").lte(endTime));
-//        }
+        Date startTime = crowdGroupDTO.getStart_date();
+        Date endTime =crowdGroupDTO.getEnd_date();
+        if (startTime !=null && endTime==null) {
+            criatira.and("create_time").gte(startTime);
+        } else if (startTime == null && endTime != null) {
+            criatira.and("create_time").lte(endTime);
+        } else if (startTime != null && endTime != null) {
+            criatira.andOperator(
+                    Criteria.where("create_time").gte(startTime),
+                    Criteria.where("create_time").lte(endTime));
+        }
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "create_time");
-        Pageable pageable = PageRequest.of(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize(), sort);
+
 
         Query query = new Query();
         query.addCriteria(criatira);
 
-        int total = (int) mongoTemplate.count(query, CrowdGroup.class, COLLECTION_NAME); //先求总数
+        int total = (int) mongoTemplate.count(query, member_crowd_group.class, COLLECTION_NAME); //先求总数
 
         int skip = (crowdGroupDTO.getCurrentPage() - 1) * crowdGroupDTO.getPageSize();
         query.skip(skip).limit(crowdGroupDTO.getPageSize());
-        List<CrowdGroup> crowdGroupList = mongoTemplate.find(query, CrowdGroup.class);
+        //排序
+        Sort sort = Sort.by(Sort.Direction.DESC, "create_time");
+        query.with(sort);
+        query.fields().include("_id")
+                .include("crowd_name").include("description")
+                .include("enable").include("effective_date")
+                .include("expire_date").include("create_name")
+                .include("create_time");
+        List<member_crowd_group> crowdGroupList = mongoTemplate.find(query, member_crowd_group.class);
 
         //mongoTemplate.count计算总数
 

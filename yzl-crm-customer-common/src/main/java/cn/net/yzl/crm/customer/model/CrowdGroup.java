@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.model;
 
+import cn.net.yzl.crm.customer.BaseObject;
 import cn.net.yzl.crm.customer.annotations.FieldForMongo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,14 +13,9 @@ import java.util.List;
 
 @ApiModel("人群圈选实体类")
 @Data
-@Document(collection="member_crowd_group")
-public class CrowdGroup {
-
-    private int id;
-
-    @FieldForMongo(PrimaryKey = "crowd_id")
+public class CrowdGroup extends BaseObject {
     @ApiModelProperty("群组id")
-    private String crowd_id;
+    private String _id;
     @ApiModelProperty("群组名称")
     @Field("crowd_name")
     private String name;

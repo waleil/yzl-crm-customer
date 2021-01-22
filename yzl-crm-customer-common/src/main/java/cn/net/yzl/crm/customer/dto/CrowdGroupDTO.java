@@ -17,17 +17,17 @@ public class CrowdGroupDTO extends PageDTO {
     private String name;
 
     @ApiModelProperty("查询圈选状态，-1表示全部，1表示启用，0表示未启用")
-    private int enable;
+    private Integer enable;
 
-    //@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
-  //  @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建开始日期")
-    private String start_date;
+    private Date start_date;
 
-    //@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
-   // @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建截止日期")
-    private String end_date;
+    private Date end_date;
 
 
 

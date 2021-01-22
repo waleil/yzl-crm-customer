@@ -308,7 +308,7 @@ public class CustomerController {
                     String crowdGroupIds) {
 
         List<String> groupIds = Arrays.asList(crowdGroupIds.split(","));
-        List<CrowdGroup> crowdGroupList = memberService.getCrowdGroupByIds(groupIds);
+        List<member_crowd_group> crowdGroupList = memberService.getCrowdGroupByIds(groupIds);
         return ComResponse.success(crowdGroupList);
 
     }
@@ -318,19 +318,19 @@ public class CustomerController {
     public ComResponse addCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
 
-        CrowdGroup crowdGroup = new CrowdGroup();
-//        crowdGroup.setCreate_code();
-//        crowdGroup.setCreate_name();
-        crowdGroup.setName(memberCrowdGroup.getCrowd_name());
-        crowdGroup.setDescription(memberCrowdGroup.getDescription());
-        crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-MM-dd HH:mm:ss"));
-        crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(), "yyyy-MM-dd HH:mm:ss"));
-        crowdGroup.setEnable(memberCrowdGroup.getEnable());
-        crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
-        int insertRows = memberService.addCrowdGroup(crowdGroup);
+//        CrowdGroup crowdGroup = new CrowdGroup();
+////        crowdGroup.setCreate_code();
+////        crowdGroup.setCreate_name();
+//        crowdGroup.setName(memberCrowdGroup.getCrowd_name());
+//        crowdGroup.setDescription(memberCrowdGroup.getDescription());
+//        crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-MM-dd HH:mm:ss"));
+//        crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(), "yyyy-MM-dd HH:mm:ss"));
+//        crowdGroup.setEnable(memberCrowdGroup.getEnable());
+//        crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
+//        int insertRows = memberService.addCrowdGroup(crowdGroup);
 
-        memberCrowdGroup.setCreate_time(DateHelper.getCurrentDate());
-        memberCrowdGroup.setCrowd_id(crowdGroup.getId() + "");
+//        memberCrowdGroup.setCreate_time(DateHelper.getCurrentDate());
+//        memberCrowdGroup.setCrowd_id(String.valueOf(crowdGroup.getId()));
         memberService.saveMemberCrowdGroup(memberCrowdGroup);
         //todo 圈选人
         return ComResponse.success();
@@ -342,20 +342,20 @@ public class CustomerController {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         try {
 
-            CrowdGroup crowdGroup = new CrowdGroup();
-            crowdGroup.setId(Integer.parseInt(memberCrowdGroup.getCrowd_id()));
-            crowdGroup.setUpdate_code(memberCrowdGroup.getUpdate_code());
-            crowdGroup.setUpdate_name(memberCrowdGroup.getUpdate_name());
-            crowdGroup.setName(memberCrowdGroup.getCrowd_name());
-            crowdGroup.setDescription(memberCrowdGroup.getDescription());
-            crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-MM-dd HH:mm:ss"));
-            crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(), "yyyy-MM-dd HH:mm:ss"));
-            crowdGroup.setEnable(memberCrowdGroup.getEnable());
-            crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
-
-            memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDate());
-
-            memberService.updateCrowdGroup(crowdGroup);
+//            CrowdGroup crowdGroup = new CrowdGroup();
+//            crowdGroup.setId(Integer.parseInt(memberCrowdGroup.getCrowd_id()));
+//            crowdGroup.setUpdate_code(memberCrowdGroup.getUpdate_code());
+//            crowdGroup.setUpdate_name(memberCrowdGroup.getUpdate_name());
+//            crowdGroup.setName(memberCrowdGroup.getCrowd_name());
+//            crowdGroup.setDescription(memberCrowdGroup.getDescription());
+//            crowdGroup.setEffective_date(DateHelper.formateDate(memberCrowdGroup.getEffective_date(), "yyyy-MM-dd HH:mm:ss"));
+//            crowdGroup.setExpire_date(DateHelper.formatDate(memberCrowdGroup.getExpire_date(), "yyyy-MM-dd HH:mm:ss"));
+//            crowdGroup.setEnable(memberCrowdGroup.getEnable());
+//            crowdGroup.setPerson_count(memberCrowdGroup.getPerson_count());
+//
+//            memberCrowdGroup.setUpdate_time(DateHelper.getCurrentDate());
+//
+//            memberService.updateCrowdGroup(crowdGroup);
             memberService.updateMemberCrowdGroup(memberCrowdGroup);
             //todo 圈选人
             return ComResponse.success();
@@ -366,10 +366,10 @@ public class CustomerController {
 
 
     @ApiOperation("分页获取圈选列表")
-    @PostMapping("/v1/getCrowdGroupByPage")
-    public ComResponse getCrowdGroupByPage(@RequestBody CrowdGroupDTO crowdGroupDTO) {
+    @GetMapping("/v1/getCrowdGroupByPage")
+    public ComResponse getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
         if (crowdGroupDTO == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
-        Page<CrowdGroup> page = memberService.getCrowdGroupByPage(crowdGroupDTO);
+        Page<member_crowd_group> page = memberService.getCrowdGroupByPage(crowdGroupDTO);
         return ComResponse.success(page);
     }
 
