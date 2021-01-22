@@ -241,7 +241,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
-        member_crowd_group old = getMemberCrowdGroup(member_crowd_group.get_id());
+        member_crowd_group old = getMemberCrowdGroup(member_crowd_group.getCrowd_id());
         member_crowd_group.setCreate_time(old.getCreate_time());
         member_crowd_group.setCreate_code(old.getCreate_code());
         member_crowd_group.setUpdate_time(new Date());
