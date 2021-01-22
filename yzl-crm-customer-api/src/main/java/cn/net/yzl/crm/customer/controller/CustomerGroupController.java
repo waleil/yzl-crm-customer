@@ -101,7 +101,7 @@ public class CustomerGroupController {
      * @Return: cn.net.yzl.common.entity.ComResponse<cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO>
      */
     @ApiOperation("查询顾客圈选列表")
-    @PostMapping("/v1/query4Select")
+    @GetMapping("/v1/query4Select")
     public ComResponse<List<CustomerCrowdGroupVO>> query4Select(){
         return customerGroupService.query4Select();
     }
