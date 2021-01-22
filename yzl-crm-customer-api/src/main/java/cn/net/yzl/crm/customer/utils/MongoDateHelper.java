@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SimpleTimeZone;
@@ -29,6 +30,12 @@ public class MongoDateHelper {
     /** 时间格式(yyyy-MM-dd HH:mm:ss) */
     public final static String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+    public static Date getMongoDate(Date date) {
+        Calendar ca = Calendar.getInstance();
+        ca.setTime(date);
+        ca.add(Calendar.HOUR_OF_DAY, 8);
+        return ca.getTime();
+    }
     public static Date formatD(String dateStr){
         return formatD(dateStr,DATE_TIME_PATTERN);
     }

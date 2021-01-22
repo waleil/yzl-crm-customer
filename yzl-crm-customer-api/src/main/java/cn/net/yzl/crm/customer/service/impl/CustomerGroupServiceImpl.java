@@ -7,6 +7,7 @@ import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
+import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +65,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     @Override
     public ComResponse saveCustomerCrowdGroup(member_crowd_group member_crowd_group) {
-        member_crowd_group.setCreate_time(new Date());
+        member_crowd_group.setCreate_time(MongoDateHelper.getMongoDate(new Date()));
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
         return ComResponse.success();
     }
@@ -94,9 +95,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         if(old.getEnable()!=null && old.getEnable()==1){
             return ComResponse.fail(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(),"已经生效的规则，无法编辑!");
         }
-        member_crowd_group.setCreate_time(old.getCreate_time());
+        member_crowd_group.setCreate_time(MongoDateHelper.getMongoDate(old.getCreate_time()));
         member_crowd_group.setCreate_code(old.getCreate_code());
-        member_crowd_group.setUpdate_time(new Date());
+        member_crowd_group.setUpdate_time(MongoDateHelper.getMongoDate(new Date()));
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
        return ComResponse.success();
     }
