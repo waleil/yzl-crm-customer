@@ -3,6 +3,8 @@ package cn.net.yzl.crm.customer.service;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 
 import java.util.List;
@@ -42,6 +44,7 @@ public interface CustomerGroupService {
      * @Date: 2021/1/22 1:57 下午
      * @Return:
      */
-    boolean updateCustomerCrowdGroupStatus();
+    ComResponse updateCustomerCrowdGroupStatus(UpdateCrowdStatusVO vo);
 
+    ComResponse<List<CustomerCrowdGroupVO>> query4Select();
 }

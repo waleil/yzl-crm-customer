@@ -5,6 +5,8 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
@@ -101,9 +103,28 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
        return ComResponse.success();
     }
-
+    /**
+     * @Author: lichanghong
+     * @Description: 修改圈选状态
+     * @Date: 2021/1/22 8:21 下午
+     * @param vo
+     * @Return: cn.net.yzl.common.entity.ComResponse
+     */
     @Override
-    public boolean updateCustomerCrowdGroupStatus() {
-        return false;
+    public ComResponse updateCustomerCrowdGroupStatus(UpdateCrowdStatusVO vo) {
+
+        return memberCrowdGroupDao.updateCustomerCrowdGroupStatus(vo);
+    }
+    /**
+     * @Author: lichanghong
+     * @Description:  查询圈选规则
+     * @Date: 2021/1/22 8:20 下午
+     * @param
+     * @Return: cn.net.yzl.common.entity.ComResponse<cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO>
+     */
+    @Override
+    public ComResponse<List<CustomerCrowdGroupVO>> query4Select() {
+        List<CustomerCrowdGroupVO> list = memberCrowdGroupDao.query4Select();
+        return ComResponse.success(list);
     }
 }

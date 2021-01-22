@@ -1,13 +1,17 @@
 package cn.net.yzl.crm.customer.dao.mongo;
 
+import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.entity.PageParam;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.model.CrowdGroup;
+import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.sys.BizException;
+import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.MongoQueryUtil;
 import cn.net.yzl.crm.customer.utils.QueryUpdate;
 import io.netty.util.internal.StringUtil;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
@@ -74,7 +79,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         Query query = new Query();
         Update update = new Update();
-        query.addCriteria(Criteria.where("crowd_id").is(crowdId));
+        query.addCriteria(Criteria.where("_id").is(crowdId));
         update.set("del", true);
         mongoTemplate.updateFirst(query, update, member_crowd_group.class);
     }
@@ -170,7 +175,35 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         query.addCriteria(Criteria.where("member_card").is(member_card));
         return mongoTemplate.findOne(query, member_wide.class);
     }
+    /**
+     * @Author: lichanghong
+     * @Description:  修改状态
+     * @Date: 2021/1/22 6:41 下午
+     * @param vo
+     * @Return: boolean
+     */
+    public ComResponse updateCustomerCrowdGroupStatus(UpdateCrowdStatusVO vo){
+        member_crowd_group group= getMemberCrowdGroup(vo.get_id());
+        if(Objects.isNull(group)){
+            return ComResponse.nodata("群组不存在");
+        }
+        if(vo.getEnable()!=null && vo.getEnable()==1){
+            if(group.getExpire_date().getTime()<System.currentTimeMillis()){
+                return ComResponse.fail(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(),"当前群组已经过期!");
+            }
+        }
 
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria(Criteria.where("_id").is(vo.get_id()));
+        update.set("enable", vo.getEnable())
+                .set("update_code",vo.getUpdate_code())
+                .set("update_name",vo.getUpdate_name())
+                .set("update_time", MongoDateHelper.getMongoDate(new Date()));
+
+        mongoTemplate.updateFirst(query, update, member_crowd_group.class);
+        return ComResponse.success();
+    }
     /**
      * 保存顾客信息到mongo
      *
@@ -193,6 +226,18 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         QueryUpdate queryUpdate = MongoQueryUtil.getMongoQueryForUpdate(member);
         mongoTemplate.updateFirst(queryUpdate.getQuery(), queryUpdate.getUpdate(), this.getEntityClass());
 
+    }
+    public List<CustomerCrowdGroupVO> query4Select(){
+        Query query = new Query();
+        Criteria  criatira =Criteria.where("del").is(false);
+        query.addCriteria(criatira);
+        //排序
+        Sort sort = Sort.by(Sort.Direction.DESC, "create_time");
+        query.with(sort);
+        query.fields().include("_id")
+                .include("crowd_name");
+        List<CustomerCrowdGroupVO> crowdGroupList = mongoTemplate.find(query, CustomerCrowdGroupVO.class,COLLECTION_NAME);
+        return crowdGroupList;
     }
 
 }

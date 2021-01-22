@@ -4,6 +4,8 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -14,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
@@ -85,5 +88,21 @@ public class CustomerGroupController {
         member_crowd_group member_crowd_group = customerGroupService.getMemberCrowdGroup(crowdId);
         return ComResponse.success(member_crowd_group);
     }
-
+    @ApiOperation("修改圈选规则状态")
+    @PostMapping("/v1/updateStatus")
+    public ComResponse updateMemberCrowdGroupStatus(@RequestBody @Valid UpdateCrowdStatusVO vo){
+        return customerGroupService.updateCustomerCrowdGroupStatus(vo);
+    }
+    /**
+     * @Author: lichanghong
+     * @Description:  查询圈选规则
+     * @Date: 2021/1/22 8:20 下午
+     * @param
+     * @Return: cn.net.yzl.common.entity.ComResponse<cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO>
+     */
+    @ApiOperation("查询顾客圈选列表")
+    @PostMapping("/v1/query4Select")
+    public ComResponse<List<CustomerCrowdGroupVO>> query4Select(){
+        return customerGroupService.query4Select();
+    }
 }
