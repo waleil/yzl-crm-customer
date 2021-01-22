@@ -186,68 +186,6 @@ public class MemberServiceImpl implements MemberService {
     public List<MemberOrderStatViewModel> getMemberList(List<String> member_cards) {
         return memberMapper.getMemberList(member_cards);
     }
-
-    @Override
-    public List<member_crowd_group> getCrowdGroupByIds(List<String> groupIds) {
-        return memberCrowdGroupDao.getMemberCrowdGroupByIds(groupIds);
-    }
-
-    @Override
-    public Page<member_crowd_group> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
-        if (crowdGroupDTO.getCurrentPage() == null || crowdGroupDTO.getCurrentPage() == 0) {
-            crowdGroupDTO.setCurrentPage(1);
-        }
-        if (crowdGroupDTO.getPageSize() == null || crowdGroupDTO.getPageSize() == 0) {
-            crowdGroupDTO.setPageSize(10);
-        }
-
-         return memberCrowdGroupDao.findCrowdGroupByPage(crowdGroupDTO);
-
-//        PageHelper.startPage(crowdGroupDTO.getCurrentPage(), crowdGroupDTO.getPageSize());
-//        List<CrowdGroup> list = memberMapper.getCrowdGroupByPage(crowdGroupDTO);
-//        Page<CrowdGroup> page = AssemblerResultUtil.resultAssembler(list);
-//
-//        return page;
-    }
-
-    /**
-     * 添加顾客圈选
-     *
-     * @param member_crowd_group
-     */
-    @Override
-    public void saveMemberCrowdGroup(member_crowd_group member_crowd_group) {
-        member_crowd_group.setCreate_time(new Date());
-        memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
-    }
-
-    /**
-     * 获取一个圈选
-     *
-     * @param crowdId
-     * @return
-     */
-    @Override
-    public member_crowd_group getMemberCrowdGroup(String crowdId) {
-        return memberCrowdGroupDao.getMemberCrowdGroup(crowdId);
-    }
-
-    /**
-     * 修改顾客圈选
-     *
-     * @param member_crowd_group
-     * @throws Exception
-     */
-
-    @Override
-    public void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
-        member_crowd_group old = getMemberCrowdGroup(member_crowd_group.get_id());
-        member_crowd_group.setCreate_time(old.getCreate_time());
-        member_crowd_group.setCreate_code(old.getCreate_code());
-        member_crowd_group.setUpdate_time(new Date());
-        memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
-    }
-
     /**
      * 获取顾客行为偏好基础数据
      *

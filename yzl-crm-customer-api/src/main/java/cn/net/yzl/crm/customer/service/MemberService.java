@@ -80,27 +80,7 @@ public interface MemberService {
 
     List<MemberOrderStatViewModel> getMemberList(List<String> member_cards);
 
-    /**
-     * //     * 根据圈选id批量获取圈选
-     * //     * @return
-     * //
-     */
-    List<member_crowd_group> getCrowdGroupByIds(List<String> groupIds);
 
-
-    Page<member_crowd_group> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO);
-
-    void saveMemberCrowdGroup(member_crowd_group member_crowd_group);
-
-    /**
-     * 根据crowd_id获取一个圈选
-     *
-     * @param crowdId
-     * @return
-     */
-    member_crowd_group getMemberCrowdGroup(String crowdId);
-
-    void updateMemberCrowdGroup(member_crowd_group member_crowd_group) throws Exception;
 
     /**
      * 获取顾客行为偏好字典数据
