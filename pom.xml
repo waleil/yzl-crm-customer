@@ -18,7 +18,7 @@
 
     <groupId>cn.net.yzl.crm.customer</groupId>
     <artifactId>yzl-crm-customer-platform</artifactId>
-    <!--    <version>1.0-SNAPSHOT</version>-->
+     <version>1.0-SNAPSHOT</version>
 
     <build>
         <resources>
