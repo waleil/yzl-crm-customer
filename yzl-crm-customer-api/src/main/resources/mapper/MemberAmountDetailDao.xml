@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.yzl.crm.customer.dao.MemberAmountDetailDao">
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.MemberAmountDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
+    <result column="discount_name" jdbcType="VARCHAR" property="discountName" />
+    <result column="discount_money" jdbcType="INTEGER" property="discountMoney" />
+    <result column="discount_no" jdbcType="VARCHAR" property="discountNo" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="end_date" jdbcType="TIMESTAMP" property="endDate" />
+    <result column="discount_type" jdbcType="TINYINT" property="discountType" />
+    <result column="obtain_type" jdbcType="TINYINT" property="obtainType" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="product_no" jdbcType="VARCHAR" property="productNo" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, member_card, discount_name, discount_money, discount_no, start_date, end_date, 
+    discount_type, obtain_type, order_no, product_no, create_date, `status`, remark
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from member_amount_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="getMemberAmountDetailList" resultType="cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto">
+        SELECT
+            member_card memberCard,
+            create_date createDate,
+            discount_money discountMoney,
+            obtain_type obtainType,
+            remark
+        FROM
+            member_amount_detail
+        WHERE
+
+             `status` = 1 AND member_card = #{memberCard}
+             <if test="now!=null">
+              and create_date &gt;= #{now}
+             </if>
+        ORDER BY
+            create_date DESC
+
+
+  </select>
+  <select id="getByTypeAndOrder" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from member_amount_detail
+    where order_no = #{orderNo} and obtain_type=#{obtainType} and status in (1,2)
+    limit 1
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from member_amount_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.model.MemberAmountDetail" useGeneratedKeys="true">
+    insert into member_amount_detail (member_card, discount_name, discount_money, 
+      discount_no, start_date, end_date, 
+      discount_type, obtain_type, order_no, 
+      product_no, create_date, `status`, 
+      remark)
+    values (#{memberCard,jdbcType=VARCHAR}, #{discountName,jdbcType=VARCHAR}, #{discountMoney,jdbcType=INTEGER}, 
+      #{discountNo,jdbcType=VARCHAR}, #{startDate,jdbcType=TIMESTAMP}, #{endDate,jdbcType=TIMESTAMP}, 
+      #{discountType,jdbcType=TINYINT}, #{obtainType,jdbcType=TINYINT}, #{orderNo,jdbcType=VARCHAR}, 
+      #{productNo,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{status,jdbcType=TINYINT}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.model.MemberAmountDetail" useGeneratedKeys="true">
+    insert into member_amount_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="memberCard != null">
+        member_card,
+      </if>
+      <if test="discountName != null">
+        discount_name,
+      </if>
+      <if test="discountMoney != null">
+        discount_money,
+      </if>
+      <if test="discountNo != null">
+        discount_no,
+      </if>
+      <if test="startDate != null">
+        start_date,
+      </if>
+      <if test="endDate != null">
+        end_date,
+      </if>
+      <if test="discountType != null">
+        discount_type,
+      </if>
+      <if test="obtainType != null">
+        obtain_type,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="productNo != null">
+        product_no,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="status != null">
+        `status`,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="memberCard != null">
+        #{memberCard,jdbcType=VARCHAR},
+      </if>
+      <if test="discountName != null">
+        #{discountName,jdbcType=VARCHAR},
+      </if>
+      <if test="discountMoney != null">
+        #{discountMoney,jdbcType=INTEGER},
+      </if>
+      <if test="discountNo != null">
+        #{discountNo,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null">
+        #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endDate != null">
+        #{endDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="discountType != null">
+        #{discountType,jdbcType=TINYINT},
+      </if>
+      <if test="obtainType != null">
+        #{obtainType,jdbcType=TINYINT},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productNo != null">
+        #{productNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.MemberAmountDetail">
+    update member_amount_detail
+    <set>
+      <if test="memberCard != null">
+        member_card = #{memberCard,jdbcType=VARCHAR},
+      </if>
+      <if test="discountName != null">
+        discount_name = #{discountName,jdbcType=VARCHAR},
+      </if>
+      <if test="discountMoney != null">
+        discount_money = #{discountMoney,jdbcType=INTEGER},
+      </if>
+      <if test="discountNo != null">
+        discount_no = #{discountNo,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null">
+        start_date = #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endDate != null">
+        end_date = #{endDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="discountType != null">
+        discount_type = #{discountType,jdbcType=TINYINT},
+      </if>
+      <if test="obtainType != null">
+        obtain_type = #{obtainType,jdbcType=TINYINT},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productNo != null">
+        product_no = #{productNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        `status` = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.MemberAmountDetail">
+    update member_amount_detail
+    set member_card = #{memberCard,jdbcType=VARCHAR},
+      discount_name = #{discountName,jdbcType=VARCHAR},
+      discount_money = #{discountMoney,jdbcType=INTEGER},
+      discount_no = #{discountNo,jdbcType=VARCHAR},
+      start_date = #{startDate,jdbcType=TIMESTAMP},
+      end_date = #{endDate,jdbcType=TIMESTAMP},
+      discount_type = #{discountType,jdbcType=TINYINT},
+      obtain_type = #{obtainType,jdbcType=TINYINT},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      product_no = #{productNo,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      `status` = #{status,jdbcType=TINYINT},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

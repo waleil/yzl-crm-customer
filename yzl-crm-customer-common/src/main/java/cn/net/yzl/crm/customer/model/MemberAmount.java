@@ -1,37 +1,60 @@
 package cn.net.yzl.crm.customer.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 import lombok.Data;
 
-@ApiModel("顾客账户实体")
+/**
+ * member_amount
+ * @author 
+ */
 @Data
-public class MemberAmount {
+public class MemberAmount implements Serializable {
+    private Integer id;
 
-    @ApiModelProperty("顾客卡号")
-    private String member_card;
+    /**
+     * 会员卡号
+     */
+    private String memberCard;
 
-    @ApiModelProperty("余积分")
-    private int last_integral;
+    /**
+     * 余积分
+     */
+    private Integer lastIntegral;
 
-    @ApiModelProperty("余红包")
-    private int last_red_bag;
+    /**
+     * 余红包
+     */
+    private Integer lastRedBag;
 
-    @ApiModelProperty("余券")
-    private int last_coupon;
+    /**
+     * 余券
+     */
+    private Integer lastCoupon;
 
-    @ApiModelProperty("总剩余金额")
-    private int total_money;
+    /**
+     * 总剩余金额
+     */
+    private Integer totalMoney;
 
-    @ApiModelProperty("占用预存款")
-    private int frozen_amount;
+    /**
+     * 占用预存款
+     */
+    private Integer frozenAmount;
 
-    @ApiModelProperty("占用返券")
-    private int frozen_ticket;
+    /**
+     * 占用返券
+     */
+    private Integer frozenTicket;
 
-    @ApiModelProperty("占用红包")
-    private int frozen_red_bag;
+    /**
+     * 占用积分
+     */
+    private Integer frozenIntegral;
 
-    @ApiModelProperty("占用积分")
-    private int frozen_integral;
+    /**
+     * 占用红包
+     */
+    private Integer frozenRedBag;
+
+    private static final long serialVersionUID = 1L;
 }
