@@ -20,25 +20,20 @@ import java.util.Date;
 @ApiModel(value = "MemberAmountDetailVO",description = "顾客账户信息记录实体")
 public class MemberAmountDetailVO implements Serializable {
 
-    @ApiModelProperty(value = "顾客卡号",name = "memberCard",required = true)
+    @ApiModelProperty(value = "顾客卡号", name = "memberCard", required = true)
     @NotBlank
     private String memberCard;
-    @ApiModelProperty(value = "金额",name = "discountMoney",required = true)
+    @ApiModelProperty(value = "金额", name = "discountMoney", required = true)
     @NotNull
     @Min(1)
     private Integer discountMoney;
-    @ApiModelProperty(value = "1 退回 2 消费,3:充值",name = "obtainType",required = true)
+    @ApiModelProperty(value = "1 退回 2 消费,3:充值", name = "obtainType", required = true)
     @NotNull
     @Min(1)
     @Max(3)
     private int obtainType;
-    @ApiModelProperty(value = "备注",name = "remark")
+    @ApiModelProperty(value = "备注", name = "remark")
     private String remark;
-    @ApiModelProperty(value = "订单号(操作类型为1或者2时,orderNo必传)",name = "orderNo")
+    @ApiModelProperty(value = "订单号(操作类型为1或者2时,orderNo必传)", name = "orderNo")
     private String orderNo;
-    @ApiModelProperty(value = "1 操作成功，2操作中",name = "status")
-    @Min(1)
-    @Max(3)
-    @NotNull
-    private int status;
 }

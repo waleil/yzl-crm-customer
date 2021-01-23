@@ -101,7 +101,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         }
         MemberAmount memberAmount = new MemberAmount();
         memberAmount.setMemberCard(memberCard);
-        int status = memberAmountDetailVO.getStatus();
+
 
         if(obtainType==1){ // 退回
             memberAmount.setTotalMoney(totalMoney+discountMoney);
@@ -110,9 +110,6 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         }else if(obtainType==3){ //充值
             memberAmount.setTotalMoney(totalMoney+discountMoney);
 
-        }
-        if(status==2){ // 操作成功
-            memberAmount.setFrozenAmount(discountMoney);
         }
         // 修改账户信息
         int num = memberAmountDao.updateByPrimaryKeySelective(memberAmount);
