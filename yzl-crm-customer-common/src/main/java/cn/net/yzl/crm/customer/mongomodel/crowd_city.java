@@ -9,7 +9,7 @@ import lombok.Data;
 public class crowd_city {
 
     @ApiModelProperty("城市编码")
-    private int city_code;
+    private Integer city_code;
 
     @ApiModelProperty("城市名称")
     private String name;

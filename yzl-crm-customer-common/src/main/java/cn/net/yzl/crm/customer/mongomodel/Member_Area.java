@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 public class Member_Area {
     @ApiModelProperty("省Id")
-    private int province_id;
+    private Integer province_id;
     @ApiModelProperty("省名称")
     private String province_name;
     @ApiModelProperty("要排除的城市")

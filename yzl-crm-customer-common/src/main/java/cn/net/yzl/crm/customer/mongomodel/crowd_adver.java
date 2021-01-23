@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class crowd_adver {
     @ApiModelProperty("广告id")
-    private int id;
+    private Integer id;
 
     @ApiModelProperty("广告名称")
     private String name;
