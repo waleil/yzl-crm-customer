@@ -39,8 +39,21 @@ public class Member {
     private String region_code;
     @ApiModelProperty(value = "所属省份")
     private Integer province_code;
+    @ApiModelProperty(value = "所属省份名称")
+    private String province_name;
     @ApiModelProperty(value = "所属城市id")
     private Integer city_code;
+    @ApiModelProperty(value = "所属城市名称")
+    private Integer city_name;
+
+    @ApiModelProperty(value = "所属区域编号")
+    private Integer area_code;
+    @ApiModelProperty(value = "所属区域")
+    private String area_name;
+    @ApiModelProperty(value = "媒体id")
+    private Integer media_id;
+    @ApiModelProperty(value = "媒体名称")
+    private String media_name;
     @ApiModelProperty(value = "累计消费金额")
     private Integer total_amount;
     @ApiModelProperty(value = "qq")
@@ -72,8 +85,6 @@ public class Member {
     private Integer first_order_am;
     @ApiModelProperty(value = "订购次数")
     private Integer order_num;
-    @ApiModelProperty(value = "媒体名称（冗余，暂定第一次进线）")
-    private String media_name;
     @ApiModelProperty(value = "媒体类型id")
     private Integer media_type_code;
     @ApiModelProperty(value = "媒体类型名称（冗余，暂定第一次进线）")
@@ -113,5 +124,20 @@ public class Member {
 
     @ApiModelProperty("购买意向  1 无意向 2 低意向 3中意向 4高意向")
     private Integer buy_intention;
+    @ApiModelProperty("身份证号")
+    private String id_card;
+    @ApiModelProperty("创建人编号")
+    private String creator_no;
+
+    @ApiModelProperty("创建人姓名")
+    private String creator_name;
+    @ApiModelProperty("编辑人编号")
+    private String updator_no;
+
+    @ApiModelProperty("编辑人姓名")
+    private String updator_name;
+    @ApiModelProperty("修改时间")
+    private Date update_time;
+
 
 }

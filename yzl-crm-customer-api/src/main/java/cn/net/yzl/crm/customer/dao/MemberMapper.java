@@ -16,7 +16,7 @@ public interface MemberMapper {
     List<MemberGrad> getMemberGrad();
 
     @DataSourceSelector(value = DynamicDataSourceEnum.master)
-    int insert(Member record);
+    int insertSelective(Member record);
 
     List<Member> findPageByCondition(MemberSerchConditionDTO dto);
 
