@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 public class CityServiceImpl implements CityService {
 
 //    @Autowired
-//    CityMapper cityMapper;
-//
-//    @Autowired
-//    ProvinceMapper provinceMapper;
+////    CityMapper cityMapper;
+////
+////    @Autowired
+////    ProvinceMapper provinceMapper;
 
     @Override
     public void saveProvince(Province province) {
