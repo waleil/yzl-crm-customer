@@ -36,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public int insert(Member record) {
-        return memberMapper.insert(record);
+        return memberMapper.insertSelective(record);
     }
 
     @Override
