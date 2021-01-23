@@ -23,8 +23,8 @@ public class Member {
     private String nick_name;
     @ApiModelProperty(value = "年龄")
     private Integer age;
-    @ApiModelProperty(value = "性别：0代表男，1代表女，代表未知")
-    private int sex;
+    @ApiModelProperty(value = "性别：0代表男，1代表女，2代表未知")
+    private Integer sex;
     @ApiModelProperty(value = "广告id")
     private Integer adver_code;
     @ApiModelProperty(value = "顾客级别  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
