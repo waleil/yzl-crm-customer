@@ -30,9 +30,9 @@ public class Member {
     @ApiModelProperty(value = "顾客级别  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
     private String m_grade_code;
     @ApiModelProperty(value = "0未发卡1已发卡未激活2已激活")
-    private Short is_active;
+    private Integer is_active;
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
-    private Byte member_status;
+    private Integer member_status;
     @ApiModelProperty(value = "活跃度 1 活跃 2 冷淡 3 一般")
     private int activity;
     @ApiModelProperty(value = "所属区")
@@ -107,5 +107,11 @@ public class Member {
 
     @ApiModelProperty("顾客账户")
     private MemberAmount member_amount;
+
+    @ApiModelProperty("是否拒访，1 是0 否")
+    private Integer reject_flag;
+
+    @ApiModelProperty("购买意向  1 无意向 2 低意向 3中意向 4高意向")
+    private Integer buy_intention;
 
 }
