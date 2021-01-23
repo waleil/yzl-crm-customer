@@ -23,7 +23,7 @@ public class Member {
     private String nick_name;
     @ApiModelProperty(value = "年龄")
     private Integer age;
-    @ApiModelProperty(value = "性别：0代表男，1代表女")
+    @ApiModelProperty(value = "性别：0代表男，1代表女，代表未知")
     private int sex;
     @ApiModelProperty(value = "广告id")
     private Integer adver_code;
