@@ -1127,5 +1127,8 @@
         limit #{currentPage},#{pageSize}
 
     </select>
+    <select id="queryMaxMemberCard" resultType="java.lang.String">
+          SELECT max(member_card) as maxCode FROM member;
+    </select>
 
 </mapper>

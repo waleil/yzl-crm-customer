@@ -122,4 +122,6 @@ public interface MemberMapper {
     List<MemberAmount> getMemberAmount(List<String> member_cards);
 
     List<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
+
+    String queryMaxMemberCard();
 }
