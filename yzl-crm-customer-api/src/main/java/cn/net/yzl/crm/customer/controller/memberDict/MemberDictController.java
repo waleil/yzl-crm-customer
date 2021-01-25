@@ -1,7 +1,6 @@
 package cn.net.yzl.crm.customer.controller.memberDict;
 
 import cn.net.yzl.common.entity.GeneralResult;
-import cn.net.yzl.crm.customer.service.memberDict.MemberDictService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
