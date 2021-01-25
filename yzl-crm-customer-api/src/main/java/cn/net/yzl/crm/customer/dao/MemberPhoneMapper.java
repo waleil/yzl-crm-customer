@@ -1,9 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.MemberPhone;
-import cn.net.yzl.crm.customer.model.db.MemberPhoneExample;
-import java.util.List;
-import org.apache.ibatis.annotations.Param;
+
 /**
  * @Author: lichanghong
  * @Description: 会员手机号接口

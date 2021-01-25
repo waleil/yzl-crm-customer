@@ -1,9 +1,8 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
-import cn.net.yzl.crm.customer.model.db.MemberOrderStatExample;
+
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * @Author: lichanghong
