@@ -5,6 +5,7 @@ import cn.net.yzl.crm.customer.config.db.DynamicDataSourceEnum;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import org.springframework.stereotype.Component;
@@ -122,4 +123,8 @@ public interface MemberMapper {
     List<MemberAmount> getMemberAmount(List<String> member_cards);
 
     List<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
+
+    List<MemberLabel> queryAllMemberByPage(int currentPage, int pageSize);
+
+    String queryMaxMemberCard();
 }

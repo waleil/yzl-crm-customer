@@ -41,9 +41,9 @@ public class MemberOrderStat {
 
     private Integer dayAvgCount;
 
-    private String yearAvgCount;
+    private Integer yearAvgCount;
 
-    private String returnGoodsRate;
+    private Integer returnGoodsRate;
 
     private Date createTime;
 
@@ -199,20 +199,20 @@ public class MemberOrderStat {
         this.dayAvgCount = dayAvgCount;
     }
 
-    public String getYearAvgCount() {
+    public Integer getYearAvgCount() {
         return yearAvgCount;
     }
 
-    public void setYearAvgCount(String yearAvgCount) {
-        this.yearAvgCount = yearAvgCount == null ? null : yearAvgCount.trim();
+    public void setYearAvgCount(Integer yearAvgCount) {
+        this.yearAvgCount = yearAvgCount;
     }
 
-    public String getReturnGoodsRate() {
+    public Integer getReturnGoodsRate() {
         return returnGoodsRate;
     }
 
-    public void setReturnGoodsRate(String returnGoodsRate) {
-        this.returnGoodsRate = returnGoodsRate == null ? null : returnGoodsRate.trim();
+    public void setReturnGoodsRate(Integer returnGoodsRate) {
+        this.returnGoodsRate = returnGoodsRate ;
     }
 
     public Date getCreateTime() {

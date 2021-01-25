@@ -26,10 +26,7 @@
     from member_disease
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from member_disease
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
+
   <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.MemberDisease" >
     insert into member_disease (id, member_card, disease_id, 
       disease_name, disease_descrip, del_flag, 
@@ -136,4 +133,15 @@
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="queryByMemberCodes" resultType="cn.net.yzl.crm.customer.model.mogo.MemberDisease" parameterType="list" >
+    select
+    member_card, disease_id, disease_name,
+    from member_disease
+    where member_card in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
 </mapper>
