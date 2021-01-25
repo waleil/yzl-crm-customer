@@ -51,7 +51,7 @@
     select
     <include refid="Base_Column_List" />
     from member_amount_detail
-    where order_no = #{orderNo} and obtain_type=#{obtainType} and status in (1,2)
+    where order_no = #{orderNo} and obtain_type=#{obtainType}
     limit 1
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
