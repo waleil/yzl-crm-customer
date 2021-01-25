@@ -86,9 +86,9 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
                         num+=memberActionRelationMapper.deleteAllByCardNo(cardNo);
                     }else{
                         //传入参数id有值则进行删除,并移除库中被提及id的数据，则表中剩余不被提及的数据全部被删除
-                        for (MemberActionRelationDto memberAgeRelation : memberActionRelationDtoList) {
+                        for (MemberActionRelation memberAgeRelation : memberActionRelations) {
                             if(memberAgeRelation.getId().intValue()==memberActionRelationDto.getId().intValue()){
-                                num+=memberActionRelationMapper.deleteByPrimaryKey(memberActionRelationDto.getId());
+                                num+=memberActionRelationMapper.updateByPrimaryKey(memberActionRelationDto);
                                 memberActionRelations2.remove(memberAgeRelation);
                             }
 

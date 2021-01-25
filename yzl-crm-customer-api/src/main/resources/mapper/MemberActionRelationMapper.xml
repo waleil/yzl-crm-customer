@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.net.yzl.crm.customer.dao.MemberActionRelationMapper">
-  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
+    <result column="type" jdbcType="INTEGER" property="type" />
     <result column="did" jdbcType="INTEGER" property="did" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="dname" jdbcType="VARCHAR" property="dname" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="value2" jdbcType="VARCHAR" property="value2" />
   </resultMap>
   <sql id="Base_Column_List">
     t.id, t.member_card, t.type, t.did, b.name as dname, b.value,b.value2
@@ -74,9 +76,6 @@
       <if test="did != null">
         did = #{did,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="creator != null">
         creator = #{creator,jdbcType=VARCHAR},
       </if>
@@ -87,7 +86,6 @@
     update member_action_relation
     set member_card = #{memberCard,jdbcType=VARCHAR},
       did = #{did,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>

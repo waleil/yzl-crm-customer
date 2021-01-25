@@ -28,7 +28,7 @@ public interface MemberActionRelationMapper {
 
     List<MemberActionRelation> selectRelationByMemberCard(@Param("memberCard") String memberCard);
 
-    int updateByPrimaryKey(MemberActionRelation record);
+    int updateByPrimaryKey(MemberActionRelationDto record);
 
     List<cn.net.yzl.crm.customer.model.mogo.ActionDict> queryByMemberCodes(@Param("list") List<String> codes);
 }

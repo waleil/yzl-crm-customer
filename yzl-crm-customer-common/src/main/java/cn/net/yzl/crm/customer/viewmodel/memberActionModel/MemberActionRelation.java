@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.viewmodel.memberActionModel;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,27 +12,28 @@ import java.util.Date;
  */
 @Data
 public class MemberActionRelation implements Serializable {
+
+    @ApiModelProperty("编号")
     private Integer id;
 
-    /**
-     * 顾客卡号
-     */
+    @ApiModelProperty("顾客卡号")
     private String memberCard;
 
-    /**
-     * 字典id
-     */
+    @ApiModelProperty("字典id")
     private Integer did;
 
-    /**
-     * 创建时间
-     */
-    private Date createTime;
+    @ApiModelProperty("字典值名")
+    private String dname;
 
-    /**
-     * 创建人
-     */
-    private String creator;
+    @ApiModelProperty("综合行为类型：1方便接电话时间 2性格偏好 3响应时间 4 坐席偏好 5 综合行为 6 下单行为 7活动偏好 8 代表年龄段")
+    private Integer type;
+
+    @ApiModelProperty("值1")
+    private String value;
+
+    @ApiModelProperty("值2")
+    private String value2;
+
 
     private static final long serialVersionUID = 1L;
 
