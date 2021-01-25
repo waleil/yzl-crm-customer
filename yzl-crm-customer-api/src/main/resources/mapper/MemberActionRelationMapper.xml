@@ -9,54 +9,61 @@
     <result column="creator" jdbcType="VARCHAR" property="creator" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, member_card, did, create_time, creator
+    t.id, t.member_card, t.type, t.did, b.name as dname, b.value,b.value2
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from member_action_relation
-    where id = #{id,jdbcType=INTEGER}
+    from member_action_relation t
+    inner join action_dict b on t.did=b.id
+    where t.id = #{id,jdbcType=INTEGER}  and b.is_del=0
   </select>
+
+  <select id="selectRelationByMemberCardAndType"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from member_action_relation t
+    inner join action_dict b on t.did=b.id
+    where t.member_card = #{memberCard,jdbcType=VARCHAR} and t.type=#{type,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectRelationByMemberCard"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from member_action_relation t
+    inner join action_dict b on t.did=b.id
+    where t.member_card = #{memberCard,jdbcType=VARCHAR}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from member_action_relation
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto" useGeneratedKeys="true">
-    insert into member_action_relation (member_card, did, create_time, 
-      creator)
-    values (#{memberCard,jdbcType=VARCHAR}, #{did,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{creator,jdbcType=VARCHAR})
+
+  <delete id="deleteBatch" parameterType="java.lang.Integer">
+    delete from member_action_relation
+    where id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+      #{item.id,jdbcType=INTEGER}
+    </foreach>
+  </delete>
+
+  <delete id="deleteAllByCardNo" parameterType="java.lang.Integer">
+    delete from member_action_relation
+    where member_card = #{memberCard,jdbcType=VARCHAR} and is_del=0
+  </delete>
+
+  <insert id="insert" >
+    insert into member_action_relation (member_card, did, type, creator)
+    values (#{memberCard,jdbcType=VARCHAR}, #{did,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto" useGeneratedKeys="true">
-    insert into member_action_relation
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="memberCard != null">
-        member_card,
-      </if>
-      <if test="did != null">
-        did,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
-      <if test="creator != null">
-        creator,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="memberCard != null">
-        #{memberCard,jdbcType=VARCHAR},
-      </if>
-      <if test="did != null">
-        #{did,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="creator != null">
-        #{creator,jdbcType=VARCHAR},
-      </if>
-    </trim>
+
+  <insert id="insertBatch" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
+    insert into member_action_relation (member_card, did, type, creator)
+    values
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+    (#{memberCard,jdbcType=VARCHAR}, #{did,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR})
+    </foreach>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
     update member_action_relation
@@ -94,4 +101,5 @@
     </foreach>
 
   </select>
+
 </mapper>
