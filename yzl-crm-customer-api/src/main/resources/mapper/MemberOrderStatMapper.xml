@@ -32,7 +32,17 @@
     product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate, create_time
   </sql>
 
+<!--根据顾客编号查询订单相关信息-->
+<select id="queryByMemberCodes" parameterType="list" resultMap="BaseResultMap">
+  select
+  <include refid="Base_Column_List" />
+  from member_order_stat
+  where member_card in
+  <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+  #{item}
+</foreach>
 
+</select>
 
   <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderStat" >
     insert into member_order_stat
