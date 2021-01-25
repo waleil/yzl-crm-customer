@@ -18,6 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,13 +58,14 @@ public class CustomerController {
     @ApiOperation(value = "更新会员基本信息")
     @PostMapping("v1/updateByMemberCard")
     public GeneralResult<Boolean> updateByMemberCard(@RequestBody Member dto) {
-
+        if (StringUtils.isEmpty(dto.getMember_card())) {
+            return GeneralResult.errorWithMessage(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "memberCard不能为空");
+        }
         int result = memberService.updateByMemberCardSelective(dto);
-        if (result == 1) {
-            return GeneralResult.success(Boolean.TRUE);
-        } else {
+        if (result != 1) {
             return GeneralResult.success(Boolean.FALSE);
         }
+        return GeneralResult.success(Boolean.TRUE);
     }
 
     @ApiOperation(value = "根据顾客号查询顾客基本信息")
