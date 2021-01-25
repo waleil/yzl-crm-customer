@@ -11,6 +11,8 @@ import cn.net.yzl.crm.customer.model.MemberGrad;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
+import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
+import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +31,30 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     MemberCrowdGroupDao memberCrowdGroupDao;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
     @Override
     public List<MemberGrad> getMemberGrad() {
         return memberMapper.getMemberGrad();
     }
 
+    /**
+     * wangzhe
+     * 2021-01-25
+     * @param member
+     * @return
+     */
     @Override
-    public int insert(Member record) {
-        return memberMapper.insertSelective(record);
+    public int insert(Member member) {
+        //生成顾客会员卡号缓存的key
+        String cacheKey = CacheKeyUtil.maxMemberCardCacheKey();
+        //生成顾客会员卡号
+        long maxMemberCard = redisUtil.incr(cacheKey, 1);
+        //设置顾客会员卡号
+        member.setMember_card(String.valueOf(maxMemberCard));
+        //保存数据
+        return memberMapper.insertSelective(member);
     }
 
     @Override
