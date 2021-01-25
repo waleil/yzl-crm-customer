@@ -15,5 +15,7 @@ public interface MemberAmountService {
     // 获取账户明细
     ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(String memberCard, Integer timeFlag) throws ParseException;
 
-    ComResponse<String> edit(MemberAmountDetailVO memberAmountDetailVO);
+    ComResponse<String> operation(MemberAmountDetailVO memberAmountDetailVO);
+
+    ComResponse<String> operationConfirm(int obtainType, String orderNo);
 }
