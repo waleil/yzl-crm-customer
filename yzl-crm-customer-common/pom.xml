@@ -26,24 +26,6 @@
             <artifactId>yzl-common</artifactId>
             <version>1.0-RELEASE</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.pagehelper</groupId>
-                    <artifactId>pagehelper-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- 包含了jsr 303的很多注解 -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>${validation-api.version}</version>
-        </dependency>
-        <!-- hibernate validator -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.data</groupId>
