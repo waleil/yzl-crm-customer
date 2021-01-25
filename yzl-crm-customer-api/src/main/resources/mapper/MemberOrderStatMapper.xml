@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.yzl.crm.customer.dao.MemberOrderStatMapper" >
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.db.MemberOrderStat" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="member_card" property="memberCard" jdbcType="VARCHAR" />
+    <result column="total_counsum_amount" property="totalCounsumAmount" jdbcType="INTEGER" />
+    <result column="total_invest_amount" property="totalInvestAmount" jdbcType="INTEGER" />
+    <result column="total_order_amount" property="totalOrderAmount" jdbcType="INTEGER" />
+    <result column="order_rec_amount" property="orderRecAmount" jdbcType="INTEGER" />
+    <result column="first_order_time" property="firstOrderTime" jdbcType="TIMESTAMP" />
+    <result column="last_order_time" property="lastOrderTime" jdbcType="TIMESTAMP" />
+    <result column="last_buy_product_code" property="lastBuyProductCode" jdbcType="VARCHAR" />
+    <result column="first_order_staff_no" property="firstOrderStaffNo" jdbcType="VARCHAR" />
+    <result column="first_order_no" property="firstOrderNo" jdbcType="VARCHAR" />
+    <result column="first_buy_product_code" property="firstBuyProductCode" jdbcType="VARCHAR" />
+    <result column="first_order_am" property="firstOrderAm" jdbcType="INTEGER" />
+    <result column="order_high_am" property="orderHighAm" jdbcType="INTEGER" />
+    <result column="order_low_am" property="orderLowAm" jdbcType="INTEGER" />
+    <result column="order_avg_am" property="orderAvgAm" jdbcType="INTEGER" />
+    <result column="product_type_cnt" property="productTypeCnt" jdbcType="INTEGER" />
+    <result column="buy_count" property="buyCount" jdbcType="INTEGER" />
+    <result column="day_avg_count" property="dayAvgCount" jdbcType="INTEGER" />
+    <result column="year_avg_count" property="yearAvgCount" jdbcType="VARCHAR" />
+    <result column="return_goods_rate" property="returnGoodsRate" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, member_card, total_counsum_amount, total_invest_amount, total_order_amount, order_rec_amount, 
+    first_order_time, last_order_time, last_buy_product_code, first_order_staff_no, first_order_no, 
+    first_buy_product_code, first_order_am, order_high_am, order_low_am, order_avg_am, 
+    product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate, create_time
+  </sql>
+
+<!--根据顾客编号查询订单相关信息-->
+<select id="queryByMemberCodes" parameterType="list" resultMap="BaseResultMap">
+  select
+  <include refid="Base_Column_List" />
+  from member_order_stat
+  where member_card in
+  <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+  #{item}
+</foreach>
+
+</select>
+
+  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderStat" >
+    insert into member_order_stat
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="memberCard != null" >
+        member_card,
+      </if>
+      <if test="totalCounsumAmount != null" >
+        total_counsum_amount,
+      </if>
+      <if test="totalInvestAmount != null" >
+        total_invest_amount,
+      </if>
+      <if test="totalOrderAmount != null" >
+        total_order_amount,
+      </if>
+      <if test="orderRecAmount != null" >
+        order_rec_amount,
+      </if>
+      <if test="firstOrderTime != null" >
+        first_order_time,
+      </if>
+      <if test="lastOrderTime != null" >
+        last_order_time,
+      </if>
+      <if test="lastBuyProductCode != null" >
+        last_buy_product_code,
+      </if>
+      <if test="firstOrderStaffNo != null" >
+        first_order_staff_no,
+      </if>
+      <if test="firstOrderNo != null" >
+        first_order_no,
+      </if>
+      <if test="firstBuyProductCode != null" >
+        first_buy_product_code,
+      </if>
+      <if test="firstOrderAm != null" >
+        first_order_am,
+      </if>
+      <if test="orderHighAm != null" >
+        order_high_am,
+      </if>
+      <if test="orderLowAm != null" >
+        order_low_am,
+      </if>
+      <if test="orderAvgAm != null" >
+        order_avg_am,
+      </if>
+      <if test="productTypeCnt != null" >
+        product_type_cnt,
+      </if>
+      <if test="buyCount != null" >
+        buy_count,
+      </if>
+      <if test="dayAvgCount != null" >
+        day_avg_count,
+      </if>
+      <if test="yearAvgCount != null" >
+        year_avg_count,
+      </if>
+      <if test="returnGoodsRate != null" >
+        return_goods_rate,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="memberCard != null" >
+        #{memberCard,jdbcType=VARCHAR},
+      </if>
+      <if test="totalCounsumAmount != null" >
+        #{totalCounsumAmount,jdbcType=INTEGER},
+      </if>
+      <if test="totalInvestAmount != null" >
+        #{totalInvestAmount,jdbcType=INTEGER},
+      </if>
+      <if test="totalOrderAmount != null" >
+        #{totalOrderAmount,jdbcType=INTEGER},
+      </if>
+      <if test="orderRecAmount != null" >
+        #{orderRecAmount,jdbcType=INTEGER},
+      </if>
+      <if test="firstOrderTime != null" >
+        #{firstOrderTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastOrderTime != null" >
+        #{lastOrderTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastBuyProductCode != null" >
+        #{lastBuyProductCode,jdbcType=VARCHAR},
+      </if>
+      <if test="firstOrderStaffNo != null" >
+        #{firstOrderStaffNo,jdbcType=VARCHAR},
+      </if>
+      <if test="firstOrderNo != null" >
+        #{firstOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="firstBuyProductCode != null" >
+        #{firstBuyProductCode,jdbcType=VARCHAR},
+      </if>
+      <if test="firstOrderAm != null" >
+        #{firstOrderAm,jdbcType=INTEGER},
+      </if>
+      <if test="orderHighAm != null" >
+        #{orderHighAm,jdbcType=INTEGER},
+      </if>
+      <if test="orderLowAm != null" >
+        #{orderLowAm,jdbcType=INTEGER},
+      </if>
+      <if test="orderAvgAm != null" >
+        #{orderAvgAm,jdbcType=INTEGER},
+      </if>
+      <if test="productTypeCnt != null" >
+        #{productTypeCnt,jdbcType=INTEGER},
+      </if>
+      <if test="buyCount != null" >
+        #{buyCount,jdbcType=INTEGER},
+      </if>
+      <if test="dayAvgCount != null" >
+        #{dayAvgCount,jdbcType=INTEGER},
+      </if>
+      <if test="yearAvgCount != null" >
+        #{yearAvgCount,jdbcType=VARCHAR},
+      </if>
+      <if test="returnGoodsRate != null" >
+        #{returnGoodsRate,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderStat" >
+    update member_order_stat
+    <set >
+      <if test="totalCounsumAmount != null" >
+        total_counsum_amount = #{totalCounsumAmount,jdbcType=INTEGER},
+      </if>
+      <if test="totalInvestAmount != null" >
+        total_invest_amount = #{totalInvestAmount,jdbcType=INTEGER},
+      </if>
+      <if test="totalOrderAmount != null" >
+        total_order_amount = #{totalOrderAmount,jdbcType=INTEGER},
+      </if>
+      <if test="orderRecAmount != null" >
+        order_rec_amount = #{orderRecAmount,jdbcType=INTEGER},
+      </if>
+      <if test="firstOrderTime != null" >
+        first_order_time = #{firstOrderTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastOrderTime != null" >
+        last_order_time = #{lastOrderTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastBuyProductCode != null" >
+        last_buy_product_code = #{lastBuyProductCode,jdbcType=VARCHAR},
+      </if>
+      <if test="firstOrderStaffNo != null" >
+        first_order_staff_no = #{firstOrderStaffNo,jdbcType=VARCHAR},
+      </if>
+      <if test="firstOrderNo != null" >
+        first_order_no = #{firstOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="firstBuyProductCode != null" >
+        first_buy_product_code = #{firstBuyProductCode,jdbcType=VARCHAR},
+      </if>
+      <if test="firstOrderAm != null" >
+        first_order_am = #{firstOrderAm,jdbcType=INTEGER},
+      </if>
+      <if test="orderHighAm != null" >
+        order_high_am = #{orderHighAm,jdbcType=INTEGER},
+      </if>
+      <if test="orderLowAm != null" >
+        order_low_am = #{orderLowAm,jdbcType=INTEGER},
+      </if>
+      <if test="orderAvgAm != null" >
+        order_avg_am = #{orderAvgAm,jdbcType=INTEGER},
+      </if>
+      <if test="productTypeCnt != null" >
+        product_type_cnt = #{productTypeCnt,jdbcType=INTEGER},
+      </if>
+      <if test="buyCount != null" >
+        buy_count = #{buyCount,jdbcType=INTEGER},
+      </if>
+      <if test="dayAvgCount != null" >
+        day_avg_count = #{dayAvgCount,jdbcType=INTEGER},
+      </if>
+      <if test="yearAvgCount != null" >
+        year_avg_count = #{yearAvgCount,jdbcType=VARCHAR},
+      </if>
+      <if test="returnGoodsRate != null" >
+        return_goods_rate = #{returnGoodsRate,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where member_card = #{memberCard,jdbcType=VARCHAR}
+  </update>
+</mapper>
