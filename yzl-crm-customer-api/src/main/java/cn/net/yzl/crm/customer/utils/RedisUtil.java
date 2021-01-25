@@ -1,12 +1,18 @@
 package cn.net.yzl.crm.customer.utils;
 
+import cn.net.yzl.logger.annotate.SysAccessLog;
+import cn.net.yzl.logger.enums.DefaultDataEnums;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  * 针对所有的List 都是以l开头的方法
  */
 @Component
+@Slf4j
 public class RedisUtil {
 
     @Resource
@@ -97,6 +104,31 @@ public class RedisUtil {
      */
     public Object get(String key) {
         return key == null ? null : redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 普通缓存获取
+     *
+     * @param key 键
+     * @return 值
+     */
+    @SysAccessLog(logKeyParamName = {"key"},
+            source = DefaultDataEnums.Source.REDIS,action = DefaultDataEnums.Action.QUERY)
+    public String getStr(String key) {
+        if (!StringUtils.hasText(key)) {
+            return null;
+        }
+        try {
+            Object result = redisTemplate.opsForValue().get(key);
+            if (Objects.nonNull(result)) {
+                return String.valueOf(result);
+            }
+        } catch (Exception e) {
+            log.error("redis调用失败,code:{}", e);
+//            e.printStackTrace();
+            return null;
+        }
+        return null;
     }
 
     /**

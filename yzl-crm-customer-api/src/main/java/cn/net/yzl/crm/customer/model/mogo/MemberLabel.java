@@ -6,7 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.util.ArrayList;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -121,6 +122,11 @@ public class MemberLabel extends BaseObject {
     @ApiModelProperty("媒体id")
     private int media_id;
 
+    @ApiModelProperty(value = "首单下单时间")
+    private Date first_order_time;
+
+    @ApiModelProperty(value = "最后一次下单时间")
+    private Date last_order_time;
     @ApiModelProperty(value = "媒体名称（冗余，暂定第一次进线）")
     private String media_name;
 
@@ -133,6 +139,9 @@ public class MemberLabel extends BaseObject {
     @ApiModelProperty(value = "是否vip")
     private Boolean vip_flag;
 
+    @ApiModelProperty(value = "购买意向  1 无意向 2 低意向 3中意向 4高意向")
+    private Integer buy_intention;
+
     @ApiModelProperty("广告名称")
     private String adver_name;
 
@@ -143,43 +152,43 @@ public class MemberLabel extends BaseObject {
     private String member_type;
 
     @ApiModelProperty("累计消费金额")
-    private int total_counsum_amount;
+    private int totalCounsumAmount;
 
     @ApiModelProperty("累计充值金额")
-    private int total_invest_amount;
+    private int totalInvestAmount;
 
     @ApiModelProperty("最后一次购买商品")
-    private String last_buy_product_code;
+    private List<String> lastBuyProductCodes;
 
     @ApiModelProperty("首单订单编号")
     private String first_order_no;
 
     @ApiModelProperty("首次购买商品")
-    private String first_buy_product_code;
+    private List<String> firstBuyProductCodes;
 
     @ApiModelProperty("订单最高金额")
-    private int order_high_am;
+    private Integer orderHighAm;
 
     @ApiModelProperty("订单最低金额")
-    private int order_low_am;
+    private Integer orderLowAm;
 
     @ApiModelProperty("订单平均金额")
-    private int order_avg_am;
+    private Integer orderAvgAm;
 
     @ApiModelProperty("购买产品种类个数")
-    private int product_type_cnt;
+    private Integer productTypeCnt;
 
     @ApiModelProperty("累计购买次数")
-    private int buy_count;
+    private Integer buyCount;
 
     @ApiModelProperty("总平均购买天数")
-    private int day_avg_count;
+    private Integer dayAvgCount;
 
     @ApiModelProperty("年度平均购买天数")
-    private int year_avg_count;
+    private Integer yearAvgCount;
 
     @ApiModelProperty("退货率")
-    private String return_goods_rate;
+    private Integer returnGoodsRate;
 
 
     @ApiModelProperty("累计订单总金额")

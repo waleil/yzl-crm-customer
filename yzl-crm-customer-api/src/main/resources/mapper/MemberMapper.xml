@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="cn.net.yzl.crm.customer.dao.MemberMapper" >
-    <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.Member" >
-        <id column="id" property="id" jdbcType="INTEGER" />
-        <result column="member_card" property="member_card" jdbcType="VARCHAR" />
-        <result column="member_name" property="member_name" jdbcType="VARCHAR" />
-        <result column="nick_name" property="nick_name" jdbcType="VARCHAR" />
-        <result column="age" property="age" jdbcType="INTEGER" />
-        <result column="sex" property="sex" jdbcType="INTEGER" />
-        <result column="id_card" property="id_card" jdbcType="VARCHAR" />
-        <result column="adver_code" property="adver_code" jdbcType="INTEGER" />
-        <result column="adver_name" property="adver_name" jdbcType="VARCHAR" />
-        <result column="m_grade_code" property="m_grade_code" jdbcType="VARCHAR" />
-        <result column="member_type" property="member_type" jdbcType="VARCHAR" />
-        <result column="is_active" property="is_active" jdbcType="SMALLINT" />
-        <result column="member_status" property="member_status" jdbcType="TINYINT" />
-        <result column="activity" property="activity" jdbcType="INTEGER" />
-        <result column="region_code" property="region_code" jdbcType="VARCHAR" />
-        <result column="region_name" property="region_name" jdbcType="VARCHAR" />
-        <result column="province_code" property="province_code" jdbcType="INTEGER" />
-        <result column="province_name" property="province_name" jdbcType="VARCHAR" />
-        <result column="city_code" property="city_code" jdbcType="INTEGER" />
-        <result column="city_name" property="city_name" jdbcType="VARCHAR" />
-        <result column="area_code" property="area_code" jdbcType="INTEGER" />
-        <result column="area_name" property="area_name" jdbcType="VARCHAR" />
-        <result column="total_amount" property="total_amount" jdbcType="INTEGER" />
-        <result column="qq" property="qq" jdbcType="INTEGER" />
-        <result column="wechat" property="wechat" jdbcType="VARCHAR" />
-        <result column="email" property="email" jdbcType="VARCHAR" />
-        <result column="source" property="source" jdbcType="INTEGER" />
-        <result column="address" property="address" jdbcType="VARCHAR" />
-        <result column="birthday" property="birthday" jdbcType="DATE" />
-        <result column="job_code" property="job_code" jdbcType="VARCHAR" />
-        <result column="first_order_time" property="first_order_time" jdbcType="TIMESTAMP" />
-        <result column="last_order_time" property="last_order_time" jdbcType="TIMESTAMP" />
-        <result column="master_card" property="master_card" jdbcType="VARCHAR" />
-        <result column="first_order_staff_no" property="first_order_staff_no" jdbcType="VARCHAR" />
-        <result column="first_order_am" property="first_order_am" jdbcType="INTEGER" />
-        <result column="order_num" property="order_num" jdbcType="INTEGER" />
-        <result column="intro_no" property="intro_no" jdbcType="VARCHAR" />
-        <result column="intro_name" property="intro_name" jdbcType="VARCHAR" />
-        <result column="intro_type" property="intro_type" jdbcType="TINYINT" />
-        <result column="media_id" property="media_id" jdbcType="INTEGER" />
-        <result column="media_name" property="media_name" jdbcType="VARCHAR" />
-        <result column="media_type_code" property="media_type_code" jdbcType="INTEGER" />
-        <result column="media_type_name" property="media_type_name" jdbcType="VARCHAR" />
-        <result column="creator_no" property="creator_no" jdbcType="VARCHAR" />
-        <result column="create_time" property="create_time" jdbcType="TIMESTAMP" />
-        <result column="creator_name" property="creator_name" jdbcType="VARCHAR" />
-        <result column="updator_no" property="updator_no" jdbcType="VARCHAR" />
-        <result column="updator_name" property="updator_name" jdbcType="VARCHAR" />
-        <result column="update_time" property="update_time" jdbcType="TIMESTAMP" />
-        <result column="source_type" property="source_type" jdbcType="TINYINT" />
-        <result column="vip_flag" property="vip_flag" jdbcType="TINYINT" />
-        <result column="buy_intention" property="buy_intention" jdbcType="TINYINT" />
-        <result column="reject_flag" property="reject_flag" jdbcType="TINYINT" />
+<mapper namespace="cn.net.yzl.crm.customer.dao.MemberMapper">
+    <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.Member">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="member_card" property="member_card" jdbcType="VARCHAR"/>
+        <result column="member_name" property="member_name" jdbcType="VARCHAR"/>
+        <result column="nick_name" property="nick_name" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="sex" property="sex" jdbcType="INTEGER"/>
+        <result column="id_card" property="id_card" jdbcType="VARCHAR"/>
+        <result column="adver_code" property="adver_code" jdbcType="INTEGER"/>
+        <result column="adver_name" property="adver_name" jdbcType="VARCHAR"/>
+        <result column="m_grade_code" property="m_grade_code" jdbcType="VARCHAR"/>
+        <result column="member_type" property="member_type" jdbcType="VARCHAR"/>
+        <result column="is_active" property="is_active" jdbcType="SMALLINT"/>
+        <result column="member_status" property="member_status" jdbcType="TINYINT"/>
+        <result column="activity" property="activity" jdbcType="INTEGER"/>
+        <result column="region_code" property="region_code" jdbcType="VARCHAR"/>
+        <result column="region_name" property="region_name" jdbcType="VARCHAR"/>
+        <result column="province_code" property="province_code" jdbcType="INTEGER"/>
+        <result column="province_name" property="province_name" jdbcType="VARCHAR"/>
+        <result column="city_code" property="city_code" jdbcType="INTEGER"/>
+        <result column="city_name" property="city_name" jdbcType="VARCHAR"/>
+        <result column="area_code" property="area_code" jdbcType="INTEGER"/>
+        <result column="area_name" property="area_name" jdbcType="VARCHAR"/>
+        <result column="total_amount" property="total_amount" jdbcType="INTEGER"/>
+        <result column="qq" property="qq" jdbcType="INTEGER"/>
+        <result column="wechat" property="wechat" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="source" property="source" jdbcType="INTEGER"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="birthday" property="birthday" jdbcType="DATE"/>
+        <result column="job_code" property="job_code" jdbcType="VARCHAR"/>
+        <result column="first_order_time" property="first_order_time" jdbcType="TIMESTAMP"/>
+        <result column="last_order_time" property="last_order_time" jdbcType="TIMESTAMP"/>
+        <result column="master_card" property="master_card" jdbcType="VARCHAR"/>
+        <result column="first_order_staff_no" property="first_order_staff_no" jdbcType="VARCHAR"/>
+        <result column="first_order_am" property="first_order_am" jdbcType="INTEGER"/>
+        <result column="order_num" property="order_num" jdbcType="INTEGER"/>
+        <result column="intro_no" property="intro_no" jdbcType="VARCHAR"/>
+        <result column="intro_name" property="intro_name" jdbcType="VARCHAR"/>
+        <result column="intro_type" property="intro_type" jdbcType="TINYINT"/>
+        <result column="media_id" property="media_id" jdbcType="INTEGER"/>
+        <result column="media_name" property="media_name" jdbcType="VARCHAR"/>
+        <result column="media_type_code" property="media_type_code" jdbcType="INTEGER"/>
+        <result column="media_type_name" property="media_type_name" jdbcType="VARCHAR"/>
+        <result column="creator_no" property="creator_no" jdbcType="VARCHAR"/>
+        <result column="create_time" property="create_time" jdbcType="TIMESTAMP"/>
+        <result column="creator_name" property="creator_name" jdbcType="VARCHAR"/>
+        <result column="updator_no" property="updator_no" jdbcType="VARCHAR"/>
+        <result column="updator_name" property="updator_name" jdbcType="VARCHAR"/>
+        <result column="update_time" property="update_time" jdbcType="TIMESTAMP"/>
+        <result column="source_type" property="source_type" jdbcType="TINYINT"/>
+        <result column="vip_flag" property="vip_flag" jdbcType="TINYINT"/>
+        <result column="buy_intention" property="buy_intention" jdbcType="TINYINT"/>
+        <result column="reject_flag" property="reject_flag" jdbcType="TINYINT"/>
     </resultMap>
-    <sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
     id, member_card, passwd, member_name, nick_name, age, sex, id_card, adver_code, adver_name,
     m_grade_code, member_type, is_active, member_status, activity, region_code, region_name,
     province_code, province_name, city_code, city_name, area_code, area_name, total_amount,
@@ -66,316 +66,316 @@
     creator_name, updator_no, updator_name, update_time, source_type, vip_flag, buy_intention,
     reject_flag
   </sql>
-    <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.Member" >
+    <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.Member">
         insert into member
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="id != null" >
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
                 id,
             </if>
-            <if test="member_card != null" >
+            <if test="member_card != null">
                 member_card,
             </if>
-            <if test="passwd != null" >
+            <if test="passwd != null">
                 passwd,
             </if>
-            <if test="member_name != null" >
+            <if test="member_name != null">
                 member_name,
             </if>
-            <if test="nick_name != null" >
+            <if test="nick_name != null">
                 nick_name,
             </if>
-            <if test="age != null" >
+            <if test="age != null">
                 age,
             </if>
-            <if test="sex != null" >
+            <if test="sex != null">
                 sex,
             </if>
-            <if test="id_card != null" >
+            <if test="id_card != null">
                 id_card,
             </if>
-            <if test="adver_code != null" >
+            <if test="adver_code != null">
                 adver_code,
             </if>
-            <if test="adver_name != null" >
+            <if test="adver_name != null">
                 adver_name,
             </if>
-            <if test="m_grade_code != null" >
+            <if test="m_grade_code != null">
                 m_grade_code,
             </if>
-            <if test="member_type != null" >
+            <if test="member_type != null">
                 member_type,
             </if>
-            <if test="is_active != null" >
+            <if test="is_active != null">
                 is_active,
             </if>
-            <if test="member_status != null" >
+            <if test="member_status != null">
                 member_status,
             </if>
-            <if test="activity != null" >
+            <if test="activity != null">
                 activity,
             </if>
-            <if test="region_code != null" >
+            <if test="region_code != null">
                 region_code,
             </if>
-            <if test="region_name != null" >
+            <if test="region_name != null">
                 region_name,
             </if>
-            <if test="province_code != null" >
+            <if test="province_code != null">
                 province_code,
             </if>
-            <if test="province_name != null" >
+            <if test="province_name != null">
                 province_name,
             </if>
-            <if test="city_code != null" >
+            <if test="city_code != null">
                 city_code,
             </if>
-            <if test="city_name != null" >
+            <if test="city_name != null">
                 city_name,
             </if>
-            <if test="area_code != null" >
+            <if test="area_code != null">
                 area_code,
             </if>
-            <if test="area_name != null" >
+            <if test="area_name != null">
                 area_name,
             </if>
-            <if test="total_amount != null" >
+            <if test="total_amount != null">
                 total_amount,
             </if>
-            <if test="qq != null" >
+            <if test="qq != null">
                 qq,
             </if>
-            <if test="wechat != null" >
+            <if test="wechat != null">
                 wechat,
             </if>
-            <if test="email != null" >
+            <if test="email != null">
                 email,
             </if>
-            <if test="source != null" >
+            <if test="source != null">
                 source,
             </if>
-            <if test="address != null" >
+            <if test="address != null">
                 address,
             </if>
-            <if test="birthday != null" >
+            <if test="birthday != null">
                 birthday,
             </if>
-            <if test="job_code != null" >
+            <if test="job_code != null">
                 job_code,
             </if>
-            <if test="first_order_time != null" >
+            <if test="first_order_time != null">
                 first_order_time,
             </if>
-            <if test="last_order_time != null" >
+            <if test="last_order_time != null">
                 last_order_time,
             </if>
-            <if test="master_card != null" >
+            <if test="master_card != null">
                 master_card,
             </if>
-            <if test="first_order_staff_no != null" >
+            <if test="first_order_staff_no != null">
                 first_order_staff_no,
             </if>
-            <if test="first_order_am != null" >
+            <if test="first_order_am != null">
                 first_order_am,
             </if>
-            <if test="order_num != null" >
+            <if test="order_num != null">
                 order_num,
             </if>
-            <if test="intro_no != null" >
+            <if test="intro_no != null">
                 intro_no,
             </if>
-            <if test="intro_name != null" >
+            <if test="intro_name != null">
                 intro_name,
             </if>
-            <if test="intro_type != null" >
+            <if test="intro_type != null">
                 intro_type,
             </if>
-            <if test="media_id != null" >
+            <if test="media_id != null">
                 media_id,
             </if>
-            <if test="media_name != null" >
+            <if test="media_name != null">
                 media_name,
             </if>
-            <if test="media_type_code != null" >
+            <if test="media_type_code != null">
                 media_type_code,
             </if>
-            <if test="media_type_name != null" >
+            <if test="media_type_name != null">
                 media_type_name,
             </if>
-            <if test="creator_no != null" >
+            <if test="creator_no != null">
                 creator_no,
             </if>
 
-            <if test="creator_name != null" >
+            <if test="creator_name != null">
                 creator_name,
             </if>
-            <if test="source_type != null" >
+            <if test="source_type != null">
                 source_type,
             </if>
-            <if test="vip_flag != null" >
+            <if test="vip_flag != null">
                 vip_flag,
             </if>
-            <if test="buy_intention != null" >
+            <if test="buy_intention != null">
                 buy_intention,
             </if>
-            <if test="reject_flag != null" >
+            <if test="reject_flag != null">
                 reject_flag,
             </if>
         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="id != null" >
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
                 #{id,jdbcType=INTEGER},
             </if>
-            <if test="member_card != null" >
+            <if test="member_card != null">
                 #{member_card,jdbcType=VARCHAR},
             </if>
-            <if test="passwd != null" >
+            <if test="passwd != null">
                 #{passwd,jdbcType=VARCHAR},
             </if>
-            <if test="member_name != null" >
+            <if test="member_name != null">
                 #{member_name,jdbcType=VARCHAR},
             </if>
-            <if test="nick_name != null" >
+            <if test="nick_name != null">
                 #{nick_name,jdbcType=VARCHAR},
             </if>
-            <if test="age != null" >
+            <if test="age != null">
                 #{age,jdbcType=INTEGER},
             </if>
-            <if test="sex != null" >
+            <if test="sex != null">
                 #{sex,jdbcType=BIT},
             </if>
-            <if test="id_card != null" >
+            <if test="id_card != null">
                 #{id_card,jdbcType=VARCHAR},
             </if>
-            <if test="adver_code != null" >
+            <if test="adver_code != null">
                 #{adver_code,jdbcType=INTEGER},
             </if>
-            <if test="adver_name != null" >
+            <if test="adver_name != null">
                 #{adver_name,jdbcType=VARCHAR},
             </if>
-            <if test="m_grade_code != null" >
+            <if test="m_grade_code != null">
                 #{m_grade_code,jdbcType=VARCHAR},
             </if>
-            <if test="member_type != null" >
+            <if test="member_type != null">
                 #{member_type,jdbcType=VARCHAR},
             </if>
-            <if test="is_active != null" >
+            <if test="is_active != null">
                 #{is_active,jdbcType=SMALLINT},
             </if>
-            <if test="member_status != null" >
+            <if test="member_status != null">
                 #{member_status,jdbcType=TINYINT},
             </if>
-            <if test="activity != null" >
+            <if test="activity != null">
                 #{activity,jdbcType=BIT},
             </if>
-            <if test="region_code != null" >
+            <if test="region_code != null">
                 #{region_code,jdbcType=VARCHAR},
             </if>
-            <if test="region_name != null" >
+            <if test="region_name != null">
                 #{region_name,jdbcType=VARCHAR},
             </if>
-            <if test="province_code != null" >
+            <if test="province_code != null">
                 #{province_code,jdbcType=INTEGER},
             </if>
-            <if test="province_name != null" >
+            <if test="province_name != null">
                 #{province_name,jdbcType=VARCHAR},
             </if>
-            <if test="city_code != null" >
+            <if test="city_code != null">
                 #{city_code,jdbcType=INTEGER},
             </if>
-            <if test="city_name != null" >
+            <if test="city_name != null">
                 #{city_name,jdbcType=VARCHAR},
             </if>
-            <if test="area_code != null" >
+            <if test="area_code != null">
                 #{area_code,jdbcType=INTEGER},
             </if>
-            <if test="area_name != null" >
+            <if test="area_name != null">
                 #{area_name,jdbcType=VARCHAR},
             </if>
-            <if test="total_amount != null" >
+            <if test="total_amount != null">
                 #{total_amount,jdbcType=INTEGER},
             </if>
-            <if test="qq != null" >
+            <if test="qq != null">
                 #{qq,jdbcType=INTEGER},
             </if>
-            <if test="wechat != null" >
+            <if test="wechat != null">
                 #{wechat,jdbcType=VARCHAR},
             </if>
-            <if test="email != null" >
+            <if test="email != null">
                 #{email,jdbcType=VARCHAR},
             </if>
-            <if test="source != null" >
+            <if test="source != null">
                 #{source,jdbcType=INTEGER},
             </if>
-            <if test="address != null" >
+            <if test="address != null">
                 #{address,jdbcType=VARCHAR},
             </if>
-            <if test="birthday != null" >
+            <if test="birthday != null">
                 #{birthday,jdbcType=DATE},
             </if>
-            <if test="job_code != null" >
+            <if test="job_code != null">
                 #{job_code,jdbcType=VARCHAR},
             </if>
-            <if test="first_order_time != null" >
+            <if test="first_order_time != null">
                 #{first_order_time,jdbcType=TIMESTAMP},
             </if>
-            <if test="last_order_time != null" >
+            <if test="last_order_time != null">
                 #{last_order_time,jdbcType=TIMESTAMP},
             </if>
-            <if test="master_card != null" >
+            <if test="master_card != null">
                 #{master_card,jdbcType=VARCHAR},
             </if>
-            <if test="first_order_staff_no != null" >
+            <if test="first_order_staff_no != null">
                 #{first_order_staff_no,jdbcType=VARCHAR},
             </if>
-            <if test="first_order_am != null" >
+            <if test="first_order_am != null">
                 #{first_order_am,jdbcType=INTEGER},
             </if>
-            <if test="order_num != null" >
+            <if test="order_num != null">
                 #{order_num,jdbcType=INTEGER},
             </if>
-            <if test="intro_no != null" >
+            <if test="intro_no != null">
                 #{intro_no,jdbcType=VARCHAR},
             </if>
-            <if test="intro_name != null" >
+            <if test="intro_name != null">
                 #{intro_name,jdbcType=VARCHAR},
             </if>
-            <if test="intro_type != null" >
+            <if test="intro_type != null">
                 #{intro_type,jdbcType=BIT},
             </if>
-            <if test="media_id != null" >
+            <if test="media_id != null">
                 #{media_id,jdbcType=INTEGER},
             </if>
-            <if test="media_name != null" >
+            <if test="media_name != null">
                 #{media_name,jdbcType=VARCHAR},
             </if>
-            <if test="media_type_code != null" >
+            <if test="media_type_code != null">
                 #{media_type_code,jdbcType=INTEGER},
             </if>
-            <if test="media_type_name != null" >
+            <if test="media_type_name != null">
                 #{media_type_name,jdbcType=VARCHAR},
             </if>
-            <if test="creator_no != null" >
+            <if test="creator_no != null">
                 #{creator_no,jdbcType=VARCHAR},
             </if>
 
-            <if test="creator_name != null" >
+            <if test="creator_name != null">
                 #{creator_name,jdbcType=VARCHAR},
             </if>
-            <if test="source_type != null" >
+            <if test="source_type != null">
                 #{source_type,jdbcType=BIT},
             </if>
-            <if test="vip_flag != null" >
+            <if test="vip_flag != null">
                 #{vip_flag,jdbcType=BIT},
             </if>
-            <if test="buy_intention != null" >
+            <if test="buy_intention != null">
                 #{buy_intention,jdbcType=TINYINT},
             </if>
-            <if test="reject_flag != null" >
+            <if test="reject_flag != null">
                 #{reject_flag,jdbcType=BIT},
             </if>
         </trim>
     </insert>
-    <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.Member" >
+    <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.Member">
     insert into member ( member_card, member_name,
                         nick_name, age, sex, adver_code,
                         m_grade_code, is_active, member_status,
@@ -402,161 +402,161 @@
            )
   </insert>
 
-    <update id="updateByMemberCardSelective" parameterType="cn.net.yzl.crm.customer.model.Member" >
+    <update id="updateByMemberCardSelective" parameterType="cn.net.yzl.crm.customer.model.Member">
         update member
-        <set >
-            <if test="member_card != null" >
+        <set>
+            <if test="member_card != null">
                 member_card = #{member_card,jdbcType=VARCHAR},
             </if>
-            <if test="passwd != null" >
+            <if test="passwd != null">
                 passwd = #{passwd,jdbcType=VARCHAR},
             </if>
-            <if test="member_name != null" >
+            <if test="member_name != null">
                 member_name = #{member_name,jdbcType=VARCHAR},
             </if>
-            <if test="nick_name != null" >
+            <if test="nick_name != null">
                 nick_name = #{nick_name,jdbcType=VARCHAR},
             </if>
-            <if test="age != null" >
+            <if test="age != null">
                 age = #{age,jdbcType=INTEGER},
             </if>
-            <if test="sex != null" >
+            <if test="sex != null">
                 sex = #{sex,jdbcType=BIT},
             </if>
-            <if test="id_card != null" >
+            <if test="id_card != null">
                 id_card = #{id_card,jdbcType=VARCHAR},
             </if>
-            <if test="adver_code != null" >
+            <if test="adver_code != null">
                 adver_code = #{adver_code,jdbcType=INTEGER},
             </if>
-            <if test="adver_name != null" >
+            <if test="adver_name != null">
                 adver_name = #{adver_name,jdbcType=VARCHAR},
             </if>
-            <if test="m_grade_code != null" >
+            <if test="m_grade_code != null">
                 m_grade_code = #{m_grade_code,jdbcType=VARCHAR},
             </if>
-            <if test="member_type != null" >
+            <if test="member_type != null">
                 member_type = #{member_type,jdbcType=VARCHAR},
             </if>
-            <if test="is_active != null" >
+            <if test="is_active != null">
                 is_active = #{is_active,jdbcType=SMALLINT},
             </if>
-            <if test="member_status != null" >
+            <if test="member_status != null">
                 member_status = #{member_status,jdbcType=TINYINT},
             </if>
-            <if test="activity != null" >
+            <if test="activity != null">
                 activity = #{activity,jdbcType=BIT},
             </if>
-            <if test="region_code != null" >
+            <if test="region_code != null">
                 region_code = #{region_code,jdbcType=VARCHAR},
             </if>
-            <if test="region_name != null" >
+            <if test="region_name != null">
                 region_name = #{region_name,jdbcType=VARCHAR},
             </if>
-            <if test="province_code != null" >
+            <if test="province_code != null">
                 province_code = #{province_code,jdbcType=INTEGER},
             </if>
-            <if test="province_name != null" >
+            <if test="province_name != null">
                 province_name = #{province_name,jdbcType=VARCHAR},
             </if>
-            <if test="city_code != null" >
+            <if test="city_code != null">
                 city_code = #{city_code,jdbcType=INTEGER},
             </if>
-            <if test="city_name != null" >
+            <if test="city_name != null">
                 city_name = #{city_name,jdbcType=VARCHAR},
             </if>
-            <if test="area_code != null" >
+            <if test="area_code != null">
                 area_code = #{area_code,jdbcType=INTEGER},
             </if>
-            <if test="area_name != null" >
+            <if test="area_name != null">
                 area_name = #{area_name,jdbcType=VARCHAR},
             </if>
-            <if test="total_amount != null" >
+            <if test="total_amount != null">
                 total_amount = #{total_amount,jdbcType=INTEGER},
             </if>
-            <if test="qq != null" >
+            <if test="qq != null">
                 qq = #{qq,jdbcType=INTEGER},
             </if>
-            <if test="wechat != null" >
+            <if test="wechat != null">
                 wechat = #{wechat,jdbcType=VARCHAR},
             </if>
-            <if test="email != null" >
+            <if test="email != null">
                 email = #{email,jdbcType=VARCHAR},
             </if>
-            <if test="source != null" >
+            <if test="source != null">
                 source = #{source,jdbcType=INTEGER},
             </if>
-            <if test="address != null" >
+            <if test="address != null">
                 address = #{address,jdbcType=VARCHAR},
             </if>
-            <if test="birthday != null" >
+            <if test="birthday != null">
                 birthday = #{birthday,jdbcType=DATE},
             </if>
-            <if test="job_code != null" >
+            <if test="job_code != null">
                 job_code = #{job_code,jdbcType=VARCHAR},
             </if>
-            <if test="first_order_time != null" >
+            <if test="first_order_time != null">
                 first_order_time = #{first_order_time,jdbcType=TIMESTAMP},
             </if>
-            <if test="last_order_time != null" >
+            <if test="last_order_time != null">
                 last_order_time = #{last_order_time,jdbcType=TIMESTAMP},
             </if>
-            <if test="master_card != null" >
+            <if test="master_card != null">
                 master_card = #{master_card,jdbcType=VARCHAR},
             </if>
-            <if test="first_order_staff_no != null" >
+            <if test="first_order_staff_no != null">
                 first_order_staff_no = #{first_order_staff_no,jdbcType=VARCHAR},
             </if>
-            <if test="first_order_am != null" >
+            <if test="first_order_am != null">
                 first_order_am = #{first_order_am,jdbcType=INTEGER},
             </if>
-            <if test="order_num != null" >
+            <if test="order_num != null">
                 order_num = #{order_num,jdbcType=INTEGER},
             </if>
-            <if test="intro_no != null" >
+            <if test="intro_no != null">
                 intro_no = #{intro_no,jdbcType=VARCHAR},
             </if>
-            <if test="intro_name != null" >
+            <if test="intro_name != null">
                 intro_name = #{intro_name,jdbcType=VARCHAR},
             </if>
-            <if test="intro_type != null" >
+            <if test="intro_type != null">
                 intro_type = #{intro_type,jdbcType=BIT},
             </if>
-            <if test="media_id != null" >
+            <if test="media_id != null">
                 media_id = #{media_id,jdbcType=INTEGER},
             </if>
-            <if test="media_name != null" >
+            <if test="media_name != null">
                 media_name = #{media_name,jdbcType=VARCHAR},
             </if>
-            <if test="media_type_code != null" >
+            <if test="media_type_code != null">
                 media_type_code = #{media_type_code,jdbcType=INTEGER},
             </if>
-            <if test="media_type_name != null" >
+            <if test="media_type_name != null">
                 media_type_name = #{media_type_name,jdbcType=VARCHAR},
             </if>
-            <if test="updator_no != null" >
+            <if test="updator_no != null">
                 updator_no = #{updator_no,jdbcType=VARCHAR},
             </if>
-            <if test="updator_name != null" >
+            <if test="updator_name != null">
                 updator_name = #{updator_name,jdbcType=VARCHAR},
             </if>
-            <if test="source_type != null" >
+            <if test="source_type != null">
                 source_type = #{source_type,jdbcType=BIT},
             </if>
-            <if test="vip_flag != null" >
+            <if test="vip_flag != null">
                 vip_flag = #{vip_flag,jdbcType=BIT},
             </if>
-            <if test="buy_intention != null" >
+            <if test="buy_intention != null">
                 buy_intention = #{buy_intention,jdbcType=TINYINT},
             </if>
-            <if test="reject_flag != null" >
+            <if test="reject_flag != null">
                 reject_flag = #{reject_flag,jdbcType=BIT},
             </if>
         </set>
         where member_card = #{member_card,jdbcType=VARCHAR}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.Member" >
+    <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.Member">
     update member
     set member_card = #{member_card,jdbcType=VARCHAR},
       passwd = #{passwd,jdbcType=VARCHAR},
@@ -614,7 +614,8 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-    <select id="findPageByCondition"  resultType="cn.net.yzl.crm.customer.model.Member" parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
+    <select id="findPageByCondition" resultType="cn.net.yzl.crm.customer.model.Member"
+            parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
         SELECT
         m.id,
         m.member_card ,
@@ -674,22 +675,22 @@
             <if test="lastOrderTimeEnd != null and lastOrderTimeEnd != ''">
                 and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeEnd}
             </if>
-<!--            <if test="diseaseId != null and diseaseId != '' ">-->
-<!--                and d.disease_id = #{diseaseId}-->
-<!--            </if>-->
-<!--            <if test="diseasePid != null and diseasePid != '' and (diseaseId == null or diseaseId == '' )">-->
-<!--                and d.disease_id = #{diseasePid}-->
-<!--            </if>-->
+            <!--            <if test="diseaseId != null and diseaseId != '' ">-->
+            <!--                and d.disease_id = #{diseaseId}-->
+            <!--            </if>-->
+            <!--            <if test="diseasePid != null and diseasePid != '' and (diseaseId == null or diseaseId == '' )">-->
+            <!--                and d.disease_id = #{diseasePid}-->
+            <!--            </if>-->
         </where>
     </select>
     <!--根据顾客号查询顾客基本信息 -->
     <select id="selectMemberByCard" parameterType="java.lang.String" resultType="cn.net.yzl.crm.customer.model.Member">
         SELECT
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         FROM member
         WHERE member_card = #{memberCard}
     </select>
-    <select id="getMemberGrad" resultType="cn.net.yzl.crm.customer.model.MemberGrad" >
+    <select id="getMemberGrad" resultType="cn.net.yzl.crm.customer.model.MemberGrad">
         select id,no,name from member_type
     </select>
     <!--根据顾客号查询顾客手机号信息 -->
@@ -703,27 +704,28 @@
     <!--根据顾客手机号查询顾客基本信息 ，用来判断手机号是否被注册，如果注册，则返回注册顾客的实体-->
     <select id="getMemberByPhone" resultType="cn.net.yzl.crm.customer.model.Member">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from member where member_card=
-            (
+        (
 
-            select member_card
-            from member_phone
-            where phone_number in
-                <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-             limit 1
+        select member_card
+        from member_phone
+        where phone_number in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        limit 1
 
 
-            )
+        )
     </select>
 
-    <update id="setMemberToVip" parameterType="String" >
+    <update id="setMemberToVip" parameterType="String">
         update member set vip_flag=1 where member_card=#{member_card}
     </update>
 
-    <select id="getMemberProductEffectList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberProductEffect">
+    <select id="getMemberProductEffectList" parameterType="String"
+            resultType="cn.net.yzl.crm.customer.model.MemberProductEffect">
         select  member_card,order_no,product_code,eating_perday,product_last_num,
                 due_date,taking_state,taking_effect,product_count,product_code,product_name
          from   member_product_effect
@@ -731,7 +733,8 @@
                 and due_date  <![CDATA[ > ]]> now()
     </select>
 
-    <select id="getProductConsultationList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.ProductConsultation">
+    <select id="getProductConsultationList" parameterType="String"
+            resultType="cn.net.yzl.crm.customer.model.ProductConsultation">
         select  id,member_card,product_code,product_name
         from product_consultation where member_card=#{member_card}
     </select>
@@ -743,10 +746,10 @@
 
     </select>
 
-    <select id="getMemberDiseaseByMemberCards"  resultType="cn.net.yzl.crm.customer.model.MemberDisease">
+    <select id="getMemberDiseaseByMemberCards" resultType="cn.net.yzl.crm.customer.model.MemberDisease">
         select id, member_card,disease_id,disease_name
-        from   member_disease
-        where  member_card in
+        from member_disease
+        where member_card in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -754,8 +757,7 @@
     </select>
 
 
-
-    <insert id="saveReveiverAddress" parameterType="cn.net.yzl.crm.customer.model.ReveiverAddress" >
+    <insert id="saveReveiverAddress" parameterType="cn.net.yzl.crm.customer.model.ReveiverAddress">
         insert into reveiver_address(reveiver_address_code,member_card,member_name,member_mobile,
         member_province_no,member_province_name,
         member_city_no,member_city_name,
@@ -773,7 +775,7 @@
         )
     </insert>
 
-    <update id="updateReveiverAddress" parameterType="cn.net.yzl.crm.customer.model.ReveiverAddress" >
+    <update id="updateReveiverAddress" parameterType="cn.net.yzl.crm.customer.model.ReveiverAddress">
         update reveiver_address
         set member_mobile=#{member_mobile},
             member_province_no=#{member_province_no},
@@ -791,7 +793,7 @@
 
     </update>
 
-    <select id="getReveiverAddress" parameterType="String" resultType="cn.net.yzl.crm.customer.model.ReveiverAddress" >
+    <select id="getReveiverAddress" parameterType="String" resultType="cn.net.yzl.crm.customer.model.ReveiverAddress">
             select
                     reveiver_address_code,member_card,member_name,member_mobile,
                     member_province_no,member_province_name,
@@ -812,7 +814,7 @@
 
     </select>
 
-    <insert id="addMemberOrderStat" parameterType="cn.net.yzl.crm.customer.model.MemberOrderStat" >
+    <insert id="addMemberOrderStat" parameterType="cn.net.yzl.crm.customer.model.MemberOrderStat">
         insert into member_order_stat(
         member_card,
         total_counsum_amount,
@@ -876,59 +878,60 @@
             return_goods_rate=#{return_goods_rate}
         where member_card=#{member_card}
     </update>
-    
-<!--    <select id="getMemberAction" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberAction">-->
-<!--        select  member_card,-->
-<!--                phone_time,-->
-<!--                nature,-->
-<!--                response_time,-->
-<!--                action,-->
-<!--                order_action,-->
-<!--                active-->
-<!--        from member_action-->
-<!--        where member_card=#{member_card}-->
-<!--    </select>-->
-<!--    -->
-<!--    <insert id="saveMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction" >-->
-<!--        insert into member_action(-->
-<!--                member_card,-->
-<!--                phone_time,-->
-<!--                nature,-->
-<!--                response_time,-->
-<!--                action,-->
-<!--                order_action,-->
-<!--                active-->
-<!--        )-->
-<!--        values(-->
-<!--                #{member_card},-->
-<!--                #{phone_time},-->
-<!--                #{nature},-->
-<!--                #{response_time},-->
-<!--                #{action},-->
-<!--                #{order_action},-->
-<!--                #{active}-->
-<!--        )-->
-<!--    </insert>-->
 
-<!--    <update id="updateMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction">-->
-<!--        update member_action-->
-<!--               set-->
-<!--                phone_time=phone_time +','+ #{phone_time},-->
-<!--                nature=nature+ ','+ #{nature},-->
-<!--                response_time=response_time + ','+ #{response_time},-->
-<!--                action=action+ ','+ #{action},-->
-<!--                order_action=order_action + ','+ #{order_action},-->
-<!--                active= active + ','+ #{active}-->
-<!--        where member_card=#{member_card}-->
-<!--    </update>-->
+    <!--    <select id="getMemberAction" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberAction">-->
+    <!--        select  member_card,-->
+    <!--                phone_time,-->
+    <!--                nature,-->
+    <!--                response_time,-->
+    <!--                action,-->
+    <!--                order_action,-->
+    <!--                active-->
+    <!--        from member_action-->
+    <!--        where member_card=#{member_card}-->
+    <!--    </select>-->
+    <!--    -->
+    <!--    <insert id="saveMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction" >-->
+    <!--        insert into member_action(-->
+    <!--                member_card,-->
+    <!--                phone_time,-->
+    <!--                nature,-->
+    <!--                response_time,-->
+    <!--                action,-->
+    <!--                order_action,-->
+    <!--                active-->
+    <!--        )-->
+    <!--        values(-->
+    <!--                #{member_card},-->
+    <!--                #{phone_time},-->
+    <!--                #{nature},-->
+    <!--                #{response_time},-->
+    <!--                #{action},-->
+    <!--                #{order_action},-->
+    <!--                #{active}-->
+    <!--        )-->
+    <!--    </insert>-->
 
-    <select id="getMemberList" resultType="cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel" >
-        select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code,  mt.`name` as m_grade_name, is_active,
-    member_status, activity, region_code,region_name, province_code, city_code, total_amount, qq,id_card,
-    wechat, email, source, address, birthday, job_code, m.first_order_time, m.last_order_time,
-    master_card, m.first_order_staff_no, m.first_order_am, order_num, media_id,media_name, media_type_code,
-    media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag,member_type,
-     total_counsum_amount,
+    <!--    <update id="updateMemberAction" parameterType="cn.net.yzl.crm.customer.model.MemberAction">-->
+    <!--        update member_action-->
+    <!--               set-->
+    <!--                phone_time=phone_time +','+ #{phone_time},-->
+    <!--                nature=nature+ ','+ #{nature},-->
+    <!--                response_time=response_time + ','+ #{response_time},-->
+    <!--                action=action+ ','+ #{action},-->
+    <!--                order_action=order_action + ','+ #{order_action},-->
+    <!--                active= active + ','+ #{active}-->
+    <!--        where member_card=#{member_card}-->
+    <!--    </update>-->
+
+    <select id="getMemberList" resultType="cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel">
+        select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code, mt.`name` as m_grade_name,
+        is_active,
+        member_status, activity, region_code,region_name, province_code, city_code, total_amount, qq,id_card,
+        wechat, email, source, address, birthday, job_code, m.first_order_time, m.last_order_time,
+        master_card, m.first_order_staff_no, m.first_order_am, order_num, media_id,media_name, media_type_code,
+        media_type_name,intro_no,intro_name,intro_type,source_type,vip_flag,member_type,
+        total_counsum_amount,
         total_invest_amount,
         last_buy_product_code,
         first_order_no,
@@ -941,14 +944,16 @@
         day_avg_count,
         year_avg_count,
         return_goods_rate
-        from member m inner join member_order_stat o on m.member_card= o.member_card LEFT JOIN member_type mt on m.m_grade_code=mt.`no`
+        from member m inner join member_order_stat o on m.member_card= o.member_card LEFT JOIN member_type mt on
+        m.m_grade_code=mt.`no`
         where m.member_card in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
 
-    <insert id="addCrowdGroup" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="cn.net.yzl.crm.customer.model.CrowdGroup">
+    <insert id="addCrowdGroup" useGeneratedKeys="true" keyProperty="id" keyColumn="id"
+            parameterType="cn.net.yzl.crm.customer.model.CrowdGroup">
         insert into crowd_group(
         name,
         description,
@@ -977,22 +982,23 @@
         )
     </insert>
 
-    <select id="getCrowdGroupByPage" parameterType="cn.net.yzl.crm.customer.dto.CrowdGroupDTO" resultType="cn.net.yzl.crm.customer.model.CrowdGroup">
+    <select id="getCrowdGroupByPage" parameterType="cn.net.yzl.crm.customer.dto.CrowdGroupDTO"
+            resultType="cn.net.yzl.crm.customer.model.CrowdGroup">
 
         select
-            id,
-            id as crowd_id,
-            name,
-            description,
-            enable,
-            effective_date,
-            expire_date,
-            create_time,
-            create_code,
-            create_name,
-            update_time,
-            update_name,
-            person_count
+        id,
+        id as crowd_id,
+        name,
+        description,
+        enable,
+        effective_date,
+        expire_date,
+        create_time,
+        create_code,
+        create_name,
+        update_time,
+        update_name,
+        person_count
         from crowd_group
         <where>
             del=0
@@ -1010,7 +1016,7 @@
             </if>
         </where>
     </select>
-    
+
     <update id="updateCrowdGroup" parameterType="cn.net.yzl.crm.customer.model.CrowdGroup">
          update crowd_group
             set name=#{name},
@@ -1024,21 +1030,21 @@
             person_count=#{person_count}
           where id=#{id}
     </update>
-    
-    <select id="getCrowdGroupByIds" resultType="cn.net.yzl.crm.customer.model.CrowdGroup" >
-         select
-            id,
-            name,
-            description,
-            enable,
-            effective_date,
-            expire_date,
-            create_time,
-            create_code,
-            create_name,
-            update_time,
-            update_name,
-            person_count
+
+    <select id="getCrowdGroupByIds" resultType="cn.net.yzl.crm.customer.model.CrowdGroup">
+        select
+        id,
+        name,
+        description,
+        enable,
+        effective_date,
+        expire_date,
+        create_time,
+        create_code,
+        create_name,
+        update_time,
+        update_name,
+        person_count
         from crowd_group
         where id in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
@@ -1050,11 +1056,11 @@
         select id,name,ltype from member_base_attr
     </select>
 
-    <update id="delCrowdGroupById"  >
+    <update id="delCrowdGroupById">
         update crowd_group set del=1 where id=#{id}
     </update>
-    
-    <select id="getMemberAmount"  resultType="cn.net.yzl.crm.customer.model.MemberAmount">
+
+    <select id="getMemberAmount" resultType="cn.net.yzl.crm.customer.model.MemberAmount">
         select
         member_card,last_integral,last_red_bag,last_coupon,total_money,frozen_amount,frozen_ticket,frozen_red_bag,frozen_integral
         from member_amount
@@ -1127,5 +1133,64 @@
         limit #{currentPage},#{pageSize}
 
     </select>
+    <select id="queryAllMemberByPage" resultType="cn.net.yzl.crm.customer.model.mogo.MemberLabel">
+        select
+      member_card,
+      member_name,
+      nick_name,
+      age,
+      sex,
+      adver_code,
+      adver_name,
+     m_grade_code,
+     member_type,
+     is_active,
+     member_status,
+     activity,
+     region_code,
+     region_name,
+    province_code,
+    province_name,
+    city_code,
+    city_name,
+    area_code,
+    area_name,
+    total_amount,
+    qq,
+    wechat,
+    email,
+    source,
+    address,
+    birthday,
+    job_code,
+    first_order_time,
+    last_order_time,
+    master_card,
+    first_order_staff_no,
+    first_order_am,
+    order_num,
+    intro_no,
+    intro_name,
+    intro_type,
+    media_id,
+    media_name,
+    media_type_code,
+     media_type_name,
+     creator_no,
+     create_time,
+    creator_name,
+    updator_no,
+    updator_name,
+    update_time,
+    source_type,
+    vip_flag,
+    buy_intention
+         from member
+        ORDER BY member_card limit #{currentPage},#{pageSize}
 
+    </select>
+
+    <select id="queryMaxMemberCard" resultType="java.lang.String">
+          SELECT max(member_card) as maxCode FROM member;
+    </select>
 </mapper>
