@@ -16,12 +16,16 @@ import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.text.ParseException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/member/customerAmount")
 @Api(value = "顾客账户信息", tags = {"顾客服务"})
+@Validated
 public class MemberAmountController {
 
     @Autowired
@@ -47,9 +51,19 @@ public class MemberAmountController {
 
 
 
-    @ApiOperation(value = "顾客账户-账户余额修改", notes = "顾客账户-账户余额修改")
-    @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    ComResponse<String> edit(@RequestBody @Validated MemberAmountDetailVO memberAmountDetailVO) throws ParseException {
-        return memberAmountService.edit(memberAmountDetailVO);
+    @ApiOperation(value = "顾客账户-账户操作(充值,消费,退回)", notes = "顾客账户-账户操作(充值,消费,退回)")
+    @RequestMapping(value = "/operation", method = RequestMethod.POST)
+    ComResponse<String> operation(@RequestBody @Validated MemberAmountDetailVO memberAmountDetailVO) throws ParseException {
+        return memberAmountService.operation(memberAmountDetailVO);
+    }
+    @ApiOperation(value = "顾客账户-账户操作(消费/退回)确认", notes = "顾客账户-账户操作(消费/退回)确认")
+    @RequestMapping(value = "/operationConfirm", method = RequestMethod.GET)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "obtainType", value = "操作类型(1 退回 2 消费,3:充值(目前先不考虑)", required = true, dataType = "string", paramType = "query")
+
+    })
+    ComResponse<String> operationConfirm(@RequestParam("obtainType") @Min(1) @Max(2) int obtainType, @RequestParam("orderNo") @NotBlank String orderNo) throws ParseException {
+        return memberAmountService.operationConfirm(obtainType,orderNo);
     }
 }
