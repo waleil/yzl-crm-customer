@@ -21,8 +21,8 @@
     <result column="product_type_cnt" property="productTypeCnt" jdbcType="INTEGER" />
     <result column="buy_count" property="buyCount" jdbcType="INTEGER" />
     <result column="day_avg_count" property="dayAvgCount" jdbcType="INTEGER" />
-    <result column="year_avg_count" property="yearAvgCount" jdbcType="VARCHAR" />
-    <result column="return_goods_rate" property="returnGoodsRate" jdbcType="VARCHAR" />
+    <result column="year_avg_count" property="yearAvgCount" jdbcType="INTEGER" />
+    <result column="return_goods_rate" property="returnGoodsRate" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
@@ -35,7 +35,10 @@
 <!--根据顾客编号查询订单相关信息-->
 <select id="queryByMemberCodes" parameterType="list" resultMap="BaseResultMap">
   select
-  <include refid="Base_Column_List" />
+  member_card, total_counsum_amount, total_invest_amount, total_order_amount, order_rec_amount,
+  first_order_time, last_order_time, last_buy_product_code, first_order_staff_no, first_order_no,
+  first_buy_product_code, first_order_am, order_high_am, order_low_am, order_avg_am,
+  product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate
   from member_order_stat
   where member_card in
   <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
@@ -167,10 +170,10 @@
         #{dayAvgCount,jdbcType=INTEGER},
       </if>
       <if test="yearAvgCount != null" >
-        #{yearAvgCount,jdbcType=VARCHAR},
+        #{yearAvgCount,jdbcType=INTEGER},
       </if>
       <if test="returnGoodsRate != null" >
-        #{returnGoodsRate,jdbcType=VARCHAR},
+        #{returnGoodsRate,jdbcType=INTEGER},
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
@@ -232,10 +235,10 @@
         day_avg_count = #{dayAvgCount,jdbcType=INTEGER},
       </if>
       <if test="yearAvgCount != null" >
-        year_avg_count = #{yearAvgCount,jdbcType=VARCHAR},
+        year_avg_count = #{yearAvgCount,jdbcType=INTEGER},
       </if>
       <if test="returnGoodsRate != null" >
-        return_goods_rate = #{returnGoodsRate,jdbcType=VARCHAR},
+        return_goods_rate = #{returnGoodsRate,jdbcType=INTEGER},
       </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -243,4 +246,6 @@
     </set>
     where member_card = #{memberCard,jdbcType=VARCHAR}
   </update>
+
+
 </mapper>

@@ -20,5 +20,16 @@ public class MemberProduct {
 
     @ApiModelProperty("商品名称")
     private String productName;
+    /**
+     * 服用状态: 1 正常，2 非常好，3已停服
+     * @mbggenerated Mon Jan 25 21:24:38 CST 2021
+     */
+    private Integer takingState;
+
+    /**
+     * 服用效果 1好，2一般，3没有效果
+     * @mbggenerated Mon Jan 25 21:24:38 CST 2021
+     */
+    private Integer takingEffect;
 
 }
