@@ -81,7 +81,10 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         RLock lock = redisson.getLock("operation---"+memberCard);
 
         try {
-            lock.tryLock(3, TimeUnit.SECONDS);
+            //尝试加锁300ms
+            if(lock.tryLock(300, TimeUnit.MILLISECONDS)){
+
+
 
             // 判断账户是否存在
             MemberAmountDto memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
@@ -137,6 +140,9 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             int num1 = memberAmountDetailDao.insertSelective(memberAmountDetail);
             if (num1 < 1) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "账户信息记录保存错误");
+            }
+            }else{
+                throw new BizException(ResponseCodeEnums.REPEAT_ERROR_CODE.getCode(), "当前账户正在下单操作，请勿重复下单!");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
