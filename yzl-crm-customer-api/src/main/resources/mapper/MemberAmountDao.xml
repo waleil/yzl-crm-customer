@@ -36,6 +36,19 @@
 
 
   </select>
+  <select id="queryByMemberCodes" resultType="cn.net.yzl.crm.customer.model.mogo.MemberAmount" parameterType="list" >
+    SELECT
+    member_card memberCard,
+    frozen_amount frozenAmount,
+    total_money totalMoney
+    FROM
+    member_amount
+    where member_card in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from member_amount
     where id = #{id,jdbcType=INTEGER}

@@ -136,7 +136,7 @@
 
   <select id="queryByMemberCodes" resultType="cn.net.yzl.crm.customer.model.mogo.MemberDisease" parameterType="list" >
     select
-    member_card, disease_id, disease_name,
+    member_card as memberCard, disease_id as diseaseId, disease_name as diseaseName
     from member_disease
     where member_card in
     <foreach item="item" index="index" collection="list" open="(" separator="," close=")">

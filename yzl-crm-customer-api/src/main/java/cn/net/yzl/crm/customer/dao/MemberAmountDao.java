@@ -5,6 +5,8 @@ import cn.net.yzl.crm.customer.model.MemberAmount;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MemberAmountDao {
     int deleteByPrimaryKey(Integer id);
@@ -20,4 +22,7 @@ public interface MemberAmountDao {
     int updateByPrimaryKey(MemberAmount record);
 
     MemberAmountDto getMemberAmount(@Param("memberCard") String memberCard);
+
+    List<cn.net.yzl.crm.customer.model.mogo.MemberAmount> queryByMemberCodes(List<String> codes);
+
 }
