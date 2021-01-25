@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.net.yzl.crm.customer.dao.memberDictRelation.MemberOrderBehaviorRelationMapper">
-  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberOrderBehaviorRelation">
+<mapper namespace="cn.net.yzl.crm.customer.dao.MemberActionRelationDao">
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
     <result column="did" jdbcType="INTEGER" property="did" />
@@ -14,21 +14,21 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from member_order_behavior_relation
+    from member_action_relation
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from member_order_behavior_relation
+    delete from member_action_relation
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.dto.member.MemberOrderBehaviorRelationDto" useGeneratedKeys="true">
-    insert into member_order_behavior_relation (member_card, did, create_time, 
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto" useGeneratedKeys="true">
+    insert into member_action_relation (member_card, did, create_time, 
       creator)
     values (#{memberCard,jdbcType=VARCHAR}, #{did,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{creator,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.dto.member.MemberOrderBehaviorRelationDto" useGeneratedKeys="true">
-    insert into member_order_behavior_relation
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto" useGeneratedKeys="true">
+    insert into member_action_relation
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="memberCard != null">
         member_card,
@@ -58,8 +58,8 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.dto.member.MemberOrderBehaviorRelationDto">
-    update member_order_behavior_relation
+  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
+    update member_action_relation
     <set>
       <if test="memberCard != null">
         member_card = #{memberCard,jdbcType=VARCHAR},
@@ -76,8 +76,8 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.dto.member.MemberOrderBehaviorRelationDto">
-    update member_order_behavior_relation
+  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
+    update member_action_relation
     set member_card = #{memberCard,jdbcType=VARCHAR},
       did = #{did,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
