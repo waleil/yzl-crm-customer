@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * @Description: 会员订单统计表
  * @Date: 2021/1/25 3:21 下午
  */
+@Repository
 public interface MemberOrderStatMapper {
 
     int insertSelective(MemberOrderStat record);

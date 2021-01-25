@@ -84,4 +84,14 @@
       creator = #{creator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="queryByMemberCodes" parameterType="list" resultType="cn.net.yzl.crm.customer.model.mogo.ActionDict">
+    select mar.member_card as memberCard,ad.id,ad.`name`,ad.`type`,ad.`value`,ad.value2 from member_action_relation mar
+    left join action_dict ad on mar.did = ad.id and ad.del_flag =0
+    where mar.member_card in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+
+  </select>
 </mapper>
