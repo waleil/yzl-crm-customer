@@ -3,50 +3,6 @@ spring:
     name: yzl-crm-customer-api
   profiles:
     active: dev
-mysql:
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    mapperLocations: classpath:/mapper/*.xml,classpath:/mapper/**/*.xml
-    configLocation: classpath:/mybatis-config.xml
-    write:
-      url: jdbc:mysql://192.168.32.33:3306/yzl_crm_customer?useUnicode=true&characterEncoding=utf8&useSSL=true
-      username: yzl_crm
-      password: YZL123456!
-      driver-class-name: com.mysql.jdbc.Driver
-      minIdle: 5
-      maxActive: 100
-      initialSize: 10
-      maxWait: 60000
-      timeBetweenEvictionRunsMillis: 60000
-      minEvictableIdleTimeMillis: 300000
-      validationQuery: select 'x'
-      testWhileIdle: true
-      testOnBorrow: false
-      testOnReturn: false
-      poolPreparedStatements: true
-      maxPoolPreparedStatementPerConnectionSize: 50
-      removeAbandoned: true
-      filters: stat
-    read:
-      url: jdbc:mysql://192.168.32.33:3306/yzl_crm_customer?useUnicode=true&characterEncoding=utf8&useSSL=true
-      username: yzl_crm
-      password: YZL123456!
-      driver-class-name: com.mysql.jdbc.Driver
-      minIdle: 5
-      maxActive: 100
-      initialSize: 10
-      maxWait: 60000
-      timeBetweenEvictionRunsMillis: 60000
-      minEvictableIdleTimeMillis: 300000
-      validationQuery: select 'x'
-      testWhileIdle: true
-      testOnBorrow: false
-      testOnReturn: false
-      poolPreparedStatements: true
-      maxPoolPreparedStatementPerConnectionSize: 50
-      removeAbandoned: true
-      filters: stat
 
 
-logging:
-  config: classpath:logback-spring.xml
+
