@@ -4,6 +4,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
+import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
@@ -27,6 +28,8 @@ import java.util.List;
 public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Autowired
     private MemberCrowdGroupDao memberCrowdGroupDao;
+    @Autowired
+    private MemberLabelDao memberLabelDao;
     /**
      * @Author: lichanghong
      * @Description: 根据群组编号查询
@@ -126,5 +129,11 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     public ComResponse<List<CustomerCrowdGroupVO>> query4Select() {
         List<CustomerCrowdGroupVO> list = memberCrowdGroupDao.query4Select();
         return ComResponse.success(list);
+    }
+
+    @Override
+    public int memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
+
+        return memberLabelDao.memberCrowdGroupTrial(memberCrowdGroup);
     }
 }

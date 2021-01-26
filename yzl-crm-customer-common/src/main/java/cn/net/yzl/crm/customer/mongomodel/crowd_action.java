@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @ApiModel("顾客行为偏好")
 public class crowd_action {
-
+    @ApiModelProperty("关键主键")
     private int id;
 
     @ApiModelProperty("名称")

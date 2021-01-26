@@ -48,7 +48,7 @@ public class Member {
     @ApiModelProperty(value = "所属城市id")
     private Integer city_code;
     @ApiModelProperty(value = "所属城市名称")
-    private Integer city_name;
+    private String city_name;
 
     @ApiModelProperty(value = "所属区域编号")
     private Integer area_code;

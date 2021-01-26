@@ -25,7 +25,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/member/memberAddress")
+@RequestMapping("/memberAddress")
 @Api(value = "顾客收货地址信息", tags = {"顾客收货地址"})
 @Validated
 public class MemberAddressController {
@@ -34,21 +34,21 @@ public class MemberAddressController {
     private MemberAddressService memberAddressService;
 
     @ApiOperation(value = "顾客收货地址-添加顾客收货地址", notes = "顾客收货地址-添加顾客收货地址")
-    @RequestMapping(value = "/v1/addReveiverAddress", method = RequestMethod.POST)
+    @RequestMapping(value = "v1/addReveiverAddress", method = RequestMethod.POST)
     public ComResponse<String> addReveiverAddress(@RequestBody  @Validated ReveiverAddressInsertVO reveiverAddressInsertVO) throws IllegalAccessException {
         reveiverAddressInsertVO = BeanUtil.setNullValue(reveiverAddressInsertVO);
         return memberAddressService.addReveiverAddress(reveiverAddressInsertVO);
     }
 
     @ApiOperation(value = "顾客收货地址-更新收货地址", notes = "顾客收货地址-更新收货地址")
-    @RequestMapping(value = "/v1/updateReveiverAddress", method = RequestMethod.POST)
+    @RequestMapping(value = "v1/updateReveiverAddress", method = RequestMethod.POST)
     public ComResponse<String> updateReveiverAddress(@RequestBody @Validated ReveiverAddressUpdateVO reveiverAddressUpdateVO) throws IllegalAccessException {
         reveiverAddressUpdateVO = BeanUtil.setNullValue(reveiverAddressUpdateVO);
         return memberAddressService.updateReveiverAddress(reveiverAddressUpdateVO);
     }
 
     @ApiOperation(value = "顾客收货地址-获取顾客收货地址", notes = "顾客收货地址-获取顾客收货地址")
-    @RequestMapping(value = "/v1/getReveiverAddress", method = RequestMethod.GET)
+    @RequestMapping(value = "v1/getReveiverAddress", method = RequestMethod.GET)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query")
     })

@@ -24,12 +24,13 @@
     <result column="year_avg_count" property="yearAvgCount" jdbcType="INTEGER" />
     <result column="return_goods_rate" property="returnGoodsRate" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="last_sign_time" property="lastSignTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, member_card, total_counsum_amount, total_invest_amount, total_order_amount, order_rec_amount, 
     first_order_time, last_order_time, last_buy_product_code, first_order_staff_no, first_order_no, 
     first_buy_product_code, first_order_am, order_high_am, order_low_am, order_avg_am, 
-    product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate, create_time
+    product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate, create_time,last_sign_time
   </sql>
 
 <!--根据顾客编号查询订单相关信息-->
@@ -38,7 +39,7 @@
   member_card, total_counsum_amount, total_invest_amount, total_order_amount, order_rec_amount,
   first_order_time, last_order_time, last_buy_product_code, first_order_staff_no, first_order_no,
   first_buy_product_code, first_order_am, order_high_am, order_low_am, order_avg_am,
-  product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate
+  product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate,last_sign_time
   from member_order_stat
   where member_card in
   <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
@@ -113,6 +114,9 @@
       <if test="createTime != null" >
         create_time,
       </if>
+      <if test="lastSignTime != null" >
+        last_sign_time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="memberCard != null" >
@@ -178,6 +182,9 @@
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="lastSignTime != null" >
+        #{last_sign_time,jdbcType=TIMESTAMP},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderStat" >
@@ -242,6 +249,9 @@
       </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastSignTime != null" >
+        last_sign_time = #{lastSignTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where member_card = #{memberCard,jdbcType=VARCHAR}

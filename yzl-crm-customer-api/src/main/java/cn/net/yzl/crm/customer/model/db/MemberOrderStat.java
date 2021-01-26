@@ -46,6 +46,15 @@ public class MemberOrderStat {
     private Integer returnGoodsRate;
 
     private Date createTime;
+    private Date lastSignTime;
+
+    public Date getLastSignTime() {
+        return lastSignTime;
+    }
+
+    public void setLastSignTime(Date lastSignTime) {
+        this.lastSignTime = lastSignTime;
+    }
 
     public Integer getId() {
         return id;

@@ -156,7 +156,8 @@ public class MemberLabel extends BaseObject {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("建档时间")
     private Date createTime;
-
+    //最后签收时间
+    private Date lastSignTime;
     @ApiModelProperty("顾客类型")
     private String memberType;
 

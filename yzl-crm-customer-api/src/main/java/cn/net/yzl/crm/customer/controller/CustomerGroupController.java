@@ -105,4 +105,12 @@ public class CustomerGroupController {
     public ComResponse<List<CustomerCrowdGroupVO>> query4Select(){
         return customerGroupService.query4Select();
     }
+
+    @ApiOperation("修改顾客圈选")
+    @PostMapping("/v1/groupTrial")
+    public ComResponse<Integer> memberCrowdGroupTrial(@RequestBody member_crowd_group memberCrowdGroup){
+        if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        int count = customerGroupService.memberCrowdGroupTrial(memberCrowdGroup);
+        return ComResponse.success(count);
+    }
 }

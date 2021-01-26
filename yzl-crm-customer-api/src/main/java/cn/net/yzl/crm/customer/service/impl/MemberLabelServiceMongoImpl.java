@@ -40,6 +40,8 @@ public class MemberLabelServiceMongoImpl implements MemberLabelService {
     private MemberLabelDao memberLabelDao;
     @Autowired
     private MemberAmountDao memberAmountDao;
+    @Autowired
+    private MemberProductEffectMapper memberProductEffectMapper;
 
     @Override
     public Boolean syncProcess(int pageNo, int pageSize) {
@@ -98,6 +100,9 @@ public class MemberLabelServiceMongoImpl implements MemberLabelService {
                 //处理创建时间，修改时间，首次下单时间，最后一个下单时间
                 if(Objects.nonNull(memberLabel.getCreateTime())){
                     memberLabel.setCreateTime(MongoDateHelper.getMongoDate(memberLabel.getCreateTime()));
+                }
+                if(Objects.nonNull(memberLabel.getLastSignTime())){
+                    memberLabel.setLastSignTime(MongoDateHelper.getMongoDate(memberLabel.getLastSignTime()));
                 }
                 if(Objects.nonNull(memberLabel.getUpdateTime())){
                     memberLabel.setUpdateTime(MongoDateHelper.getMongoDate(memberLabel.getUpdateTime()));

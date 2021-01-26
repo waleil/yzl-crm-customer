@@ -1191,6 +1191,7 @@
     o.day_avg_count as dayAvgCount,
     o.year_avg_count as yearAvgCount,
     o.return_goods_rate as returnGoodsRate,
+    o.last_sign_time as lastSignTime,
 	a.total_money as totalMoney
          from member m
          left join member_order_stat o on m.member_card= o.member_card

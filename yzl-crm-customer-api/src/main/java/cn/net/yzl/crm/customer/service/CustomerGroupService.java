@@ -47,4 +47,6 @@ public interface CustomerGroupService {
     ComResponse updateCustomerCrowdGroupStatus(UpdateCrowdStatusVO vo);
 
     ComResponse<List<CustomerCrowdGroupVO>> query4Select();
+
+    int memberCrowdGroupTrial(member_crowd_group memberCrowdGroup);
 }
