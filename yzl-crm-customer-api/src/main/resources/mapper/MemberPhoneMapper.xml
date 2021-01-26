@@ -26,9 +26,16 @@
     from member_phone
     where id = #{id,jdbcType=INTEGER}
   </select>
+    <select id="getMemberCardByPhoneNumber" resultType="java.lang.String">
+        select
+            member_card
+        from
+            member_phone
+        where phone_number = #{phoneNumber,jdbcType=INTEGER}
+    </select>
 
-  <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.MemberPhone" >
-    insert into member_phone (id, member_card, phone_number, 
+    <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.MemberPhone" >
+    insert into member_phone (id, member_card, phone_number,
       phone_place, service_provider, phone_type, 
       enabled, creator_no, create_time, 
       updator_no, update_time)
