@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -29,6 +30,7 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
     private static final String PREFIX_ZERO = "0";
 
     @Override
+    @Transactional
     public ComResponse<String> getMemberCardByphoneNumber(String phoneNumber) {
         if (StringUtils.isEmpty(phoneNumber)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号不能为空!");
