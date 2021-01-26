@@ -1,7 +1,11 @@
 package cn.net.yzl.crm.customer.dao;
 
+import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddress;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ReveiverAddressMapper {
@@ -52,4 +56,7 @@ public interface ReveiverAddressMapper {
      * @mbggenerated Mon Jan 25 17:26:03 CST 2021
      */
     int updateByPrimaryKey(ReveiverAddress record);
+
+
+    List<ReveiverAddressDto> getReveiverAddressByMemberCard(@Param("memberCard") String memberCard);
 }

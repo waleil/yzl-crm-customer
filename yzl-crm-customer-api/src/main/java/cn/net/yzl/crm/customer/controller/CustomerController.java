@@ -194,35 +194,7 @@ public class CustomerController {
         return GeneralResult.success(memberDiseaseList);
     }
 
-    @ApiOperation("添加收货地址")
-    @PostMapping("/v1/addReveiverAddress")
-    public GeneralResult addReveiverAddress(@RequestBody ReveiverAddress reveiverAddress) {
-        if (reveiverAddress == null) return GeneralResult.errorWithMessage(101, "参数空");
-        memberService.saveReveiverAddress(reveiverAddress);
-        return GeneralResult.success();
-    }
 
-    @ApiOperation("修改收获地址")
-    @PostMapping("/v1/updateReveiverAddress")
-    public GeneralResult updateReveiverAddress(@RequestBody ReveiverAddress reveiverAddress) {
-        if (reveiverAddress == null || StringUtil.isNullOrEmpty(reveiverAddress.getMember_card()))
-            return GeneralResult.errorWithMessage(101, "参数空");
-        memberService.updateReveiverAddress(reveiverAddress);
-
-        return GeneralResult.success();
-    }
-
-    @ApiOperation("获取顾客收货地址")
-    @GetMapping("/v1/getReveiverAddress")
-    public GeneralResult getReveiverAddress(
-            @RequestParam("member_card")
-            @NotBlank(message = "member_card不能为空")
-            @ApiParam(name = "member_card", value = "会员卡号", required = true)
-                    String member_card
-    ) {
-        List<ReveiverAddress> reveiverAddressList = memberService.getReveiverAddress(member_card);
-        return GeneralResult.success(reveiverAddressList);
-    }
 
 
     @ApiOperation("获取顾客购买能力")
