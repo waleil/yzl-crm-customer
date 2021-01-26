@@ -19,20 +19,20 @@ import java.util.List;
 
 @Api(value="ActionDictController",tags = {"客户综合行为"})
 @RestController
-@RequestMapping("/member/actionDict")
+@RequestMapping("/member/memberAction")
 public class ActionDictController {
 
     @Autowired
     private ActionDictService actionDictService;
 
     @ApiOperation(value="字典管理-客户年龄段字典列表查询",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    @GetMapping("/getAgeDictList")
+    @GetMapping("v1/getActionDictList")
     public ComResponse<List<ActionDict>>  getListByType(@RequestParam("type") @NotNull @Min(0) Integer type){
        return actionDictService.getDictListByType(type);
     }
 
     @ApiOperation(value="字典管理-客户年龄段字典保存",consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PostMapping("/memberAgeSaveUpdate")
+    @PostMapping("v1/saveUpdateActionDict")
     public ComResponse<Integer> memberAgeSaveUpdate(@RequestBody @Validated ValidList<ActionDictDto> ageDictDtos){
         return  actionDictService.saveUpdateActionDict(ageDictDtos);
     }

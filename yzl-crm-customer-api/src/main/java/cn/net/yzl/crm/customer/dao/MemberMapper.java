@@ -1,7 +1,6 @@
 package cn.net.yzl.crm.customer.dao;
 
-import cn.net.yzl.crm.customer.config.db.DataSourceSelector;
-import cn.net.yzl.crm.customer.config.db.DynamicDataSourceEnum;
+
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
@@ -17,7 +16,7 @@ import java.util.List;
 public interface MemberMapper {
     List<MemberGrad> getMemberGrad();
 
-    @DataSourceSelector(value = DynamicDataSourceEnum.master)
+//    @DataSourceSelector(value = DynamicDataSourceEnum.master)
     int insertSelective(Member record);
 
     List<Member> findPageByCondition(MemberSerchConditionDTO dto);
