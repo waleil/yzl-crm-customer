@@ -43,5 +43,7 @@ public class ReveiverAddressInsertVO implements Serializable {
     @ApiModelProperty(value = "详细地址，街道门牌号",name = "memberAddress",required = true)
     @NotBlank
     private String memberAddress;
+    @ApiModelProperty(value = "创建人",name = "createCode",hidden = true)
+    private String createCode;
 
 }

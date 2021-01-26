@@ -39,5 +39,6 @@ public class ReveiverAddressUpdateVO implements Serializable {
     private String memberStreetName;
     @ApiModelProperty(value = "详细地址，街道门牌号",name = "memberAddress",required = true)
     private String memberAddress;
-
+    @ApiModelProperty(value = "更新人",name = "updateCode",hidden = true)
+    private String updateCode;
 }
