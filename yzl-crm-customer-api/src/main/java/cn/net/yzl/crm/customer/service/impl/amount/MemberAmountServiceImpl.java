@@ -78,9 +78,14 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     public ComResponse<String> operation(MemberAmountDetailVO memberAmountDetailVO) {
         String memberCard = memberAmountDetailVO.getMemberCard();
         // 用会员号 做锁
-        RLock lock = redisson.getLock(memberCard);
-        lock.lock(3, TimeUnit.SECONDS);
+        RLock lock = redisson.getLock("operation---"+memberCard);
+
         try {
+            //尝试加锁300ms
+            if(lock.tryLock(300, TimeUnit.MILLISECONDS)){
+
+
+
             // 判断账户是否存在
             MemberAmountDto memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
 
@@ -115,12 +120,12 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             MemberAmountDetail memberAmountDetail = new MemberAmountDetail();
             if (obtainType == 1) { // 退回
                 memberAmount.setFrozenAmount(discountMoney);
-                memberAmountDetail.setStatus((byte)3); // 进行中 待确认
+                memberAmountDetail.setStatus((byte) 3); // 进行中 待确认
             } else if (obtainType == 2) { //消费
-                memberAmountDetail.setStatus((byte)3);// 进行中 待确认
+                memberAmountDetail.setStatus((byte) 3);// 进行中 待确认
                 memberAmount.setFrozenAmount(discountMoney);
             } else if (obtainType == 3) { //充值
-                memberAmountDetail.setStatus((byte)1);// 进行中 正常(完成)
+                memberAmountDetail.setStatus((byte) 1);// 进行中 正常(完成)
                 memberAmount.setTotalMoney(totalMoney + discountMoney);
             }
             // 修改账户信息
@@ -136,6 +141,11 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             if (num1 < 1) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "账户信息记录保存错误");
             }
+            }else{
+                throw new BizException(ResponseCodeEnums.REPEAT_ERROR_CODE.getCode(), "当前账户正在下单操作，请勿重复下单!");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             lock.unlock();
         }
@@ -146,9 +156,10 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     @Override
     @Transactional
     public ComResponse<String> operationConfirm(int obtainType, String orderNo) {
-        RLock lock = redisson.getLock(orderNo);
-        lock.lock(3, TimeUnit.SECONDS);
+        RLock lock = redisson.getLock("operationConfirm"+orderNo);
+
         try {
+            lock.tryLock(3, TimeUnit.SECONDS);
             logger.info("MemberAmountServiceImpl  operationConfirm () : obtainType : {},orderNO : {}", orderNo, orderNo);
             // 目前的操作 只支持 消费和退款的 确认 obtainType 为 1(退回) 2:(消费)
             // 获取 操作记录
@@ -157,6 +168,9 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             if (memberAmountDetail == null) {
                 logger.info("obtainType: {},orderNo : {} 记录不存在!", obtainType, orderNo);
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "订单 记录不存在!");
+            }
+            if(memberAmountDetail.getStatus()!=3){
+                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "订单状态不正确 只有进行中的订单才能确认!");
             }
 
             // 判断 如果 存在 是否已经 确认
@@ -187,7 +201,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             }
             MemberAmount memberAmount = new MemberAmount();
             memberAmount.setMemberCard(memberCard);
-            memberAmount.setFrozenAmount(memberAmount.getFrozenAmount() - discountMoney);
+            memberAmount.setFrozenAmount(memberAmountDto.getFrozenAmount() - discountMoney);
 
             // 判断 是消费 的时候 总金额是否满足扣除
             if (obtainType == 2) { // 2:(消费)
@@ -195,10 +209,10 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                 if (totalMoney < discountMoney) {
                     throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "消费 确认时,总额度 不够消费的!");
                 }
-                memberAmount.setTotalMoney(memberAmount.getTotalMoney() - discountMoney);
+                memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() - discountMoney);
             } else if (obtainType == 1) {
 
-                memberAmount.setTotalMoney(memberAmount.getTotalMoney() + discountMoney);
+                memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + discountMoney);
             }
 
             // 修改账户信息
@@ -206,6 +220,8 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             if (num < 1) {
                 throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "顾客账户信息修改异常");
             }
+        }catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             lock.unlock();
         }

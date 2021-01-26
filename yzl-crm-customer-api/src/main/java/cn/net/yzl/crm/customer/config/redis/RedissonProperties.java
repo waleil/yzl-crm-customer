@@ -10,7 +10,7 @@ public class RedissonProperties {
     private String password;
     @Value("${redisson.nodes}")
     private String nodes;
-    @Value("${redisson.type:1}")
+    @Value("${redisson.type:2}")
     private int type;
 
 
