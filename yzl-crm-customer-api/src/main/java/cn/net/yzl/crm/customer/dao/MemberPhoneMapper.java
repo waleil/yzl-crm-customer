@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
-import cn.net.yzl.crm.customer.model.db.MemberPhone;
+import cn.net.yzl.crm.customer.model.Member;
+import cn.net.yzl.crm.customer.model.MemberPhone;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -29,8 +30,10 @@ public interface MemberPhoneMapper {
      * 根据电话号查询会员号
      * wangzhe
      * 2021-01-26
-     * @param phoneNumber
+     * @param phoneNumbers
      * @return
      */
-    String getMemberCardByPhoneNumber(@Param("phoneNumber") String phoneNumber);
+    String getMemberCardByPhoneNumber(@Param("list") List phoneNumbers);
+
+
 }

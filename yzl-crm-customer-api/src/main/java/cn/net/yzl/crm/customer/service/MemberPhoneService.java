@@ -1,6 +1,9 @@
 package cn.net.yzl.crm.customer.service;
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.crm.customer.model.Member;
+
+import java.util.List;
 
 public interface MemberPhoneService {
     /**
@@ -10,5 +13,9 @@ public interface MemberPhoneService {
      * @param phoneNumber
      * @return
      */
-    ComResponse<String> getMemberCard(String phoneNumber);
+
+    ComResponse<String> getMemberCardByphoneNumber(String phoneNumber);
+
+
+    ComResponse<Member> getMemberByphoneNumber(String phoneNumber);
 }

@@ -16,7 +16,7 @@
   </resultMap>
 
   <sql id="Base_Column_List" >
-    id, member_card, phone_number, phone_place, service_provider, phone_type, enabled, 
+    id, member_card, phone_number, phone_place, service_provider, phone_type, enabled,
     creator_no, create_time, updator_no, update_time
   </sql>
 
@@ -31,20 +31,23 @@
             member_card
         from
             member_phone
-        where phone_number = #{phoneNumber,jdbcType=INTEGER}
+        where phone_number in
+      <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        #{item}
+      </foreach>
     </select>
 
-    <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.MemberPhone" >
+  <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.MemberPhone" >
     insert into member_phone (id, member_card, phone_number,
       phone_place, service_provider, phone_type, 
       enabled, creator_no, create_time, 
       updator_no, update_time)
-    values (#{id,jdbcType=INTEGER}, #{memberCard,jdbcType=VARCHAR}, #{phoneNumber,jdbcType=VARCHAR}, 
-      #{phonePlace,jdbcType=VARCHAR}, #{serviceProvider,jdbcType=BIT}, #{phoneType,jdbcType=BIT}, 
-      #{enabled,jdbcType=BIT}, #{creatorNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updatorNo,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    values (#{id,jdbcType=INTEGER}, #{member_card,jdbcType=VARCHAR}, #{phone_number,jdbcType=VARCHAR},
+      #{phone_place,jdbcType=VARCHAR}, #{service_provider,jdbcType=BIT}, #{phone_type,jdbcType=BIT},
+      #{enabled,jdbcType=BIT}, #{creator_no,jdbcType=VARCHAR}, #{create_time,jdbcType=TIMESTAMP},
+      #{updator_no,jdbcType=VARCHAR}, #{update_time,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberPhone" >
+  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.MemberPhone" >
     insert into member_phone
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

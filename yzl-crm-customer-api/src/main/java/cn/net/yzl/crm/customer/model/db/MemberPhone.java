@@ -13,7 +13,7 @@ public class MemberPhone {
 
     private Boolean serviceProvider;
 
-    private Boolean phoneType;
+    private Integer phoneType;
 
     private Boolean enabled;
 
@@ -65,11 +65,11 @@ public class MemberPhone {
         this.serviceProvider = serviceProvider;
     }
 
-    public Boolean getPhoneType() {
+    public Integer getPhoneType() {
         return phoneType;
     }
 
-    public void setPhoneType(Boolean phoneType) {
+    public void setPhoneType(Integer phoneType) {
         this.phoneType = phoneType;
     }
 

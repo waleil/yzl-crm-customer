@@ -114,7 +114,7 @@ public class Member {
 
     private List<MemberPhone> memberPhoneList;
     @ApiModelProperty("建档时间")
-    private  String create_time;
+    private  Date create_time;
     @ApiModelProperty("顾客类型")
     private String member_type;
 

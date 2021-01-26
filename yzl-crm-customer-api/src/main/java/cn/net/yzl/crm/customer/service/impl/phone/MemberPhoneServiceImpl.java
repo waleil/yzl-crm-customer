@@ -1,22 +1,23 @@
 package cn.net.yzl.crm.customer.service.impl.phone;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.MemberPhoneMapper;
 import cn.net.yzl.crm.customer.model.Member;
-import cn.net.yzl.crm.customer.model.db.MemberPhone;
+import cn.net.yzl.crm.customer.model.MemberPhone;
 import cn.net.yzl.crm.customer.service.MemberPhoneService;
 import cn.net.yzl.crm.customer.service.MemberService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 public class MemberPhoneServiceImpl implements MemberPhoneService {
 
@@ -24,9 +25,11 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
     MemberService memberService;
     @Autowired
     MemberPhoneMapper memberPhoneMapper;
+    
+    private static final String PREFIX_ZERO = "0";
 
     @Override
-    public ComResponse<String> getMemberCard(String phoneNumber) {
+    public ComResponse<String> getMemberCardByphoneNumber(String phoneNumber) {
         if (StringUtils.isEmpty(phoneNumber)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号不能为空!");
         }
@@ -37,20 +40,28 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         }
 
         String noZeroNumber = "";
+        String haveZeroNumber = "";
 
         //是否以0开头 --> 去掉0
-        if (phoneNumber.startsWith("0")){
+        if (phoneNumber.startsWith(PREFIX_ZERO)){
             noZeroNumber = phoneNumber.substring(1);
+            haveZeroNumber = phoneNumber;
         }else{
             noZeroNumber = phoneNumber;
+            haveZeroNumber = PREFIX_ZERO + phoneNumber;
         }
-        /**
-         * 1.校验手机号，电话号码是否正确
-         */
-        if (!isMobile(noZeroNumber) && !isPhone(phoneNumber)) {
+        //校验手机号
+        int phoneType = 0;
+        if (isMobile(noZeroNumber)) {
+            phoneType = 1;
+        }
+        //不是手机号时，要校验是否为电话号
+        if (phoneType == 0 && isPhone(phoneNumber)){
+            phoneType = 2;
+        }
+        if (phoneType == 0) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!");
         }
-
         /**
          * 2.查询member_phone中电话号码是否存在
          *      1.存在时：
@@ -61,36 +72,43 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
          *          添加一条member_phne记录
          *          添加一条member记录
          */
-
-        String memberCard= memberPhoneMapper.getMemberCardByPhoneNumber(phoneNumber);
-        if (StringUtils.isEmpty(memberCard)) {
+        String memberCard= memberPhoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
+        if (StringUtils.isNotEmpty(memberCard)) {
+            log.info("通过phoneNumber：{}，查询到对应的会员信息,会员号为：{}", phoneNumber, memberCard);
+        }else{
+            log.info("通过phoneNumber：{}，没有查询到对应的会员信息。",phoneNumber);
             //新建会员
             Member member = new Member();
+            member.setCreate_time(new Date());
+            member.setUpdate_time(member.getCreate_time());
+            member.setSource_type(0);
             int result = memberService.insert(member);
             if (result == 1) {
-                memberCard = member.getMember_card();
+                //保存member_phone记录
+                MemberPhone memberPhone = new MemberPhone();
+                memberPhone.setPhone_number(phoneNumber);
+                memberPhone.setPhone_type(phoneType);
+                memberPhone.setMember_card(member.getMember_card());
+                memberPhone.setCreator_no(member.getCreator_no());
+                memberPhone.setCreate_time(new Date());
+                memberPhone.setUpdator_no(memberPhone.getCreator_no());
+                memberPhone.setUpdate_time(memberPhone.getCreate_time());
+                result = memberPhoneMapper.insert(memberPhone);
             }
-            //保存member_phone记录
-            MemberPhone memberPhone = new MemberPhone();
-            memberPhone.setMemberCard(memberCard);
-            memberPhone.setPhoneNumber(phoneNumber);
-            memberPhoneMapper.insert(memberPhone);
+            if (result == 1) {
+                memberCard = member.getMember_card();
+                log.info("通过phoneNumber：{}，新增会员信息,会员号为：{}",phoneNumber,memberCard);
+            }else{
+                log.error("通过phoneNumber：{}，新增会员异常");
+            }
         }
-
-        /**
-         * 3.接口返回member_card
-         */
+        //3.接口返回member_card
         if (StringUtils.isEmpty(memberCard)) {
             return ComResponse.fail(ResponseCodeEnums.SYSTEM_ERROR_CODE.getCode(),"操作异常!");
         }else{
             return ComResponse.success(memberCard);
         }
     }
-
-
-
-
-
 
     /**
      * 手机号验证
@@ -141,5 +159,31 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         return m.matches();
     }
 
+    @Override
+    public ComResponse<Member> getMemberByphoneNumber(String phoneNumber) {
+        if (StringUtils.isEmpty(phoneNumber)) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号不能为空!");
+        }
+        phoneNumber = phoneNumber.trim();
 
+        String noZeroNumber = "";
+        String haveZeroNumber = "";
+
+        //是否以0开头 --> 去掉0
+        if (phoneNumber.startsWith(PREFIX_ZERO)){
+            noZeroNumber = phoneNumber.substring(1);
+            haveZeroNumber = phoneNumber;
+        }else{
+            noZeroNumber = phoneNumber;
+            haveZeroNumber = PREFIX_ZERO + phoneNumber;
+        }
+        String memberCard = memberPhoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
+        if (StringUtils.isEmpty(memberCard)) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"没有查询到客户信息!");
+        }
+        //根据会员号查询会员信息
+        Member memberEntity = memberService.selectMemberByCard(memberCard);
+        return ComResponse.success(memberEntity);
+
+    }
 }
