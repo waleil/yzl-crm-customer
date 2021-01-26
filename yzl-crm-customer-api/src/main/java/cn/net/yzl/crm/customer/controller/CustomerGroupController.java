@@ -106,7 +106,7 @@ public class CustomerGroupController {
         return customerGroupService.query4Select();
     }
 
-    @ApiOperation("修改顾客圈选")
+    @ApiOperation("圈选试算")
     @PostMapping("/v1/groupTrial")
     public ComResponse<Integer> memberCrowdGroupTrial(@RequestBody member_crowd_group memberCrowdGroup){
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);

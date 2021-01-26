@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class crowd_base_value {
 
-
+    @ApiModelProperty("编号")
     private String id;
 
     @ApiModelProperty("名称")
