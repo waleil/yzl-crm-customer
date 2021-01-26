@@ -26,17 +26,12 @@
     from member_phone
     where id = #{id,jdbcType=INTEGER}
   </select>
-    <select id="getMemberCardByPhoneNumbers" resultType="java.lang.String">
+    <select id="getMemberCardByPhoneNumber" resultType="java.lang.String">
         select
             member_card
         from
             member_phone
-        where phone_number in
-      <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
-        #{item}
-      </foreach>
-
-
+        where phone_number = #{phoneNumber,jdbcType=INTEGER}
     </select>
 
     <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.MemberPhone" >

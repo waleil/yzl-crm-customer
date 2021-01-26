@@ -29,8 +29,8 @@ public interface MemberPhoneMapper {
      * 根据电话号查询会员号
      * wangzhe
      * 2021-01-26
-     * @param phoneNumbers
+     * @param phoneNumber
      * @return
      */
-    List<String> getMemberCardByPhoneNumbers(@Param("list") List<String> phoneNumbers);
+    String getMemberCardByPhoneNumber(@Param("phoneNumber") String phoneNumber);
 }

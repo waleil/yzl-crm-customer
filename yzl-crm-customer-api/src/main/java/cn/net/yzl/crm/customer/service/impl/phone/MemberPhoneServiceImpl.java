@@ -36,22 +36,18 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!");
         }
 
-        String haveZeroNumber = "";
         String noZeroNumber = "";
-
 
         //是否以0开头 --> 去掉0
         if (phoneNumber.startsWith("0")){
-            haveZeroNumber = phoneNumber;
             noZeroNumber = phoneNumber.substring(1);
         }else{
-            haveZeroNumber = "0" + phoneNumber;
             noZeroNumber = phoneNumber;
         }
         /**
          * 1.校验手机号，电话号码是否正确
          */
-        if (!isMobile(noZeroNumber) && !isPhone(haveZeroNumber)) {
+        if (!isMobile(noZeroNumber) && !isPhone(phoneNumber)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!");
         }
 
@@ -66,14 +62,8 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
          *          添加一条member记录
          */
 
-        List<String> phoneNumbers = new ArrayList<>();
-        phoneNumbers.add(haveZeroNumber);
-        phoneNumbers.add(noZeroNumber);
-        List<String> memberCards= memberPhoneMapper.getMemberCardByPhoneNumbers(phoneNumbers);
-        String memberCard = "";
-        if (CollectionUtil.isNotEmpty(memberCards)) {
-            memberCard = memberCards.get(0);
-        }else{
+        String memberCard= memberPhoneMapper.getMemberCardByPhoneNumber(phoneNumber);
+        if (StringUtils.isEmpty(memberCard)) {
             //新建会员
             Member member = new Member();
             int result = memberService.insert(member);
@@ -85,7 +75,6 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
             memberPhone.setMemberCard(memberCard);
             memberPhone.setPhoneNumber(phoneNumber);
             memberPhoneMapper.insert(memberPhone);
-
         }
 
         /**
