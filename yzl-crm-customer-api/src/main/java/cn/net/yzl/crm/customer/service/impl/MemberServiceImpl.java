@@ -18,6 +18,7 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cn.net.yzl.crm.customer.model.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,6 +47,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
+    @Transactional
     public int insert(Member member) {
         //生成顾客会员卡号缓存的key
         String cacheKey = CacheKeyUtil.maxMemberCardCacheKey();
