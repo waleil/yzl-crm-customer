@@ -39,6 +39,7 @@ public class MemberAmountController {
     ComResponse<MemberAmountDto> getMemberAmount(@RequestParam("memberCard") String  memberCard) {
         return memberAmountService.getMemberAmount(memberCard);
     }
+
     @ApiOperation(value = "顾客账户-获取余额明细", notes = "顾客账户-获取余额明细")
     @RequestMapping(value = "/getMemberAmountDetailList", method = RequestMethod.GET)
     @ApiImplicitParams({
@@ -56,12 +57,12 @@ public class MemberAmountController {
     ComResponse<String> operation(@RequestBody @Validated MemberAmountDetailVO memberAmountDetailVO) throws ParseException {
         return memberAmountService.operation(memberAmountDetailVO);
     }
+
     @ApiOperation(value = "顾客账户-账户操作(消费/退回)确认", notes = "顾客账户-账户操作(消费/退回)确认")
     @RequestMapping(value = "/operationConfirm", method = RequestMethod.GET)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "obtainType", value = "操作类型(1 退回 2 消费,3:充值(目前先不考虑)", required = true, dataType = "string", paramType = "query")
-
     })
     ComResponse<String> operationConfirm(@RequestParam("obtainType") @Min(1) @Max(2) int obtainType, @RequestParam("orderNo") @NotBlank String orderNo) throws ParseException {
         return memberAmountService.operationConfirm(obtainType,orderNo);

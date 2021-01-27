@@ -10,6 +10,25 @@
     <result column="value" jdbcType="VARCHAR" property="value" />
     <result column="value2" jdbcType="VARCHAR" property="value2" />
   </resultMap>
+
+
+  <resultMap id="memberActionrRelationItem" type="cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionrRelationItem">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="did" jdbcType="INTEGER" property="did" />
+    <result column="dname" jdbcType="VARCHAR" property="dname" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="value2" jdbcType="VARCHAR" property="value2" />
+  </resultMap>
+
+  <resultMap id="BaseResultListMap" type="cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList">
+    <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="type_name" jdbcType="VARCHAR" property="typeName" />
+    <collection property="items" resultMap="memberActionrRelationItem"/>
+  </resultMap>
+
   <sql id="Base_Column_List">
     t.id, t.member_card, t.type, t.did, b.name as dname, b.value,b.value2
   </sql>
@@ -37,9 +56,27 @@
     where t.member_card = #{memberCard,jdbcType=VARCHAR} and t.type=#{type,jdbcType=INTEGER}
   </select>
 
-  <select id="selectRelationByMemberCard"  resultMap="BaseResultMap">
+  <select id="selectRelationTreeByMemberCard"  resultMap="BaseResultListMap">
     select
-    <include refid="Base_Column_List" />
+    t.id, t.member_card,t.did, b.name as dname, b.value,b.value2,
+    t.type,
+    case  t.type when 1 then '方便接电话时间'
+                 when 2 then '性格偏好'
+                 when 3 then '响应时间'
+                 when 4 then '坐席偏好'
+                 when 5 then '综合行为'
+                 when 6 then '下单行为'
+                 when 7 then '活动偏好'
+                 when 8 then '代表年龄段'
+                 else '其他' end as type_name
+    from member_action_relation t
+    inner join action_dict b on t.did=b.id
+    where t.member_card = #{memberCard,jdbcType=VARCHAR}
+  </select>
+
+    <select id="selectRelationByMemberCard"  resultMap="BaseResultMap">
+    select
+    t.id, t.member_card,t.did, b.name as dname, b.value,b.value2, t.type
     from member_action_relation t
     inner join action_dict b on t.did=b.id
     where t.member_card = #{memberCard,jdbcType=VARCHAR}

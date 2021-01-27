@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +29,8 @@ public interface MemberActionRelationMapper {
 
     List<MemberActionRelation> selectRelationByMemberCardAndDid(@Param("memberCard") String memberCard,
                                                                  @Param("did") Integer did );
+
+    List<MemberActionRelationList> selectRelationTreeByMemberCard(@Param("memberCard") String memberCard);
 
     List<MemberActionRelation> selectRelationByMemberCard(@Param("memberCard") String memberCard);
 

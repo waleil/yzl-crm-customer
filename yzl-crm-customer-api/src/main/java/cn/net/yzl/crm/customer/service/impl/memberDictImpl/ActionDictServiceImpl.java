@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.service.impl.memberDictImpl;
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.ActionDictMapper;
 import cn.net.yzl.crm.customer.dto.member.ActionDictDto;
 import cn.net.yzl.crm.customer.service.memberDict.ActionDictService;
@@ -52,7 +53,13 @@ public class ActionDictServiceImpl implements ActionDictService {
                         num+=actionDictMapper.insertSelective(actionDictDto);
                     }else if(actionDictDto.getId().intValue()==0){
                         //传入参数id为0则为清空
-                        num+=actionDictMapper.deleteByType(type,updator);
+                        int i = actionDictMapper.selectCountForRelationByType(type);
+                        if(i<1){
+                            num+=actionDictMapper.deleteByType(type,updator);
+                        }else{
+                            return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getMessage());
+                        }
+
                     }else{
                         //传入参数id有值则进行删除,并移除表中被提及id的数据，则表中剩余不被提交的数据全部被删除
                         for (ActionDict actionDict : actionDictList) {
@@ -66,6 +73,12 @@ public class ActionDictServiceImpl implements ActionDictService {
                 }
                 //表中剩余不被提交的数据全部被删除
                 for (ActionDict contactTimeDict : actionDictList2) {
+                    int i = actionDictMapper.selectCountForRelationByDid(contactTimeDict.getId());
+                    if(i<1){
+                        num+=actionDictMapper.deleteByType(type,updator);
+                    }else{
+                        return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getMessage());
+                    }
                     num+=actionDictMapper.deleteByPrimaryKey(contactTimeDict.getId(),updator);
                 }
             }

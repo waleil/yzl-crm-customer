@@ -30,4 +30,8 @@ public interface ActionDictMapper {
     List<ActionDict> selectByTypeAndName(@Param("type") Integer type,@Param("name") String name);
 
     int updateByPrimaryKeySelective(ActionDictDto record);
+
+    int selectCountForRelationByDid(Integer id);
+
+    int selectCountForRelationByType(Integer type);
 }

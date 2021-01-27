@@ -209,9 +209,7 @@ public class CustomerController {
     @PostMapping("/v1/addMemberOrderStat")
     public GeneralResult addMemberOrderStat(@RequestBody MemberOrderStat memberOrderStat) {
         if (memberOrderStat == null) return GeneralResult.errorWithMessage(101, "参数空");
-
         memberService.addMemberOrderStat(memberOrderStat);
-
         return GeneralResult.success();
     }
 

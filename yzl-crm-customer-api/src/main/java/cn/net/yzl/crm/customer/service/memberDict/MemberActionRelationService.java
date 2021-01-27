@@ -4,6 +4,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface MemberActionRelationService {
 
     public ComResponse<List<MemberActionRelation>> selectRelationByMemberCardAndType(String card, Integer type);
 
-    public ComResponse<List<MemberActionRelation>> selectRelationByMemberCard(String card);
+    public ComResponse<List<MemberActionRelationList>> selectRelationTreeByMemberCard(String card);
 
     public ComResponse<Integer> addRelationWithDict(MemberActionRelationDto memberActionRelationDto);
 

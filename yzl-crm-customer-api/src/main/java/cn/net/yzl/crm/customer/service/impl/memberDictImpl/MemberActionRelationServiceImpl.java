@@ -10,6 +10,7 @@ import cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,13 +37,15 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
     }
 
     @Override
-    public ComResponse<List<MemberActionRelation>> selectRelationByMemberCard(String card) {
-        List<MemberActionRelation> memberActionRelations = memberActionRelationMapper.selectRelationByMemberCard(card);
+    public ComResponse<List<MemberActionRelationList>> selectRelationTreeByMemberCard(String card) {
+        List<MemberActionRelationList> memberActionRelations = memberActionRelationMapper.selectRelationTreeByMemberCard(card);
         if(memberActionRelations==null || memberActionRelations.size()<1){
             return  ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(),ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getMessage());
         }
         return ComResponse.success(memberActionRelations);
     }
+
+
 
 
     @Override
