@@ -52,7 +52,8 @@ public class MemberServiceImpl implements MemberService {
         //设置顾客会员卡号
         member.setMember_card(String.valueOf(maxMemberCard));
         //保存数据
-        return memberMapper.insertSelective(member);
+        int result = memberMapper.insertSelective(member);
+        return result;
     }
 
     @Override

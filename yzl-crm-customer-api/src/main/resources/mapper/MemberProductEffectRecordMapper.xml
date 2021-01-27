@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.yzl.crm.customer.dao.MemberProductEffectRecordMapper">
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="before_data" jdbcType="VARCHAR" property="beforeData" />
+    <result column="after_data" jdbcType="VARCHAR" property="afterData" />
+    <result column="product_effect_id" jdbcType="INTEGER" property="productEffectId" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="modify_no" jdbcType="VARCHAR" property="modifyNo" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, before_data, after_data, product_effect_id, modify_time, modify_no
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from member_product_effect_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from member_product_effect_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord">
+    insert into member_product_effect_record (id, before_data, after_data, 
+      product_effect_id, modify_time, modify_no
+      )
+    values (#{id,jdbcType=INTEGER}, #{beforeData,jdbcType=VARCHAR}, #{afterData,jdbcType=VARCHAR}, 
+      #{productEffectId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyNo,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord">
+    insert into member_product_effect_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="beforeData != null">
+        before_data,
+      </if>
+      <if test="afterData != null">
+        after_data,
+      </if>
+      <if test="productEffectId != null">
+        product_effect_id,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
+      </if>
+      <if test="modifyNo != null">
+        modify_no,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="beforeData != null">
+        #{beforeData,jdbcType=VARCHAR},
+      </if>
+      <if test="afterData != null">
+        #{afterData,jdbcType=VARCHAR},
+      </if>
+      <if test="productEffectId != null">
+        #{productEffectId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyNo != null">
+        #{modifyNo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord">
+    update member_product_effect_record
+    <set>
+      <if test="beforeData != null">
+        before_data = #{beforeData,jdbcType=VARCHAR},
+      </if>
+      <if test="afterData != null">
+        after_data = #{afterData,jdbcType=VARCHAR},
+      </if>
+      <if test="productEffectId != null">
+        product_effect_id = #{productEffectId,jdbcType=INTEGER},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyNo != null">
+        modify_no = #{modifyNo,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord">
+    update member_product_effect_record
+    set before_data = #{beforeData,jdbcType=VARCHAR},
+      after_data = #{afterData,jdbcType=VARCHAR},
+      product_effect_id = #{productEffectId,jdbcType=INTEGER},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_no = #{modifyNo,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
