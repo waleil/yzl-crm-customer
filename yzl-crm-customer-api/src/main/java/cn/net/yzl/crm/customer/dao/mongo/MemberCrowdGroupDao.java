@@ -143,8 +143,8 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         query.with(sort);
         query.fields().include("_id")
                 .include("crowd_name").include("description")
-                .include("enable").include("effective_date")
-                .include("expire_date").include("create_name")
+                .include("enable").include("effective_date").include("person_count")
+                .include("expire_date").include("create_name").include("create_code")
                 .include("create_time");
         List<member_crowd_group> crowdGroupList = mongoTemplate.find(query, member_crowd_group.class);
 

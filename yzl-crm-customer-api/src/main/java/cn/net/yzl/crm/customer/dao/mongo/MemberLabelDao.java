@@ -1,7 +1,10 @@
 package cn.net.yzl.crm.customer.dao.mongo;
 
+import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
+import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -40,6 +43,18 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Return: java.lang.Integer
      */
     public Integer memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
+        Query query = initQuery(memberCrowdGroup);
+        return (int) mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
+    }
+    /**
+     * @Author: lichanghong
+     * @Description: 初始化MongoDB查询条件
+     * @Date: 2021/1/27 10:06 上午
+     * @param memberCrowdGroup
+     * @Return: org.springframework.data.mongodb.core.query.Query
+     */
+    private static Query initQuery( member_crowd_group memberCrowdGroup){
+
         Query query = new Query();
         Criteria criteria = new Criteria();
         //判断性别
@@ -122,11 +137,11 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
             if (!CollectionUtils.isEmpty(in)) {
                 int size = in.size();
                 Criteria [] andArray = new Criteria[size];
-               for(int i=0;i<size;i++){
-                   Criteria c = new Criteria();
+                for(int i=0;i<size;i++){
+                    Criteria c = new Criteria();
                     Member_Age age =in.get(i);
-                   andArray[i]= c.andOperator(Criteria.where("age").gte(age.getStart_age()),Criteria.where("age").lt(age.getEnd_age()));
-               }
+                    andArray[i]= c.andOperator(Criteria.where("age").gte(age.getStart_age()),Criteria.where("age").lt(age.getEnd_age()));
+                }
                 criteria.andOperator(andArray);
             }
             if (!CollectionUtils.isEmpty(ex)) {
@@ -251,7 +266,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         if(memberCrowdGroup.getFirst_order_to_days()!=null){
             int days = memberCrowdGroup.getFirst_order_to_days();
             if(days>10000){
-                return 0;
+                throw new  BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"首单下单时间不能大于10000");
             }
             Date date = getPastDate(days);
             criteria.and("firstOrderTime").lt(MongoDateHelper.getMongoDate(date));
@@ -265,16 +280,45 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         if(memberCrowdGroup.getLast_order_to_days()!=null){
             int days = memberCrowdGroup.getLast_order_to_days();
             if(days>10000){
-                return 0;
+                throw new  BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"最后一次下单时间不能大于10000");
             }
             Date date = getPastDate(days);
             criteria.and("lastOrderTime").lt(MongoDateHelper.getMongoDate(date));
         }
+        //生日月份
+        if(!CollectionUtils.isEmpty(memberCrowdGroup.getMember_month())){
+            List<crowd_base_value> memberMonth = memberCrowdGroup.getMember_month();
+            Map<Integer, List<crowd_base_value>> temps = memberMonth.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> in = temps.get(1);
+            List<crowd_base_value> ex = temps.get(0);
+            if(!CollectionUtils.isEmpty(in)){
+                int size = in.size();
+                Criteria [] andArray = new Criteria[size];
+                for(int i=0;i<size;i++){
+                    crowd_base_value c = in.get(i);
+                    andArray[i] =Criteria.where("memberMonth").is(c.getId());
+                }
+                criteria.andOperator(andArray);
+            }
+
+            if(!CollectionUtils.isEmpty(ex)) {
+                int size = ex.size();
+                Criteria [] exArray = new Criteria[size];
+                for(int i=0;i<size;i++){
+                    crowd_base_value c = ex.get(i);
+                    exArray[i] =Criteria.where("memberMonth").is(c.getId());
+                }
+                criteria.norOperator(exArray);
+            }
+        }
+        //获客媒体
+
+        //广告
         //最后一次下单时间>=
         if(memberCrowdGroup.getSign_date_to_days()!=null){
             int days = memberCrowdGroup.getSign_date_to_days();
             if(days>10000){
-                return 0;
+                throw new  BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"最后一次签收时间不能大于10000");
             }
             Date date = getPastDate(days);
             criteria.and("lastSignTime").lt(MongoDateHelper.getMongoDate(date));
@@ -282,9 +326,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         //方便接电话时间
 
         query.addCriteria(criteria);
-        return (int) mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
+        return query;
     }
-
     /**
      * @Author: lichanghong
      * @Description: 获取之前几天的日期
