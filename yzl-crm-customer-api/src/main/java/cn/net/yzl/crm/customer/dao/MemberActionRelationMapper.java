@@ -26,6 +26,9 @@ public interface MemberActionRelationMapper {
     List<MemberActionRelation> selectRelationByMemberCardAndType(@Param("memberCard") String memberCard,
                                                                  @Param("type") Integer type );
 
+    List<MemberActionRelation> selectRelationByMemberCardAndDid(@Param("memberCard") String memberCard,
+                                                                 @Param("did") Integer did );
+
     List<MemberActionRelation> selectRelationByMemberCard(@Param("memberCard") String memberCard);
 
     int updateByPrimaryKey(MemberActionRelationDto record);

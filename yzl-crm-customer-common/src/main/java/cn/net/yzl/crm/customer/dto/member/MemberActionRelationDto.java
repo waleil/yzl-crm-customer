@@ -32,10 +32,12 @@ public class MemberActionRelationDto implements Serializable {
     @NotBlank
     private String memberCard;
 
-    @ApiModelProperty(value ="字典id",name="did")
-    @NotNull
+    @ApiModelProperty(value ="字典id(手动新增时可不填)",name="did")
     @Min(0)
     private Integer did;
+
+    @ApiModelProperty(value ="字典名称(手动填写时必填)",name="dname")
+    private String dname;
 
     @ApiModelProperty(value ="创建人",name="creator")
     @NotBlank

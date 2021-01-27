@@ -26,6 +26,13 @@
         where type = #{type,jdbcType=INTEGER}
   </select>
 
+  <select id="selectByTypeAndName"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from action_dict
+    where type = #{type,jdbcType=INTEGER} and name=#{name,jdbcType=VARCHAR}
+  </select>
+
   <update id="deleteByPrimaryKey" >
     update action_dict set del_flag=1,updator=#{updator,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER} and del_flag=0

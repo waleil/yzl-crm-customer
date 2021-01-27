@@ -50,6 +50,13 @@ public class MemberActionRelationController {
         return memberActionRelationService.addRelation(memberAgeRelationDtos);
     }
 
+    @ApiOperation(value="客户行为关联-客户综合行为手动新增录入关联",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("v1/addRelationWithDict")
+    public ComResponse<Integer> addRelationWithDict(@RequestBody @Validated MemberActionRelationDto memberActionRelationDto){
+        return memberActionRelationService.addRelationWithDict(memberActionRelationDto);
+    }
+
+
     @ApiOperation(value="客户行为关联-客户全综合行为关联删除",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @GetMapping("v1/deleteRelation")
     public ComResponse<Integer> deleteRelation(@RequestParam("rid") @NotNull @Min(0) Integer rid){

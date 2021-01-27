@@ -21,6 +21,14 @@
     where t.id = #{id,jdbcType=INTEGER}  and b.is_del=0
   </select>
 
+  <select id="selectRelationByMemberCardAndDid"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from member_action_relation t
+    inner join action_dict b on t.did=b.id
+    where t.member_card = #{memberCard,jdbcType=VARCHAR} and t.did=#{did,jdbcType=INTEGER}
+  </select>
+
   <select id="selectRelationByMemberCardAndType"  resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />

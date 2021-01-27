@@ -3,9 +3,12 @@ package cn.net.yzl.crm.customer.service.impl.memberDictImpl;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.crm.customer.dao.ActionDictMapper;
 import cn.net.yzl.crm.customer.dao.MemberActionRelationMapper;
+import cn.net.yzl.crm.customer.dto.member.ActionDictDto;
 import cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,9 @@ import java.util.List;
 
 @Service
 public class MemberActionRelationServiceImpl implements MemberActionRelationService {
+
+    @Autowired
+    private ActionDictMapper actionDictMapper;
 
     @Autowired
     private MemberActionRelationMapper memberActionRelationMapper;
@@ -44,6 +50,37 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
         int insert = memberActionRelationMapper.insert(memberActionRelationDto);
         if(insert<1){
             return  ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
+        }
+        return ComResponse.success(insert);
+    }
+
+
+    @Override
+    public ComResponse<Integer> addRelationWithDict(MemberActionRelationDto memberActionRelationDto) {
+        int insert;
+        if(memberActionRelationDto.getDid()==null){
+            int did;//新生成的字典编号
+            List<ActionDict> actionDicts = actionDictMapper.selectByTypeAndName(memberActionRelationDto.getType(), memberActionRelationDto.getDname());
+            if(actionDicts!=null && actionDicts.size()>0){
+                did = actionDicts.get(0).getId();
+            }else{
+                ActionDictDto actionDict=new ActionDictDto();
+                actionDict.setCreator(memberActionRelationDto.getCreator());
+                actionDict.setName(memberActionRelationDto.getDname());
+                actionDict.setType(memberActionRelationDto.getType());
+                actionDictMapper.insertSelective(actionDict);
+                did=actionDict.getId();
+            }
+            memberActionRelationDto.setDid(did);
+        }
+        List<MemberActionRelation> memberActionRelations = memberActionRelationMapper.selectRelationByMemberCardAndDid(memberActionRelationDto.getMemberCard(), memberActionRelationDto.getDid());
+        if(memberActionRelations==null || memberActionRelations.size()<1){
+                insert = memberActionRelationMapper.insert(memberActionRelationDto);
+            if(insert<1){
+                return  ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
+            }
+        }else{
+            return  ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getMessage());
         }
         return ComResponse.success(insert);
     }

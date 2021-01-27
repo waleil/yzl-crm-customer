@@ -32,7 +32,7 @@ public class ActionDictDto implements Serializable {
     @ApiModelProperty("综合行为类型：1、方便接电话时间 2性格偏好 3响应时间 4 坐席偏好 5 综合行为 6 下单行为 7活动偏好 8 代表年龄段")
     @NotNull
     @Min(0)
-    private Byte type;
+    private Integer type;
 
     @ApiModelProperty("值")
     private String value;

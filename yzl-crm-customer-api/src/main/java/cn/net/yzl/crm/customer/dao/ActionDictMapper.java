@@ -27,5 +27,7 @@ public interface ActionDictMapper {
 
     List<ActionDict> selectByType(Integer type);
 
+    List<ActionDict> selectByTypeAndName(@Param("type") Integer type,@Param("name") String name);
+
     int updateByPrimaryKeySelective(ActionDictDto record);
 }
