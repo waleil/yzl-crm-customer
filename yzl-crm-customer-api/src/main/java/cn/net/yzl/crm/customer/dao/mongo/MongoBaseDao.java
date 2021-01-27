@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.dao.mongo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -244,8 +245,13 @@ public abstract class MongoBaseDao<T> {
     /***
      * mongo 批量插入
      */
-    public List<T> bathSave(List<T> list) {
+    public void bathSave(List<T> list) {
         Collection<T> ts = mongoTemplate.insertAll(list);
-        return ts.stream().collect(Collectors.toList());
+    }
+
+    public boolean batchInsert(List<T> list,String collect){
+        BulkOperations bulkOperations= mongoTemplate.bulkOps(BulkOperations.BulkMode.ORDERED,collect);
+        bulkOperations.insert(list).execute();
+        return true;
     }
 }

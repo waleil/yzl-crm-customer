@@ -1138,6 +1138,7 @@
     </select>
     <select id="queryAllMemberByPage" resultType="cn.net.yzl.crm.customer.model.mogo.MemberLabel">
         select
+        m.id as dbId,
       m.member_card as memberCard,
       m.member_name as memberName,
       m.nick_name as nickName,
@@ -1199,7 +1200,8 @@
          from member m
          left join member_order_stat o on m.member_card= o.member_card
             left join member_amount a on a.member_card=m.member_card
-        ORDER BY m.member_card limit #{currentPage},#{pageSize}
+            where m.id > #{id}
+        ORDER BY m.member_card limit #{pageSize}
     </select>
 
     <select id="queryMaxMemberCard" resultType="java.lang.String">

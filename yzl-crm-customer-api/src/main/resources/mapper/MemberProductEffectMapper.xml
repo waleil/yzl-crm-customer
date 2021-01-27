@@ -218,11 +218,10 @@
   </update>
   <select id="queryByMemberCodes" parameterType="list" resultType="cn.net.yzl.crm.customer.model.mogo.MemberProduct" >
     select
-    member_card, order_no,
-    product_code, product_name, eating_time,
-    product_last_num, due_date, taking_state,
-    taking_effect, product_count, one_use_num,
-    one_to_times
+    member_card as memberCard,
+    product_code as productCode, product_name as productName,
+    taking_state as takingState,
+    taking_effect as takingEffect from member_product_effect
     where member_card in
     <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
       #{item}

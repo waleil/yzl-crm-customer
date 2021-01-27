@@ -123,7 +123,7 @@ public interface MemberMapper {
 
     List<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
 
-    List<MemberLabel> queryAllMemberByPage(int currentPage, int pageSize);
+    List<MemberLabel> queryAllMemberByPage(int id, int pageSize);
 
     String queryMaxMemberCard();
 }
