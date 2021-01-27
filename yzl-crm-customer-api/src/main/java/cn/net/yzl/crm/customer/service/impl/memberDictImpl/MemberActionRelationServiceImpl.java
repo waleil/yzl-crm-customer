@@ -80,7 +80,7 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
                 return  ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
             }
         }else{
-            return  ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getMessage());
+            return  ComResponse.fail(21201,"顾客该综合行为已存在");
         }
         return ComResponse.success(insert);
     }
