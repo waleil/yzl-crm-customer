@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,6 +43,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+    @Transactional
     @Override
     public ComResponse save(MemberProductEffectVO record) {
         //查询客户是否存在
@@ -53,6 +55,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         //
         MemberProductEffect memberProductEffect = new MemberProductEffect();
         BeanUtil.copyProperties(record, memberProductEffect);
+        record.setId(null);
         memberProductEffect.setUpateTime(new Date());
 
         //每天吃几次
@@ -65,19 +68,27 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         Integer productLastNum = record.getProductLastNum();
 
         //每天用量
-        Integer oneNum = oneToTimes*oneUseNum;
+        Integer oneNum = null;
+        if (oneToTimes > 0 && oneUseNum > 0) {
+            oneNum = oneToTimes*oneUseNum;
+        }
         //每天吃多少(计算)
         memberProductEffect.setEatingTime(oneNum);
         //商品服用完日期
         Integer eatDay = null;
-        if (oneNum > 0) {
+        if (oneNum > 0 && productLastNum>0) {
             eatDay = productLastNum % oneNum == 0 ? productLastNum / oneNum : productLastNum / oneNum + 1;
+            //获取当前时间
+            Calendar current = Calendar.getInstance();
+            current.add(Calendar.DATE, eatDay-1);
+            Date date = null;
+            try {
+                date = sdf.parse(sdf.format(current.getTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            memberProductEffect.setDueDate(date);
         }
-
-        //获取当前时间
-        Calendar current = Calendar.getInstance();
-        current.add(Calendar.DATE, eatDay);
-        memberProductEffect.setDueDate(current.getTime());
 
         int result = memberProductEffectMapper.insertSelective(memberProductEffect);
         if (result < 1) {
@@ -102,14 +113,12 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         if (result < 1) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
         }
-        if (eatDay > 0) {
-            eatDay -= 1;
-        }
         return ComResponse.success();
     }
 
 
-    private int modify(MemberProductEffectVO record) {
+    @Transactional
+    protected int modify(MemberProductEffectVO record) {
         if (record.getId() == null) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "id不能为空");
         }
@@ -141,21 +150,27 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         Integer productLastNum = record.getProductLastNum();
 
         //每天用量
-        Integer oneNum = oneToTimes*oneUseNum;
+        Integer oneNum = null;
+        if (oneToTimes > 0 && oneUseNum > 0) {
+            oneNum = oneToTimes*oneUseNum;
+        }
         //每天吃多少(计算)
         memberProductEffect.setEatingTime(oneNum);
         //商品服用完日期
         Integer eatDay = null;
-        if (oneNum > 0) {
+        if (oneNum > 0 && productLastNum>0) {
             eatDay = productLastNum % oneNum == 0 ? productLastNum / oneNum : productLastNum / oneNum + 1;
+            //获取当前时间
+            Calendar current = Calendar.getInstance();
+            current.add(Calendar.DATE, eatDay-1);
+            Date date = null;
+            try {
+                date = sdf.parse(sdf.format(current.getTime()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            memberProductEffect.setDueDate(date);
         }
-        if (eatDay > 0) {
-            eatDay -= 1;
-        }
-        //获取当前时间
-        Calendar current = Calendar.getInstance();
-        current.add(Calendar.DATE, eatDay);
-        memberProductEffect.setDueDate(current.getTime());
 
         int result = memberProductEffectMapper.updateByPrimaryKeySelective(memberProductEffect);
 
