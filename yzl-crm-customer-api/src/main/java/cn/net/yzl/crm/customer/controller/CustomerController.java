@@ -79,8 +79,12 @@ public class CustomerController {
         if (memberAmountList != null && memberAmountList.size() > 0) {
             memberEntity.setMember_amount(memberAmountList.get(0));
         }
-        memberEntity.setReceive_address_list(addressList);
-        memberEntity.setMemberPhoneList(memberPhoneList);
+        if(addressList!=null && addressList.size()>0){
+            memberEntity.setReceive_address_list(addressList);
+        }
+        if(memberPhoneList!=null && memberPhoneList.size()>0){
+            memberEntity.setMemberPhoneList(memberPhoneList);
+        }
         return GeneralResult.success(memberEntity);
     }
 
@@ -201,9 +205,7 @@ public class CustomerController {
     @PostMapping("/v1/addMemberOrderStat")
     public GeneralResult addMemberOrderStat(@RequestBody MemberOrderStat memberOrderStat) {
         if (memberOrderStat == null) return GeneralResult.errorWithMessage(101, "参数空");
-
         memberService.addMemberOrderStat(memberOrderStat);
-
         return GeneralResult.success();
     }
 

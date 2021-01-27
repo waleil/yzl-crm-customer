@@ -1,14 +1,14 @@
 package cn.net.yzl.crm.customer.viewmodel.memberActionModel;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+        import io.swagger.annotations.ApiModelProperty;
+        import lombok.Data;
 
-import java.io.Serializable;
-import java.util.Date;
+        import java.io.Serializable;
+        import java.util.Date;
 
 /**
  * member_action_relation
- * @author 
+ * @author
  */
 @Data
 public class MemberActionRelation implements Serializable {

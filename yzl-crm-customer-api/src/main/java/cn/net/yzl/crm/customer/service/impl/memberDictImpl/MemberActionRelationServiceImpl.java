@@ -10,6 +10,7 @@ import cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +37,8 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
     }
 
     @Override
-    public ComResponse<List<MemberActionRelation>> selectRelationByMemberCard(String card) {
-        List<MemberActionRelation> memberActionRelations = memberActionRelationMapper.selectRelationByMemberCard(card);
+    public ComResponse<List<MemberActionRelationList>> selectRelationTreeByMemberCard(String card) {
+        List<MemberActionRelationList> memberActionRelations = memberActionRelationMapper.selectRelationTreeByMemberCard(card);
         if(memberActionRelations==null || memberActionRelations.size()<1){
             return  ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(),ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getMessage());
         }
@@ -45,15 +46,27 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
     }
 
 
+
+
     @Override
     public ComResponse<Integer> addRelation(MemberActionRelationDto memberActionRelationDto) {
+        //验证是否该顾客已有该行为属性
+        List<MemberActionRelation> memberActionRelations = memberActionRelationMapper.selectRelationByMemberCardAndDid(memberActionRelationDto.getMemberCard(), memberActionRelationDto.getDid());
+        if(memberActionRelations !=null && memberActionRelations.size()>0){
+            return  ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getMessage());
+        }
+        //验证该综合行为字典是否存在
+        ActionDict actionDict = actionDictMapper.selectByPrimaryKey(memberActionRelationDto.getDid());
+        if(actionDict==null){
+            return  ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_NOT_EXIST_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_NOT_EXIST_ERROR.getMessage());
+        }
+
         int insert = memberActionRelationMapper.insert(memberActionRelationDto);
         if(insert<1){
             return  ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
         }
         return ComResponse.success(insert);
     }
-
 
     @Override
     public ComResponse<Integer> addRelationWithDict(MemberActionRelationDto memberActionRelationDto) {
@@ -80,7 +93,7 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
                 return  ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
             }
         }else{
-            return  ComResponse.fail(21201,"顾客该综合行为已存在");
+            return  ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getMessage());
         }
         return ComResponse.success(insert);
     }

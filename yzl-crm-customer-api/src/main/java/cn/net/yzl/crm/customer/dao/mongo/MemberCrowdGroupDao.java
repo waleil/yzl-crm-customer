@@ -222,11 +222,10 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
     public void updateMemberToMongo(member_wide member) throws Exception {
         if (member == null || StringUtil.isNullOrEmpty(member.getMember_card()))
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
-
         QueryUpdate queryUpdate = MongoQueryUtil.getMongoQueryForUpdate(member);
         mongoTemplate.updateFirst(queryUpdate.getQuery(), queryUpdate.getUpdate(), this.getEntityClass());
-
     }
+
     public List<CustomerCrowdGroupVO> query4Select(){
         Query query = new Query();
         Criteria  criatira =Criteria.where("del").is(false);

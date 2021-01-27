@@ -6,6 +6,7 @@ import cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.utils.ValidList;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,8 @@ public class MemberActionRelationController {
 
     @ApiOperation(value="客户行为关联-客户全综合行为关联查询",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @GetMapping("v1/getRelationByMemberCard")
-    public ComResponse<List<MemberActionRelation>> getRelationByMemberCard(@RequestParam("cardNo") @NotBlank  String cardNo){
-        return  memberActionRelationService.selectRelationByMemberCard(cardNo);
+    public ComResponse<List<MemberActionRelationList>> getRelationByMemberCard(@RequestParam("cardNo") @NotBlank  String cardNo){
+        return  memberActionRelationService.selectRelationTreeByMemberCard(cardNo);
     }
 
     @ApiOperation(value="客户行为关联-客户一类综合行为关联查询",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

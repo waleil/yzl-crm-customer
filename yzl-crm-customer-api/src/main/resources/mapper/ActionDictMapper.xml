@@ -16,21 +16,21 @@
     select 
     <include refid="Base_Column_List" />
     from action_dict
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}  and del_flag=0
   </select>
 
   <select id="selectByType" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from action_dict
-        where type = #{type,jdbcType=INTEGER}
+        where type = #{type,jdbcType=INTEGER}  and del_flag=0
   </select>
 
   <select id="selectByTypeAndName"  resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from action_dict
-    where type = #{type,jdbcType=INTEGER} and name=#{name,jdbcType=VARCHAR}
+    where type = #{type,jdbcType=INTEGER} and name=#{name,jdbcType=VARCHAR}  and del_flag=0
   </select>
 
   <update id="deleteByPrimaryKey" >
@@ -102,5 +102,21 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectCountForRelationByDid"  resultType="java.lang.Integer">
+    select
+    count(1) as ct
+    from action_dict t
+    inner join member_action_relation b on t.id=b.did
+    where t.id= #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectCountForRelationByType"  resultType="java.lang.Integer">
+    select
+    count(1) as ct
+    from action_dict t
+    inner join member_action_relation b on t.id=b.did and t.del_flag=0
+    where t.id= #{type,jdbcType=INTEGER}
+  </select>
 
 </mapper>
