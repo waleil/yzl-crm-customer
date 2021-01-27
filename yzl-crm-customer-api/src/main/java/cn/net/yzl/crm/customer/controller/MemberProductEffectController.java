@@ -2,15 +2,11 @@ package cn.net.yzl.crm.customer.controller;
 
 
 import cn.net.yzl.common.entity.ComResponse;
-import cn.net.yzl.common.entity.GeneralResult;
-import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
-import cn.net.yzl.crm.customer.model.Member;
-import cn.net.yzl.crm.customer.model.MemberOrderStat;
-import cn.net.yzl.crm.customer.model.db.MemberProductEffect;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
+import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
-import cn.net.yzl.crm.customer.vo.MemberProductEffectVO;
+import cn.net.yzl.crm.customer.vo.MemberProductEffectUpdateVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -42,9 +38,20 @@ public class MemberProductEffectController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "productEffects", value = "商品服用效果", required = true),
     })
-    public ComResponse batchModifyProductEffect(@RequestBody List<MemberProductEffectVO> productEffects) {
+    public ComResponse batchModifyProductEffect(@RequestBody List<MemberProductEffectUpdateVO> productEffects) {
 
         ComResponse result = memberProductEffectService.batchModifyProductEffect(productEffects);
+        return result;
+    }
+
+    @ApiOperation(value = "批量保存商品服用效果", notes = "批量保存商品服用效果")
+    @RequestMapping(value = "/v1/batchSaveProductEffect", method = RequestMethod.POST)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "productEffects", value = "商品服用效果", required = true),
+    })
+    public ComResponse batchSaveProductEffect(@RequestBody List<MemberProductEffectInsertVO> productEffects) {
+
+        ComResponse result = memberProductEffectService.batchSaveProductEffect(productEffects);
         return result;
     }
 
@@ -53,7 +60,7 @@ public class MemberProductEffectController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "productEffect", value = "商品服用效果", required = true),
     })
-    public ComResponse saveProductEffect(@RequestBody MemberProductEffectVO productEffect) {
+    public ComResponse saveProductEffect(@RequestBody MemberProductEffectInsertVO productEffect) {
 
         ComResponse result = memberProductEffectService.save(productEffect);
         return result;

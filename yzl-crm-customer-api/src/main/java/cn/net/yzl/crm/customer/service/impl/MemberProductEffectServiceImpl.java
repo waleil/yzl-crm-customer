@@ -14,8 +14,9 @@ import cn.net.yzl.crm.customer.model.db.MemberProductEffect;
 import cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.sys.BizException;
+import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
-import cn.net.yzl.crm.customer.vo.MemberProductEffectVO;
+import cn.net.yzl.crm.customer.vo.MemberProductEffectUpdateVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
     @Transactional
     @Override
-    public ComResponse save(MemberProductEffectVO record) {
+    public ComResponse save(MemberProductEffectInsertVO record) {
         //查询客户是否存在
         Member member = memberMapper.selectMemberByCard(record.getMemberCard());
         if (member == null) {
@@ -55,7 +56,6 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         //
         MemberProductEffect memberProductEffect = new MemberProductEffect();
         BeanUtil.copyProperties(record, memberProductEffect);
-        record.setId(null);
         memberProductEffect.setUpateTime(new Date());
 
         //每天吃几次
@@ -118,7 +118,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
 
     @Transactional
-    protected int modify(MemberProductEffectVO record) {
+    protected int modify(MemberProductEffectUpdateVO record) {
         if (record.getId() == null) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "id不能为空");
         }
@@ -185,7 +185,6 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         modifyRecord.setBeforeData(JSONUtil.toJsonPrettyStr(memberProductEffectBefore));
         modifyRecord.setAfterData(JSONUtil.toJsonPrettyStr(memberProductEffectAfter));
         modifyRecord.setModifyNo(record.getUpdator());
-        modifyRecord.setModifyTime(record.getUpateTime());
         modifyRecord.setProductEffectId(memberProductEffect.getId());
 
         modifyRecord.setModifyTime(new Date());
@@ -198,6 +197,24 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         return result;
     }
 
+    /**
+     * 批量修改客户辅营效果记录
+     * @param records
+     * @return
+     */
+    @Transactional
+    public ComResponse batchSaveProductEffect(List<MemberProductEffectInsertVO> records) {
+        if (CollectionUtil.isEmpty(records)) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空!");
+        }
+        for (MemberProductEffectInsertVO record : records) {
+            ComResponse result = this.save(record);
+            if (result.getStatus() != 1) {
+                return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+            }
+        }
+        return ComResponse.success();
+    }
 
 
     /**
@@ -206,11 +223,11 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * @return
      */
     @Transactional
-    public ComResponse batchModifyProductEffect(List<MemberProductEffectVO> records) {
+    public ComResponse batchModifyProductEffect(List<MemberProductEffectUpdateVO> records) {
         if (CollectionUtil.isEmpty(records)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空!");
         }
-        for (MemberProductEffectVO record : records) {
+        for (MemberProductEffectUpdateVO record : records) {
             int result = this.modify(record);
             if (result != 1) {
                 return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");

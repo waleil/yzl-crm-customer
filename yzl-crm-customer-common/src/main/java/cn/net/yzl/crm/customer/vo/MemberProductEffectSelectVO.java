@@ -26,8 +26,8 @@ public class MemberProductEffectSelectVO implements Serializable {
     private String orderNo;
 
 
-    @ApiModelProperty(value = "商品编号",name="productCodes",required = true)
-    private List<String> productCodes;
+//    @ApiModelProperty(value = "商品编号",name="productCodes",required = true)
+//    private List<String> productCodes;
 
 
 }
