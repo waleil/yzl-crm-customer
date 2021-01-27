@@ -87,12 +87,6 @@ public class CustomerController {
         return GeneralResult.success(memberEntity);
     }
 
-    @ApiOperation("获取顾客级别")
-    @GetMapping("v1/getMemberGrad")
-    public GeneralResult getMemberGrad() {
-        return GeneralResult.success(memberService.getMemberGrad());
-    }
-
 
     @ApiOperation("获取顾客联系方式信息，包括手机号，座机号")
     @GetMapping("v1/getMemberPhoneList")

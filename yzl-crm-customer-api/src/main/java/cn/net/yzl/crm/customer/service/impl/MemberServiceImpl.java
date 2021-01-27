@@ -36,11 +36,6 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private RedisUtil redisUtil;
 
-    @Override
-    public List<MemberGrad> getMemberGrad() {
-        return memberMapper.getMemberGrad();
-    }
-
     /**
      * wangzhe
      * 2021-01-25

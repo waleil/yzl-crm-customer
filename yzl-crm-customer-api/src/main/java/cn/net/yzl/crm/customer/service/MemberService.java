@@ -12,7 +12,6 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import java.util.List;
 
 public interface MemberService {
-    List<MemberGrad> getMemberGrad();
 
     int insert(Member record);
 
