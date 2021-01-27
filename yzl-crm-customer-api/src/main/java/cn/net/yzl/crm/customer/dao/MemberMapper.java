@@ -2,12 +2,13 @@ package cn.net.yzl.crm.customer.dao;
 
 
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
-import org.springframework.stereotype.Component;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -126,4 +127,6 @@ public interface MemberMapper {
     List<MemberLabel> queryAllMemberByPage(int currentPage, int pageSize);
 
     String queryMaxMemberCard();
+
+    List<MemberDiseaseCustomerDto> getMemberDiseaseDtoByMemberCard(@Param("memberCard") String memberCard);
 }

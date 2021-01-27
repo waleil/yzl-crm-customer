@@ -55,6 +55,8 @@
         <result column="vip_flag" property="vip_flag" jdbcType="TINYINT"/>
         <result column="buy_intention" property="buy_intention" jdbcType="TINYINT"/>
         <result column="reject_flag" property="reject_flag" jdbcType="TINYINT"/>
+        <result column="m_grade_id" property="mGradeId" />
+        <result column="m_grade_name" property="mGradeName" />
     </resultMap>
     <sql id="Base_Column_List">
     id, member_card, passwd, member_name, nick_name, age, sex, id_card, adver_code, adver_name,
@@ -64,7 +66,7 @@
     master_card, first_order_staff_no, first_order_am, order_num, intro_no, intro_name,
     intro_type, media_id, media_name, media_type_code, media_type_name, creator_no, create_time,
     creator_name, updator_no, updator_name, update_time, source_type, vip_flag, buy_intention,
-    reject_flag
+    reject_flag,m_grade_id,m_grade_name
   </sql>
     <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.Member">
         insert into member
@@ -1204,5 +1206,21 @@
 
     <select id="queryMaxMemberCard" resultType="java.lang.String">
           SELECT max(member_card) as maxCode FROM member;
+    </select>
+
+    <select id="getMemberDiseaseDtoByMemberCard"
+            resultType="cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto">
+        SELECT
+            member_card memberCard,
+            disease_id diseaseId,
+            disease_name diseaseName
+        FROM
+            member_disease
+        WHERE
+            member_card = #{memberCard}
+
+            AND del_flag =0
+
+
     </select>
 </mapper>

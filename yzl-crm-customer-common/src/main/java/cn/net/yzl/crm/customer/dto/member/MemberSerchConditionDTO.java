@@ -20,13 +20,13 @@ public class MemberSerchConditionDTO extends PageDTO {
 
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
     private Integer memberStatus;
-    @ApiModelProperty("会员级别id")
+    @ApiModelProperty(value="会员级别id")
     private Integer mGradeId;
-    @ApiModelProperty(value = "最后一次下单时间起始时间")
+    @ApiModelProperty(value = "最后一次下单时间起始时间 格式: yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastOrderTimeStart;
 
-    @ApiModelProperty(value = "最后一次下单时间结束时间")
+    @ApiModelProperty(value = "最后一次下单时间结束时间 格式: yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastOrderTimeEnd;
 
