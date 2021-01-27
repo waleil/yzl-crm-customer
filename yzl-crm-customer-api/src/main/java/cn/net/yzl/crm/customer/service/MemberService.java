@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.service;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
@@ -31,7 +32,7 @@ public interface MemberService {
 
     List<ProductConsultation> getProductConsultationList(String member_card);
 
-    List<MemberDisease> getMemberDisease(String member_card);
+    ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(String member_card);
 
     void saveReveiverAddress(ReveiverAddress reveiverAddress);
 

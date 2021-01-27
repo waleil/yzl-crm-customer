@@ -4,8 +4,8 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
-import cn.net.yzl.common.util.DateHelper;
-import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+
+import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
@@ -15,10 +15,7 @@ import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.BeanUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import io.netty.util.internal.StringUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -82,8 +79,12 @@ public class CustomerController {
         if (memberAmountList != null && memberAmountList.size() > 0) {
             memberEntity.setMember_amount(memberAmountList.get(0));
         }
-        memberEntity.setReceive_address_list(addressList);
-        memberEntity.setMemberPhoneList(memberPhoneList);
+        if(addressList!=null && addressList.size()>0){
+            memberEntity.setReceive_address_list(addressList);
+        }
+        if(memberPhoneList!=null && memberPhoneList.size()>0){
+            memberEntity.setMemberPhoneList(memberPhoneList);
+        }
         return GeneralResult.success(memberEntity);
     }
 
@@ -173,21 +174,16 @@ public class CustomerController {
         return GeneralResult.success(memberServiceProductConsultationList);
     }
 
-    /**
-     * 获取顾客病症
-     *
-     * @param member_card
-     * @return
-     */
-    @ApiOperation("获取顾客病症")
+
+
+    @ApiOperation("顾客画像-获取顾客病症")
     @GetMapping("v1/getMemberDisease")
-    public GeneralResult getMemberDisease(
-            @RequestParam("member_card")
-            @NotBlank(message = "member_card不能为空")
-            @ApiParam(name = "member_card", value = "会员卡号", required = true)
-                    String member_card) {
-        List<MemberDisease> memberDiseaseList = memberService.getMemberDisease(member_card);
-        return GeneralResult.success(memberDiseaseList);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query")
+    })
+    public ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(@NotBlank String memberCard) {
+        return  memberService.getMemberDisease(memberCard);
+
     }
 
 
@@ -224,35 +220,6 @@ public class CustomerController {
         return GeneralResult.success();
     }
 
-//    @ApiOperation("添加顾客行为偏好")
-//    @PostMapping("/v1/addMemberAction")
-//    public GeneralResult addMemberAction(@RequestBody MemberAction memberAction) {
-//        if (memberAction == null) return GeneralResult.errorWithMessage(101, "参数空");
-//        memberService.saveMemberAction(memberAction);
-//        return GeneralResult.success();
-//    }
-
-
-//    @ApiOperation("修改顾客行为偏好")
-//    @PostMapping("/v1/updateMemberAction")
-//    public GeneralResult updateMemberAction(@RequestBody MemberAction memberAction) {
-//        if (memberAction == null || StringUtil.isNullOrEmpty(memberAction.getMember_card()))
-//            return GeneralResult.errorWithMessage(101, "参数空");
-//        memberService.updateMemberAction(memberAction);
-//        return GeneralResult.success();
-//    }
-//
-//    @ApiOperation("获取顾客行为偏好")
-//    @GetMapping("/v1/getMemberAction")
-//    public GeneralResult getMemberAction(
-//            @RequestParam("member_card")
-//            @NotBlank(message = "member_card不能为空")
-//            @ApiParam(name = "member_card", value = "会员卡号", required = true)
-//                    String member_card
-//    ) {
-//        MemberAction memberAction = memberService.getMemberAction(member_card);
-//        return GeneralResult.success(memberAction);
-//    }
 
     @ApiOperation("根据一批会员卡号获取会员信息，会员卡号用英文逗号分隔")
     @GetMapping("/v1/getMemberList")

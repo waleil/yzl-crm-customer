@@ -57,7 +57,7 @@ public class ActionDictServiceImpl implements ActionDictService {
                         if(i<1){
                             num+=actionDictMapper.deleteByType(type,updator);
                         }else{
-                            return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getMessage());
+                            return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getMessage());
                         }
 
                     }else{
@@ -75,11 +75,11 @@ public class ActionDictServiceImpl implements ActionDictService {
                 for (ActionDict contactTimeDict : actionDictList2) {
                     int i = actionDictMapper.selectCountForRelationByDid(contactTimeDict.getId());
                     if(i<1){
-                        num+=actionDictMapper.deleteByType(type,updator);
+                        num+=actionDictMapper.deleteByPrimaryKey(contactTimeDict.getId(),updator);
                     }else{
-                        return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_EXIST_DELETE_ERROR.getMessage());
+                        return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getMessage());
                     }
-                    num+=actionDictMapper.deleteByPrimaryKey(contactTimeDict.getId(),updator);
+
                 }
             }
         }

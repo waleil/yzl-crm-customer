@@ -6,6 +6,7 @@ import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
@@ -52,7 +53,8 @@ public class MemberServiceImpl implements MemberService {
         //设置顾客会员卡号
         member.setMember_card(String.valueOf(maxMemberCard));
         //保存数据
-        return memberMapper.insertSelective(member);
+        int result = memberMapper.insertSelective(member);
+        return result;
     }
 
     @Override
@@ -130,8 +132,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<MemberDisease> getMemberDisease(String member_card) {
-        return memberMapper.getMemberDisease(member_card);
+    public ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(String memberCard) {
+        List<MemberDiseaseCustomerDto> list = memberMapper.getMemberDiseaseDtoByMemberCard(memberCard);
+        if(list==null || list.size()<1){
+            return ComResponse.nodata();
+        }
+        return ComResponse.success(list);
     }
 
     @Override

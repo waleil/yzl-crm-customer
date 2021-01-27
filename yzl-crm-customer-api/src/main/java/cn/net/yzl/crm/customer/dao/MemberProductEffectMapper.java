@@ -1,7 +1,9 @@
 package cn.net.yzl.crm.customer.dao;
 
+import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
 import cn.net.yzl.crm.customer.model.db.MemberProductEffect;
 import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
+import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -51,4 +53,6 @@ public interface MemberProductEffectMapper {
     int updateByPrimaryKey(MemberProductEffect record);
 
     List<MemberProduct> queryByMemberCodes(List<String> codes);
+
+    List<MemberProductEffectDTO> getProductEffects(MemberProductEffectSelectVO productEffect);
 }
