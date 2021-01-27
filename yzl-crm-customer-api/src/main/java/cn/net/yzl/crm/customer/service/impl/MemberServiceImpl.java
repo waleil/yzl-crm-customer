@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.service.impl;
 
+import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
@@ -60,18 +61,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<Member> findPageByCondition(MemberSerchConditionDTO dto) {
-        if (dto.getCurrentPage() == null || dto.getCurrentPage() == 0) {
-            dto.setCurrentPage(1);
-        }
-        if (dto.getPageSize() == null || dto.getPageSize() == 0) {
-            dto.setPageSize(10);
-        }
+    public ComResponse<Page<Member>> findPageByCondition(MemberSerchConditionDTO dto) {
         PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
         List<Member> list = memberMapper.findPageByCondition(dto);
+        if(list==null || list.size()<0){
+            return ComResponse.nodata();
+        }
         Page<Member> page = AssemblerResultUtil.resultAssembler(list);
 
-        return page;
+        return ComResponse.success(page);
     }
 
     @Override

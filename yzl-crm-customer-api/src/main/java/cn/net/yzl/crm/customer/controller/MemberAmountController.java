@@ -24,7 +24,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/member/customerAmount")
-@Api(value = "顾客账户信息", tags = {"顾客服务"})
+@Api(value = "顾客账户信息", tags = {"顾客账户信息"})
 @Validated
 public class MemberAmountController {
 

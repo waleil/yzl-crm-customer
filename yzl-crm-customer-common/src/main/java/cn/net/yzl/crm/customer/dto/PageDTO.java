@@ -12,9 +12,9 @@ import java.io.Serializable;
 public class PageDTO implements Serializable {
 
     @ApiModelProperty(value = "当前页码",required = true)
-    private Integer currentPage;
+    protected Integer currentPage=1;
 
     @ApiModelProperty(value = "每页条数",required = true)
-    private Integer pageSize;
+    protected Integer pageSize=20;
 
 }

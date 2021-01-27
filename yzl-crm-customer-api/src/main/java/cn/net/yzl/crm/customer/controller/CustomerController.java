@@ -12,6 +12,7 @@ import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
+import cn.net.yzl.crm.customer.utils.BeanUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Api(value="CustomerController",tags = {"顾客服务"})
+@Api(value="顾客信息",tags = {"顾客信息"})
 @RestController
 @RequestMapping("member")
 public class CustomerController {
@@ -35,11 +36,12 @@ public class CustomerController {
     @Autowired
     MemberService memberService;
 
-    @ApiOperation("获取顾客列表")
-    @GetMapping("v1/getMemberListByPage")
-    public GeneralResult<Page<Member>> getMemberListByPage(MemberSerchConditionDTO dto) {
-        Page<Member> memberPage = memberService.findPageByCondition(dto);
-        return GeneralResult.success(memberPage);
+    @ApiOperation("顾客列表-查询")
+    @PostMapping("v1/getMemberListByPage")
+    public ComResponse<Page<Member>> getMemberListByPage(@RequestBody MemberSerchConditionDTO dto) throws IllegalAccessException {
+        dto = BeanUtil.setNullValue(dto);
+        return memberService.findPageByCondition(dto);
+
 
     }
 

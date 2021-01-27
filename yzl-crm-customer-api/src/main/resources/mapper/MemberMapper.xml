@@ -654,25 +654,25 @@
         member m
         <where>
             1=1
-            <if test="memberName != null and memberName != ''">
+            <if test="memberName != null">
                 and (m.member_card = #{memberName} or m.member_name = #{memberName})
             </if>
-            <if test="media_id != null and media_id != 0">
-                and m.media_id = #{media_id}
+            <if test="mediaId != null">
+                and m.media_id = #{mediaId}
             </if>
-            <if test="adver_code != null and adver_code != 0">
-                and m.adver_code = #{adver_code}
+            <if test="adverCode != null">
+                and m.adver_code = #{adverCode}
             </if>
-            <if test="memberStatus != null and memberStatus != ''">
+            <if test="memberStatus != null">
                 and m.member_status = #{memberStatus}
             </if>
-            <if test="mGradeCode != null and mGradeCode != ''">
-                and m.m_grade_code = #{mGradeCode}
+            <if test="mGradeId != null">
+                and m.m_grade_id = #{mGradeId}
             </if>
-            <if test="lastOrderTimeStart != null and lastOrderTimeStart != ''">
+            <if test="lastOrderTimeStart != null">
                 and m.last_order_time <![CDATA[ >= ]]> #{lastOrderTimeStart}
             </if>
-            <if test="lastOrderTimeEnd != null and lastOrderTimeEnd != ''">
+            <if test="lastOrderTimeEnd != null">
                 and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeEnd}
             </if>
             <!--            <if test="diseaseId != null and diseaseId != '' ">-->
@@ -682,6 +682,7 @@
             <!--                and d.disease_id = #{diseasePid}-->
             <!--            </if>-->
         </where>
+        order by last_order_time desc
     </select>
     <!--根据顾客号查询顾客基本信息 -->
     <select id="selectMemberByCard" parameterType="java.lang.String" resultType="cn.net.yzl.crm.customer.model.Member">

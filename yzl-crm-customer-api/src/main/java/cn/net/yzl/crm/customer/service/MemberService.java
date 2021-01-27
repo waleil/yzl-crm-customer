@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.service;
 
+import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
@@ -15,7 +16,7 @@ public interface MemberService {
 
     int insert(Member record);
 
-    Page<Member> findPageByCondition(MemberSerchConditionDTO dto);
+    ComResponse<Page<Member>> findPageByCondition(MemberSerchConditionDTO dto);
 
     int updateByMemberCardSelective(Member dto);
 

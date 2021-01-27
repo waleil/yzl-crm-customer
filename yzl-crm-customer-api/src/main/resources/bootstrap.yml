@@ -3,6 +3,10 @@ spring:
     name: yzl-crm-customer-api
   profiles:
     active: dev
-
+logging:
+  level:
+    cn:
+      net:
+        yzl: debug
 
 
