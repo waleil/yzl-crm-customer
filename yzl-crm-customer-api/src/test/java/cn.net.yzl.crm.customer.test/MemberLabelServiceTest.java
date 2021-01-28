@@ -1,23 +1,20 @@
+package cn.net.yzl.crm.customer.test;
 
-
-import cn.net.yzl.crm.customer.CrmCustomerPlatformAppApplication;
-import cn.net.yzl.crm.customer.dao.*;
+import cn.net.yzl.crm.customer.dao.MemberActionRelationMapper;
+import cn.net.yzl.crm.customer.dao.MemberDiseaseMapper;
+import cn.net.yzl.crm.customer.dao.MemberMapper;
+import cn.net.yzl.crm.customer.dao.MemberProductEffectMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.model.mogo.ActionDict;
 import cn.net.yzl.crm.customer.model.mogo.MemberDisease;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,12 +34,12 @@ public class MemberLabelServiceTest {
     private MemberDiseaseMapper memberDiseaseMapper;
     @Autowired
     private MemberActionRelationMapper memberActionRelationMapper;
+//    @Autowired
+//    private MemberOrderStatMapper memberOrderStatMapper;
     @Autowired
-    private MemberOrderStatMapper memberOrderStatMapper;
-    @Autowired
-    private MemberLabelDao memberLabelDao;
-    @Autowired
-    private MemberAmountDao memberAmountDao;
+    private MemberLabelDao memberLabelDao;//保存
+//    @Autowired
+//    private MemberAmountDao memberAmountDao;
     @Autowired
     private MemberProductEffectMapper memberProductEffectMapper;
     private static String member_label = "member_label";
@@ -66,6 +63,7 @@ public class MemberLabelServiceTest {
                 List<ActionDict> actionDictList = memberActionRelationMapper.queryByMemberCodes(memberCodes);
                 Map<String, List<ActionDict>> actionDictListMap = actionDictList.stream()
                         .collect(Collectors.groupingBy(ActionDict::getMemberCard));
+                //通过会员卡号查询顾客服用效果
                 List<MemberProduct> memberProducts=memberProductEffectMapper.queryByMemberCodes(memberCodes);
                 Map<String, List<MemberProduct>> memberProductsMap = memberProducts.stream()
                         .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
@@ -130,12 +128,16 @@ public class MemberLabelServiceTest {
                     }
                     memberLabel.set_id(memberLabel.getMemberCard());
                     String memberCard = memberLabel.getMemberCard();
+                    //获取对应会员卡号的顾客的服用效果下信息
                     List<MemberProduct> products = memberProductsMap.get(memberCard);
+                    //设置顾客服用效果
                     if(!CollectionUtils.isEmpty(products)){
                         memberLabel.setMemberProductList(products);
                     }
                     //todo 是否有积分、红包、优惠券要从DMC获取
+                    //获取当前顾客的综合行为
                     List<ActionDict> actionDicts =actionDictListMap.get(memberCard);
+                    //设置当前顾客的综合行为
                     if(!CollectionUtils.isEmpty(actionDicts)){
                         Map<Integer,List<ActionDict>> temp=actionDicts.stream().filter(s->s.getType()!=null).collect(Collectors.groupingBy(ActionDict::getType));
                         //方便接电话时间
