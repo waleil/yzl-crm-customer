@@ -14,6 +14,7 @@ import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +62,7 @@ public class CustomerGroupController {
     @ApiOperation("修改顾客圈选")
     @PostMapping("/v1/updateCrowdGroup")
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
-        if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         try {
             return customerGroupService.updateCustomerCrowdGroup(memberCrowdGroup);
         } catch (Exception exc) {

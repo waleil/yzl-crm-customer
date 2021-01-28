@@ -115,10 +115,6 @@ public class MemberServiceImpl implements MemberService {
         memberMapper.setMemberToVip(member_card);
     }
 
-    @Override
-    public List<MemberProductEffect> getMemberProductEffectList(String member_card) {
-        return memberMapper.getMemberProductEffectList(member_card);
-    }
 
     /**
      * 获取咨询商品

@@ -47,7 +47,7 @@ public class MemberLabelServiceTest {
     @Autowired
     private MemberProductEffectMapper memberProductEffectMapper;
     private static String member_label = "member_label";
-    @Test
+//    @Test
     public void syncProcess() {
 
         int id = 0;
