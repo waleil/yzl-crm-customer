@@ -14,10 +14,12 @@ import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.BeanUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
@@ -143,12 +145,7 @@ public class CustomerController {
 
 
 
-    /**
-     * 获取顾客咨询商品
-     *
-     * @param member_card
-     * @return
-     */
+
     @ApiOperation("获取顾客咨询商品")
     @GetMapping("v1/getProductConsultationList")
     public GeneralResult getProductConsultationList(
@@ -160,7 +157,11 @@ public class CustomerController {
         return GeneralResult.success(memberServiceProductConsultationList);
     }
 
-
+    @ApiOperation("顾客画像-添加顾客咨询商品")
+    @PostMapping("v1/addProductConsultation")
+    public ComResponse<String> addProductConsultation(@RequestBody @Validated ProductConsultationInsertVO productConsultationInsertVO) {
+        return memberService.addProductConsultation(productConsultationInsertVO);
+    }
 
     @ApiOperation("顾客画像-获取顾客病症")
     @GetMapping("v1/getMemberDisease")

@@ -1,9 +1,12 @@
 package cn.net.yzl.crm.customer.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
+import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
@@ -13,9 +16,11 @@ import cn.net.yzl.crm.customer.model.MemberGrad;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
+import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -286,6 +291,22 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void updateMemberToMongo(member_wide member) throws Exception {
         memberCrowdGroupDao.updateMemberToMongo(member);
+    }
+
+    @Autowired
+    private ProductConsultationMapper productConsultationMapper;
+
+    @Override
+    public ComResponse<String> addProductConsultation(ProductConsultationInsertVO productConsultationInsertVO) {
+
+        cn.net.yzl.crm.customer.model.db.ProductConsultation productConsultation = new cn.net.yzl.crm.customer.model.db.ProductConsultation();
+        BeanUtil.copyProperties(productConsultationInsertVO,productConsultation);
+
+       int num =  productConsultationMapper.insertSelective(productConsultation);
+       if(num<0) {
+           throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
+       }
+        return ComResponse.success();
     }
 
 

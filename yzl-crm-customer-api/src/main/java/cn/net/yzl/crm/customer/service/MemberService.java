@@ -9,6 +9,7 @@ import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 
 import java.util.List;
 
@@ -136,4 +137,7 @@ public interface MemberService {
      * @param member
      */
     void updateMemberToMongo(member_wide member) throws Exception;
+
+    // 添加顾客咨询商品
+    ComResponse<String> addProductConsultation(ProductConsultationInsertVO productConsultationInsertVO);
 }
