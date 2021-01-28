@@ -228,7 +228,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
 
     public List<CustomerCrowdGroupVO> query4Select(){
         Query query = new Query();
-        Criteria  criatira =Criteria.where("del").is(false);
+        Criteria  criatira =Criteria.where("del").is(false).and("enable").is(1);
         query.addCriteria(criatira);
         //排序
         Sort sort = Sort.by(Sort.Direction.DESC, "create_time");
