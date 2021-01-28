@@ -98,6 +98,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Override
     public ComResponse updateCustomerCrowdGroup(member_crowd_group member_crowd_group) throws Exception {
         member_crowd_group old = getMemberCrowdGroup(member_crowd_group.get_id());
+        if (old == null) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录不存在!");
+        }
         if(old.getEnable()!=null && old.getEnable()==1){
             return ComResponse.fail(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(),"已经生效的规则，无法编辑!");
         }
