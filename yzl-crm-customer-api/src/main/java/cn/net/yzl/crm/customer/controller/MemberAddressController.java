@@ -25,7 +25,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/memberAddress")
+@RequestMapping("/member/memberAddress")
 @Api(value = "顾客收货地址信息", tags = {"顾客收货地址"})
 @Validated
 public class MemberAddressController {
