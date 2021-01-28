@@ -735,7 +735,7 @@
                 due_date,taking_state,taking_effect,product_count,product_code,product_name
          from   member_product_effect
          where  member_card=#{member_card}
-                and due_date  <![CDATA[ > ]]> now()
+                /*and due_date  <![CDATA[ > ]]> now()*/
     </select>
 
     <select id="getProductConsultationList" parameterType="String"
