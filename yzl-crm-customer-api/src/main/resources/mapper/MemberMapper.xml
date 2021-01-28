@@ -731,7 +731,7 @@
 
     <select id="getMemberProductEffectList" parameterType="String"
             resultType="cn.net.yzl.crm.customer.model.MemberProductEffect">
-        select  member_card,order_no,product_code,eating_perday,product_last_num,
+        select  member_card,order_no,product_code,eating_time eating_perday,product_last_num,
                 due_date,taking_state,taking_effect,product_count,product_code,product_name
          from   member_product_effect
          where  member_card=#{member_card}
