@@ -28,14 +28,6 @@ public class member_crowd_group extends BaseObject {
     @ApiModelProperty("是否启用:0=否，1=是")
     private  Integer enable;
 
-    @ApiModelProperty("生效时间")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
-    private Date effective_date;
-
-    @ApiModelProperty("失效时间")
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
-    private Date expire_date;
-
     @ApiModelProperty("是否删除，true删除，false未删除")
     private boolean del;
 

@@ -187,11 +187,11 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         if(Objects.isNull(group)){
             return ComResponse.nodata("群组不存在");
         }
-        if(vo.getEnable()!=null && vo.getEnable()==1){
+        /*if(vo.getEnable()!=null && vo.getEnable()==1){
             if(group.getExpire_date().getTime()<System.currentTimeMillis()){
                 return ComResponse.fail(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(),"当前群组已经过期!");
             }
-        }
+        }*/
 
         Query query = new Query();
         Update update = new Update();
