@@ -210,9 +210,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
             }
         }
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getAreas())) {
-            List<crowd_area> list = memberCrowdGroup.getAreas();
+            List<crowd_area> areas = memberCrowdGroup.getAreas();
             //进行分组
-            Map<Integer, List<crowd_area>> listMap = list.stream().collect(Collectors.groupingBy(crowd_area::getLevel));
+            Map<Integer, List<crowd_area>> listMap = areas.stream().collect(Collectors.groupingBy(crowd_area::getLevel));
             //省
             List<crowd_area> provinceList = listMap.get(1);
             if (!CollectionUtils.isEmpty(provinceList)) {
@@ -263,8 +263,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //级别
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getMember_grade())) {
-            List<crowd_base_value> member_grade = memberCrowdGroup.getMember_grade();
-            Map<Integer, List<crowd_base_value>> temps = member_grade.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> memberGrades = memberCrowdGroup.getMember_grade();
+            Map<Integer, List<crowd_base_value>> temps = memberGrades.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
             List<crowd_base_value> in = temps.get(1);
             List<crowd_base_value> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -288,8 +288,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //活跃度
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActive_degree())) {
-            List<crowd_activity_degree> degree = memberCrowdGroup.getActive_degree();
-            Map<Integer, List<crowd_activity_degree>> temps = degree.stream().collect(Collectors.groupingBy(crowd_activity_degree::getInclude));
+            List<crowd_activity_degree> activeDegrees = memberCrowdGroup.getActive_degree();
+            Map<Integer, List<crowd_activity_degree>> temps = activeDegrees.stream().collect(Collectors.groupingBy(crowd_activity_degree::getInclude));
             List<crowd_activity_degree> in = temps.get(1);
             List<crowd_activity_degree> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -363,8 +363,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //获客媒体
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getMediaList())) {
-            List<crowd_media> mediaList = memberCrowdGroup.getMediaList();
-            Map<Integer, List<crowd_media>> temps = mediaList.stream().collect(Collectors.groupingBy(crowd_media::getInclude));
+            List<crowd_media> medias = memberCrowdGroup.getMediaList();
+            Map<Integer, List<crowd_media>> temps = medias.stream().collect(Collectors.groupingBy(crowd_media::getInclude));
             List<crowd_media> in = temps.get(1);
             List<crowd_media> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -424,8 +424,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //方便接电话时间
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getPhone_time())) {
-            List<crowd_action> phone_time = memberCrowdGroup.getPhone_time();
-            Map<Integer, List<crowd_action>> temps = phone_time.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
+            List<crowd_action> phoneTimes = memberCrowdGroup.getPhone_time();
+            Map<Integer, List<crowd_action>> temps = phoneTimes.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
             List<crowd_action> in = temps.get(1);
             List<crowd_action> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -451,8 +451,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //性格偏好
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getNature())) {
-            List<crowd_action> nature = memberCrowdGroup.getNature();
-            Map<Integer, List<crowd_action>> temps = nature.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
+            List<crowd_action> natures = memberCrowdGroup.getNature();
+            Map<Integer, List<crowd_action>> temps = natures.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
             List<crowd_action> in = temps.get(1);
             List<crowd_action> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -478,8 +478,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //响应时间
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getResponse_time())) {
-            List<crowd_action> rest = memberCrowdGroup.getResponse_time();
-            Map<Integer, List<crowd_action>> temps = rest.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
+            List<crowd_action> responseTimes = memberCrowdGroup.getResponse_time();
+            Map<Integer, List<crowd_action>> temps = responseTimes.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
             List<crowd_action> in = temps.get(1);
             List<crowd_action> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -559,8 +559,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //活动偏好
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActive_like())) {
-            List<crowd_action> active_like = memberCrowdGroup.getActive_like();
-            Map<Integer, List<crowd_action>> temps = active_like.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
+            List<crowd_action> activeLikes = memberCrowdGroup.getActive_like();
+            Map<Integer, List<crowd_action>> temps = activeLikes.stream().collect(Collectors.groupingBy(crowd_action::getInclude));
             List<crowd_action> in = temps.get(1);
             List<crowd_action> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -587,8 +587,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         //------订单相关
         //支付方式
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getPay_type())) {
-            List<crowd_base_value> active_like = memberCrowdGroup.getPay_type();
-            Map<Integer, List<crowd_base_value>> temps = active_like.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> payTypes = memberCrowdGroup.getPay_type();
+            Map<Integer, List<crowd_base_value>> temps = payTypes.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
             List<crowd_base_value> in = temps.get(1);
             List<crowd_base_value> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -614,8 +614,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //支付形式
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getPay_form())) {
-            List<crowd_base_value> active_like = memberCrowdGroup.getPay_form();
-            Map<Integer, List<crowd_base_value>> temps = active_like.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> payForms = memberCrowdGroup.getPay_form();
+            Map<Integer, List<crowd_base_value>> temps = payForms.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
             List<crowd_base_value> in = temps.get(1);
             List<crowd_base_value> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -641,8 +641,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //订单状态
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getOrder_state())) {
-            List<crowd_base_value> active_like = memberCrowdGroup.getOrder_state();
-            Map<Integer, List<crowd_base_value>> temps = active_like.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> orderStatus = memberCrowdGroup.getOrder_state();
+            Map<Integer, List<crowd_base_value>> temps = orderStatus.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
             List<crowd_base_value> in = temps.get(1);
             List<crowd_base_value> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -676,8 +676,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //订单参与的活动
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActiveCodeList())) {
-            List<crowd_active> active_like = memberCrowdGroup.getActiveCodeList();
-            Map<Integer, List<crowd_active>> temps = active_like.stream().collect(Collectors.groupingBy(crowd_active::getInclude));
+            List<crowd_active> activeCodes = memberCrowdGroup.getActiveCodeList();
+            Map<Integer, List<crowd_active>> temps = activeCodes.stream().collect(Collectors.groupingBy(crowd_active::getInclude));
             List<crowd_active> in = temps.get(1);
             List<crowd_active> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -703,8 +703,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //订单参与活动的类型
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActiveTypeList())) {
-            List<crowd_active> active_like = memberCrowdGroup.getActiveTypeList();
-            Map<Integer, List<crowd_active>> temps = active_like.stream().collect(Collectors.groupingBy(crowd_active::getInclude));
+            List<crowd_active> activeTypes = memberCrowdGroup.getActiveTypeList();
+            Map<Integer, List<crowd_active>> temps = activeTypes.stream().collect(Collectors.groupingBy(crowd_active::getInclude));
             List<crowd_active> in = temps.get(1);
             List<crowd_active> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -730,8 +730,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //订单来源
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getOrder_source())) {
-            List<crowd_base_value> active_like = memberCrowdGroup.getOrder_source();
-            Map<Integer, List<crowd_base_value>> temps = active_like.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> orderSources = memberCrowdGroup.getOrder_source();
+            Map<Integer, List<crowd_base_value>> temps = orderSources.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
             List<crowd_base_value> in = temps.get(1);
             List<crowd_base_value> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -790,8 +790,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //物流状态
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getLogistics_state())) {
-            List<crowd_base_value> products = memberCrowdGroup.getLogistics_state();
-            Map<Integer, List<crowd_base_value>> temps = products.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> logisticsStates = memberCrowdGroup.getLogistics_state();
+            Map<Integer, List<crowd_base_value>> temps = logisticsStates.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
             List<crowd_base_value> in = temps.get(1);
             List<crowd_base_value> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -816,8 +816,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //物流公司
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getLogistics_company_id())) {
-            List<crowd_base_value> products = memberCrowdGroup.getLogistics_state();
-            Map<Integer, List<crowd_base_value>> temps = products.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
+            List<crowd_base_value> logisticsCompanyIds = memberCrowdGroup.getLogistics_company_id();
+            Map<Integer, List<crowd_base_value>> temps = logisticsCompanyIds.stream().collect(Collectors.groupingBy(crowd_base_value::getInclude));
             List<crowd_base_value> in = temps.get(1);
             List<crowd_base_value> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
@@ -878,8 +878,8 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //病症
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getDiseases())) {
-            List<crowd_disease> products = memberCrowdGroup.getDiseases();
-            Map<Integer, List<crowd_disease>> temps = products.stream().collect(Collectors.groupingBy(crowd_disease::getInclude));
+            List<crowd_disease> diseases = memberCrowdGroup.getDiseases();
+            Map<Integer, List<crowd_disease>> temps = diseases.stream().collect(Collectors.groupingBy(crowd_disease::getInclude));
             List<crowd_disease> in = temps.get(1);
             List<crowd_disease> ex = temps.get(0);
             if (!CollectionUtils.isEmpty(in)) {
