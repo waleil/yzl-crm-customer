@@ -28,7 +28,7 @@ public interface MemberService {
     Member getMemberByPhone(String phone);
 
     void setMemberToVip(String member_card);
-
+    List<MemberProductEffect> getMemberProductEffectList(String member_card);
 
     List<ProductConsultation> getProductConsultationList(String member_card);
 

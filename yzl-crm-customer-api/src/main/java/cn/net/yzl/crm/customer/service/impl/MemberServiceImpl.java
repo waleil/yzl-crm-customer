@@ -73,7 +73,10 @@ public class MemberServiceImpl implements MemberService {
 
         return ComResponse.success(page);
     }
-
+    @Override
+    public List<MemberProductEffect> getMemberProductEffectList(String member_card) {
+        return memberMapper.getMemberProductEffectList(member_card);
+    }
     @Override
     public int updateByMemberCardSelective(Member dto) {
         return memberMapper.updateByMemberCardSelective(dto);
