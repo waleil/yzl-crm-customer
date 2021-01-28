@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.test;
 
+import cn.net.yzl.crm.customer.CrmCustomerPlatformAppApplication;
 import cn.net.yzl.crm.customer.dao.MemberActionRelationMapper;
 import cn.net.yzl.crm.customer.dao.MemberDiseaseMapper;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
@@ -11,7 +12,10 @@ import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
