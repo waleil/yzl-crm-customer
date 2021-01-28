@@ -1203,7 +1203,7 @@
          left join member_order_stat o on m.member_card= o.member_card
             left join member_amount a on a.member_card=m.member_card
             where m.id > #{id}
-        ORDER BY m.member_card limit #{pageSize}
+        ORDER BY m.id limit #{pageSize}
     </select>
 
     <select id="queryMaxMemberCard" resultType="java.lang.String">
