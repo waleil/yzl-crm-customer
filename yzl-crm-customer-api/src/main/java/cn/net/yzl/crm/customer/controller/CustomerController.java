@@ -141,16 +141,7 @@ public class CustomerController {
     }
 
 
-    @ApiOperation("获取顾客购买商品")
-    @GetMapping("v1/getMemberProductEffectList")
-    public GeneralResult getMemberProductEffectList(
-            @RequestParam("member_card")
-            @NotBlank(message = "member_card不能为空")
-            @ApiParam(name = "member_card", value = "会员卡号", required = true)
-                    String member_card) {
-        List<MemberProductEffect> memberProductEffectList = memberService.getMemberProductEffectList(member_card);
-        return GeneralResult.success(memberProductEffectList);
-    }
+
 
     /**
      * 获取顾客咨询商品
