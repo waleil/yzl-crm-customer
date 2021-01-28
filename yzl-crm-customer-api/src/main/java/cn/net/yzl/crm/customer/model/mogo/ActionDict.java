@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.model.mogo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import lombok.Data;
  */
 @Data
 public class ActionDict {
+    @JsonIgnore
     @ApiModelProperty("会员卡号")
     private String memberCard;
 
@@ -21,6 +23,7 @@ public class ActionDict {
     @ApiModelProperty("综合行为名称")
     private String name;
     //综合行为类型 1、方便接电话时间 2性格偏好 3响应时间 4 坐席偏好 5 综合行为 6 下单行为 7活动偏好
+    @JsonIgnore
     private Integer type;
     //值域1
     private String value;

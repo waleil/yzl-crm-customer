@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.model.mogo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -12,6 +13,7 @@ import lombok.Data;
 @Data
 public class MemberOrder {
     //会员卡号
+    @JsonIgnore
     private String memberCard;
     //订单参与的活动
     private String activityCode;

@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.model.mogo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -16,5 +17,6 @@ public class MemberDisease {
     //病症名称
     private String diseaseName;
     //会员卡号
+    @JsonIgnore
     private String memberCard;
 }
