@@ -140,12 +140,7 @@ public class CustomerController {
         return GeneralResult.success();
     }
 
-    /**
-     * 获取顾客购买商品
-     *
-     * @param member_card
-     * @return
-     */
+
     @ApiOperation("获取顾客购买商品")
     @GetMapping("v1/getMemberProductEffectList")
     public GeneralResult getMemberProductEffectList(
