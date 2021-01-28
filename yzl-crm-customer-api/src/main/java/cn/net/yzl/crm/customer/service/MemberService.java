@@ -4,6 +4,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
+import cn.net.yzl.crm.customer.dto.member.MemberMessageDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
@@ -140,4 +141,6 @@ public interface MemberService {
 
     // 添加顾客咨询商品
     ComResponse<String> addProductConsultation(ProductConsultationInsertVO productConsultationInsertVO);
+
+    List<MemberMessageDTO> findMembereMessage(List<String> memberCardList);
 }

@@ -4,11 +4,10 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
-
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
+import cn.net.yzl.crm.customer.dto.member.MemberMessageDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
-import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -279,5 +278,19 @@ public class CustomerController {
                 memberService.updateMemberToMongo(member);
             }
         }
+    }
+
+    @ApiOperation("顾客一批顾客卡号获取顾客收货地址、余额、会员等级)")
+    @GetMapping("/v1/getMembereMessage")
+    public ComResponse getMembereMessage(
+            @RequestParam("member_cards")
+            @NotBlank(message = "member_cards不能为空")
+            @ApiParam(name = "member_cards", value = "一批顾客卡号", required = true)
+                    String member_cards) {
+
+        if (StringUtil.isNullOrEmpty(member_cards)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        List<String> memberCardList = Arrays.asList(member_cards.split(","));
+        List<MemberMessageDTO> list = memberService.findMembereMessage(memberCardList);
+        return ComResponse.success(list);
     }
 }

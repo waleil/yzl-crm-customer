@@ -58,6 +58,74 @@
         <result column="m_grade_id" property="mGradeId" />
         <result column="m_grade_name" property="mGradeName" />
     </resultMap>
+
+    <resultMap type="cn.net.yzl.crm.customer.dto.member.MemberMessageDTO" id="memberMap">
+        <id column="memberCard" property="memberCard" jdbcType="VARCHAR"/>
+        <id column="memberName" property="memberName" jdbcType="VARCHAR"/>
+        <id column="gradeId" property="gradeId" jdbcType="INTEGER"/>
+        <id column="gradeCode" property="gradeCode" jdbcType="VARCHAR"/>
+        <id column="totalMoney" property="totalMoney" jdbcType="DOUBLE"/>
+
+
+        <collection property="phoneNumbers" resultMap="phoneNumberListMap"/>
+        <collection property="reveiverAddresss" resultMap="BatchAddressListResultMap"/>
+    </resultMap>
+
+    <resultMap type="cn.net.yzl.crm.customer.dto.address.ReveiverAddressMessageDTO" id="BatchAddressListResultMap">
+        <id column="addressee" property="addressee" jdbcType="VARCHAR"/>
+        <id column="memberMobile" property="memberMobile" jdbcType="VARCHAR"/>
+        <id column="memberProvinceNo" property="memberProvinceNo" jdbcType="INTEGER"/>
+        <id column="memberProvinceName" property="memberProvinceName" jdbcType="VARCHAR"/>
+        <id column="memberCityNo" property="memberCityNo" jdbcType="INTEGER"/>
+        <id column="memberCityName" property="memberCityName" jdbcType="VARCHAR"/>
+        <id column="memberCountyNo" property="memberCountyNo" jdbcType="INTEGER"/>
+        <id column="memberCountyName" property="memberCountyName" jdbcType="VARCHAR"/>
+        <id column="memberStreetNo" property="memberStreetNo" jdbcType="INTEGER"/>
+        <id column="memberStreetName" property="memberStreetName" jdbcType="VARCHAR"/>
+        <id column="memberAddress" property="memberAddress" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="phoneNumberListMap" type="java.lang.String">
+        <id column="phoneNumber" property="phoneNumber" javaType="String"/>
+    </resultMap>
+
+    <sql id="reveiverAddressDtos_Column_List">
+        address.member_province_no memberProvinceNo,
+        address.member_province_name memberProvinceName,
+        address.member_city_no memberCityNo,
+        address.member_city_name memberCityName,
+        address.member_county_no memberCountyNo,
+        address.member_county_name memberCountyName,
+        member_street_no	memberStreetNo,
+        member_street_name memberStreetName,
+        address.member_address memberAddress,
+        address.member_name addressee,
+        address.member_mobile memberMobile
+    </sql>
+
+    <sql id="phoneNumberList_Column_List">
+        phone.phone_number phoneNumber
+    </sql>
+
+    <select id="findMembereMessage" resultMap="memberMap">
+        SELECT
+            m.member_card memberCard,
+            m.member_name memberName,
+            m.m_grade_id gradeId,
+            m.m_grade_code gradeCode,
+            <include refid="reveiverAddressDtos_Column_List"/>,
+            <include refid="phoneNumberList_Column_List"/>,
+            amount.total_money totalMoney
+        FROM
+            member m
+            left join member_amount amount on m.member_card=amount.member_card
+            left join reveiver_address address on m.member_card = address.member_card
+            left join member_phone phone on m.member_card = phone.member_card
+        where m.member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <sql id="Base_Column_List">
     id, member_card, passwd, member_name, nick_name, age, sex, id_card, adver_code, adver_name,
     m_grade_code, member_type, is_active, member_status, activity, region_code, region_name,

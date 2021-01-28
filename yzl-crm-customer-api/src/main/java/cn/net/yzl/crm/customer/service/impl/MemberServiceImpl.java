@@ -10,6 +10,7 @@ import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
+import cn.net.yzl.crm.customer.dto.member.MemberMessageDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberGrad;
@@ -310,6 +311,11 @@ public class MemberServiceImpl implements MemberService {
            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
        }
         return ComResponse.success();
+    }
+
+    @Override
+    public List<MemberMessageDTO> findMembereMessage(List<String> memberCardList) {
+        return memberMapper.findMembereMessage(memberCardList);
     }
 
 
