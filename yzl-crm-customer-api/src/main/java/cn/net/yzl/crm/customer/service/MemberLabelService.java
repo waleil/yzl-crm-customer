@@ -14,5 +14,5 @@ public interface MemberLabelService {
      * @Date: 2021/1/25 7:53 下午
      * @Return:
      */
-    Boolean syncProcess(int pageNo,int pageSize);
+    Integer syncProcess();
 }

@@ -1,28 +1,36 @@
-package cn.net.yzl.crm.customer.service.impl;
 
+
+import cn.net.yzl.crm.customer.CrmCustomerPlatformAppApplication;
 import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
-import cn.net.yzl.crm.customer.model.mogo.*;
+import cn.net.yzl.crm.customer.model.mogo.ActionDict;
+import cn.net.yzl.crm.customer.model.mogo.MemberDisease;
+import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
+import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author lichanghong
  * @version 1.0
- * @title: MemberLabelServiceMongoImpl
- * @description 同步数据至MongoDB
- * @date: 2021/1/25 7:53 下午
+ * @title: MemberLabelServiceTest
+ * @description MongoDB数据测试
+ * @date: 2021/1/25 10:47 下午MemberLabelServiceMongoImpl
  */
-@Slf4j
-@Service
-public class MemberLabelServiceMongoImpl {
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes = CrmCustomerPlatformAppApplication.class)
+public class MemberLabelServiceTest {
     @Autowired
     private MemberMapper memberMapper;
     @Autowired
@@ -38,14 +46,15 @@ public class MemberLabelServiceMongoImpl {
     @Autowired
     private MemberProductEffectMapper memberProductEffectMapper;
     private static String member_label = "member_label";
-    public Boolean syncProcess() {
+    @Test
+    public void syncProcess() {
 
         int id = 0;
         int pageSize = 1000;
         while (true){
             List<MemberLabel> list = memberMapper.queryAllMemberByPage(id, pageSize);
             if (!CollectionUtils.isEmpty(list)) {
-                log.info("同步顾客数据至MongoDB,当前页数:{},分页大小:{},数据大小:{}", id, pageSize, list.size());
+               System.out.println(String.format("同步顾客数据至MongoDB,当前页数:%s,分页大小:%s,数据大小:%s", id, pageSize, list.size()));
                 //处理顾客编号
                 List<String> memberCodes = list.stream().map(MemberLabel::getMemberCard)
                         .collect(Collectors.toList());
@@ -167,18 +176,18 @@ public class MemberLabelServiceMongoImpl {
                 list.clear();
 
             } else {
-               break;
+                break;
             }
         }
-        return true;
+
 
     }
 
     private static Integer getMonth(String date) {
-       String[] str = date.split("-");
-       if(str.length>2){
-           return Integer.parseInt(str[1]);
-       }
-       return 0;
+        String[] str = date.split("-");
+        if(str.length>2){
+            return Integer.parseInt(str[1]);
+        }
+        return 0;
     }
 }

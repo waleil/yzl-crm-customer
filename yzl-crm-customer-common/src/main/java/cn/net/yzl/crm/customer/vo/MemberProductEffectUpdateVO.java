@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Data
 @ApiModel(value = "MemberProductEffectVO",description = "顾客服用效果实体")
-public class MemberProductEffectVO implements Serializable {
+public class MemberProductEffectUpdateVO implements Serializable {
     @ApiModelProperty(value = "id",name = "id",required = true)
     private Integer id;
 
@@ -49,8 +49,8 @@ public class MemberProductEffectVO implements Serializable {
     @ApiModelProperty(value = "修改人编号",name="updator",required = true)
     private String updator;
 
-    @ApiModelProperty(value = "修改时间",name="upateTime")
-    private Date upateTime;
+//    @ApiModelProperty(value = "修改时间",name="upateTime")
+//    private Date upateTime;
 
 
 

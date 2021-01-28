@@ -160,9 +160,10 @@ public class member_crowd_group extends BaseObject {
     @ApiModelProperty("是否活动订单，1是，0否，-1不做统计查询")
     private Integer active_order;
 
-    @ApiModelProperty("活动")
-    private List<crowd_active> activeList;
-
+    @ApiModelProperty("活动名称")
+    private List<crowd_active> activeCodeList;
+    @ApiModelProperty("活动类型")
+    private List<crowd_active> activeTypeList;
     @ApiModelProperty("订单来源: 0=电销事业中心，1=OTC ，2=淘宝 ，3=京东 ，4=自建app")
     private List<crowd_base_value> order_source;
 

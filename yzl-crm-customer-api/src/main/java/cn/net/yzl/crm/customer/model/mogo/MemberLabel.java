@@ -44,7 +44,7 @@ public class MemberLabel extends BaseObject {
     private int activity;
     @ApiModelProperty(value = "所属区")
     private String regionCode;
-
+    private Integer dbId;
     @ApiModelProperty("所属区")
     private String regionName;
 
@@ -226,22 +226,8 @@ public class MemberLabel extends BaseObject {
     private List<ActionDict> memberCharacterList;
     //综合行为
     private List<ActionDict> comprehensiveBehaviorList;
-    //订单来源
-    private List<OrderSource> orderSourceList;
-    //活动名称
-    private List<OrderActivity> orderActivityList;
-    //订单状态
-    private List<OrderStatus> orderStatusList;
-    //活动类型
-    private List<OrderActivityType> activityTypeList;
-    //支付形式
-    private List<OrderPayType> payTypeList;
-    //支付方式
-    private List<OrderPayMode> payModeList;
-    //物流状态
-    private List<LogisticsStatus> logisticsStatusList;
-    //物流公司
-    private List<LogisticsCompany> logisticsCompanyList;
-    //支付状态
-    private List<PayStatus> payStatusList;
+    //活动偏好
+    private List<ActionDict> activityBehaviorList;
+    //顾客关联的订单
+    private List<MemberOrder> memberOrders;
 }

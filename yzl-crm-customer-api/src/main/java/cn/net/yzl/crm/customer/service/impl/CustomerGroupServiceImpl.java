@@ -6,6 +6,7 @@ import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
+import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
@@ -135,5 +136,21 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     public int memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
 
         return memberLabelDao.memberCrowdGroupTrial(memberCrowdGroup);
+    }
+
+    @Override
+    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
+
+        return memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
+    }
+
+    @Override
+    public String queryGroupIdByMemberCard(String memberCard) {
+        return memberLabelDao.queryGroupIdByMemberCard(memberCard);
+    }
+
+    @Override
+    public List<GroupRefMember> queryMembersByGroupId(String groupId) {
+        return memberLabelDao.queryMembersByGroupId(groupId);
     }
 }
