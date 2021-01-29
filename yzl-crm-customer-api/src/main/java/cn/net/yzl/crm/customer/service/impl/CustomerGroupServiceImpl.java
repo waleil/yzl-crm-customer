@@ -156,4 +156,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     public List<GroupRefMember> queryMembersByGroupId(String groupId) {
         return memberLabelDao.queryMembersByGroupId(groupId);
     }
+
+    @Override
+    public boolean deleteMongoGroupRefMemberByGroupId(String groupId) {
+        return memberLabelDao.deleteMongoGroupRefMemberByGroupId(groupId);
+    }
 }

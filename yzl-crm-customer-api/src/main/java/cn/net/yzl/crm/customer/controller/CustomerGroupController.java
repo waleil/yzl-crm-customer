@@ -123,6 +123,14 @@ public class CustomerGroupController {
         return ComResponse.success(count);
     }
 
+    @ApiOperation("根据groupId删除圈选")
+    @GetMapping("/v1/deletegroupRunByGroupId")
+    public ComResponse<Boolean> deleteMongoGroupRefMemberByGroupId(@RequestParam String groupId){
+        if (StringUtils.isEmpty(groupId)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        boolean b = customerGroupService.deleteMongoGroupRefMemberByGroupId(groupId);
+        return ComResponse.success(b);
+    }
+
     /**
      * @Author: lichanghong
      * @Description: 根据顾客编号查询顾客所属圈选群

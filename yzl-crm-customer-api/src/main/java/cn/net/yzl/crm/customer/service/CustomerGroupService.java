@@ -68,4 +68,6 @@ public interface CustomerGroupService {
      * @Return: java.util.List<cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember>
      */
      List<GroupRefMember> queryMembersByGroupId(String groupId);
+
+    boolean deleteMongoGroupRefMemberByGroupId(String groupId);
 }

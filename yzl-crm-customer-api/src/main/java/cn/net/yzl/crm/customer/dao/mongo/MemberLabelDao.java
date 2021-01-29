@@ -7,6 +7,8 @@ import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
+import com.mongodb.client.result.DeleteResult;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -176,7 +178,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //是否为会员
         if (memberCrowdGroup.getVip() != null) {
-            if (memberCrowdGroup.getRecharge() == 1) {
+            if (memberCrowdGroup.getVip() == 1) {
                 and.add(Criteria.where("vipFlag").is(true));
             } else {
                 and.add(Criteria.where("vipFlag").is(false));
@@ -970,5 +972,23 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) - past);
         Date today = calendar.getTime();
         return today;
+    }
+
+    /**
+     * 根据groupId删除数据
+     * wangzhe
+     * 2021-01-29
+     * @param groupId 圈选分组id
+     * @return
+     */
+    public boolean deleteMongoGroupRefMemberByGroupId(String groupId){
+        if (StringUtils.isEmpty(groupId)) {
+            return false;
+        }
+        //查询出符合条件的第一个结果，并将符合条件的数据删除
+        Query query = Query.query(Criteria.where("groupId").is(groupId));
+        DeleteResult remove = mongoTemplate.remove(query, GroupRefMember.class);
+        System.out.println(remove);
+        return true;
     }
 }
