@@ -4,10 +4,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
-import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
-import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
-import cn.net.yzl.crm.customer.dto.member.MemberGradeRecordDto;
-import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
+import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
@@ -21,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,7 +178,12 @@ public class CustomerController {
 
     }
 
-
+    @ApiOperation("顾客画像-添加顾客病症")
+    @PostMapping("v1/insertMemberDisease")
+    public ComResponse insertMemberDisease(@RequestBody @Validated MemberDiseaseDto diseaseDto) {
+        ComResponse<Integer> integer = memberService.insertMemberDisease(diseaseDto);
+        return integer;
+    }
 
 
     @ApiOperation("获取顾客购买能力")

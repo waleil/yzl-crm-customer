@@ -9,10 +9,7 @@ import cn.net.yzl.crm.customer.dao.MemberGradeRecordDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
-import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
-import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
-import cn.net.yzl.crm.customer.dto.member.MemberGradeRecordDto;
-import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
+import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
@@ -132,6 +129,16 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<ProductConsultation> getProductConsultationList(String member_card) {
         return memberMapper.getProductConsultationList(member_card);
+    }
+
+    @Override
+    public ComResponse<Integer> insertMemberDisease(MemberDiseaseDto memberDiseaseDto) {
+        List<MemberDisease> memberDiseaseByCardAndDiseaseId = memberMapper.getMemberDiseaseByCardAndDiseaseId(memberDiseaseDto.getMemberCard(), memberDiseaseDto.getDiseaseId());
+        if(memberDiseaseByCardAndDiseaseId!=null && memberDiseaseByCardAndDiseaseId.size()>0){
+            return ComResponse.fail(ResponseCodeEnums.MEMBER_DISEASE_EXIST_ERROR.getCode(),ResponseCodeEnums.MEMBER_DISEASE_EXIST_ERROR.getMessage());
+        }
+        Integer integer = memberMapper.insertMemberDisease(memberDiseaseDto);
+        return ComResponse.success(integer);
     }
 
     @Override
@@ -273,9 +280,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public List<member_wide> selectFullMemberByPage(int currentPage, int pageSize) {
-      //  PageHelper.startPage(currentPage, pageSize);
+        //  PageHelper.startPage(currentPage, pageSize);
         List<member_wide> list = memberMapper.selectFullMemberByPage(currentPage*pageSize, pageSize);
-       // Page<member_wide> page = AssemblerResultUtil.resultAssembler(list);
+        // Page<member_wide> page = AssemblerResultUtil.resultAssembler(list);
 
         return list;
     }

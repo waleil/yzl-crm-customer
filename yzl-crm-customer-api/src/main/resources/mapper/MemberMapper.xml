@@ -818,18 +818,27 @@
     <select id="getMemberDisease" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberDisease">
         select id, member_card,disease_id,disease_name
         from   member_disease
-        where  member_card=#{member_card}
+        where  member_card=#{member_card} and  del_flag=0
+    </select>
 
+    <insert id="insertMemberDisease" >
+        insert into member_disease (member_card,disease_id,disease_name,create_no)
+        values (#{memberCard},#{diseaseId},#{diseaseName},#{createNo})
+    </insert>
+
+    <select id="getMemberDiseaseByCardAndDiseaseId"  resultType="cn.net.yzl.crm.customer.model.MemberDisease">
+        select id, member_card,disease_id,disease_name
+        from member_disease
+        where member_card =#{memberCard} and disease_id=#{diseaseId} and del_flag=0
     </select>
 
     <select id="getMemberDiseaseByMemberCards" resultType="cn.net.yzl.crm.customer.model.MemberDisease">
         select id, member_card,disease_id,disease_name
         from member_disease
-        where member_card in
+        where  del_flag=0 and member_card in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
         </foreach>
-
     </select>
 
 

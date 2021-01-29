@@ -2,8 +2,9 @@ package cn.net.yzl.crm.customer.dao;
 
 
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
-import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
+import cn.net.yzl.crm.customer.dto.member.MemberDiseaseDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
@@ -36,6 +37,11 @@ public interface MemberMapper {
     List<MemberProductEffect> getMemberProductEffectList(String member_card);
 
     List<ProductConsultation> getProductConsultationList(String member_card);
+
+    Integer insertMemberDisease(MemberDiseaseDto memberDiseaseDto);
+
+
+    List<MemberDisease> getMemberDiseaseByCardAndDiseaseId(@Param("memberCard") String memberCard,@Param("diseaseId") Integer diseaseId);
 
     List<MemberDisease> getMemberDisease(String member_card);
 
