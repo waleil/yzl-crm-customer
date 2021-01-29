@@ -6,9 +6,6 @@ import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
-import cn.net.yzl.crm.customer.utils.RedisUtil;
-import com.mongodb.client.result.DeleteResult;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -33,34 +30,23 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
     private static String group_ref_member= "group_ref_member";
     @Autowired
     private MongoTemplate mongoTemplate;
-    @Autowired
-    private RedisUtil redisUtil;
 
     @Override
     protected Class<MemberLabel> getEntityClass() {
         return MemberLabel.class;
     }
+
     /**
      * @param memberCrowdGroup
      * @Author: lichanghong
      * @Description: 员工圈选
      * @Date: 2021/1/26 11:42 上午
-     * @Return: java.lang.Integer
+     * @Return
      */
-    public Integer memberCrowdGroupRun(member_crowd_group memberCrowdGroup){
+    public List<MemberLabel> memberCrowdGroupRun(member_crowd_group memberCrowdGroup){
         Query query = initQuery(memberCrowdGroup);
         query.fields().include("memberCard").include("memberName").exclude("_id");
-       List<MemberLabel> labels= mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
-       List<GroupRefMember> list = new ArrayList<>(labels.size());
-        for(MemberLabel label:labels){
-            GroupRefMember member = new GroupRefMember();
-            member.setGroupId(memberCrowdGroup.get_id());
-            member.setMemberCard(label.getMemberCard());
-            member.setMemberName(label.getMemberName());
-            list.add(member);
-        }
-        mongoTemplate.insertAll(list);
-       return labels.size();
+        return mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
     }
     /**
      * @Author: lichanghong
@@ -974,21 +960,4 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         return today;
     }
 
-    /**
-     * 根据groupId删除数据
-     * wangzhe
-     * 2021-01-29
-     * @param groupId 圈选分组id
-     * @return
-     */
-    public boolean deleteMongoGroupRefMemberByGroupId(String groupId){
-        if (StringUtils.isEmpty(groupId)) {
-            return false;
-        }
-        //查询出符合条件的第一个结果，并将符合条件的数据删除
-        Query query = Query.query(Criteria.where("groupId").is(groupId));
-        DeleteResult remove = mongoTemplate.remove(query, GroupRefMember.class);
-        System.out.println(remove);
-        return true;
-    }
 }

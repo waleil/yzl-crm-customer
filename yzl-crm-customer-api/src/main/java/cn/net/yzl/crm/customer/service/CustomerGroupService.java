@@ -69,5 +69,4 @@ public interface CustomerGroupService {
      */
      List<GroupRefMember> queryMembersByGroupId(String groupId);
 
-    boolean deleteMongoGroupRefMemberByGroupId(String groupId);
 }
