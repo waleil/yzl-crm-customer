@@ -68,38 +68,38 @@
 
 
         <collection property="phoneNumbers" resultMap="phoneNumberListMap"/>
-        <collection property="reveiverAddresss" resultMap="BatchAddressListResultMap"/>
+        <collection property="reveiverInformations" resultMap="BatchAddressListResultMap"/>
     </resultMap>
 
     <resultMap type="cn.net.yzl.crm.customer.dto.address.ReveiverAddressMsgDTO" id="BatchAddressListResultMap">
-        <id column="addressee" property="addressee" jdbcType="VARCHAR"/>
-        <id column="memberMobile" property="memberMobile" jdbcType="VARCHAR"/>
-        <id column="memberProvinceNo" property="memberProvinceNo" jdbcType="INTEGER"/>
-        <id column="memberProvinceName" property="memberProvinceName" jdbcType="VARCHAR"/>
-        <id column="memberCityNo" property="memberCityNo" jdbcType="INTEGER"/>
-        <id column="memberCityName" property="memberCityName" jdbcType="VARCHAR"/>
-        <id column="memberCountyNo" property="memberCountyNo" jdbcType="INTEGER"/>
-        <id column="memberCountyName" property="memberCountyName" jdbcType="VARCHAR"/>
-        <id column="memberStreetNo" property="memberStreetNo" jdbcType="INTEGER"/>
-        <id column="memberStreetName" property="memberStreetName" jdbcType="VARCHAR"/>
-        <id column="memberAddress" property="memberAddress" jdbcType="VARCHAR"/>
+        <id column="consignee" property="consignee" jdbcType="VARCHAR"/>
+        <id column="recieverPhone" property="recieverPhone" jdbcType="VARCHAR"/>
+        <id column="memberProvinceNo" property="provinceNo" jdbcType="INTEGER"/>
+        <id column="memberProvinceName" property="provinceName" jdbcType="VARCHAR"/>
+        <id column="memberCityNo" property="cityNo" jdbcType="INTEGER"/>
+        <id column="memberCityName" property="cityName" jdbcType="VARCHAR"/>
+        <id column="memberCountyNo" property="countyNo" jdbcType="INTEGER"/>
+        <id column="memberCountyName" property="countyName" jdbcType="VARCHAR"/>
+        <id column="memberStreetNo" property="streetNo" jdbcType="INTEGER"/>
+        <id column="memberStreetName" property="streetName" jdbcType="VARCHAR"/>
+        <id column="memberAddress" property="detailedReceivingAddress" jdbcType="VARCHAR"/>
     </resultMap>
     <resultMap id="phoneNumberListMap" type="java.lang.String">
-        <id column="phoneNumber" property="phoneNumber" javaType="String"/>
+        <id column="phoneNumber" javaType="String"/>
     </resultMap>
 
     <sql id="reveiverAddressDtos_Column_List">
+        address.member_name consignee,
+        address.member_mobile recieverPhone,
         address.member_province_no memberProvinceNo,
         address.member_province_name memberProvinceName,
         address.member_city_no memberCityNo,
         address.member_city_name memberCityName,
         address.member_county_no memberCountyNo,
         address.member_county_name memberCountyName,
-        member_street_no	memberStreetNo,
+        member_street_no memberStreetNo,
         member_street_name memberStreetName,
-        address.member_address memberAddress,
-        address.member_name addressee,
-        address.member_mobile memberMobile
+        address.member_address memberAddress
     </sql>
 
     <sql id="phoneNumberList_Column_List">
@@ -118,7 +118,7 @@
         FROM
             member m
             left join member_amount amount on m.member_card=amount.member_card
-            left join reveiver_address address on m.member_card = address.member_card
+            left join reveiver_address address on m.member_card = address.member_card and address.status = 0
             left join member_phone phone on m.member_card = phone.member_card
         where m.member_card in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">

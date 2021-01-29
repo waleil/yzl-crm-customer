@@ -11,25 +11,25 @@ import java.util.List;
 @Data
 public class MemberAddressAndLevelDTO {
 
-    @ApiModelProperty(value = "顾客卡号")
+    @ApiModelProperty(value = "顾客卡号" , name = "memberCard")
     private String memberCard;
 
-    @ApiModelProperty(value = "顾客名称")
+    @ApiModelProperty(value = "顾客名称" , name = "memberName")
     private String memberName;
 
-    @ApiModelProperty(value = "顾客级别编号")
+    @ApiModelProperty(value = "顾客级别编号" , name = "gradeId")
     private String gradeId;
 
-    @ApiModelProperty(value = "顾客级别")
+    @ApiModelProperty(value = "顾客级别" , name = "gradeCode")
     private String gradeCode;
 
-    @ApiModelProperty(value = "收获地址信息")
-    private List<ReveiverAddressMsgDTO> reveiverAddresss;
+    @ApiModelProperty(value = "收获地址信息" , name = "reveiverInformations")
+    private List<ReveiverAddressMsgDTO> reveiverInformations;
 
-    @ApiModelProperty(value = "顾客联系电话")
+    @ApiModelProperty(value = "顾客联系电话" , name = "phoneNumbers")
     private List<String> phoneNumbers;
 
-    @ApiModelProperty(value = "顾客余额")
+    @ApiModelProperty(value = "顾客余额" , name = "totalMoney")
     private Double totalMoney;
 
 
