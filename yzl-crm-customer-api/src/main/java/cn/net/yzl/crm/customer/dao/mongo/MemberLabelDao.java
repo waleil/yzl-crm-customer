@@ -6,6 +6,7 @@ import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
+import com.mongodb.client.result.DeleteResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -47,6 +48,13 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         Query query = initQuery(memberCrowdGroup);
         query.fields().include("memberCard").include("memberName").exclude("_id");
         return mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
+    }
+    public <T> void insertAll(Collection<? extends T> objectsToSave) {
+        mongoTemplate.insertAll(objectsToSave);
+    }
+
+    public DeleteResult remove(Query query, Class<?> entityClass) {
+        return mongoTemplate.remove(query, GroupRefMember.class);
     }
     /**
      * @Author: lichanghong

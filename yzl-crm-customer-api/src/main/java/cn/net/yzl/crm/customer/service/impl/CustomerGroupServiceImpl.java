@@ -18,11 +18,9 @@ import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,8 +41,6 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
     @Autowired
     private RedisUtil redisUtil;
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
     private final static Integer SAVE_LINE = 10_000;
 
@@ -171,14 +167,17 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return memberLabelDao.queryMembersByGroupId(groupId);
     }
 
+    //@Transactional (transactionManager = "mongoTransactionManager")
+    //@Transactional(transactionManager = "mongoTransactionManager",rollbackFor = Throwable.class)
     @Override
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
         List<MemberLabel> labels = memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
-        return generateGroupRun(memberCrowdGroup.get_id(), labels);
+      /*  return generateGroupRun(memberCrowdGroup.get_id(), labels);
     }
-
     @Transactional (transactionManager = "mongoTransactionManager")
-    public Integer generateGroupRun(String groupId,List<MemberLabel> labels){
+    public Integer generateGroupRun(String groupId,List<MemberLabel> labels){*/
+        String groupId = memberCrowdGroup.get_id();
+
         List<GroupRefMember> list = new ArrayList<>(labels.size());
         String memberCard;
         MemberLabel label;
@@ -201,14 +200,18 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             member.setMemberName(label.getMemberName());
             list.add(member);
             if (isSaveLine(i)) {
-                mongoTemplate.insertAll(list);
+                memberLabelDao.insertAll(list);
                 list.clear();
             }
         }
         //保存小于10000条对象的集合
         if (CollectionUtil.isNotEmpty(list)) {
-            mongoTemplate.insertAll(list);
+            memberLabelDao.insertAll(list);
         }
+        //删除redis中的对应的缓存
+        String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
+        redisUtil.del(cacheKey);
+
         //返回本次同步数据的条数
         return labels.size();
     }
@@ -226,7 +229,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         }
         //查询出符合条件的第一个结果，并将符合条件的数据删除
         Query query = Query.query(Criteria.where("groupId").is(groupId));
-        /*DeleteResult remove = */mongoTemplate.remove(query, GroupRefMember.class);
+        /*DeleteResult remove = */memberLabelDao.remove(query, GroupRefMember.class);
         //删除redis中的对应的缓存
         String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
         redisUtil.del(cacheKey);
@@ -244,7 +247,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     private Boolean getAndSetNxInGroupCache(String groupId,String memberCard){
         boolean isFind = false;
         //是否包含群组id
-        if (cacheMap.containsKey(groupId)) {
+        /*if (cacheMap.containsKey(groupId)) {
             //群组下是否包含该客户编号
             if (cacheMap.get(groupId).contains(memberCard)) {
                 isFind = true;
@@ -252,14 +255,19 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
                 //不存在则设置
                 cacheMap.get(groupId).add(memberCard);
             }
-        }
+        }else{
+            HashSet<String> set = new HashSet<>();
+            set.add(memberCard);
+            cacheMap.put(groupId, set);
+        }*/
         //cacheMap中不存在，则去redis中去寻找
         String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
         if (redisUtil.sHasKey(cacheKey,memberCard)) {
             isFind = true;
+        }else{
+            //不存在则设置
+            redisUtil.sSet(cacheKey, memberCard);
         }
-        //不存在则设置
-        redisUtil.sSet(cacheKey, memberCard);
         return isFind;
     }
 

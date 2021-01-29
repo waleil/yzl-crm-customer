@@ -163,7 +163,7 @@ public class MybatisConfiguration {
     
     //事务管理
     @Bean
-    @Primary //事务默认使用mysql数据库
+//    @Primary //事务默认使用mysql数据库
     public PlatformTransactionManager annotationDrivenTransactionManager() {
         return new DataSourceTransactionManager((DataSource) BeanUtils.getBean("roundRobinDataSouceProxy"));
     }

@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.config.mongodb;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.MongoTransactionManager;
 public class MongoTransactionConfig {
 
     @Bean(name = "mongoTransactionManager")
+    @ConditionalOnProperty(name="spring.data.mongodb.transactionEnabled",havingValue = "true")
     MongoTransactionManager transactionManager(MongoDatabaseFactory factory){
         return new MongoTransactionManager(factory);
     }
