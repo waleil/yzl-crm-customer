@@ -314,8 +314,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<MemberMessageDTO> findMembereMessage(List<String> memberCardList) {
-        return memberMapper.findMembereMessage(memberCardList);
+    public List<MemberMessageDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList) {
+        return memberMapper.getMembereAddressAndLevelByMemberCards(memberCardList);
     }
 
 

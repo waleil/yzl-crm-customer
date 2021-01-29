@@ -131,5 +131,5 @@ public interface MemberMapper {
 
     List<MemberDiseaseCustomerDto> getMemberDiseaseDtoByMemberCard(@Param("memberCard") String memberCard);
 
-    List<MemberMessageDTO> findMembereMessage(@Param("list")  List<String> memberCards);
+    List<MemberMessageDTO> getMembereAddressAndLevelByMemberCards(@Param("list")  List<String> memberCards);
 }

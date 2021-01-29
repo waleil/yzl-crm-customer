@@ -106,7 +106,7 @@
         phone.phone_number phoneNumber
     </sql>
 
-    <select id="findMembereMessage" resultMap="memberMap">
+    <select id="getMembereAddressAndLevelByMemberCards" resultMap="memberMap">
         SELECT
             m.member_card memberCard,
             m.member_name memberName,

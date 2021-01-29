@@ -142,5 +142,5 @@ public interface MemberService {
     // 添加顾客咨询商品
     ComResponse<String> addProductConsultation(ProductConsultationInsertVO productConsultationInsertVO);
 
-    List<MemberMessageDTO> findMembereMessage(List<String> memberCardList);
+    List<MemberMessageDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList);
 }

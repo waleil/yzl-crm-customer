@@ -281,8 +281,8 @@ public class CustomerController {
     }
 
     @ApiOperation("顾客一批顾客卡号获取顾客收货地址、余额、会员等级)")
-    @GetMapping("/v1/getMembereMessage")
-    public ComResponse getMembereMessage(
+    @GetMapping("/v1/getMembereAddressAndLevelByMemberCards")
+    public ComResponse getMembereAddressAndLevelByMemberCards(
             @RequestParam("member_cards")
             @NotBlank(message = "member_cards不能为空")
             @ApiParam(name = "member_cards", value = "一批顾客卡号", required = true)
@@ -290,7 +290,7 @@ public class CustomerController {
 
         if (StringUtil.isNullOrEmpty(member_cards)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         List<String> memberCardList = Arrays.asList(member_cards.split(","));
-        List<MemberMessageDTO> list = memberService.findMembereMessage(memberCardList);
+        List<MemberMessageDTO> list = memberService.getMembereAddressAndLevelByMemberCards(memberCardList);
         return ComResponse.success(list);
     }
 }
