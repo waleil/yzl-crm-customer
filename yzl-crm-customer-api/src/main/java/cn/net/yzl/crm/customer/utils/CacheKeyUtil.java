@@ -17,4 +17,14 @@ public class CacheKeyUtil {
     public static String maxMemberCardCacheKey(){
         return new StringBuilder(serverName).append("-").append("maxMemberCard").toString();
     }
+
+    /**
+     * 生成圈选顾客缓存key
+     * wangzhe
+     * 2021-01-25
+     * @return
+     */
+    public static String groupRunCacheKey(String groupId){
+        return new StringBuilder("all{").append(serverName).append("groupRun").append("}:").append(groupId).toString();
+    }
 }

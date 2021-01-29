@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -7,16 +8,24 @@ import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
+import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
+import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
+import cn.net.yzl.crm.customer.utils.RedisUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author lichanghong
@@ -31,6 +40,16 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     private MemberCrowdGroupDao memberCrowdGroupDao;
     @Autowired
     private MemberLabelDao memberLabelDao;
+
+    @Autowired
+    private RedisUtil redisUtil;
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    private final static Integer SAVE_LINE = 10_000;
+
+    //缓存圈选群组id，顾客编号
+    private static Map<String, HashSet<String>> cacheMap = new ConcurrentHashMap<>();
     /**
      * @Author: lichanghong
      * @Description: 根据群组编号查询
@@ -141,11 +160,6 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return memberLabelDao.memberCrowdGroupTrial(memberCrowdGroup);
     }
 
-    @Override
-    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
-
-        return memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
-    }
 
     @Override
     public String queryGroupIdByMemberCard(String memberCard) {
@@ -158,7 +172,106 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     }
 
     @Override
-    public boolean deleteMongoGroupRefMemberByGroupId(String groupId) {
-        return memberLabelDao.deleteMongoGroupRefMemberByGroupId(groupId);
+    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
+        List<MemberLabel> labels = memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
+        return generateGroupRun(memberCrowdGroup.get_id(), labels);
     }
+
+    @Transactional (transactionManager = "mongoTransactionManager")
+    public Integer generateGroupRun(String groupId,List<MemberLabel> labels){
+        List<GroupRefMember> list = new ArrayList<>(labels.size());
+        String memberCard;
+        MemberLabel label;
+        //删除mongo里面的当前groupId对应的历史数据
+        boolean result = deleteMongoGroupRefMemberByGroupId(groupId);
+        if (!result) {
+            return 0;
+        }
+        //生成当前groupId对应的数据，并保存至mongo
+        for (int i = 0,lengh = labels.size(); i < lengh; i++) {
+            label = labels.get(i);
+            memberCard = label.getMemberCard();
+            //判读是否存在
+            if (getAndSetNxInGroupCache(groupId,memberCard)) {
+                continue;
+            }
+            GroupRefMember member = new GroupRefMember();
+            member.setGroupId(groupId);
+            member.setMemberCard(label.getMemberCard());
+            member.setMemberName(label.getMemberName());
+            list.add(member);
+            if (isSaveLine(i)) {
+                mongoTemplate.insertAll(list);
+                list.clear();
+            }
+        }
+        //保存小于10000条对象的集合
+        if (CollectionUtil.isNotEmpty(list)) {
+            mongoTemplate.insertAll(list);
+        }
+        //返回本次同步数据的条数
+        return labels.size();
+    }
+
+    /**
+     * 根据groupId删除数据
+     * wangzhe
+     * 2021-01-29
+     * @param groupId 圈选分组id
+     * @return
+     */
+    public boolean deleteMongoGroupRefMemberByGroupId(String groupId){
+        if (StringUtils.isEmpty(groupId)) {
+            return false;
+        }
+        //查询出符合条件的第一个结果，并将符合条件的数据删除
+        Query query = Query.query(Criteria.where("groupId").is(groupId));
+        /*DeleteResult remove = */mongoTemplate.remove(query, GroupRefMember.class);
+        //删除redis中的对应的缓存
+        String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
+        redisUtil.del(cacheKey);
+        return true;
+    }
+
+    /**
+     * 判读是否存在，不存在则设置
+     * wangzhe
+     * 2021-01-29
+     * @param groupId 群组id
+     * @param memberCard 会员卡号
+     * @return 当前是否存在缓存
+     */
+    private Boolean getAndSetNxInGroupCache(String groupId,String memberCard){
+        boolean isFind = false;
+        //是否包含群组id
+        if (cacheMap.containsKey(groupId)) {
+            //群组下是否包含该客户编号
+            if (cacheMap.get(groupId).contains(memberCard)) {
+                isFind = true;
+            }else{
+                //不存在则设置
+                cacheMap.get(groupId).add(memberCard);
+            }
+        }
+        //cacheMap中不存在，则去redis中去寻找
+        String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
+        if (redisUtil.sHasKey(cacheKey,memberCard)) {
+            isFind = true;
+        }
+        //不存在则设置
+        redisUtil.sSet(cacheKey, memberCard);
+        return isFind;
+    }
+
+    /**
+     * 判断是否需要保存一次
+     * wangzhe
+     * 2021-01-29
+     * @param index 当先的下标
+     * @return
+     */
+    private Boolean isSaveLine(Integer index){
+        return index > 0 && index % SAVE_LINE == 0;
+    }
+
 }
