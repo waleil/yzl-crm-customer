@@ -36,6 +36,8 @@ public class MemberLabel extends BaseObject {
     private Integer adverCode;
     @ApiModelProperty(value = "顾客级别  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
     private String mGradeCode;
+    @ApiModelProperty(value = "顾客级别编号，来自DMC")
+    private Integer mGradeId;
     @ApiModelProperty(value = "0未发卡1已发卡未激活2已激活")
     private int active;
     @ApiModelProperty(value = "会员状态1 正常 ，2 恶意3 拒访 4 无效 5 放弃")
@@ -230,4 +232,8 @@ public class MemberLabel extends BaseObject {
     private List<ActionDict> activityBehaviorList;
     //顾客关联的订单
     private List<MemberOrder> memberOrders;
+    //最后一次进线广告关联的商品编号
+    private List<String> advertProducts;
+    //最后一次进线时间
+    private Date lastCallTime;
 }
