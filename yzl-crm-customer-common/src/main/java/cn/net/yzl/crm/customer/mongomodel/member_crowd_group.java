@@ -191,4 +191,10 @@ public class member_crowd_group extends BaseObject {
 
     @ApiModelProperty("圈选病症")
     private List<crowd_disease> diseases;
+
+    @ApiModelProperty("广告关联的商品信息")
+    private List<crowd_product> advertProducts;
+
+    @ApiModelProperty("最后一次进线截止天数")
+    private Integer lastCallDays;
 }
