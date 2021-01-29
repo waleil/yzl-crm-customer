@@ -27,7 +27,8 @@ public class MemberOrderStat {
 
     @ApiModelProperty("最后一次购买商品")
     private String last_buy_product_code;
-
+    @ApiModelProperty("最后一次购买商品名称")
+    private String lastBuyProductNames;
     @ApiModelProperty("首单下单员工")
     private String first_order_staff_no;
 
@@ -36,7 +37,8 @@ public class MemberOrderStat {
 
     @ApiModelProperty("首次购买商品")
     private String first_buy_product_code;
-
+    @ApiModelProperty("首次购买商品名称")
+    private String firstBuyProductNames;
     @ApiModelProperty("首单金额")
     private int first_order_am;
 
