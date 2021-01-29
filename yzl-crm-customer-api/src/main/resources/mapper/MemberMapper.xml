@@ -59,7 +59,7 @@
         <result column="m_grade_name" property="mGradeName" />
     </resultMap>
 
-    <resultMap type="cn.net.yzl.crm.customer.dto.member.MemberMessageDTO" id="memberMap">
+    <resultMap type="cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO" id="memberMap">
         <id column="memberCard" property="memberCard" jdbcType="VARCHAR"/>
         <id column="memberName" property="memberName" jdbcType="VARCHAR"/>
         <id column="gradeId" property="gradeId" jdbcType="INTEGER"/>
@@ -71,7 +71,7 @@
         <collection property="reveiverAddresss" resultMap="BatchAddressListResultMap"/>
     </resultMap>
 
-    <resultMap type="cn.net.yzl.crm.customer.dto.address.ReveiverAddressMessageDTO" id="BatchAddressListResultMap">
+    <resultMap type="cn.net.yzl.crm.customer.dto.address.ReveiverAddressMsgDTO" id="BatchAddressListResultMap">
         <id column="addressee" property="addressee" jdbcType="VARCHAR"/>
         <id column="memberMobile" property="memberMobile" jdbcType="VARCHAR"/>
         <id column="memberProvinceNo" property="memberProvinceNo" jdbcType="INTEGER"/>

@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @ApiModel(value = "ReveiverAddressMessageDTO",description = "顾客收货地址实体")
-public class ReveiverAddressMessageDTO implements Serializable {
+public class ReveiverAddressMsgDTO implements Serializable {
 
     @ApiModelProperty(value = "收货人姓名",name = "addressee")
     private String addressee;

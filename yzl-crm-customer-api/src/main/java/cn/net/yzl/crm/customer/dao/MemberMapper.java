@@ -3,7 +3,7 @@ package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
-import cn.net.yzl.crm.customer.dto.member.MemberMessageDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
@@ -131,5 +131,5 @@ public interface MemberMapper {
 
     List<MemberDiseaseCustomerDto> getMemberDiseaseDtoByMemberCard(@Param("memberCard") String memberCard);
 
-    List<MemberMessageDTO> getMembereAddressAndLevelByMemberCards(@Param("list")  List<String> memberCards);
+    List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(@Param("list")  List<String> memberCards);
 }

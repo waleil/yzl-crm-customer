@@ -5,7 +5,7 @@ import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
-import cn.net.yzl.crm.customer.dto.member.MemberMessageDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
@@ -290,7 +290,7 @@ public class CustomerController {
 
         if (StringUtil.isNullOrEmpty(member_cards)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         List<String> memberCardList = Arrays.asList(member_cards.split(","));
-        List<MemberMessageDTO> list = memberService.getMembereAddressAndLevelByMemberCards(memberCardList);
+        List<MemberAddressAndLevelDTO> list = memberService.getMembereAddressAndLevelByMemberCards(memberCardList);
         return ComResponse.success(list);
     }
 }

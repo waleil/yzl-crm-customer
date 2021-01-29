@@ -8,13 +8,10 @@ import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
-import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
-import cn.net.yzl.crm.customer.dto.member.MemberMessageDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
-import cn.net.yzl.crm.customer.model.MemberGrad;
-import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -29,7 +26,6 @@ import cn.net.yzl.crm.customer.model.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -314,7 +310,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<MemberMessageDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList) {
+    public List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList) {
         return memberMapper.getMembereAddressAndLevelByMemberCards(memberCardList);
     }
 
