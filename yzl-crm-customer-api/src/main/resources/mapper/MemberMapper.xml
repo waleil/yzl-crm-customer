@@ -800,7 +800,8 @@
     <select id="getMemberProductEffectList" parameterType="String"
             resultType="cn.net.yzl.crm.customer.model.MemberProductEffect">
         select  member_card,order_no,product_code,eating_time eating_perday,product_last_num,
-                due_date,taking_state,taking_effect,product_count,product_code,product_name
+                due_date,taking_state,taking_effect,product_count,product_code,product_name,
+                IF( to_days( due_date ) - to_days( now())> 0, to_days( due_date ) - to_days( now()), 0 )
          from   member_product_effect
          where  member_card=#{member_card}
                 /*and due_date  <![CDATA[ > ]]> now()*/
