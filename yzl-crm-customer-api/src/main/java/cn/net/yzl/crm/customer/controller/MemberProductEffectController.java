@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/memberProductEffect")
-@Api(value = "顾客手机号", tags = {"顾客手机号服务"})
+@Api(value = "顾客商品服用效果", tags = {"顾客商品服用效果"})
 @Validated
 public class MemberProductEffectController {
 
