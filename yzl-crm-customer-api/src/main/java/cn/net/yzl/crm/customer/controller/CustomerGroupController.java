@@ -118,7 +118,7 @@ public class CustomerGroupController {
     @ApiOperation("圈选")
     @PostMapping("/v1/groupRun")
     public ComResponse<Integer> memberCrowdGroupRun(@RequestBody member_crowd_group memberCrowdGroup){
-        if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupRun(memberCrowdGroup);
         return ComResponse.success(count);
     }
