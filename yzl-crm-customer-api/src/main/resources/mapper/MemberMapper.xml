@@ -1217,6 +1217,7 @@
       m.adver_code as adverCode,
       m.adver_name as adverName,
      m.m_grade_code as mGradeCode,
+     m.m_grade_id as mGradeId,
      m.member_type as memberType,
      m.is_active as active,
     m.member_status as memberStatus,
