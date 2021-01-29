@@ -23,4 +23,7 @@ public class GroupRefMember extends BaseObject {
     private String memberCard;
     @ApiModelProperty(name = "memberName",value = "顾客名称")
     private String memberName;
+
+    @ApiModelProperty(name = "version",value = "版本号")
+    private int version;
 }
