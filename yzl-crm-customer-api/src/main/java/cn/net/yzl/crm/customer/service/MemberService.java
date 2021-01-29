@@ -138,7 +138,7 @@ public interface MemberService {
     void updateMemberToMongo(member_wide member) throws Exception;
 
     // 添加顾客咨询商品
-    ComResponse<String> addProductConsultation(ProductConsultationInsertVO productConsultationInsertVO);
+    ComResponse<String> addProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList);
 
     List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList);
 }

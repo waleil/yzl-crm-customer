@@ -297,15 +297,18 @@ public class MemberServiceImpl implements MemberService {
     private ProductConsultationMapper productConsultationMapper;
 
     @Override
-    public ComResponse<String> addProductConsultation(ProductConsultationInsertVO productConsultationInsertVO) {
+    @Transactional
+    public ComResponse<String> addProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList) {
+        for (ProductConsultationInsertVO productConsultationInsertVO : productConsultationInsertVOList) {
 
-        cn.net.yzl.crm.customer.model.db.ProductConsultation productConsultation = new cn.net.yzl.crm.customer.model.db.ProductConsultation();
-        BeanUtil.copyProperties(productConsultationInsertVO,productConsultation);
+            cn.net.yzl.crm.customer.model.db.ProductConsultation productConsultation = new cn.net.yzl.crm.customer.model.db.ProductConsultation();
+            BeanUtil.copyProperties(productConsultationInsertVO,productConsultation);
 
-       int num =  productConsultationMapper.insertSelective(productConsultation);
-       if(num<0) {
-           throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
-       }
+            int num =  productConsultationMapper.insertSelective(productConsultation);
+            if(num<0) {
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
+            }
+        }
         return ComResponse.success();
     }
 

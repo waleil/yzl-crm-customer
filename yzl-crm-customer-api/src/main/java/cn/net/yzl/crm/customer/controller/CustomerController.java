@@ -167,8 +167,8 @@ public class CustomerController {
 
     @ApiOperation("顾客画像-添加顾客咨询商品")
     @PostMapping("v1/addProductConsultation")
-    public ComResponse<String> addProductConsultation(@RequestBody @Validated ProductConsultationInsertVO productConsultationInsertVO) {
-        return memberService.addProductConsultation(productConsultationInsertVO);
+    public ComResponse<String> addProductConsultation(@RequestBody @Validated List<ProductConsultationInsertVO> productConsultationInsertVOList) {
+        return memberService.addProductConsultation(productConsultationInsertVOList);
     }
 
     @ApiOperation("顾客画像-获取顾客病症")
