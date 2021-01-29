@@ -5,11 +5,13 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.AssemblerResultUtil;
+import cn.net.yzl.crm.customer.dao.MemberGradeRecordDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberGradeRecordDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
@@ -315,6 +317,19 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList) {
         return memberMapper.getMembereAddressAndLevelByMemberCards(memberCardList);
+    }
+
+    @Autowired
+    private MemberGradeRecordDao memberGradeRecordDao;
+    @Override
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(String memberCard) {
+
+        List<MemberGradeRecordDto> list =  memberGradeRecordDao.getMemberGradeRecordList(memberCard);
+
+        if(list==null || list.size()<1){
+            return ComResponse.nodata();
+        }
+        return ComResponse.success(list);
     }
 
 

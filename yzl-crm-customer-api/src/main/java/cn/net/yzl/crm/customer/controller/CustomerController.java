@@ -6,6 +6,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberGradeRecordDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
@@ -293,4 +294,15 @@ public class CustomerController {
         List<MemberAddressAndLevelDTO> list = memberService.getMembereAddressAndLevelByMemberCards(memberCardList);
         return ComResponse.success(list);
     }
+
+    @ApiOperation("获取会员级别记录")
+    @GetMapping("v1/getMemberGradeRecordList")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query")
+    })
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(@NotBlank String memberCard) {
+        return  memberService.getMemberGradeRecordList(memberCard);
+
+    }
+
 }
