@@ -690,6 +690,8 @@
         m.id,
         m.member_card ,
         m.member_name ,
+        m.adver_code,
+        m.adver_name,
         m.sex ,
         m.media_name ,
         m.media_type_name ,
