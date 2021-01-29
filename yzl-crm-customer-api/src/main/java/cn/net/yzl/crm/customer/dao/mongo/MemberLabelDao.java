@@ -241,7 +241,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 List<crowd_area> in = temps.get(1);
                 if (!CollectionUtils.isEmpty(in)) {
                     int size = in.size();
-                    Criteria[] andArray = new Criteria[size];
+                  //  Criteria[] andArray = new Criteria[size];
                     for (int i = 0; i < size; i++) {
                         crowd_area c = in.get(i);
                         and.add(Criteria.where("cityCode").is(c.getId()));
@@ -252,7 +252,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 List<crowd_area> ex = temps.get(0);
                 if (!CollectionUtils.isEmpty(ex)) {
                     int size = ex.size();
-                    Criteria[] exArray = new Criteria[size];
+                  //  Criteria[] exArray = new Criteria[size];
                     for (int i = 0; i < size; i++) {
                         crowd_area c = ex.get(i);
                         not.add(Criteria.where("cityCode").is(c.getId()));
@@ -272,17 +272,17 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = in.get(i);
-                    and.add(Criteria.where("mGradeCode").is(c.getId()));
+                    and.add(Criteria.where("mGradeId").is(c.getId()));
                 }
                 //criteria.andOperator(andArray);
             }
 
             if (!CollectionUtils.isEmpty(ex)) {
                 int size = ex.size();
-                Criteria[] exArray = new Criteria[size];
+             //   Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("mGradeCode").is(c.getId()));
+                    not.add(Criteria.where("mGradeId").is(c.getId()));
                 }
             }
         }
@@ -319,7 +319,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "首单下单时间不能大于10000");
             }
             Date date = getPastDate(days);
-            and.add(Criteria.where("firstOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+            and.add(Criteria.where("firstOrderTime").gte(MongoDateHelper.getMongoDate(date)));
         }
         //首次订单金额>=
         if (memberCrowdGroup.getFirst_order_am() != null) {
@@ -333,7 +333,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
             }
             Date date = getPastDate(days);
-            and.add(Criteria.where("lastOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+            and.add(Criteria.where("lastOrderTime").gte(MongoDateHelper.getMongoDate(date)));
         }
         //生日月份
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getMember_month())) {
@@ -420,7 +420,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次签收时间不能大于10000");
             }
             Date date = getPastDate(days);
-            and.add(Criteria.where("lastSignTime").lt(MongoDateHelper.getMongoDate(date)));
+            and.add(Criteria.where("lastSignTime").gte(MongoDateHelper.getMongoDate(date)));
         }
         //方便接电话时间
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getPhone_time())) {
@@ -433,7 +433,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = in.get(i);
-                    and.add(Criteria.where("phoneDictList").elemMatch(Criteria.where("id").is(c.getId())));
+                    and.add(Criteria.where("phoneDictList").elemMatch(Criteria.where("_id").is(c.getId())));
 
                 }
                // criteria.andOperator(andArray);
@@ -444,7 +444,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = ex.get(i);
-                    not.add(Criteria.where("phoneDictList").elemMatch(Criteria.where("id").is(c.getId())));
+                    not.add(Criteria.where("phoneDictList").elemMatch(Criteria.where("_id").is(c.getId())));
                 }
                // criteria.norOperator(exArray);
             }
@@ -576,7 +576,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
 
             if (!CollectionUtils.isEmpty(ex)) {
                 int size = ex.size();
-                Criteria[] exArray = new Criteria[size];
+             //   Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = ex.get(i);
                     not.add(Criteria.where("activityBehaviorList").elemMatch(Criteria.where("id").is(c.getId())));
@@ -772,7 +772,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
             }
             if (!CollectionUtils.isEmpty(ex)) {
                 int size = ex.size();
-                Criteria[] exArray = new Criteria[size];
+              //  Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_product c = ex.get(i);
                     not.add(Criteria.where("memberProductList").elemMatch(Criteria.where("productCode").is(c.getId())));
@@ -898,7 +898,41 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 }
             }
         }
+        //最后一次进线时间
+        if(memberCrowdGroup.getLastCallDays()!=null){
+            int days = memberCrowdGroup.getLastCallDays();
+            if (days > 10000) {
+                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
+            }
+            Date date = getPastDate(days);
+            and.add(Criteria.where("lastCallTime").gte(MongoDateHelper.getMongoDate(date)));
+        }
+        //购买的商品
+        if (!CollectionUtils.isEmpty(memberCrowdGroup.getAdvertProducts())) {
+            List<crowd_product> advertProducts = memberCrowdGroup.getAdvertProducts();
+            Map<Integer, List<crowd_product>> temps = advertProducts.stream().collect(Collectors.groupingBy(crowd_product::getInclude));
+            List<crowd_product> in = temps.get(1);
+            List<crowd_product> ex = temps.get(0);
+            if (!CollectionUtils.isEmpty(in)) {
+                int size = in.size();
+                for (int i = 0; i < size; i++) {
+                    crowd_product c = in.get(i);
+                    Criteria criteria = new Criteria();
+                    and.add(criteria.elemMatch(Criteria.where("productCode").is(c.getId())));
 
+                }
+//                criteria.andOperator(andArray);
+            }
+            if (!CollectionUtils.isEmpty(ex)) {
+                int size = ex.size();
+                for (int i = 0; i < size; i++) {
+                    crowd_product c = ex.get(i);
+                    Criteria criteria = new Criteria();
+                    not.add(criteria.elemMatch(Criteria.where("productCode").is(c.getId())));
+                }
+                // criteria.norOperator(exArray);
+            }
+        }
         Criteria criteria1 = new Criteria();
         if(and.size()>0){
             int andSize = and.size();
