@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.yzl.crm.customer.collector.dao.YixiangcustomerDao">
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.collector.model.Yixiangcustomer">
+    <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
+    <result column="product_sno" jdbcType="VARCHAR" property="productCode" />
+    <result column="dCreateTime" jdbcType="TIMESTAMP" property="lastCallTime" />
+
+  </resultMap>
+  <sql id="Base_Column_List">
+    id,member_card, product_sno, dCreateTime
+  </sql>
+
+  <select id="queryAllByPage" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from yixiangcustomer
+    where id > #{id} order by id limit #{pageSize}
+  </select>
+
+  <select id="queryByMemberCard" resultMap="BaseResultMap" parameterType="list">
+    select
+    <include refid="Base_Column_List"/>
+    from yixiangcustomer
+    where member_card in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+</mapper>

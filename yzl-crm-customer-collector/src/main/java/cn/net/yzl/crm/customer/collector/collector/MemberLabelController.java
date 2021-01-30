@@ -1,0 +1,31 @@
+package cn.net.yzl.crm.customer.collector.collector;
+
+import cn.net.yzl.crm.customer.collector.service.MemberLabelService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @author lichanghong
+ * @version 1.0
+ * @title: MemberLabelController
+ * @description todo
+ * @date: 2021/1/30 12:26 上午
+ */
+@RestController
+public class MemberLabelController {
+    @Autowired
+    private MemberLabelService memberLabelService;
+    @ApiOperation("同步")
+    @GetMapping("/member/syncMember")
+    public boolean syncMember(long timestamp){
+    return memberLabelService.syncMember(timestamp);
+    }
+    @ApiOperation("同步")
+    @GetMapping("/member/syncById")
+    public boolean syncById(@RequestParam(defaultValue = "0") int id){
+        return memberLabelService.syncById(id);
+    }
+}

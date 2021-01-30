@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.yzl.crm.customer.collector.dao.OrderMDao">
+  <sql id="Base_Column_List">
+    id, order_no, depart_id, work_order_no, work_batch_no, media_type, media_no, media_name, 
+    media_channel, activity_no, activity_name, advisor_no, advisor_name, order_nature, 
+    order_status, logistics_status, first_order_flag, total, total_all, pfee, pfee_flag, 
+    cash, cash1, spend, amount_stored, amount_red_envelope, amount_coupon, points_deduction, 
+    return_amount_red_envelope, return_amount_coupon, return_points_deduction, member_name, 
+    member_telphone_no, member_card_no, invoice_flag, pay_type, pay_mode, pay_status, 
+    distrubution_mode, wanging_flag, express_company_flag, express_company_code, express_company_name, 
+    express_number, relation_order, reveiver_address_no, reveiver_province, reveiver_province_name, 
+    reveiver_city, reveiver_city_name, reveiver_area, reveiver_area_name, reveiver_name, 
+    reveiver_telphone_no, reveiver_address, remark, create_time, staff_code, staff_name, 
+    update_time, update_code, update_name, shipping_time, estimate_arrival_time, sign_time, 
+    member_level_befor, member_type_befor, member_level_after, member_type_after, financial_owner, 
+    financial_owner_name, relation_reissue_order_no, logistics_claims, relation_reissue_order_total, 
+    is_history, order_after_integral, order_after_rebate, order_after_red, order_after_spare
+  </sql>
+
+  <select id="queryOrderByMemberCard" parameterType="list" resultType="cn.net.yzl.crm.customer.collector.model.mogo.MemberOrder">
+    select
+           media_channel as source,
+           activity_no as activityCode,
+           pay_type payType,
+           pay_mode as payMode,
+           pay_status payStatus,
+           order_no as orderCode,
+           member_card_no as memberCard,
+           express_company_code as companyCode,
+           order_status as `status`,
+           logistics_status as logisticsStatus
+        from order_m where
+        member_card_no in
+         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+  </foreach>
+  </select>
+
+</mapper>
