@@ -368,7 +368,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_media c = in.get(i);
-                    and.add(Criteria.where("mediaTypeCode").is(c.getMedia_id()));
+                    and.add(Criteria.where("mediaId").is(c.getMedia_id()));
                 }
                 //criteria.andOperator(andArray);
             }
@@ -378,7 +378,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 //Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_media c = ex.get(i);
-                    not.add(Criteria.where("mediaTypeCode").is(c.getMedia_id()));
+                    not.add(Criteria.where("mediaId").is(c.getMedia_id()));
                 }
                // criteria.norOperator(exArray);
             }
