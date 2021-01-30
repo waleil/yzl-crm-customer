@@ -24,7 +24,7 @@ public class CacheKeyUtil {
      * 2021-01-25
      * @return
      */
-    public static String groupRunCacheKey(String groupId){
-        return new StringBuilder("all{").append(serverName).append("groupRun").append("}:").append(groupId).toString();
+    public static String groupRunCacheKey(String suffix){
+        return new StringBuilder("all{").append(serverName).append("groupRun").append("}:").append(suffix).toString();
     }
 }

@@ -17,6 +17,7 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.CacheUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
+import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -26,6 +27,7 @@ import sun.misc.Version;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lichanghong
@@ -179,19 +181,23 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         List<GroupRefMember> list = new ArrayList<>(labels.size());
         String memberCard;
         MemberLabel label;
+        //生成版本号
+        Long time = System.currentTimeMillis();
+        String version = time.toString();
 
         //生成当前groupId对应的数据，并保存至mongo
         for (int i = 0,lengh = labels.size(); i < lengh; i++) {
             label = labels.get(i);
             memberCard = label.getMemberCard();
             //判读是否存在
-            if (getAndSetNxInGroupCache(groupId,memberCard)) {
+            if (getAndSetNxInGroupCache(memberCard)) {
                 continue;
             }
             GroupRefMember member = new GroupRefMember();
             member.setGroupId(groupId);
             member.setMemberCard(label.getMemberCard());
             member.setMemberName(label.getMemberName());
+            member.setVersion(version);
             list.add(member);
             if (isSaveLine(i)) {
                 memberLabelDao.insertAll(list);
@@ -203,8 +209,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             memberLabelDao.insertAll(list);
             list.clear();
         }
+
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
-        boolean result = deleteMongoGroupRefMemberByGroupId(groupId,1);
+        deleteMongoGroupRefMemberByGroupId(groupId,version);
 
         //返回本次同步数据的条数
         return labels.size();
@@ -218,13 +225,16 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @param version 版本号
      * @return
      */
-    public boolean deleteMongoGroupRefMemberByGroupId(String groupId,Integer version){
+    public boolean deleteMongoGroupRefMemberByGroupId(String groupId,String version){
         if (StringUtils.isEmpty(groupId)) {
             return false;
         }
         //查询出符合条件的第一个结果，并将符合条件的数据删除
-        Query query = Query.query(Criteria.where("groupId").is(groupId));
-        /*DeleteResult remove = */memberLabelDao.remove(query, GroupRefMember.class);
+        Criteria criatira = new Criteria();
+        criatira.norOperator(Criteria.where("version").is(version));
+
+        Query query = Query.query(Criteria.where("groupId").is(groupId)).addCriteria(criatira);
+        DeleteResult remove = memberLabelDao.remove(query, GroupRefMember.class);
         return true;
     }
 
@@ -232,12 +242,11 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * 判读是否存在，不存在则设置
      * wangzhe
      * 2021-01-29
-     * @param groupId 群组id
      * @param memberCard 会员卡号
      * @return 当前是否存在缓存
      */
-    private Boolean getAndSetNxInGroupCache(String groupId,String memberCard){
-        String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
+    private Boolean getAndSetNxInGroupCache(String memberCard){
+        String cacheKey = CacheKeyUtil.groupRunCacheKey("");
         String newKey = cacheKey + ":" + memberCard;
         //如果包含则直接使用
         if (CacheUtil.contain(newKey)) {
