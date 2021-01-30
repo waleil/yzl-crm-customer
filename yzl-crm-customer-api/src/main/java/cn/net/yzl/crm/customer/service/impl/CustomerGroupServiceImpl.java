@@ -18,16 +18,15 @@ import cn.net.yzl.crm.customer.utils.CacheUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import com.mongodb.client.result.DeleteResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import sun.misc.Version;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author lichanghong
@@ -37,6 +36,7 @@ import java.util.concurrent.TimeUnit;
  * @date: 2021/1/22 1:58 下午
  */
 @Service
+@Slf4j
 public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Autowired
     private MemberCrowdGroupDao memberCrowdGroupDao;
@@ -175,21 +175,24 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
     @Override
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
+        Long version = System.currentTimeMillis();
         List<MemberLabel> labels = memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
         String groupId = memberCrowdGroup.get_id();
+        int length = labels.size();
+        log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},版本号为:{}",groupId,length,version);
 
         List<GroupRefMember> list = new ArrayList<>(labels.size());
         String memberCard;
         MemberLabel label;
         //生成版本号
-        Long version = System.currentTimeMillis();
-
+        Long repeatFilterCount = 0L;
         //生成当前groupId对应的数据，并保存至mongo
-        for (int i = 0,lengh = labels.size(); i < lengh; i++) {
+        for (int i = 0; i < length; i++) {
             label = labels.get(i);
             memberCard = label.getMemberCard();
             //判读是否存在
             if (getAndSetNxInGroupCache(memberCard)) {
+                repeatFilterCount++;
                 continue;
             }
             GroupRefMember member = new GroupRefMember();
@@ -200,14 +203,17 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             list.add(member);
             if (isSaveLine(i)) {
                 memberLabelDao.insertAll(list);
+                log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},本次保存{}条记录,版本号为:{}",groupId,length,list.size(),version);
                 list.clear();
             }
         }
         //保存小于10000条对象的集合
         if (CollectionUtil.isNotEmpty(list)) {
             memberLabelDao.insertAll(list);
+            log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},本次保存:{}条记录,版本号为:{}",groupId,length,list.size(),version);
             list.clear();
         }
+        log.info("memberCrowdGroupRun-filter:groupId:{},一共圈选出{},因重复圈选过滤:{}条记录,版本号为:{}",groupId,repeatFilterCount,version);
 
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
         deleteMongoGroupRefMemberByGroupId(groupId,version);
@@ -232,6 +238,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         Query query = Query.query(Criteria.where("groupId").is(groupId))
                 .addCriteria(Criteria.where("version").lt(version));
         DeleteResult remove = memberLabelDao.remove(query, GroupRefMember.class);
+        log.info("memberCrowdGroupRun-delete:groupId:{},本次操作的版本号为{},本次删除的记录数为:{}",groupId,version,remove.getDeletedCount());
         return true;
     }
 
