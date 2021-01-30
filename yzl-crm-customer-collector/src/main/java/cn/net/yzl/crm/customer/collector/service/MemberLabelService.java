@@ -169,6 +169,7 @@ public class MemberLabelService {
                     List<MemberOrder> mros = memberRefOrderMap.get(memberCard);
                     if(!CollectionUtils.isEmpty(mros)){
                         for(MemberOrder memberOrder:mros){
+                            //todo 要从DMC获取活动类型
                             if(memberOrder.getActivityCode()!=null){
                                 memberOrder.setActivityFlag(true);
                             }else{
@@ -353,6 +354,7 @@ public class MemberLabelService {
                         List<MemberOrder> mros = memberRefOrderMap.get(memberCard);
                         if(!CollectionUtils.isEmpty(mros)){
                             for(MemberOrder memberOrder:mros){
+                                //todo 要从DMC获取活动类型
                                 if(memberOrder.getActivityCode()!=null){
                                     memberOrder.setActivityFlag(true);
                                 }else{

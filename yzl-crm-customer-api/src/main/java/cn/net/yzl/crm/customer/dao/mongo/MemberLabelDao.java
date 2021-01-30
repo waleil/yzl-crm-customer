@@ -456,7 +456,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = in.get(i);
-                    and.add(Criteria.where("memberCharacterList").elemMatch(Criteria.where("id").is(c.getId())));
+                    and.add(Criteria.where("memberCharacterList").elemMatch(Criteria.where("_id").is(c.getId())));
 
                 }
                // criteria.andOperator(andArray);
@@ -467,7 +467,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = ex.get(i);
-                    not.add(Criteria.where("memberCharacterList").elemMatch(Criteria.where("id").is(c.getId())));
+                    not.add(Criteria.where("memberCharacterList").elemMatch(Criteria.where("_id").is(c.getId())));
                 }
                // criteria.norOperator(exArray);
             }
@@ -483,7 +483,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
               //  Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = in.get(i);
-                    and.add(Criteria.where("memberResponseTimeList").elemMatch(Criteria.where("id").is(c.getId())));
+                    and.add(Criteria.where("memberResponseTimeList").elemMatch(Criteria.where("_id").is(c.getId())));
 
                 }
                // criteria.andOperator(andArray);
@@ -494,7 +494,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
               //  Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = ex.get(i);
-                    not.add(Criteria.where("memberResponseTimeList").elemMatch(Criteria.where("id").is(c.getId())));
+                    not.add(Criteria.where("memberResponseTimeList").elemMatch(Criteria.where("_id").is(c.getId())));
                 }
                // criteria.norOperator(exArray);
             }
@@ -510,7 +510,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = in.get(i);
-                    and.add(Criteria.where("orderBehaviorList").elemMatch(Criteria.where("id").is(c.getId())));
+                    and.add(Criteria.where("orderBehaviorList").elemMatch(Criteria.where("_id").is(c.getId())));
 
                 }
                // criteria.andOperator(andArray);
@@ -521,7 +521,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = ex.get(i);
-                    not.add(Criteria.where("orderBehaviorList").elemMatch(Criteria.where("id").is(c.getId())));
+                    not.add(Criteria.where("orderBehaviorList").elemMatch(Criteria.where("_id").is(c.getId())));
                 }
                // criteria.norOperator(exArray);
             }
@@ -537,7 +537,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = in.get(i);
-                    and.add(Criteria.where("comprehensiveBehaviorList").elemMatch(Criteria.where("id").is(c.getId())));
+                    and.add(Criteria.where("comprehensiveBehaviorList").elemMatch(Criteria.where("_id").is(c.getId())));
 
                 }
                // criteria.andOperator(andArray);
@@ -548,7 +548,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
               //  Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = ex.get(i);
-                    not.add(Criteria.where("comprehensiveBehaviorList").elemMatch(Criteria.where("id").is(c.getId())));
+                    not.add(Criteria.where("comprehensiveBehaviorList").elemMatch(Criteria.where("_id").is(c.getId())));
                 }
                // criteria.norOperator(exArray);
             }
@@ -564,7 +564,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = in.get(i);
-                    and.add(Criteria.where("activityBehaviorList").elemMatch(Criteria.where("id").is(c.getId())));
+                    and.add(Criteria.where("activityBehaviorList").elemMatch(Criteria.where("_id").is(c.getId())));
 
                 }
                 //criteria.andOperator(andArray);
@@ -575,7 +575,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
              //   Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_action c = ex.get(i);
-                    not.add(Criteria.where("activityBehaviorList").elemMatch(Criteria.where("id").is(c.getId())));
+                    not.add(Criteria.where("activityBehaviorList").elemMatch(Criteria.where("_id").is(c.getId())));
                 }
               //  criteria.norOperator(exArray);
             }
