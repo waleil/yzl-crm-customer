@@ -1,16 +1,25 @@
 package cn.net.yzl.crm.customer.dao.mongo;
 
+import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
+import cn.net.yzl.crm.customer.utils.mongo.PageUtil;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -26,6 +35,7 @@ import java.util.stream.Collectors;
  * @date: 2021/1/25 5:36 下午
  */
 @Component
+@Slf4j
 public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
     private static String COLLECTION_NAME = "member_label";
     private static String group_ref_member= "group_ref_member";
@@ -44,17 +54,56 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Date: 2021/1/26 11:42 上午
      * @Return
      */
-    public List<MemberLabel> memberCrowdGroupRun(member_crowd_group memberCrowdGroup){
+/*    public List<MemberLabel> memberCrowdGroupRun(member_crowd_group memberCrowdGroup){
         Query query = initQuery(memberCrowdGroup);
         query.fields().include("memberCard").include("memberName").exclude("_id");
         return mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
+    }*/
+
+    public Page<MemberLabel> memberCrowdGroupRunUsePage(Integer pageNo ,Integer pageSize,Query query) {
+        Long totalCount = mongoTemplate.count(query, MemberLabel.class);
+        List<MemberLabel> memberLabels = null;
+        if (pageNo > 0 && pageSize > 0) {
+            query.skip(getStartIndex(pageNo,pageSize));
+            query.limit(pageSize);
+        }
+        if (totalCount > 0) {
+            query.with(Sort.by(Sort.Order.asc("_id")));
+            query.fields().include("memberCard").include("memberName").exclude("_id");
+            memberLabels = mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
+        }
+        query.skip(0);
+        query.limit(0);
+
+        return PageUtil.resultAssembler(memberLabels, pageNo, pageSize, totalCount.intValue());
     }
-    public <T> void insertAll(Collection<? extends T> objectsToSave) {
-        mongoTemplate.insertAll(objectsToSave);
+
+    /**
+     * 分页开始位置
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    private Integer getStartIndex(int pageNo ,int pageSize) {
+        pageNo=pageNo < 1 ? 1 : pageNo;
+        Integer startIndex=(pageNo - 1) * pageSize;
+        return startIndex == null ? 0 : startIndex;
+    }
+
+
+
+    public <T> Boolean insertAll(List<GroupRefMember> list,String collectionName) {
+        BulkOperations bulkOperations= mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,GroupRefMember.class,collectionName);
+        bulkOperations.insert(list).execute();
+        return true;
     }
 
     public DeleteResult remove(Query query, Class<?> entityClass) {
         return mongoTemplate.remove(query, GroupRefMember.class);
+    }
+
+    public UpdateResult updateFirst(Query query, UpdateDefinition update, Class<?> entityClass) {
+        return mongoTemplate.updateFirst(query, update,entityClass);
     }
     /**
      * @Author: lichanghong
@@ -108,7 +157,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Date: 2021/1/27 10:06 上午
      * @Return: org.springframework.data.mongodb.core.query.Query
      */
-    private static Query initQuery(member_crowd_group memberCrowdGroup) {
+    public static Query initQuery(member_crowd_group memberCrowdGroup) {
         Query query = new Query();
         //and查询
         List<Criteria> and = new ArrayList<>();

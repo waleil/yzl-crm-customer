@@ -1,8 +1,10 @@
 package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.entity.PageParam;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
@@ -23,10 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * @author lichanghong
@@ -46,9 +49,13 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Autowired
     private RedisUtil redisUtil;
 
-    private final static Integer SAVE_LINE = 10_000;
+    private final static Integer SAVE_LINE = 15_000;
 
-    private final static Integer REDIS_GROUP_RUN_CACHE_TIME = 60 * 60 * 5;
+    //5小时
+    private final static Integer REDIS_GROUP_RUN_CACHE_TIME = 5 * 60 * 60;
+
+    private final static String COLLECTION_NAME_MEMBER_LABEL = "member_label";
+    private final static String COLLECTION_NAME_GROUP_REF_MEMBER= "group_ref_member";
 
     //缓存圈选群组id，顾客编号
     private static Map<String, HashSet<String>> cacheMap = new ConcurrentHashMap<>();
@@ -173,19 +180,66 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return memberLabelDao.queryMembersByGroupId(groupId);
     }
 
+    /**
+     * 匹配全选规则，生成新的数据
+     * @param memberCrowdGroup
+     * @return
+     */
     @Override
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
-        Long version = System.currentTimeMillis();
-        List<MemberLabel> labels = memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
+        //生成数据的版本号
+        Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMddHHmmss"));
         String groupId = memberCrowdGroup.get_id();
-        int length = labels.size();
-        log.info("memberCrowdGroupRun-query:groupId:{},一共圈选出{},版本号为:{}",groupId,length,version);
+        Integer pageNo = 1;
+        Integer pageSize = SAVE_LINE;
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        List<MemberLabel> labels = null;
+        Page<MemberLabel> memberLabelPage;
+        //获取记录的总条数
+        boolean hasNext = true;
+        int matchCount = 0;
+        while (hasNext) {
+            //分页查询
+            memberLabelPage = memberLabelDao.memberCrowdGroupRunUsePage(pageNo, pageSize, query);
+            labels = memberLabelPage.getItems();
+            PageParam pageParam = memberLabelPage.getPageParam();
+            log.info("memberCrowdGroupRun-page query:groupId:{},本次分页,pageNo:{},圈选出{}条记录,版本号为:{}",groupId,pageParam.getPageNo(),labels.size(),version);
+            //处理数据
+            matchCount += doMemberCrowdGroupRun(groupId, labels,version);
+            labels.clear();
+            //判断是否有下一页
+            if (pageParam.getNextPage() == 0) {
+                hasNext = false;
+            }
+            pageNo = pageParam.getNextPage();
+        }
 
+        //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
+        deleteMongoGroupRefMemberByGroupId(groupId,version);
+        //设置本次匹配到圈选规则的条数
+        Query updateCondition = new Query();
+        updateCondition.addCriteria(Criteria.where("_id").is(groupId));
+        Update update = new Update();
+        update.set("person_count",matchCount);
+        memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
+        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新",groupId,matchCount,version);
+        return matchCount;
+    }
+
+    /**
+     * wangzhe
+     * 2021-01-30
+     * @param groupId
+     * @param labels
+     * @return
+     */
+    public int doMemberCrowdGroupRun(String groupId,List<MemberLabel> labels,Long version) {
+        int length = labels.size();
         List<GroupRefMember> list = new ArrayList<>(labels.size());
         String memberCard;
         MemberLabel label;
-        //生成版本号
-        Long repeatFilterCount = 0L;
+        //重复的数量
+        int repeatFilterCount = 0;
         //生成当前groupId对应的数据，并保存至mongo
         for (int i = 0; i < length; i++) {
             label = labels.get(i);
@@ -201,26 +255,23 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             member.setMemberName(label.getMemberName());
             member.setVersion(version);
             list.add(member);
-            if (isSaveLine(i)) {
-                memberLabelDao.insertAll(list);
-                log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},本次保存{}条记录,因重复圈选当前过滤:{}条记录,版本号为:{}",groupId,length,list.size(),repeatFilterCount,version);
+            /*if (isSaveLine(i)) {
+                memberLabelDao.insertAll(list,COLLECTION_NAME_MEMBER_LABEL);
+                log.info("memberCrowdGroupRun-save:groupId:{},本次保存{}条记录,因重复圈选当前过滤:{}条记录,版本号为:{}",groupId,length,list.size(),repeatFilterCount,version);
                 list.clear();
-            }
+            }*/
         }
-        //保存小于10000条对象的集合
+        //保存集合
         if (CollectionUtil.isNotEmpty(list)) {
-            memberLabelDao.insertAll(list);
-            log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},本次保存:{}条记录,版本号为:{}",groupId,length,list.size(),version);
+            memberLabelDao.insertAll(list,COLLECTION_NAME_GROUP_REF_MEMBER);
+            log.info("memberCrowdGroupRun-save:groupId:{},本次保存:{}条记录,版本号为:{}",groupId,list.size(),version);
             list.clear();
         }
-        log.info("memberCrowdGroupRun-filter:groupId:{},一共圈选出{},总共保存了:{}条记录,因重复圈选总过滤:{}条记录,版本号为:{}",groupId,length,(length - repeatFilterCount),repeatFilterCount,version);
-
-        //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
-        if (repeatFilterCount != length)
-            deleteMongoGroupRefMemberByGroupId(groupId,version);
+        int matchCount = length - repeatFilterCount;
+        log.info("memberCrowdGroupRun-page deal end:groupId:{},本次圈选出{}条记录,总共保存了:{}条记录,因重复圈选总过滤:{}条记录,版本号为:{}",groupId,length,matchCount,repeatFilterCount,version);
 
         //返回本次同步数据的条数
-        return labels.size();
+        return matchCount;
     }
 
     /**
@@ -252,7 +303,6 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     private Boolean getAndSetNxInGroupCache(String memberCard){
         String cacheKey = CacheKeyUtil.groupRunCacheKey("");
-        //String newKey = cacheKey + ":" + memberCard;
         //如果包含则直接使用
         if (CacheUtil.contain(memberCard)) {
             return true;

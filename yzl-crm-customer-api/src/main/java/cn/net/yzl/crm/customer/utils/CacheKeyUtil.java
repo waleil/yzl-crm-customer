@@ -25,6 +25,6 @@ public class CacheKeyUtil {
      * @return
      */
     public static String groupRunCacheKey(String suffix){
-        return new StringBuilder("all{").append(serverName).append("groupRun").append("}:").append(suffix).toString();
+        return new StringBuilder("all{").append(serverName).append("memberGroupRun").append("}").append(suffix).toString();
     }
 }
