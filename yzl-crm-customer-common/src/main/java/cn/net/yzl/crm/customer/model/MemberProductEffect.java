@@ -33,7 +33,7 @@ public class MemberProductEffect {
     @ApiModelProperty("商品服用完日期")
     private Date due_date;
     @ApiModelProperty("距离回访的天数")
-    private Date dueDateDays;
+    private int dueDateDays;
     @ApiModelProperty("服用状态:1 正常，2非常好，3 已停服")
     private Integer taking_state;
 
