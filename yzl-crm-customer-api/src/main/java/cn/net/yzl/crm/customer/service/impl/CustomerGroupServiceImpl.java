@@ -179,7 +179,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         List<MemberLabel> labels = memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
         String groupId = memberCrowdGroup.get_id();
         int length = labels.size();
-        log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},版本号为:{}",groupId,length,version);
+        log.info("memberCrowdGroupRun-query:groupId:{},一共圈选出{},版本号为:{}",groupId,length,version);
 
         List<GroupRefMember> list = new ArrayList<>(labels.size());
         String memberCard;
@@ -203,7 +203,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             list.add(member);
             if (isSaveLine(i)) {
                 memberLabelDao.insertAll(list);
-                log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},本次保存{}条记录,版本号为:{}",groupId,length,list.size(),version);
+                log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},本次保存{}条记录,因重复圈选当前过滤:{}条记录,版本号为:{}",groupId,length,list.size(),repeatFilterCount,version);
                 list.clear();
             }
         }
@@ -213,10 +213,11 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             log.info("memberCrowdGroupRun-save:groupId:{},一共圈选出{},本次保存:{}条记录,版本号为:{}",groupId,length,list.size(),version);
             list.clear();
         }
-        log.info("memberCrowdGroupRun-filter:groupId:{},一共圈选出{},因重复圈选过滤:{}条记录,版本号为:{}",groupId,repeatFilterCount,version);
+        log.info("memberCrowdGroupRun-filter:groupId:{},一共圈选出{},总共保存了:{}条记录,因重复圈选总过滤:{}条记录,版本号为:{}",groupId,length,(length - repeatFilterCount),repeatFilterCount,version);
 
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
-        deleteMongoGroupRefMemberByGroupId(groupId,version);
+        if (repeatFilterCount != length)
+            deleteMongoGroupRefMemberByGroupId(groupId,version);
 
         //返回本次同步数据的条数
         return labels.size();
