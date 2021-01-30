@@ -757,6 +757,8 @@
             <!--            </if>-->
         </where>
         order by last_order_time desc
+
+--         limit #{fromLine},#{pageSize}
     </select>
     <!--根据顾客号查询顾客基本信息 -->
     <select id="selectMemberByCard" parameterType="java.lang.String" resultType="cn.net.yzl.crm.customer.model.Member">
@@ -1306,5 +1308,40 @@
 
 
     </select>
-
+    <select id="findPageByConditionCount" resultType="java.lang.Integer" parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
+        SELECT
+       count(1)
+        FROM
+        member m
+        <where>
+            1=1
+            <if test="memberName != null">
+                and (m.member_card = #{memberName} or m.member_name = #{memberName})
+            </if>
+            <if test="mediaId != null">
+                and m.media_id = #{mediaId}
+            </if>
+            <if test="adverCode != null">
+                and m.adver_code = #{adverCode}
+            </if>
+            <if test="memberStatus != null">
+                and m.member_status = #{memberStatus}
+            </if>
+            <if test="mGradeId != null">
+                and m.m_grade_id = #{mGradeId}
+            </if>
+            <if test="lastOrderTimeStart != null">
+                and m.last_order_time <![CDATA[ >= ]]> #{lastOrderTimeStart}
+            </if>
+            <if test="lastOrderTimeEnd != null">
+                and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeEnd}
+            </if>
+            <!--            <if test="diseaseId != null and diseaseId != '' ">-->
+            <!--                and d.disease_id = #{diseaseId}-->
+            <!--            </if>-->
+            <!--            <if test="diseasePid != null and diseasePid != '' and (diseaseId == null or diseaseId == '' )">-->
+            <!--                and d.disease_id = #{diseasePid}-->
+            <!--            </if>-->
+        </where>
+    </select>
 </mapper>

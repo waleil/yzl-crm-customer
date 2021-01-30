@@ -17,4 +17,7 @@ public class PageDTO implements Serializable {
     @ApiModelProperty(value = "每页条数",required = true)
     protected Integer pageSize=20;
 
+    @ApiModelProperty(value = "查询的开始行数",hidden  = true)
+    protected  Integer fromLine;
+
 }

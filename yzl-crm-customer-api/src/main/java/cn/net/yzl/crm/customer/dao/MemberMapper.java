@@ -139,4 +139,5 @@ public interface MemberMapper {
 
     List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(@Param("list")  List<String> memberCards);
 
+    int findPageByConditionCount(MemberSerchConditionDTO dto);
 }

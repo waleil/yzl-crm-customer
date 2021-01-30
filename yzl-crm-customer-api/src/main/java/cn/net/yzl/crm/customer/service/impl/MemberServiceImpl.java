@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.entity.PageParam;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberGradeRecordDao;
@@ -62,6 +63,24 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public ComResponse<Page<Member>> findPageByCondition(MemberSerchConditionDTO dto) {
+
+        // 获取数量
+//
+//       int num =  memberMapper.findPageByConditionCount(dto);
+//       if(num<1){
+//           return ComResponse.nodata();
+//       }
+//        Page<Member> page = new Page<>();
+//        PageParam pageParam = new PageParam();
+//        pageParam.setTotalCount(num);
+//        pageParam.setPageSize(dto.getPageSize());
+//        pageParam.setPageNo(dto.getCurrentPage());
+//        pageParam.setNextPage((int)Math.ceil(num/dto.getPageSize()));
+//
+//        page.setPageParam(pageParam);
+//        dto.setFromLine((dto.getCurrentPage()-1)*dto.getPageSize());
+//        List<Member> list = memberMapper.findPageByCondition(dto);
+//        page.setItems(list);
 
 
         PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
