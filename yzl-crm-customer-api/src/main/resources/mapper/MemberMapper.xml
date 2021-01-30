@@ -758,7 +758,7 @@
         </where>
         order by last_order_time desc
 
---         limit #{fromLine},#{pageSize}
+<!--         limit #{fromLine},#{pageSize} -->
     </select>
     <!--根据顾客号查询顾客基本信息 -->
     <select id="selectMemberByCard" parameterType="java.lang.String" resultType="cn.net.yzl.crm.customer.model.Member">
