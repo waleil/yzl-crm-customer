@@ -157,7 +157,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Date: 2021/1/27 10:06 上午
      * @Return: org.springframework.data.mongodb.core.query.Query
      */
-    public static Query initQuery(member_crowd_group memberCrowdGroup) {
+    public  Query initQuery(member_crowd_group memberCrowdGroup) {
         Query query = new Query();
         //and查询
         List<Criteria> and = new ArrayList<>();

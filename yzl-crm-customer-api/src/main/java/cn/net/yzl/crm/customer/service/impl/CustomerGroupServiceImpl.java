@@ -188,7 +188,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Override
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
         //生成数据的版本号
-        Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMddHHmmss"));
+        Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMdd"));
         String groupId = memberCrowdGroup.get_id();
         Integer pageNo = 1;
         Integer pageSize = SAVE_LINE;
