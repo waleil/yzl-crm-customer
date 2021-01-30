@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author lichanghong
@@ -17,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableSwagger
 @SpringBootApplication
 @MapperScan("cn.net.yzl.crm.customer.collector.dao")
+//@EnableTransactionManagement
 public class CollectorApplication {
     public static void main(String[] args) {
         SpringApplication.run(CollectorApplication.class, args);
