@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class CacheUtil {
 
     private final static Integer INITIAL_CAPACITY = 1000;
-    private final static Integer MAXIMUM_SIZE = 10_000;
+    private final static Integer MAXIMUM_SIZE = 200_000;
     private final static Integer DURATION = 5;
 
     /**

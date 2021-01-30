@@ -182,8 +182,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         String memberCard;
         MemberLabel label;
         //生成版本号
-        Long time = System.currentTimeMillis();
-        String version = time.toString();
+        Long version = System.currentTimeMillis();
 
         //生成当前groupId对应的数据，并保存至mongo
         for (int i = 0,lengh = labels.size(); i < lengh; i++) {
@@ -225,15 +224,13 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @param version 版本号
      * @return
      */
-    public boolean deleteMongoGroupRefMemberByGroupId(String groupId,String version){
+    public boolean deleteMongoGroupRefMemberByGroupId(String groupId,Long version){
         if (StringUtils.isEmpty(groupId)) {
             return false;
         }
-        //查询出符合条件的第一个结果，并将符合条件的数据删除
-        Criteria criatira = new Criteria();
-        criatira.norOperator(Criteria.where("version").is(version));
-
-        Query query = Query.query(Criteria.where("groupId").is(groupId)).addCriteria(criatira);
+        //删除分组下小于当前版本的数据
+        Query query = Query.query(Criteria.where("groupId").is(groupId))
+                .addCriteria(Criteria.where("version").lt(version));
         DeleteResult remove = memberLabelDao.remove(query, GroupRefMember.class);
         return true;
     }
@@ -247,22 +244,22 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     private Boolean getAndSetNxInGroupCache(String memberCard){
         String cacheKey = CacheKeyUtil.groupRunCacheKey("");
-        String newKey = cacheKey + ":" + memberCard;
+        //String newKey = cacheKey + ":" + memberCard;
         //如果包含则直接使用
-        if (CacheUtil.contain(newKey)) {
+        if (CacheUtil.contain(memberCard)) {
             return true;
         }
         //判断redis中是否存在
         if (redisUtil.sHasKey(cacheKey,memberCard)) {
             //设置本地缓存，和redis中保持一致
-            CacheUtil.setKey(newKey,"1");
+            CacheUtil.setKey(memberCard,"1");
             //redis中存在
             return true;
         }
         //设置redis缓存
         redisUtil.sSetAndTime(cacheKey,REDIS_GROUP_RUN_CACHE_TIME, memberCard);
         //设置本地缓存
-        CacheUtil.setKey(newKey,"1");
+        CacheUtil.setKey(memberCard,"1");
         //返回本地没有直接找到
         return false;
     }

@@ -25,5 +25,5 @@ public class GroupRefMember extends BaseObject {
     private String memberName;
 
     @ApiModelProperty(name = "version",value = "版本号")
-    private String version;
+    private Long version;
 }
