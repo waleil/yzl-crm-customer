@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
     private static String COLLECTION_NAME = "member_label";
     private static String group_ref_member= "group_ref_member";
+    private static String MEMBER_CROWD_GROUP= "member_crowd_group";
     @Autowired
     private MongoTemplate mongoTemplate;
 

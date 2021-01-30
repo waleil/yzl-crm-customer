@@ -11,6 +11,7 @@ import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
+import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
@@ -187,6 +188,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     @Override
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
+        long groupRunStartTime = System.currentTimeMillis();
         //生成数据的版本号
         Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMdd"));
         String groupId = memberCrowdGroup.get_id();
@@ -222,9 +224,11 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         Update update = new Update();
         update.set("person_count",matchCount);
         memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
-        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新",groupId,matchCount,version);
+        long groupRunEndTime = System.currentTimeMillis();
+        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,本次圈选总耗时:{}",groupId,matchCount,version,(groupRunEndTime-groupRunStartTime));
         return matchCount;
     }
+
 
     /**
      * wangzhe
@@ -331,6 +335,41 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     private Boolean isSaveLine(Integer index){
         return index > 0 && index % SAVE_LINE == 0;
+    }
+
+
+    /**
+     * 通过id查询给uize并进行u安萱试算
+     * wangzhe
+     * 2021-01-21
+     * @param crowdGroupOpVO
+     * @return
+     */
+    @Override
+    public int memberCrowdGroupTrialById(MemberCrowdGroupOpVO crowdGroupOpVO){
+        //查询规则
+        member_crowd_group memberCrowdGroup = memberCrowdGroupDao.getMemberCrowdGroup(crowdGroupOpVO.get_id());
+        if (memberCrowdGroup == null) {
+            return -1;
+        }
+        return memberCrowdGroupTrial(memberCrowdGroup);
+    }
+
+    /**
+     * 通过id查询规则并运行规则
+     * wangzhe
+     * 2021-01-30
+     * @param crowdGroupOpVO
+     * @return
+     */
+    @Override
+    public int memberCrowdGroupRunById(MemberCrowdGroupOpVO crowdGroupOpVO) {
+        //查询规则
+        member_crowd_group memberCrowdGroup = memberCrowdGroupDao.getMemberCrowdGroup(crowdGroupOpVO.get_id());
+        if (memberCrowdGroup == null) {
+            return -1;
+        }
+        return memberCrowdGroupRun(memberCrowdGroup);
     }
 
 }
