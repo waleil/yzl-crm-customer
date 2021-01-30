@@ -14,6 +14,7 @@ import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
 import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
+import cn.net.yzl.crm.customer.utils.CacheUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import sun.misc.Version;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +45,8 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     private RedisUtil redisUtil;
 
     private final static Integer SAVE_LINE = 10_000;
+
+    private final static Integer REDIS_GROUP_RUN_CACHE_TIME = 60 * 60 * 5;
 
     //缓存圈选群组id，顾客编号
     private static Map<String, HashSet<String>> cacheMap = new ConcurrentHashMap<>();
@@ -167,25 +171,15 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return memberLabelDao.queryMembersByGroupId(groupId);
     }
 
-    //@Transactional (transactionManager = "mongoTransactionManager")
-    //@Transactional(transactionManager = "mongoTransactionManager",rollbackFor = Throwable.class)
     @Override
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
         List<MemberLabel> labels = memberLabelDao.memberCrowdGroupRun(memberCrowdGroup);
-      /*  return generateGroupRun(memberCrowdGroup.get_id(), labels);
-    }
-    @Transactional (transactionManager = "mongoTransactionManager")
-    public Integer generateGroupRun(String groupId,List<MemberLabel> labels){*/
         String groupId = memberCrowdGroup.get_id();
 
         List<GroupRefMember> list = new ArrayList<>(labels.size());
         String memberCard;
         MemberLabel label;
-        //删除mongo里面的当前groupId对应的历史数据
-        boolean result = deleteMongoGroupRefMemberByGroupId(groupId);
-        if (!result) {
-            return 0;
-        }
+
         //生成当前groupId对应的数据，并保存至mongo
         for (int i = 0,lengh = labels.size(); i < lengh; i++) {
             label = labels.get(i);
@@ -207,10 +201,10 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         //保存小于10000条对象的集合
         if (CollectionUtil.isNotEmpty(list)) {
             memberLabelDao.insertAll(list);
+            list.clear();
         }
-        //删除redis中的对应的缓存
-        String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
-        redisUtil.del(cacheKey);
+        //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
+        boolean result = deleteMongoGroupRefMemberByGroupId(groupId,1);
 
         //返回本次同步数据的条数
         return labels.size();
@@ -221,18 +215,16 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * wangzhe
      * 2021-01-29
      * @param groupId 圈选分组id
+     * @param version 版本号
      * @return
      */
-    public boolean deleteMongoGroupRefMemberByGroupId(String groupId){
+    public boolean deleteMongoGroupRefMemberByGroupId(String groupId,Integer version){
         if (StringUtils.isEmpty(groupId)) {
             return false;
         }
         //查询出符合条件的第一个结果，并将符合条件的数据删除
         Query query = Query.query(Criteria.where("groupId").is(groupId));
         /*DeleteResult remove = */memberLabelDao.remove(query, GroupRefMember.class);
-        //删除redis中的对应的缓存
-        String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
-        redisUtil.del(cacheKey);
         return true;
     }
 
@@ -245,30 +237,25 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @return 当前是否存在缓存
      */
     private Boolean getAndSetNxInGroupCache(String groupId,String memberCard){
-        boolean isFind = false;
-        //是否包含群组id
-        /*if (cacheMap.containsKey(groupId)) {
-            //群组下是否包含该客户编号
-            if (cacheMap.get(groupId).contains(memberCard)) {
-                isFind = true;
-            }else{
-                //不存在则设置
-                cacheMap.get(groupId).add(memberCard);
-            }
-        }else{
-            HashSet<String> set = new HashSet<>();
-            set.add(memberCard);
-            cacheMap.put(groupId, set);
-        }*/
-        //cacheMap中不存在，则去redis中去寻找
         String cacheKey = CacheKeyUtil.groupRunCacheKey(groupId);
-        if (redisUtil.sHasKey(cacheKey,memberCard)) {
-            isFind = true;
-        }else{
-            //不存在则设置
-            redisUtil.sSet(cacheKey, memberCard);
+        String newKey = cacheKey + ":" + memberCard;
+        //如果包含则直接使用
+        if (CacheUtil.contain(newKey)) {
+            return true;
         }
-        return isFind;
+        //判断redis中是否存在
+        if (redisUtil.sHasKey(cacheKey,memberCard)) {
+            //设置本地缓存，和redis中保持一致
+            CacheUtil.setKey(newKey,"1");
+            //redis中存在
+            return true;
+        }
+        //设置redis缓存
+        redisUtil.sSetAndTime(cacheKey,REDIS_GROUP_RUN_CACHE_TIME, memberCard);
+        //设置本地缓存
+        CacheUtil.setKey(newKey,"1");
+        //返回本地没有直接找到
+        return false;
     }
 
     /**
