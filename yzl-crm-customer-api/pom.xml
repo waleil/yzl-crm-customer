@@ -143,6 +143,7 @@
     </repositories>
 
     <build>
+        <finalName>yzl-crm-customer-api</finalName>
         <plugins>
 <!--            <plugin>-->
 <!--                <groupId>org.mybatis.generator</groupId>-->

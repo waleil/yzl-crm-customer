@@ -3,7 +3,7 @@ spring:
     name: yzl-crm-customer-collector
   data:
     mongodb:
-      uri: mongodb://yzl:yzl123@192.168.32.138:27017,192.168.32.139:27017,192.168.32.140:27017/yzl?slaveOk=true&replicaSet=set0&write=1&readPreference=secondaryPreferred&connectTimeoutMS=300000
+      uri: mongodb://yzl:yzl123@192.168.32.138:27017,192.168.32.139:27017,192.168.32.140:27017/yzl?replicaSet=set0&safe=true&write=2&connectTimeoutMS=300000
 
   profiles:
     active: dev
