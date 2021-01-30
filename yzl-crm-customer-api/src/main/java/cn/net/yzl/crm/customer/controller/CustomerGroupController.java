@@ -5,6 +5,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
+import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
@@ -120,6 +121,28 @@ public class CustomerGroupController {
     public ComResponse<Integer> memberCrowdGroupRun(@RequestBody member_crowd_group memberCrowdGroup){
         if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupRun(memberCrowdGroup);
+        return ComResponse.success(count);
+    }
+
+    @ApiOperation("通过群组Id圈选试算")
+    @PostMapping("/v1/groupTrialById")
+    public ComResponse<Integer> memberCrowdGroupTrialById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO){
+        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        int count = customerGroupService.memberCrowdGroupTrialById(crowdGroupOpVO);
+        if (count < 0) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        }
+        return ComResponse.success(count);
+    }
+
+    @ApiOperation("通过群组Id圈选")
+    @PostMapping("/v1/groupRunById")
+    public ComResponse<Integer> memberCrowdGroupRunById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO){
+        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        int count = customerGroupService.memberCrowdGroupRunById(crowdGroupOpVO);
+        if (count < 0) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        }
         return ComResponse.success(count);
     }
 

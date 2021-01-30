@@ -4,6 +4,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
+import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
@@ -52,6 +53,10 @@ public interface CustomerGroupService {
     int memberCrowdGroupTrial(member_crowd_group memberCrowdGroup);
 
     int memberCrowdGroupRun(member_crowd_group memberCrowdGroup);
+
+    int memberCrowdGroupTrialById(MemberCrowdGroupOpVO crowdGroupOpVO);
+
+    int memberCrowdGroupRunById(MemberCrowdGroupOpVO crowdGroupOpVO);
     /**
      * @Author: lichanghong
      * @Description: 根据顾客编号查询顾客所属圈选群
