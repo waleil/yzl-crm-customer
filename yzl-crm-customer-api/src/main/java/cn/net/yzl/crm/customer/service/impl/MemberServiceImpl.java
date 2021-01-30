@@ -38,6 +38,8 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private RedisUtil redisUtil;
 
+    private String memberCountkey="memeberCount";
+
     /**
      * wangzhe
      * 2021-01-25
@@ -60,6 +62,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public ComResponse<Page<Member>> findPageByCondition(MemberSerchConditionDTO dto) {
+
+
         PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
         List<Member> list = memberMapper.findPageByCondition(dto);
         if(list==null || list.size()<0){

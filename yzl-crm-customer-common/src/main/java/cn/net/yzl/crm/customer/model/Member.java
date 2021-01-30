@@ -87,9 +87,9 @@ public class Member {
     @ApiModelProperty(value = "最后一次下单时间")
     private Date last_order_time;
     @ApiModelProperty(value = "主客户会员卡号")
-    private Integer master_card;
+    private String master_card;
     @ApiModelProperty(value = "首单下单员工")
-    private Integer first_order_staff_no;
+    private String first_order_staff_no;
     @ApiModelProperty(value = "真正首单金额")
     private Integer first_order_am;
     @ApiModelProperty(value = "订购次数")
