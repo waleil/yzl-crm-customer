@@ -142,7 +142,7 @@ public class CustomerController {
 
     @ApiOperation("获取顾客购买商品")
     @GetMapping("v1/getMemberProductEffectList")
-    public GeneralResult getMemberProductEffectList(
+    public GeneralResult<List<MemberProductEffect>> getMemberProductEffectList(
             @RequestParam("member_card")
             @NotBlank(message = "member_card不能为空")
             @ApiParam(name = "member_card", value = "会员卡号", required = true)
@@ -153,7 +153,7 @@ public class CustomerController {
 
     @ApiOperation("获取顾客咨询商品")
     @GetMapping("v1/getProductConsultationList")
-    public GeneralResult getProductConsultationList(
+    public GeneralResult<List<ProductConsultation>> getProductConsultationList(
             @RequestParam("member_card")
             @NotBlank(message = "member_card不能为空")
             @ApiParam(name = "member_card", value = "会员卡号", required = true)
