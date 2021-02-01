@@ -20,13 +20,16 @@ public class Yixiangcustomer extends BaseObject {
     private String memberCard;
 
     /**
-     * 最后一次进线时间
+     * 最后一次拨打时间
      */
     private Date lastCallTime;
     /**
      * 进线咨询商品
      */
     private String productCode;
-
+    /**
+     * 最后一次进线时间
+     */
+    private Date lastCallInTime;
 
 }

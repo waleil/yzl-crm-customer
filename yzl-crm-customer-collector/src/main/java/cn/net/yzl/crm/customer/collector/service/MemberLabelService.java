@@ -4,7 +4,6 @@ import cn.net.yzl.crm.customer.collector.dao.MemberMapper;
 import cn.net.yzl.crm.customer.collector.dao.OrderMDao;
 import cn.net.yzl.crm.customer.collector.dao.YixiangcustomerDao;
 import cn.net.yzl.crm.customer.collector.dao.mongo.MemberLabelDao;
-import cn.net.yzl.crm.customer.collector.model.MemberRefOrder;
 import cn.net.yzl.crm.customer.collector.model.Yixiangcustomer;
 import cn.net.yzl.crm.customer.collector.model.mogo.*;
 import cn.net.yzl.crm.customer.collector.utils.MongoDateHelper;
