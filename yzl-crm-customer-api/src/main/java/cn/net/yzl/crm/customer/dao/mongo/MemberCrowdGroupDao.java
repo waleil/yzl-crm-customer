@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -131,15 +132,20 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
             //criatira.and("enable").is(crowdGroupDTO.getEnable());
             criteriaList.add(Criteria.where("enable").is(crowdGroupDTO.getEnable()));
         }
-        Date startTime = crowdGroupDTO.getStart_date();
-        Date endTime =crowdGroupDTO.getEnd_date();
-        if (startTime !=null && endTime==null) {
+        String startTime = crowdGroupDTO.getStart_date();
+        String endTime =crowdGroupDTO.getEnd_date();
+        if (StringUtils.hasText(startTime)){
             //criatira.and("create_time").gte(startTime);
-            criteriaList.add(Criteria.where("create_time").gte(startTime));
-        } else if (startTime == null && endTime != null) {
-           // criatira.and("create_time").lte(endTime);
-            criteriaList.add(Criteria.where("create_time").lte(endTime));
+
+            criteriaList.add(Criteria.where("create_time").gte(MongoDateHelper.formatD(startTime)));
+            }
+        if(StringUtils.hasText(endTime)){
+            criteriaList.add(Criteria.where("create_time").lte(MongoDateHelper.formatD(endTime)));
         }
+//        } else if (startTime == null && endTime != null) {
+////           // criatira.and("create_time").lte(endTime);
+////            criteriaList.add(Criteria.where("create_time").lte(endTime));
+////        }
 
 
 

@@ -22,12 +22,12 @@ public class CrowdGroupDTO extends PageDTO {
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建开始日期")
-    private Date start_date;
+    private String start_date;
 
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty("创建截止日期")
-    private Date end_date;
+    private String end_date;
 
 
 
