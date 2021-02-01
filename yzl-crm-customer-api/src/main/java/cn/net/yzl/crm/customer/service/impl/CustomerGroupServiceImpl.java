@@ -29,6 +29,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -202,7 +203,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @return
      */
     @Override
-    @Transactional("mongoTransactionManager")
+    @Transactional(value = "mongoTransactionManager",rollbackFor = Throwable.class)
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
         long groupRunStartTime = System.currentTimeMillis();
         //生成数据的版本号
@@ -220,6 +221,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             //分页查询
             memberLabelPage = memberLabelDao.memberCrowdGroupRunUsePage(pageNo, pageSize, query);
             labels = memberLabelPage.getItems();
+            if(!CollectionUtils.isEmpty(labels)){
             PageParam pageParam = memberLabelPage.getPageParam();
             log.info("memberCrowdGroupRun-page query:groupId:{},本次分页,pageNo:{},圈选出{}条记录,版本号为:{}",groupId,pageParam.getPageNo(),labels.size(),version);
             //处理数据
@@ -230,6 +232,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
                 hasNext = false;
             }
             pageNo = pageParam.getNextPage();
+            }else{
+                break;
+            }
         }
 
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
