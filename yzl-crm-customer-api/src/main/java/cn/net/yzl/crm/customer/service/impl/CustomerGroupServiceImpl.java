@@ -28,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -201,6 +202,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @return
      */
     @Override
+    @Transactional("mongoTransactionManager")
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
         long groupRunStartTime = System.currentTimeMillis();
         //生成数据的版本号
