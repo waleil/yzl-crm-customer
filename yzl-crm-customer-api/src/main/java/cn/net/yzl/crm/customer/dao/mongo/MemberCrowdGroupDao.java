@@ -118,34 +118,42 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
     }
 
     public Page<member_crowd_group> findCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
+        List<Criteria> criteriaList = new ArrayList<>();
 
-        Criteria criatira = new Criteria();
-
-        criatira.where("del").is(false);
+        //criatira.where("del").is(false);
+        criteriaList.add(Criteria.where("del").is(false));
         if (!StringUtil.isNullOrEmpty(crowdGroupDTO.getName())) {
-            criatira.and("crowd_name").is(crowdGroupDTO.getName());
+            String name = crowdGroupDTO.getName();
+            //criatira.and("crowd_name").regex("^.*" +name+ ".*$");
+            criteriaList.add(Criteria.where("crowd_name").regex("^.*" +name+ ".*$"));
         }
         if (crowdGroupDTO.getEnable() != null) {
-            criatira.and("enable").is(crowdGroupDTO.getEnable());
+            //criatira.and("enable").is(crowdGroupDTO.getEnable());
+            criteriaList.add(Criteria.where("enable").is(crowdGroupDTO.getEnable()));
         }
         Date startTime = crowdGroupDTO.getStart_date();
         Date endTime =crowdGroupDTO.getEnd_date();
         if (startTime !=null && endTime==null) {
-            criatira.and("create_time").gte(startTime);
+            //criatira.and("create_time").gte(startTime);
+            criteriaList.add(Criteria.where("create_time").gte(startTime));
         } else if (startTime == null && endTime != null) {
-            criatira.and("create_time").lte(endTime);
-        } else if (startTime != null && endTime != null) {
-            criatira.andOperator(
-                    Criteria.where("create_time").gte(startTime),
-                    Criteria.where("create_time").lte(endTime));
+           // criatira.and("create_time").lte(endTime);
+            criteriaList.add(Criteria.where("create_time").lte(endTime));
         }
 
 
 
         Query query = new Query();
-        query.addCriteria(criatira);
+        int size = criteriaList.size();
+        Criteria [] criterias = new Criteria[criteriaList.size()];
+        for(int i = 0 ; i < size; i++){
+            criterias[i] = criteriaList.get(i);
+        }
+        Criteria criteria = new Criteria();
+        criteria.andOperator(criterias);
+        query.addCriteria(criteria);
 
-        int total = (int) mongoTemplate.count(query, member_crowd_group.class, COLLECTION_NAME); //先求总数
+        int total = (int) mongoTemplate.count(query, COLLECTION_NAME); //先求总数
 
         int skip = (crowdGroupDTO.getCurrentPage() - 1) * crowdGroupDTO.getPageSize();
         query.skip(skip).limit(crowdGroupDTO.getPageSize());
@@ -155,9 +163,9 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         query.fields().include("_id")
                 .include("crowd_name").include("description")
                 .include("enable").include("effective_date").include("person_count")
-                .include("expire_date").include("create_name").include("create_code")
+                .include("create_name").include("create_code")
                 .include("create_time");
-        List<member_crowd_group> crowdGroupList = mongoTemplate.find(query, member_crowd_group.class);
+        List<member_crowd_group> crowdGroupList = mongoTemplate.find(query, member_crowd_group.class,COLLECTION_NAME);
 
         //mongoTemplate.count计算总数
 
