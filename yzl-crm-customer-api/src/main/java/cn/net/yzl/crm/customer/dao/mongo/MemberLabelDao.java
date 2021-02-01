@@ -951,7 +951,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
             }
             Date date = getPastDate(days);
-            and.add(Criteria.where("lastCallTime").gte(MongoDateHelper.getMongoDate(date)));
+            and.add(Criteria.where("lastCallInTime").gte(MongoDateHelper.getMongoDate(date)));
         }
         //购买的商品
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getAdvertProducts())) {
