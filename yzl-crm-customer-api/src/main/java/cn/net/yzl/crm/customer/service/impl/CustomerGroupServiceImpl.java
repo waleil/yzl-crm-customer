@@ -106,7 +106,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     @Override
     public ComResponse saveCustomerCrowdGroup(member_crowd_group member_crowd_group) {
-        member_crowd_group.setCreate_time(MongoDateHelper.getMongoDate(new Date()));
+        Date date = new Date();
+        member_crowd_group.setCreate_time(MongoDateHelper.getMongoDate(date));
+        member_crowd_group.setCreateTimeLong(date.getTime());
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
         return ComResponse.success();
     }
@@ -140,8 +142,11 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             return ComResponse.fail(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(),"已经生效的规则，无法编辑!");
         }
         member_crowd_group.setCreate_time(MongoDateHelper.getMongoDate(old.getCreate_time()));
+        member_crowd_group.setCreateTimeLong(old.getCreateTimeLong());
         member_crowd_group.setCreate_code(old.getCreate_code());
+        Date date = new Date();
         member_crowd_group.setUpdate_time(MongoDateHelper.getMongoDate(new Date()));
+        member_crowd_group.setUpdateTimeLong(date.getTime());
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
        return ComResponse.success();
     }

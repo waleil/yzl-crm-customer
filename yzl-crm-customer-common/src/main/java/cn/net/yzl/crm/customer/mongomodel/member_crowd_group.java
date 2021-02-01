@@ -35,6 +35,7 @@ public class member_crowd_group extends BaseObject {
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date create_time;
 
+    private long createTimeLong;
     @ApiModelProperty("创建人编码")
     private String create_code;
 
@@ -45,7 +46,7 @@ public class member_crowd_group extends BaseObject {
     @ApiModelProperty("修改时间")
     @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
     private Date update_time;
-
+    private long updateTimeLong;
     @ApiModelProperty("修改人")
     private String update_code;
 

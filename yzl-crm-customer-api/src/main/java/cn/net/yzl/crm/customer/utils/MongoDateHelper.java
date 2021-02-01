@@ -17,8 +17,8 @@ public class MongoDateHelper {
         //T代表后面跟着时间，Z代表UTC统一时间
         Date date = formatD(dateStr);
         SimpleDateFormat format =
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        format.setCalendar(new GregorianCalendar(new SimpleTimeZone(0, "GMT")));
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+       // format.setCalendar(new GregorianCalendar(new SimpleTimeZone(0, "GMT")));
         String isoDate = format.format(date);
         try {
             return format.parse(isoDate);

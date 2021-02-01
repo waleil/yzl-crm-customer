@@ -134,13 +134,16 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         }
         String startTime = crowdGroupDTO.getStart_date();
         String endTime =crowdGroupDTO.getEnd_date();
-        if (StringUtils.hasText(startTime)){
+        if (StringUtils.hasText(startTime)&&StringUtils.isEmpty(endTime)){
             //criatira.and("create_time").gte(startTime);
 
-            criteriaList.add(Criteria.where("create_time").gte(MongoDateHelper.formatD(startTime)));
-            }
-        if(StringUtils.hasText(endTime)){
-            criteriaList.add(Criteria.where("create_time").lte(MongoDateHelper.formatD(endTime)));
+            criteriaList.add(Criteria.where("createTimeLong").gte(MongoDateHelper.formatD(startTime).getTime()));
+            }else if(StringUtils.isEmpty(startTime)&&StringUtils.hasText(endTime)){
+            criteriaList.add(Criteria.where("createTimeLong").lt(MongoDateHelper.formatD(startTime).getTime()));
+        }else if(StringUtils.hasText(startTime)&&StringUtils.hasText(endTime)){
+            Criteria criteria = new Criteria();
+            criteriaList.add(criteria.andOperator(Criteria.where("createTimeLong").gte(MongoDateHelper.formatD(startTime).getTime()),
+                    Criteria.where("createTimeLong").lt(MongoDateHelper.formatD(endTime).getTime())));
         }
 //        } else if (startTime == null && endTime != null) {
 ////           // criatira.and("create_time").lte(endTime);
@@ -164,15 +167,16 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         int skip = (crowdGroupDTO.getCurrentPage() - 1) * crowdGroupDTO.getPageSize();
         query.skip(skip).limit(crowdGroupDTO.getPageSize());
         //排序
-        Sort sort = Sort.by(Sort.Direction.DESC, "create_time");
+        Sort sort = Sort.by(Sort.Direction.DESC, "createTimeLong");
         query.with(sort);
         query.fields().include("_id")
-                .include("crowd_name").include("description")
-                .include("enable").include("effective_date").include("person_count")
-                .include("create_name").include("create_code")
-                .include("create_time");
-        List<member_crowd_group> crowdGroupList = mongoTemplate.find(query, member_crowd_group.class,COLLECTION_NAME);
-
+                .include("crowd_name").include("description").include("createTimeLong")
+                .include("enable").include("person_count")
+                .include("create_name").include("create_code");
+        List<member_crowd_group> crowdGroupList = mongoTemplate.find(query, member_crowd_group.class);
+        for(member_crowd_group crowd_group : crowdGroupList){
+            crowd_group.setCreate_time(new Date(crowd_group.getCreateTimeLong()));
+        }
         //mongoTemplate.count计算总数
 
         Page page = new Page();
