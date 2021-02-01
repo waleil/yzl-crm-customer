@@ -52,14 +52,14 @@ public class MemberAmountController {
 
 
 
-    @ApiOperation(value = "顾客账户-账户操作(充值,消费,退回)", notes = "顾客账户-账户操作(充值,消费,退回)")
+    @ApiOperation(value = "顾客账户-账户冻结操作(充值,消费,退回)", notes = "顾客账户-账户冻结操作(充值,消费,退回)")
     @RequestMapping(value = "/operation", method = RequestMethod.POST)
     ComResponse<String> operation(@RequestBody @Validated MemberAmountDetailVO memberAmountDetailVO) throws ParseException {
         return memberAmountService.operation(memberAmountDetailVO);
     }
 
-    @ApiOperation(value = "顾客账户-账户操作(消费/退回)确认", notes = "顾客账户-账户操作(消费/退回)确认")
-    @RequestMapping(value = "/operationConfirm", method = RequestMethod.GET)
+    @ApiOperation(value = "顾客账户-冻结金额确认(消费/退回)", notes = "顾客账户-冻结金额确认(消费/退回)")
+    @RequestMapping(value = "/operationConfirm", method = RequestMethod.POST)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "obtainType", value = "操作类型(1 退回 2 消费,3:充值(目前先不考虑)", required = true, dataType = "string", paramType = "query")
