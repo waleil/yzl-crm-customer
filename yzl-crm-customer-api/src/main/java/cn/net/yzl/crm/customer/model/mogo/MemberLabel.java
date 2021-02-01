@@ -234,6 +234,8 @@ public class MemberLabel extends BaseObject {
     private List<MemberOrder> memberOrders;
     //最后一次进线广告关联的商品编号
     private List<String> advertProducts;
-    //最后一次进线时间
+    //最后一次拨打时间
     private Date lastCallTime;
+    //最后一次进线时间
+    private Date lastCallInTime;
 }
