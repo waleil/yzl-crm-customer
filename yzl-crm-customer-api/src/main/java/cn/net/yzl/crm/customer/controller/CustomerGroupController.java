@@ -31,7 +31,7 @@ import java.util.List;
  * @description 顾客圈选接口
  * @date: 2021/1/22 1:53 下午
  */
-@Api(value="顾客圈选",tags = {"顾客圈选"})
+@Api(value = "顾客圈选", tags = {"顾客圈选"})
 @RestController
 @RequestMapping(value = "customerGroup")
 public class CustomerGroupController {
@@ -63,7 +63,8 @@ public class CustomerGroupController {
     @ApiOperation("修改顾客圈选")
     @PostMapping("/v1/updateCrowdGroup")
     public ComResponse updateCrowdGroup(@RequestBody member_crowd_group memberCrowdGroup) {
-        if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         try {
             return customerGroupService.updateCustomerCrowdGroup(memberCrowdGroup);
         } catch (Exception exc) {
@@ -91,43 +92,48 @@ public class CustomerGroupController {
         member_crowd_group member_crowd_group = customerGroupService.getMemberCrowdGroup(crowdId);
         return ComResponse.success(member_crowd_group);
     }
+
     @ApiOperation("修改圈选规则状态")
     @PostMapping("/v1/updateStatus")
-    public ComResponse updateMemberCrowdGroupStatus(@RequestBody @Valid UpdateCrowdStatusVO vo){
+    public ComResponse updateMemberCrowdGroupStatus(@RequestBody @Valid UpdateCrowdStatusVO vo) {
         return customerGroupService.updateCustomerCrowdGroupStatus(vo);
     }
+
     /**
-     * @Author: lichanghong
-     * @Description:  查询圈选规则
-     * @Date: 2021/1/22 8:20 下午
      * @param
+     * @Author: lichanghong
+     * @Description: 查询圈选规则
+     * @Date: 2021/1/22 8:20 下午
      * @Return: cn.net.yzl.common.entity.ComResponse<cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO>
      */
     @ApiOperation("查询顾客圈选列表")
     @GetMapping("/v1/query4Select")
-    public ComResponse<List<CustomerCrowdGroupVO>> query4Select(){
+    public ComResponse<List<CustomerCrowdGroupVO>> query4Select() {
         return customerGroupService.query4Select();
     }
 
     @ApiOperation("圈选试算")
     @PostMapping("/v1/groupTrial")
-    public ComResponse<Integer> memberCrowdGroupTrial(@RequestBody member_crowd_group memberCrowdGroup){
+    public ComResponse<Integer> memberCrowdGroupTrial(@RequestBody member_crowd_group memberCrowdGroup) {
         if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupTrial(memberCrowdGroup);
         return ComResponse.success(count);
     }
+
     @ApiOperation("圈选")
     @PostMapping("/v1/groupRun")
-    public ComResponse<Integer> memberCrowdGroupRun(@RequestBody member_crowd_group memberCrowdGroup){
-        if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+    public ComResponse<Integer> memberCrowdGroupRun(@RequestBody member_crowd_group memberCrowdGroup) {
+        if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupRun(memberCrowdGroup);
         return ComResponse.success(count);
     }
 
     @ApiOperation("通过群组Id圈选试算")
     @PostMapping("/v1/groupTrialById")
-    public ComResponse<Integer> memberCrowdGroupTrialById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO){
-        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+    public ComResponse<Integer> memberCrowdGroupTrialById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO) {
+        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupTrialById(crowdGroupOpVO);
         if (count < 0) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
@@ -137,8 +143,9 @@ public class CustomerGroupController {
 
     @ApiOperation("通过群组Id圈选")
     @PostMapping("/v1/groupRunById")
-    public ComResponse<Integer> memberCrowdGroupRunById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO){
-        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id())) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+    public ComResponse<Integer> memberCrowdGroupRunById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO) {
+        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupRunById(crowdGroupOpVO);
         if (count < 0) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
@@ -147,27 +154,43 @@ public class CustomerGroupController {
     }
 
     /**
+     * @param memberCard
      * @Author: lichanghong
      * @Description: 根据顾客编号查询顾客所属圈选群
      * @Date: 2021/1/28 12:59 上午
-     * @param memberCard
      * @Return: java.lang.String
      */
     @ApiOperation("根据顾客编号查询圈选群组编号")
     @GetMapping("/v1/queryGroupIdByMemberCard")
-    public ComResponse<String> queryGroupIdByMemberCard(@RequestParam String memberCard){
-       return ComResponse.success(customerGroupService.queryGroupIdByMemberCard(memberCard));
+    public ComResponse<String> queryGroupIdByMemberCard(@RequestParam String memberCard) {
+        return ComResponse.success(customerGroupService.queryGroupIdByMemberCard(memberCard));
     }
+
     /**
+     * @param groupId
      * @Author: lichanghong
      * @Description: 根据分组编号查询关联的顾客
      * @Date: 2021/1/28 12:54 上午
-     * @param groupId
      * @Return: java.util.List<cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember>
      */
     @ApiOperation("根据圈选编号查询顾客")
     @GetMapping("/v1/queryMemberByGroupId")
-    public ComResponse<List<GroupRefMember>> queryMembersByGroupId(@RequestParam String groupId){
+    public ComResponse<List<GroupRefMember>> queryMembersByGroupId(@RequestParam String groupId) {
         return ComResponse.success(customerGroupService.queryMembersByGroupId(groupId));
     }
+    /**
+     * @Author: lichanghong
+     * @Description: 顾客人群圈选定时任务
+     * @Date: 2021/2/1 3:27 下午
+     * @param
+     * @Return: cn.net.yzl.common.entity.ComResponse<java.lang.Boolean>
+     */
+    @ApiOperation("顾客人群圈选定时任务")
+    @GetMapping("/v1/memberGroupTimedTask")
+    public ComResponse<Boolean> memberGroupTimedTask() {
+
+        customerGroupService.memberGroupTimedTask();
+        return ComResponse.success(true);
+    }
+
 }

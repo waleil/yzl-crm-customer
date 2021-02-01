@@ -60,6 +60,10 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
     //缓存圈选群组id，顾客编号
     private static Map<String, HashSet<String>> cacheMap = new ConcurrentHashMap<>();
+
+    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4,128,1000L,
+            TimeUnit.MILLISECONDS,  new LinkedBlockingQueue<Runnable>(1024));
+
     /**
      * @Author: lichanghong
      * @Description: 根据群组编号查询
@@ -179,6 +183,16 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Override
     public List<GroupRefMember> queryMembersByGroupId(String groupId) {
         return memberLabelDao.queryMembersByGroupId(groupId);
+    }
+
+    @Override
+    public Boolean memberGroupTimedTask() {
+        List<member_crowd_group> list =memberCrowdGroupDao.query4Task();
+        //多线程执行
+        for(member_crowd_group memberCrowdGroup:list){
+            threadPoolExecutor.execute(()->{ memberCrowdGroupRun(memberCrowdGroup);});
+        }
+        return true;
     }
 
     /**

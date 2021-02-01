@@ -73,5 +73,12 @@ public interface CustomerGroupService {
      * @Return: java.util.List<cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember>
      */
      List<GroupRefMember> queryMembersByGroupId(String groupId);
-
+    /**
+     * @Author: lichanghong
+     * @Description: 顾客人群圈选定时任务
+     * @Date: 2021/2/1 3:27 下午
+     * @param
+     * @Return: java.lang.Boolean
+     */
+    Boolean memberGroupTimedTask();
 }

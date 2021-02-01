@@ -41,8 +41,19 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
     protected Class<member_crowd_group> getEntityClass() {
         return member_crowd_group.class;
     }
+    /**
+     * @Author: lichanghong
+     * @Description: 查询所有生效的圈选规则
+     * @Date: 2021/2/1 3:54 下午
+     * @param
+     * @Return: java.util.List<cn.net.yzl.crm.customer.mongomodel.member_crowd_group>
+     */
+    public List<member_crowd_group> query4Task(){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("enable").is(1).and("del").is(false));
 
-
+        return mongoTemplate.find(query,member_crowd_group.class);
+    }
     public void saveMemberCrowdGroup(member_crowd_group member_crowd_group) {
         if (member_crowd_group == null )
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
