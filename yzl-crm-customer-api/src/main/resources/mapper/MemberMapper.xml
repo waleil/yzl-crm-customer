@@ -64,6 +64,7 @@
         <id column="memberName" property="memberName" jdbcType="VARCHAR"/>
         <id column="gradeId" property="gradeId" jdbcType="INTEGER"/>
         <id column="gradeCode" property="gradeCode" jdbcType="VARCHAR"/>
+        <id column="memberType" property="memberType" jdbcType="VARCHAR"/>
         <id column="totalMoney" property="totalMoney" jdbcType="DOUBLE"/>
 
 
@@ -112,6 +113,7 @@
             m.member_name memberName,
             m.m_grade_id gradeId,
             m.m_grade_code gradeCode,
+            m.member_type memberType,
             <include refid="reveiverAddressDtos_Column_List"/>,
             <include refid="phoneNumberList_Column_List"/>,
             amount.total_money totalMoney
