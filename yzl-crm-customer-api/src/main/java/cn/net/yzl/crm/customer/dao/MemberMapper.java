@@ -13,6 +13,7 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -140,4 +141,9 @@ public interface MemberMapper {
     List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(@Param("list")  List<String> memberCards);
 
     int findPageByConditionCount(MemberSerchConditionDTO dto);
+    /**
+     * 更新顾客最后下单时间
+     * @return
+     */
+    int updateLastOrderTime(@Param("memberCard") String memberCard,@Param("now") Date now);
 }
