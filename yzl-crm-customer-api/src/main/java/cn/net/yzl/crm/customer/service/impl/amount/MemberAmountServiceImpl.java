@@ -37,6 +37,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     private MemberAmountDao memberAmountDao;
     @Autowired
     private MemberAmountDetailDao memberAmountDetailDao;
+    @Autowired
     private MemberMapper memberMapper;
     @Override
     @Transactional
