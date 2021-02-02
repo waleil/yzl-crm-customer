@@ -23,6 +23,9 @@ public class MemberAddressAndLevelDTO {
     @ApiModelProperty(value = "顾客级别" , name = "gradeCode")
     private String gradeCode;
 
+    @ApiModelProperty(value = "顾客类型" , name = "memberType")
+    private String memberType;
+
     @ApiModelProperty(value = "收获地址信息" , name = "reveiverInformations")
     private List<ReveiverAddressMsgDTO> reveiverInformations;
 
