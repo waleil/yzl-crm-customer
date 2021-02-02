@@ -73,6 +73,7 @@
     </resultMap>
 
     <resultMap type="cn.net.yzl.crm.customer.dto.address.ReveiverAddressMsgDTO" id="BatchAddressListResultMap">
+        <id column="id" property="id" jdbcType="INTEGER"/>
         <id column="consignee" property="consignee" jdbcType="VARCHAR"/>
         <id column="recieverPhone" property="recieverPhone" jdbcType="VARCHAR"/>
         <id column="memberProvinceNo" property="provinceNo" jdbcType="INTEGER"/>
@@ -90,6 +91,7 @@
     </resultMap>
 
     <sql id="reveiverAddressDtos_Column_List">
+        address.id id,
         address.member_name consignee,
         address.member_mobile recieverPhone,
         address.member_province_no memberProvinceNo,
