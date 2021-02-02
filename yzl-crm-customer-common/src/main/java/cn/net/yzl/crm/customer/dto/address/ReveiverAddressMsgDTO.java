@@ -15,6 +15,9 @@ import java.io.Serializable;
 @ApiModel(value = "ReveiverAddressMessageDTO",description = "顾客收货地址实体")
 public class ReveiverAddressMsgDTO implements Serializable {
 
+    @ApiModelProperty(value = "主键id",name = "id")
+    private Integer id;
+
     @ApiModelProperty(value = "收货人姓名",name = "consignee")
     private String consignee;
     @ApiModelProperty(value = "收货人电话，多个用逗号分隔",name = "recieverPhone")
