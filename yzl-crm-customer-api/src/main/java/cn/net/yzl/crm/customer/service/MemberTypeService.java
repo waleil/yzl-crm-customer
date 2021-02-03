@@ -1,6 +1,6 @@
 package cn.net.yzl.crm.customer.service;
 
-import cn.net.yzl.crm.customer.vo.MemberTypeVO;
+import cn.net.yzl.crm.customer.dto.member.MemberTypeDTO;
 
 import java.util.List;
 
@@ -12,5 +12,5 @@ import java.util.List;
  * @date: 2021/2/3 5:12 下午
  */
 public interface MemberTypeService {
-    List<MemberTypeVO> queryMemberType();
+    List<MemberTypeDTO> queryMemberType();
 }

@@ -1,8 +1,8 @@
 package cn.net.yzl.crm.customer.service.impl;
 
 import cn.net.yzl.crm.customer.dao.SysDictDataDao;
+import cn.net.yzl.crm.customer.dto.member.MemberTypeDTO;
 import cn.net.yzl.crm.customer.service.MemberTypeService;
-import cn.net.yzl.crm.customer.vo.MemberTypeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class MemberTypeServiceImpl implements MemberTypeService {
     @Autowired
     private SysDictDataDao sysDictDataDao;
     @Override
-    public List<MemberTypeVO> queryMemberType() {
+    public List<MemberTypeDTO> queryMemberType() {
         return sysDictDataDao.queryMemberType();
     }
 }

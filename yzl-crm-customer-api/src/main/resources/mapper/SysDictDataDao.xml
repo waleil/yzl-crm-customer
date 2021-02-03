@@ -191,7 +191,7 @@
     where dict_code = #{dictCode,jdbcType=INTEGER}
   </update>
   <!--顾客类型-->
-  <select id="queryMemberType" resultType="cn.net.yzl.crm.customer.vo.MemberTypeVO">
+  <select id="queryMemberType" resultType="cn.net.yzl.crm.customer.dto.member.MemberTypeDTO">
      select dict_ccode as memberTypeId,dict_type_name as memberTypeName from sys_dict_data order by dict_ccode desc
   </select>
 </mapper>

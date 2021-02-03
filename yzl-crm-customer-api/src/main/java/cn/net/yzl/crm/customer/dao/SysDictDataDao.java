@@ -1,7 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
+import cn.net.yzl.crm.customer.dto.member.MemberTypeDTO;
 import cn.net.yzl.crm.customer.model.db.SysDictData;
-import cn.net.yzl.crm.customer.vo.MemberTypeVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,5 +19,5 @@ public interface SysDictDataDao {
 
     int updateByPrimaryKey(SysDictData record);
 
-    List<MemberTypeVO> queryMemberType();
+    List<MemberTypeDTO> queryMemberType();
 }

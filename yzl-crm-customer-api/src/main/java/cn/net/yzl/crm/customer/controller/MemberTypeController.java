@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.controller;
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.crm.customer.dto.member.MemberTypeDTO;
 import cn.net.yzl.crm.customer.service.MemberTypeService;
 import cn.net.yzl.crm.customer.vo.MemberTypeVO;
 import io.swagger.annotations.Api;
@@ -25,8 +26,8 @@ public class MemberTypeController {
     private MemberTypeService memberTypeService;
     @ApiOperation(value = "顾客类别查询", notes = "顾客类别查询")
     @GetMapping("/v1/queryMemberType")
-    public ComResponse<List<MemberTypeVO>> queryMemberType(){
-        List<MemberTypeVO> list = memberTypeService.queryMemberType();
+    public ComResponse<List<MemberTypeDTO>> queryMemberType(){
+        List<MemberTypeDTO> list = memberTypeService.queryMemberType();
     return ComResponse.success(list);
     }
 }
