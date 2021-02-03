@@ -718,11 +718,12 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //是否为活动单
         if (memberCrowdGroup.getActive_order() != null) {
-            if (memberCrowdGroup.getActive_order() == 1) {
-                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(true))));
-            } else {
-                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(false))));
-            }
+            and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(memberCrowdGroup.getActive_order()))));
+//            if (memberCrowdGroup.getActive_order() == 1) {
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(true))));
+//            } else {
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(false))));
+//            }
         }
         //订单参与的活动
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActiveCodeList())) {
