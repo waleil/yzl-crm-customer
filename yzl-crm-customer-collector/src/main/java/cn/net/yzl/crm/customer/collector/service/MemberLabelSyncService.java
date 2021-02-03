@@ -183,6 +183,10 @@ public class MemberLabelSyncService {
                             if(!CollectionUtils.isEmpty(temp.get(6))){
                                 memberLabel.setOrderBehaviorList(temp.get(6));
                             }
+                            //活动偏好
+                            if(!CollectionUtils.isEmpty(temp.get(7))){
+                                memberLabel.setActivityBehaviorList(temp.get(7));
+                            }
                         }
                         List<MemberDisease> diseaseList = memberDiseaseListMap.get(memberCard);
                         if(CollectionUtils.isEmpty(diseaseList)){
