@@ -718,12 +718,12 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //是否为活动单
         if (memberCrowdGroup.getActive_order() != null) {
-            and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(memberCrowdGroup.getActive_order()))));
-//            if (memberCrowdGroup.getActive_order() == 1) {
-//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(true))));
-//            } else {
-//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(false))));
-//            }
+          //  and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(memberCrowdGroup.getActive_order()))));
+            if (memberCrowdGroup.getActive_order() == 1) {
+                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(true))));
+            } else {
+                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(false))));
+            }
         }
         //订单参与的活动
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActiveCodeList())) {
@@ -833,11 +833,12 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //支付状态
         if (memberCrowdGroup.getPay_state() != null) {
-            if (memberCrowdGroup.getPay_state() == 1) {
-                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(true))));
-            } else {
-                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(false))));
-            }
+            and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(memberCrowdGroup.getPay_state()))));
+//            if (memberCrowdGroup.getPay_state() == 1) {
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(true))));
+//            } else {
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(false))));
+//            }
         }
         //物流状态
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getLogistics_state())) {
