@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -25,6 +26,7 @@ public class MemberLabel extends BaseObject {
     @ApiModelProperty(value = "主键")
     private String _id;
     @ApiModelProperty(value = "会员卡号")
+    @Indexed
     private String memberCard;
     @ApiModelProperty(value = "顾客名称")
     private String memberName;
