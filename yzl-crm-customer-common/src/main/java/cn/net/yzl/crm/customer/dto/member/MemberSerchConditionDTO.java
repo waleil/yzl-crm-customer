@@ -23,11 +23,11 @@ public class MemberSerchConditionDTO extends PageDTO {
     @ApiModelProperty(value="会员级别id")
     private Integer mGradeId;
     @ApiModelProperty(value = "最后一次下单时间起始时间 格式: yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastOrderTimeStart;
 
     @ApiModelProperty(value = "最后一次下单时间结束时间 格式: yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastOrderTimeEnd;
 
 
