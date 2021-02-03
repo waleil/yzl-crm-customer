@@ -407,7 +407,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // criteria.norOperator(exArray);
             }
         }
-            //会员类型
+            // todo 待做
             if(!CollectionUtils.isEmpty(memberCrowdGroup.getMember_type())){
 
             }
@@ -832,11 +832,12 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //支付状态
         if (memberCrowdGroup.getPay_state() != null) {
-            if (memberCrowdGroup.getPay_state() == 1) {
-                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(true))));
-            } else {
-                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(false))));
-            }
+            and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(memberCrowdGroup.getPay_state()))));
+//            if (memberCrowdGroup.getPay_state() == 1) {
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(memberCrowdGroup.getPay_state()))));
+//            } else {
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(0))));
+//            }
         }
         //物流状态
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getLogistics_state())) {
