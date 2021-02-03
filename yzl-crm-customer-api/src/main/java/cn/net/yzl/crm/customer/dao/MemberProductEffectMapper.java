@@ -55,4 +55,6 @@ public interface MemberProductEffectMapper {
     List<MemberProduct> queryByMemberCodes(List<String> codes);
 
     List<MemberProductEffectDTO> getProductEffects(MemberProductEffectSelectVO productEffect);
+
+    List<MemberProductEffect> checkMemberProductEffect();
 }
