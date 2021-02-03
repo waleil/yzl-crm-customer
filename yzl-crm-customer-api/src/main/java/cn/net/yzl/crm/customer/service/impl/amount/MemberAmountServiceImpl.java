@@ -7,6 +7,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.MemberAmountDao;
 import cn.net.yzl.crm.customer.dao.MemberAmountDetailDao;
+import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
 import cn.net.yzl.crm.customer.model.MemberAmount;
@@ -36,7 +37,8 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     private MemberAmountDao memberAmountDao;
     @Autowired
     private MemberAmountDetailDao memberAmountDetailDao;
-
+    @Autowired
+    private MemberMapper memberMapper;
     @Override
     @Transactional
     public ComResponse<MemberAmountDto> getMemberAmount(String memberCard) {
@@ -141,6 +143,10 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             if (num1 < 1) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "账户信息记录保存错误");
             }
+            //todo 消费的时候更新最后下单时间
+                if(obtainType==2){
+                    memberMapper.updateLastOrderTime(memberAmountDetailVO.getMemberCard(),new Date());
+                }
             }else{
                 throw new BizException(ResponseCodeEnums.REPEAT_ERROR_CODE.getCode(), "当前账户正在下单操作，请勿重复下单!");
             }

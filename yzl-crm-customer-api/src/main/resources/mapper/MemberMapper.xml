@@ -1312,6 +1312,13 @@
 
 
     </select>
+    <!--更新顾客最后下单时间-->
+    <update id="updateLastOrderTime" >
+        update member set
+            last_order_time = #{now,jdbcType=TIMESTAMP}
+        where
+            member_card = #{memberCard,jdbcType=VARCHAR}
+    </update>
     <select id="findPageByConditionCount" resultType="java.lang.Integer" parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
         SELECT
        count(1)
