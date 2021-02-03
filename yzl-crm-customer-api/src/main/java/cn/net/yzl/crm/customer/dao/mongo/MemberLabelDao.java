@@ -220,6 +220,15 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 and.add(Criteria.where("hasTedBag").is(false));
             }
         }
+
+        //是否有积分
+        if (memberCrowdGroup.getIntegral() != null) {
+            if (memberCrowdGroup.getIntegral() == 1) {
+                and.add(Criteria.where("hasIntegral").is(true));
+            } else {
+                and.add(Criteria.where("hasIntegral").is(false));
+            }
+        }
         //是否为会员
         if (memberCrowdGroup.getVip() != null) {
             if (memberCrowdGroup.getVip() == 1) {
@@ -332,6 +341,29 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 }
             }
         }
+        //类别
+        if (!CollectionUtils.isEmpty(memberCrowdGroup.getMember_type())) {
+            List<crowd_member_type> memberTypes = memberCrowdGroup.getMember_type();
+            Map<Integer, List<crowd_member_type>> temps = memberTypes.stream().collect(Collectors.groupingBy(crowd_member_type::getInclude));
+            List<crowd_member_type> in = temps.get(1);
+            List<crowd_member_type> ex = temps.get(0);
+            if (!CollectionUtils.isEmpty(in)) {
+                int size = in.size();
+                for (int i = 0; i < size; i++) {
+                    crowd_member_type c = in.get(i);
+                    and.add(Criteria.where("memberType").is(c.getId()));
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(ex)) {
+                int size = ex.size();
+                for (int i = 0; i < size; i++) {
+                    crowd_member_type c = ex.get(i);
+                    not.add(Criteria.where("memberType").is(c.getId()));
+                }
+            }
+        }
+
         //活跃度
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActive_degree())) {
             List<crowd_activity_degree> activeDegrees = memberCrowdGroup.getActive_degree();
