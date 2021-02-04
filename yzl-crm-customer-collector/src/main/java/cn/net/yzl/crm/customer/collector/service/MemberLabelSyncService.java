@@ -57,6 +57,7 @@ public class MemberLabelSyncService {
     public boolean syncMember(int id) {
         int tempId = id;
         while (true) {
+            //customer_distinct表中包含了：3年内有下单 1年内有通话记录 1年内有进线 有意向的客户的编号
             List<CustomerDistinct> customerDistincts = customerDistinctDao.queryAllByIdPage(tempId, pageSize);
             //判断是否获取到数据
             if(!CollectionUtils.isEmpty(customerDistincts)){
@@ -88,6 +89,7 @@ public class MemberLabelSyncService {
                     Map<String, List<MemberProduct>> memberProductsMap = memberProducts.stream()
                             .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
 
+                    ////通过会员卡号查询订单表( from order_m where member_card in)
                     List<MemberOrder> memberRefOrders = orderMDao.queryOrderByMemberCard(memberCodes);
                     Map<String, List<MemberOrder>> memberRefOrderMap = memberRefOrders.stream()
                             .collect(Collectors.groupingBy(MemberOrder::getMemberCard));
@@ -97,7 +99,7 @@ public class MemberLabelSyncService {
                     Map<String, List<Yixiangcustomer>> yixiangcustomerMap = yixiangcustomers.stream()
                             .collect(Collectors.groupingBy(Yixiangcustomer::getMemberCard));
 
-                    //查询最后一次通话记录( from member_lastcallin where member_card in)
+                    //查询最后一次通话记录( from member_lastcallin where member_card_no in)
                     List<MemberLastcallin> lastcallinList = memberLastcallinDao.queryCallInByMemberCard(memberCodes);
                     Map<String, List<MemberLastcallin>> lastcallinListMap = lastcallinList.stream()
                             .collect(Collectors.groupingBy(MemberLastcallin::getMemberCard));
