@@ -70,29 +70,34 @@ public class MemberLabelSyncService {
                         tempId = c.getId();
                     }
                 }
+                //查询MySql数据库中客户的相关信息
                 List<MemberLabel> list = memberMapper.queryMemberLabelByCodes(memberCodes);
                 if (!CollectionUtils.isEmpty(list)) {
                     //查询相关病症信息
                     List<MemberDisease> memberDiseaseList = memberMapper.queryDiseaseByMemberCodes(memberCodes);
                     Map<String, List<MemberDisease>> memberDiseaseListMap = memberDiseaseList.stream()
                             .collect(Collectors.groupingBy(MemberDisease::getMemberCard));
-                    //查询综合行为
+
+                    //查询综合行为( from member_action_relation where member_card in)
                     List<ActionDict> actionDictList = memberMapper.queryActionByMemberCodes(memberCodes);
                     Map<String, List<ActionDict>> actionDictListMap = actionDictList.stream()
                             .collect(Collectors.groupingBy(ActionDict::getMemberCard));
-                    //通过会员卡号查询顾客服用效果
+
+                    //通过会员卡号查询顾客服用效果( from member_product_effect where member_card in)
                     List<MemberProduct> memberProducts=memberMapper.queryProductByMemberCodes(memberCodes);
                     Map<String, List<MemberProduct>> memberProductsMap = memberProducts.stream()
                             .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
+
                     List<MemberOrder> memberRefOrders = orderMDao.queryOrderByMemberCard(memberCodes);
                     Map<String, List<MemberOrder>> memberRefOrderMap = memberRefOrders.stream()
                             .collect(Collectors.groupingBy(MemberOrder::getMemberCard));
 
-                    //查询进线
+                    //查询进线(意向客户 from yixiangcustomer where member_card in)
                     List<Yixiangcustomer> yixiangcustomers= yixiangcustomerDao.queryByMemberCard(memberCodes);
                     Map<String, List<Yixiangcustomer>> yixiangcustomerMap = yixiangcustomers.stream()
                             .collect(Collectors.groupingBy(Yixiangcustomer::getMemberCard));
-                    //查询最后一次通话记录
+
+                    //查询最后一次通话记录( from member_lastcallin where member_card in)
                     List<MemberLastcallin> lastcallinList = memberLastcallinDao.queryCallInByMemberCard(memberCodes);
                     Map<String, List<MemberLastcallin>> lastcallinListMap = lastcallinList.stream()
                             .collect(Collectors.groupingBy(MemberLastcallin::getMemberCard));
@@ -141,23 +146,36 @@ public class MemberLabelSyncService {
 
                         }
 
+                        //首次购买商品
                         if(StringUtils.hasText(memberLabel.getFirstBuyProductCod())){
                             Set<String> set = StringUtils.commaDelimitedListToSet(memberLabel.getFirstBuyProductCod());
                             memberLabel.setFirstBuyProductCodes(new ArrayList<>(set));
                         }
+
+                        //最后一次购买商品
                         if(StringUtils.hasText(memberLabel.getLastBuyProductCode())){
                             Set<String> set = StringUtils.commaDelimitedListToSet(memberLabel.getLastBuyProductCode());
                             memberLabel.setLastBuyProductCodes(new ArrayList<>(set));
                         }
-                        memberLabel.set_id(memberLabel.getMemberCard());
+
                         String memberCard = memberLabel.getMemberCard();
+                        //设置会员卡号
+                        memberLabel.set_id(memberCard);
+
                         //获取对应会员卡号的顾客的服用效果下信息
                         List<MemberProduct> products = memberProductsMap.get(memberCard);
                         //设置顾客服用效果
                         if(!CollectionUtils.isEmpty(products)){
                             memberLabel.setMemberProductList(products);
                         }
-                        //todo 是否有积分、红包、优惠券要从DMC获取
+
+
+
+
+                        //TODO 是否有积分、红包、优惠券要从DMC获取
+
+
+
                         //获取当前顾客的综合行为
                         List<ActionDict> actionDicts =actionDictListMap.get(memberCard);
                         //设置当前顾客的综合行为
@@ -233,14 +251,18 @@ public class MemberLabelSyncService {
                                     }
                                 }
                             }
+                            //最后一次进线广告关联的商品编号
                             memberLabel.setAdvertProducts(new ArrayList<>(set));
                         }
+                        //最后一次拨打时间
                         if(lastCallTime!=null){
                             memberLabel.setLastCallTime(MongoDateHelper.getMongoDate(lastCallTime));
                         }
+                        //设置最后一次进线时间
                         if(lastCallInTime!=null){
                             memberLabel.setLastCallInTime(MongoDateHelper.getMongoDate(lastCallInTime));
                         }
+
                         //处理最后一次通话记录
                         List<MemberLastcallin> lastcallins =lastcallinListMap.get(memberCard);
                         if(!CollectionUtils.isEmpty(lastcallins)){

@@ -250,6 +250,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 for (int i = 0; i < size; i++) {
                     Criteria c = new Criteria();
                     Member_Age age = in.get(i);
+                    //   >=     getStart_age    < getEnd_age
                     andArray[i] = c.andOperator(Criteria.where("age").gte(age.getStart_age()), Criteria.where("age").lt(age.getEnd_age()));
                     and.add(c);
                 }
