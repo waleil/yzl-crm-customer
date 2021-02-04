@@ -55,8 +55,8 @@
         <result column="vip_flag" property="vip_flag" jdbcType="TINYINT"/>
         <result column="buy_intention" property="buy_intention" jdbcType="TINYINT"/>
         <result column="reject_flag" property="reject_flag" jdbcType="TINYINT"/>
-        <result column="m_grade_id" property="mGradeId" />
-        <result column="m_grade_name" property="mGradeName" />
+        <result column="m_grade_id" property="mGradeId"  jdbcType="INTEGER"/>
+        <result column="m_grade_name" property="mGradeName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.net.yzl.crm.customer.dto.member.MemberAddressAndLevelDTO" id="memberMap">
