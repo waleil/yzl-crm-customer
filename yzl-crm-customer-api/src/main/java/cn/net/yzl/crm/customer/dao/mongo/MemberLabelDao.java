@@ -925,30 +925,30 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // criteria.norOperator(exArray);
             }
         }
-        //累计消费金额
+        //累计消费金额//大于等于
         if(memberCrowdGroup.getTotal_amount()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getTotal_amount() * 100).intValue();
             and.add(Criteria.where("totalCounsumAmount").gte(am));
         }
-        //订单总金额
+        //订单总金额//大于等于
         if(memberCrowdGroup.getOrder_total_amount()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_total_amount() * 100).intValue();
             and.add(Criteria.where("totalOrderAmount").gte(am));
         }
-        //订单应收总金额
+        //订单应收总金额//大于等于
         if(memberCrowdGroup.getOrder_rec_amount()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_rec_amount() * 100).intValue();
             and.add(Criteria.where("orderRecAmount").gte(am));
         }
 
         //
-        //最高订单金额（单）
+        //最高订单金额（单）//大于等于
         if(memberCrowdGroup.getOrder_high_am()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_high_am() * 100).intValue();
             and.add(Criteria.where("orderHighAm").gte(am));
         }
 
-        //最低订单金额（单）
+        //最低订单金额（单）//大于等于
         if(memberCrowdGroup.getOrder_low_am()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_low_am() * 100).intValue();
             and.add(Criteria.where("orderLowAm").gte(am));
