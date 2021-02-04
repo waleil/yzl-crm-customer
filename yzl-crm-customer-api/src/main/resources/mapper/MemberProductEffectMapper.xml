@@ -236,6 +236,18 @@
       #{item}
     </foreach>
   </select>
+  <select id="checkMemberProductEffect" resultMap="BaseResultMap" >
+    select
+      member_card memberCard,
+      product_code productCode,
+      eating_time eatingTime,
+      product_last_num productLastNum,
+      due_date dueDate,
+      one_use_num oneUseNum,
+      one_to_times oneToTimes
+    from member_product_effect
+    where product_last_num > 0
+  </select>
   <select id="getProductEffects" parameterType="cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO"
           resultType="cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO">
     select
