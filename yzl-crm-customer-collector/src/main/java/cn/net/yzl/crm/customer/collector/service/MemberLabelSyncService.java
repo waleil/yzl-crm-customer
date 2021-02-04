@@ -184,24 +184,28 @@ public class MemberLabelSyncService {
                         if(!CollectionUtils.isEmpty(actionDicts)){
                             Map<Integer,List<ActionDict>> temp=actionDicts.stream().filter(s->s.getType()!=null).collect(Collectors.groupingBy(ActionDict::getType));
                             //方便接电话时间
-                            if(CollectionUtils.isEmpty(temp.get(1))){
+                            if(!CollectionUtils.isEmpty(temp.get(1))){
                                 memberLabel.setPhoneDictList(temp.get(1));
                             }
                             //2性格偏好
-                            if(CollectionUtils.isEmpty(temp.get(2))){
+                            if(!CollectionUtils.isEmpty(temp.get(2))){
                                 memberLabel.setMemberCharacterList(temp.get(2));
                             }
                             //3响应时间
-                            if(CollectionUtils.isEmpty(temp.get(3))){
+                            if(!CollectionUtils.isEmpty(temp.get(3))){
                                 memberLabel.setMemberResponseTimeList(temp.get(3));
                             }
                             //综合行为
-                            if(CollectionUtils.isEmpty(temp.get(5))){
+                            if(!CollectionUtils.isEmpty(temp.get(5))){
                                 memberLabel.setComprehensiveBehaviorList(temp.get(5));
                             }
                             //下单行为
-                            if(CollectionUtils.isEmpty(temp.get(6))){
+                            if(!CollectionUtils.isEmpty(temp.get(6))){
                                 memberLabel.setOrderBehaviorList(temp.get(6));
+                            }
+                            //活动偏好
+                            if(!CollectionUtils.isEmpty(temp.get(7))){
+                                memberLabel.setActivityBehaviorList(temp.get(7));
                             }
                         }
                         List<MemberDisease> diseaseList = memberDiseaseListMap.get(memberCard);

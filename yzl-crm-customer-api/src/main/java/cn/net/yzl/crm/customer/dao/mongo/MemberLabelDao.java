@@ -440,7 +440,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // criteria.norOperator(exArray);
             }
         }
-            //会员类型
+            // todo 待做
             if(!CollectionUtils.isEmpty(memberCrowdGroup.getMember_type())){
 
             }
