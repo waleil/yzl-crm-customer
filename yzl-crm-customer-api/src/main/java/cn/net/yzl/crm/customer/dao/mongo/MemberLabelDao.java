@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.dao.mongo;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
+import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Field;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Component;
@@ -69,8 +71,6 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
             query.limit(pageSize);
         }
         if (totalCount > 0) {
-            query.with(Sort.by(Sort.Order.asc("_id")));
-            query.fields().include("memberCard").include("memberName").exclude("_id");
             memberLabels = mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
         }
         query.skip(0);
@@ -78,6 +78,26 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
 
         return PageUtil.resultAssembler(memberLabels, pageNo, pageSize, totalCount.intValue());
     }
+    public Page<MemberLabelDto> memberCrowdGroupRunUsePage(Integer pageNo , Integer pageSize, Query query, Long totalCount) {
+        if (totalCount == null) {
+            totalCount = mongoTemplate.count(query, MemberLabel.class);
+        }
+        List<MemberLabelDto> memberLabels = null;
+        if (pageNo > 0 && pageSize > 0) {
+            query.skip(getStartIndex(pageNo,pageSize));
+            query.limit(pageSize);
+        }
+        if (totalCount > 0) {
+            memberLabels = mongoTemplate.find(query, MemberLabelDto.class, COLLECTION_NAME);
+        }
+        query.skip(0);
+        query.limit(0);
+
+        return PageUtil.resultAssembler(memberLabels, pageNo, pageSize, totalCount.intValue());
+    }
+
+
+
 
     /**
      * 分页开始位置
@@ -140,15 +160,14 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
     }
     /**
-     * @param memberCrowdGroup
+     * @param query
      * @Author: lichanghong
      * @Description: 规则试算
      * @Date: 2021/1/26 11:42 上午
      * @Return: java.lang.Integer
      */
-    public Integer memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
-        Query query = initQuery(memberCrowdGroup);
-        return (int) mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
+    public long memberCrowdGroupTrial(Query query) {
+        return mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
     }
 
     /**

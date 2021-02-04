@@ -5,8 +5,9 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
-import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
+import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
+import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
@@ -120,6 +121,14 @@ public class CustomerGroupController {
         return ComResponse.success(count);
     }
 
+    @ApiOperation("圈选试算同时返回部分客户数据")
+    @PostMapping("/v1/groupTrialPullData")
+    public ComResponse<Page<MemberLabelDto>> groupTrialPullData(@RequestBody member_crowd_group memberCrowdGroup) {
+        if (memberCrowdGroup == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+            Page<MemberLabelDto> memberLabelPage = customerGroupService.groupTrialPullData(memberCrowdGroup);
+            return ComResponse.success(memberLabelPage);
+    }
+
     @ApiOperation("圈选")
     @PostMapping("/v1/groupRun")
     public ComResponse<Integer> memberCrowdGroupRun(@RequestBody member_crowd_group memberCrowdGroup) {
@@ -139,6 +148,18 @@ public class CustomerGroupController {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         }
         return ComResponse.success(count);
+    }
+
+    @ApiOperation("通过群组Id圈选试算同时返回部分客户数据")
+    @PostMapping("/v1/groupTrialPullDataById")
+    public ComResponse<Page<MemberLabelDto>> groupTrialPullDataById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO) {
+        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        Page<MemberLabelDto> page = customerGroupService.groupTrialByIdPullData(crowdGroupOpVO);
+        if (page == null) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        }
+        return ComResponse.success(page);
     }
 
     @ApiOperation("通过群组Id圈选")

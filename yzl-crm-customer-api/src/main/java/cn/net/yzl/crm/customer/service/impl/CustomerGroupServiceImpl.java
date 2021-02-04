@@ -10,6 +10,7 @@ import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
+import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
@@ -24,7 +25,9 @@ import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Field;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
@@ -177,8 +180,23 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
     @Override
     public int memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
+        //进行顾客人群圈选
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        //圈选试算
+        return (int) memberLabelDao.memberCrowdGroupTrial(query);
+    }
 
-        return memberLabelDao.memberCrowdGroupTrial(memberCrowdGroup);
+
+    @Override
+    public Page<MemberLabelDto> groupTrialPullData(member_crowd_group memberCrowdGroup) {
+        //进行顾客人群圈选
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        //圈选试算
+        Long count = memberLabelDao.memberCrowdGroupTrial(query);
+        //query.with(Sort.by(Sort.Order.asc("_id")));
+        appendQueryAttr(query,"memberCard,memberName,sex".split(","),"_id".split(","));
+        Page<MemberLabelDto> page = memberLabelDao.memberCrowdGroupRunUsePage(1, 50, query,count);
+        return page;
     }
 
 
@@ -222,6 +240,8 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         //获取记录的总条数
         boolean hasNext = true;
         int matchCount = 0;
+        query.with(Sort.by(Sort.Order.asc("_id")));
+        query.fields().include("memberCard").include("memberName").exclude("_id");
         while (hasNext) {
             //分页查询
             memberLabelPage = memberLabelDao.memberCrowdGroupRunUsePage(pageNo, pageSize, query);
@@ -381,6 +401,17 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return memberCrowdGroupTrial(memberCrowdGroup);
     }
 
+    @Override
+    public Page<MemberLabelDto>  groupTrialByIdPullData(MemberCrowdGroupOpVO crowdGroupOpVO){
+        //查询规则
+        member_crowd_group memberCrowdGroup = memberCrowdGroupDao.getMemberCrowdGroup(crowdGroupOpVO.get_id());
+        Page<MemberLabelDto> page = null;
+        if (memberCrowdGroup == null) {
+            return page;
+        }
+        return this.groupTrialPullData(memberCrowdGroup);
+    }
+
     /**
      * 通过id查询规则并运行规则
      * wangzhe
@@ -396,6 +427,28 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             return -1;
         }
         return memberCrowdGroupRun(memberCrowdGroup);
+    }
+
+    /**
+     * 构造要查询的属性和要过滤的属性
+     * wangzhe
+     * 2021-02-04
+     * @param query 查询对象
+     * @param include 包含
+     * @param exclude 不包含
+     */
+    private void appendQueryAttr(Query query,String[] include,String[] exclude){
+        Field fields = query.fields();
+        if (include == null) {
+            for (String p : include) {
+                fields.include(p);
+            }
+        }
+        if (exclude == null) {
+            for (String p : include) {
+                fields.exclude("_id");
+            }
+        }
     }
 
 }
