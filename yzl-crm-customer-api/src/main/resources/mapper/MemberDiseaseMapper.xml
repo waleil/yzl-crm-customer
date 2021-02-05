@@ -134,6 +134,15 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
+  <update id="updateMemberDiseaseByDiseaseId" parameterType="cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO" >
+    update
+        member_disease
+    set
+        disease_id = #{newDiseaseId,jdbcType=INTEGER}
+    where
+        disease_id = #{oldDiseaseId,jdbcType=INTEGER} and del_flag = 0
+  </update>
+
   <select id="queryByMemberCodes" resultType="cn.net.yzl.crm.customer.model.mogo.MemberDisease" parameterType="list" >
     select
     member_card as memberCard, disease_id as diseaseId, disease_name as diseaseName

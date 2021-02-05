@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.MemberDisease;
+import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -55,4 +56,14 @@ public interface MemberDiseaseMapper {
      * @Return:
      */
     List<cn.net.yzl.crm.customer.model.mogo.MemberDisease> queryByMemberCodes(List<String> codes);
+
+    /**
+     * 替换顾客病症id
+     * wangzhe
+     * 2021-02-05
+     * @param vo
+     * @return
+     */
+    Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo);
+
 }
