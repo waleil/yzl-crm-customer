@@ -27,7 +27,7 @@ public class MemberRestController {
 	@Resource
 	private MemberRestService memberRestService;
 
-	@ApiOperation(value = "统计激活、正常、会员总数", notes = "统计激活、正常、会员总数")
+	@ApiOperation(value = "统计激活、正常、会员总数：作者张维维", notes = "统计激活、正常、会员总数：作者张维维")
 	@PostMapping("/v1/querymembercount")
 	public ComResponse<Integer> queryMemberCount(@RequestBody MemberQuery memberQuery) {
 		if (memberQuery.getOrderTimeFrom() == null) {
