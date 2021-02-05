@@ -221,8 +221,7 @@
   <update id="updateMemberProductLastNumByMemberCards">
     update member_product_effect
     set
-        product_last_num = product_last_num - eating_time,
-        upate_time=NOW(),
+        product_last_num = (CASE when (product_last_num - eating_time) > 0 THEN (product_last_num - eating_time) else 0 end),
         updator='SYSTEM'
     where
         id in
@@ -312,7 +311,7 @@
         FROM
             member_product_effect
         WHERE
-            product_count > 0
+            product_last_num > 0
         ORDER BY id DESC
     </select>
 

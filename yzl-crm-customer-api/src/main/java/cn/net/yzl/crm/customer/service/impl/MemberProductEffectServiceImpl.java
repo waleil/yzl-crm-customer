@@ -2,6 +2,8 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -268,15 +270,26 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * 2021-02-05
      * @return
      */
-    @Override
+    @Override/*22:00*/
     public ComResponse<Boolean> updateMemberProductLastNumAndCreateWorkOrder() {
         log.info("update member product last num: start,当前时间{}",new Date());
         //查询配置规则
-        ComResponse<Integer> rules = workOrderClient.queryReturnVisitRules();
-        Integer configDay = rules.getData();
+        ComResponse<Integer> rules = null;
+        try {
+            rules = workOrderClient.queryReturnVisitRules();
+        } catch (Exception e) {
+            log.error("update member product last num:查询配置规则异常：{}",e);
+        }
+        Integer configDay = rules == null || rules.getData() == null ? Integer.MIN_VALUE : rules.getData();
+
+        log.info("update member product last num:查询配置规则,当前配置为：{}",configDay);
         Integer pageNo = 1, pageSize = 2_000;
         boolean hasNext = true;
         List<Integer> idList = new ArrayList<>();
+        //计算商品服用完日期和当前时间的天数差
+        long betweenDay;
+        //获取系统当前时间
+        Date currentDateStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getCurrentDateStart();
         while (hasNext) {
             //分页查询顾客的商品服用效果
             PageHelper.startPage(pageNo, pageSize);
@@ -288,8 +301,12 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
             //更新数据
             for (MemberProductEffect item : list) {
                 idList.add(item.getId());//用户更新商品的数量
+                if (item.getDueDate() == null) {
+                    continue;
+                }
                 //小于最小服用天数
-                if (item.getProductLastNum() < configDay){
+                betweenDay = DateUtil.between(currentDateStart, item.getDueDate(), DateUnit.DAY,false);
+                if (betweenDay < configDay){
                     //判断缓存是否存在(防止重复回访)
                     if (item.getProductLastNum() < configDay){
                         if (!CacheForProductEffectUtil.getAndSetNx(item.getMemberCard())) {
