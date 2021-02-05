@@ -2,6 +2,8 @@ package cn.net.yzl.crm.customer.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -19,8 +21,10 @@ import lombok.ToString;
 @ToString
 @ApiModel(description = "会员查询条件")
 public class MemberQuery {
-	@ApiModelProperty(value = "下单时间最小值(yyyy-MM-dd)", required = true)
+	@ApiModelProperty(value = "下单时间最小值(yyyy-MM-dd HH:mm:ss)", required = true)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime orderTimeFrom;
-	@ApiModelProperty(value = "下单时间最大值(yyyy-MM-dd)", required = true)
+	@ApiModelProperty(value = "下单时间最大值(yyyy-MM-dd HH:mm:ss)", required = true)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime orderTimeTo;
 }
