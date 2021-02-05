@@ -11,6 +11,7 @@ import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.BeanUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.*;
@@ -303,6 +304,15 @@ public class CustomerController {
     })
     public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(@NotBlank String memberCard) {
         return  memberService.getMemberGradeRecordList(memberCard);
+
+    }
+
+
+    @ApiOperation("顾客病症-根据病症id更新顾客病症")
+    @PostMapping("/v1/updateMemberDiseaseByDiseaseId")
+    public ComResponse<Integer> updateMemberDiseaseByDiseaseId(@RequestBody MemberDiseaseIdUpdateVO memberDiseaseIdUpdateVO) {
+        Integer integer = memberService.updateMemberDiseaseByDiseaseId(memberDiseaseIdUpdateVO);
+        return  ComResponse.success(integer);
 
     }
 

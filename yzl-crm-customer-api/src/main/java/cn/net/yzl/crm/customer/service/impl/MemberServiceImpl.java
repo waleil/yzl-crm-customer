@@ -6,6 +6,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.entity.PageParam;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.AssemblerResultUtil;
+import cn.net.yzl.crm.customer.dao.MemberDiseaseMapper;
 import cn.net.yzl.crm.customer.dao.MemberGradeRecordDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
@@ -18,6 +19,7 @@ import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    MemberDiseaseMapper memberDiseaseMapper;
+
 
     private String memberCountkey="memeberCount";
 
@@ -360,6 +366,17 @@ public class MemberServiceImpl implements MemberService {
             return ComResponse.nodata();
         }
         return ComResponse.success(list);
+    }
+
+
+    /**
+     * 更新顾客病症id
+     * @param vo
+     * @return
+     */
+    @Override
+    public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo) {
+       return memberDiseaseMapper.updateMemberDiseaseByDiseaseId(vo);
     }
 
 

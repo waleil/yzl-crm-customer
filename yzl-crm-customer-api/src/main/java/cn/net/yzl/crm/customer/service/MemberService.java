@@ -8,6 +8,7 @@ import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 
 import java.util.List;
@@ -145,4 +146,6 @@ public interface MemberService {
     List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList);
 
     ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(String memberCard);
+
+    public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo);
 }
