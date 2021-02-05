@@ -216,6 +216,20 @@
       one_to_times = #{oneToTimes,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <update id="updateMemberProductLastNumByMemberCards">
+    update member_product_effect
+    set
+        product_last_num = product_last_num - eating_time,
+        upate_time=NOW(),
+        updator='SYSTEM'
+    where
+        id in
+    <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </update>
   <select id="queryByMemberCodes" parameterType="list" resultType="cn.net.yzl.crm.customer.model.mogo.MemberProduct" >
     select
       member_card memberCard,
@@ -279,5 +293,27 @@
 <!--    </if>-->
 
   </select>
+    <select id="selectMemberProductEffectByPage"
+            resultType="cn.net.yzl.crm.customer.model.db.MemberProductEffect">
+        SELECT
+          id id,
+          member_card memberCard,
+          order_no orderNo,
+          product_code productCode,
+          product_name productName,
+          eating_time eatingTime,
+          product_last_num productLastNum,
+          due_date dueDate,
+          taking_state takingState,
+          taking_effect takingEffect,
+          product_count productCount,
+          one_use_num oneUseNum,
+          one_to_times oneToTimes
+        FROM
+            member_product_effect
+        WHERE
+            product_count > 0
+        ORDER BY id DESC
+    </select>
 
 </mapper>

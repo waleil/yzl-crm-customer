@@ -9,14 +9,17 @@ import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.MemberProductEffectMapper;
 import cn.net.yzl.crm.customer.dao.MemberProductEffectRecordMapper;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
+import cn.net.yzl.crm.customer.feign.client.workorder.WorkOrderClient;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.db.MemberProductEffect;
 import cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.sys.BizException;
+import cn.net.yzl.crm.customer.utils.CacheForProductEffectUtil;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectUpdateVO;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -35,11 +39,17 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
 
     @Autowired
+    WorkOrderClient workOrderClient;
+
+    @Autowired
     MemberProductEffectMapper memberProductEffectMapper;
     @Autowired
     MemberProductEffectRecordMapper memberProductEffectRecordMapper;
     @Autowired
     MemberMapper memberMapper;
+
+    //客户编号
+    List<String> memberCardList = new ArrayList<>();
 
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -252,8 +262,57 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
     }
 
-
-
+    /**
+     * 修改顾客的商品剩余数量
+     * wangzhe
+     * 2021-02-05
+     * @return
+     */
+    @Override
+    public ComResponse<Boolean> updateMemberProductLastNumAndCreateWorkOrder() {
+        log.info("update member product last num: start,当前时间{}",new Date());
+        //查询配置规则
+        ComResponse<Integer> rules = workOrderClient.queryReturnVisitRules();
+        Integer configDay = rules.getData();
+        Integer pageNo = 1, pageSize = 2_000;
+        boolean hasNext = true;
+        List<Integer> idList = new ArrayList<>();
+        while (hasNext) {
+            //分页查询顾客的商品服用效果
+            PageHelper.startPage(pageNo, pageSize);
+            List<MemberProductEffect> list = memberProductEffectMapper.selectMemberProductEffectByPage();
+            if (list.size() < pageSize) {
+                hasNext = false;
+            }
+            pageNo++;
+            //更新数据
+            for (MemberProductEffect item : list) {
+                idList.add(item.getId());//用户更新商品的数量
+                //小于最小服用天数
+                if (item.getProductLastNum() < configDay){
+                    //判断缓存是否存在(防止重复回访)
+                    if (item.getProductLastNum() < configDay){
+                        if (!CacheForProductEffectUtil.getAndSetNx(item.getMemberCard())) {
+                            memberCardList.add(item.getMemberCard());
+                        }
+                    }
+                }
+            }
+            //更新商品剩余量
+            if (CollectionUtil.isNotEmpty(idList)) {
+                Integer count = memberProductEffectMapper.updateMemberProductLastNumByMemberCards(idList);
+                log.info("update member product last num: record count:{}",count);
+            }
+            //次日回访
+            if (CollectionUtil.isNotEmpty(memberCardList)){
+                ComResponse<Boolean> response = workOrderClient.productDosage(memberCardList);
+                log.info("update member product last num:进行次日回访:状态{},状态码{},message{}",response.getStatus(),response.getCode(),response.getMessage());
+                memberCardList.clear();
+            }
+        }
+        log.info("update member product last num: end,当前时间{}",new Date());
+        return ComResponse.success(true);
+    }
 
 
 }

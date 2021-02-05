@@ -4,6 +4,7 @@ import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
 import cn.net.yzl.crm.customer.model.db.MemberProductEffect;
 import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -57,4 +58,8 @@ public interface MemberProductEffectMapper {
     List<MemberProductEffectDTO> getProductEffects(MemberProductEffectSelectVO productEffect);
 
     List<MemberProductEffect> checkMemberProductEffect();
+
+    List<MemberProductEffect> selectMemberProductEffectByPage();
+
+    Integer updateMemberProductLastNumByMemberCards(@Param("ids") List<Integer> memberCardList);
 }
