@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.dao.mongo;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
+import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Field;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Component;
@@ -69,8 +71,6 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
             query.limit(pageSize);
         }
         if (totalCount > 0) {
-            query.with(Sort.by(Sort.Order.asc("_id")));
-            query.fields().include("memberCard").include("memberName").exclude("_id");
             memberLabels = mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
         }
         query.skip(0);
@@ -78,6 +78,26 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
 
         return PageUtil.resultAssembler(memberLabels, pageNo, pageSize, totalCount.intValue());
     }
+    public Page<MemberLabelDto> memberCrowdGroupRunUsePage(Integer pageNo , Integer pageSize, Query query, Long totalCount) {
+        if (totalCount == null) {
+            totalCount = mongoTemplate.count(query, MemberLabel.class);
+        }
+        List<MemberLabelDto> memberLabels = null;
+        if (pageNo > 0 && pageSize > 0) {
+            query.skip(getStartIndex(pageNo,pageSize));
+            query.limit(pageSize);
+        }
+        if (totalCount > 0) {
+            memberLabels = mongoTemplate.find(query, MemberLabelDto.class, COLLECTION_NAME);
+        }
+        query.skip(0);
+        query.limit(0);
+
+        return PageUtil.resultAssembler(memberLabels, pageNo, pageSize, totalCount.intValue());
+    }
+
+
+
 
     /**
      * 分页开始位置
@@ -140,15 +160,14 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
     }
     /**
-     * @param memberCrowdGroup
+     * @param query
      * @Author: lichanghong
      * @Description: 规则试算
      * @Date: 2021/1/26 11:42 上午
      * @Return: java.lang.Integer
      */
-    public Integer memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
-        Query query = initQuery(memberCrowdGroup);
-        return (int) mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
+    public long memberCrowdGroupTrial(Query query) {
+        return mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
     }
 
     /**
@@ -220,6 +239,15 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 and.add(Criteria.where("hasTedBag").is(false));
             }
         }
+
+        //是否有积分
+        if (memberCrowdGroup.getIntegral() != null) {
+            if (memberCrowdGroup.getIntegral() == 1) {
+                and.add(Criteria.where("hasIntegral").is(true));
+            } else {
+                and.add(Criteria.where("hasIntegral").is(false));
+            }
+        }
         //是否为会员
         if (memberCrowdGroup.getVip() != null) {
             if (memberCrowdGroup.getVip() == 1) {
@@ -241,6 +269,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 for (int i = 0; i < size; i++) {
                     Criteria c = new Criteria();
                     Member_Age age = in.get(i);
+                    //   >=     getStart_age    < getEnd_age
                     andArray[i] = c.andOperator(Criteria.where("age").gte(age.getStart_age()), Criteria.where("age").lt(age.getEnd_age()));
                     and.add(c);
                 }
@@ -332,6 +361,29 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 }
             }
         }
+        //类别
+        if (!CollectionUtils.isEmpty(memberCrowdGroup.getMember_type())) {
+            List<crowd_member_type> memberTypes = memberCrowdGroup.getMember_type();
+            Map<Integer, List<crowd_member_type>> temps = memberTypes.stream().collect(Collectors.groupingBy(crowd_member_type::getInclude));
+            List<crowd_member_type> in = temps.get(1);
+            List<crowd_member_type> ex = temps.get(0);
+            if (!CollectionUtils.isEmpty(in)) {
+                int size = in.size();
+                for (int i = 0; i < size; i++) {
+                    crowd_member_type c = in.get(i);
+                    and.add(Criteria.where("memberType").is(c.getId()));
+                }
+            }
+
+            if (!CollectionUtils.isEmpty(ex)) {
+                int size = ex.size();
+                for (int i = 0; i < size; i++) {
+                    crowd_member_type c = ex.get(i);
+                    not.add(Criteria.where("memberType").is(c.getId()));
+                }
+            }
+        }
+
         //活跃度
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getActive_degree())) {
             List<crowd_activity_degree> activeDegrees = memberCrowdGroup.getActive_degree();
@@ -718,6 +770,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //是否为活动单
         if (memberCrowdGroup.getActive_order() != null) {
+          //  and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(memberCrowdGroup.getActive_order()))));
             if (memberCrowdGroup.getActive_order() == 1) {
                 and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("activityFlag").is(true))));
             } else {
@@ -834,9 +887,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         if (memberCrowdGroup.getPay_state() != null) {
             and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(memberCrowdGroup.getPay_state()))));
 //            if (memberCrowdGroup.getPay_state() == 1) {
-//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(memberCrowdGroup.getPay_state()))));
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(true))));
 //            } else {
-//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(0))));
+//                and.add((Criteria.where("memberOrders").elemMatch(Criteria.where("payStatus").is(false))));
 //            }
         }
         //物流状态
@@ -891,30 +944,30 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // criteria.norOperator(exArray);
             }
         }
-        //累计消费金额
+        //累计消费金额//大于等于
         if(memberCrowdGroup.getTotal_amount()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getTotal_amount() * 100).intValue();
             and.add(Criteria.where("totalCounsumAmount").gte(am));
         }
-        //订单总金额
+        //订单总金额//大于等于
         if(memberCrowdGroup.getOrder_total_amount()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_total_amount() * 100).intValue();
             and.add(Criteria.where("totalOrderAmount").gte(am));
         }
-        //订单应收总金额
+        //订单应收总金额//大于等于
         if(memberCrowdGroup.getOrder_rec_amount()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_rec_amount() * 100).intValue();
             and.add(Criteria.where("orderRecAmount").gte(am));
         }
 
         //
-        //最高订单金额（单）
+        //最高订单金额（单）//大于等于
         if(memberCrowdGroup.getOrder_high_am()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_high_am() * 100).intValue();
             and.add(Criteria.where("orderHighAm").gte(am));
         }
 
-        //最低订单金额（单）
+        //最低订单金额（单）//大于等于
         if(memberCrowdGroup.getOrder_low_am()!=null){
             int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_low_am() * 100).intValue();
             and.add(Criteria.where("orderLowAm").gte(am));

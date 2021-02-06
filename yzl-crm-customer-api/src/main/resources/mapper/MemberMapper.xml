@@ -718,6 +718,7 @@
         m.media_id,
         m.media_type_code,
         m.region_code,
+        m.region_name,
         m.province_code,
         m.city_code,
         m.qq,

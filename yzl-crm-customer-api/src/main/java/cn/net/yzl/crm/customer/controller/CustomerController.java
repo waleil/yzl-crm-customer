@@ -311,6 +311,9 @@ public class CustomerController {
     @ApiOperation("顾客病症-根据病症id更新顾客病症")
     @PostMapping("/v1/updateMemberDiseaseByDiseaseId")
     public ComResponse<Integer> updateMemberDiseaseByDiseaseId(@RequestBody MemberDiseaseIdUpdateVO memberDiseaseIdUpdateVO) {
+        if (memberDiseaseIdUpdateVO == null || memberDiseaseIdUpdateVO.getNewDiseaseId() == null || memberDiseaseIdUpdateVO.getOldDiseaseId() == null) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+        }
         Integer integer = memberService.updateMemberDiseaseByDiseaseId(memberDiseaseIdUpdateVO);
         return  ComResponse.success(integer);
 
