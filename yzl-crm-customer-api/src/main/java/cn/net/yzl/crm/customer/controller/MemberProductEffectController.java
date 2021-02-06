@@ -80,4 +80,14 @@ public class MemberProductEffectController {
         return result;
 
     }
+
+
+    @ApiOperation(value = "商品服用效果，根据配置查询出距离商品服用完日期不足多少天的库存的会员号，进行回访", notes = "商品服用效果，根据配置查询出距离商品服用完日期不足多少天的库存的会员号，进行回访")
+    @RequestMapping(value = "/v1/udateMemberProductLastNumAndCreateWorkOrder", method = RequestMethod.GET)
+    public ComResponse udateMemberProductLastNumAndCreateWorkOrder() {
+        ComResponse result = memberProductEffectService.updateMemberProductLastNumAndCreateWorkOrder();
+        return result;
+    }
+
+
 }
