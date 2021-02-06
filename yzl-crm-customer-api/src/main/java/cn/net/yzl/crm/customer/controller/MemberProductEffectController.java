@@ -23,7 +23,7 @@ import java.util.List;
  * 2021-01-27
  */
 @RestController
-@RequestMapping("/memberProductEffect")
+@RequestMapping("memberProductEffect")
 @Api(value = "顾客商品服用效果", tags = {"顾客商品服用效果"})
 @Validated
 public class MemberProductEffectController {
