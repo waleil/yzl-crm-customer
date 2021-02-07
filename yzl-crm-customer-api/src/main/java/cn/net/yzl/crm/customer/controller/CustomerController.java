@@ -14,6 +14,7 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
@@ -333,6 +334,28 @@ public class CustomerController {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
         }
         ComResponse<MemberGroupCodeDTO> response = memberService.coilInDealMemberData(coilInVo);
+        return response;
+
+    }
+
+    /*@ApiOperation("顾客管理-处理工单、下单时顾客信息")
+    @PostMapping("/v1/dealWorkOrderUpdateMemberData")
+    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(@RequestBody MemberCoilInVO coilInVo) {
+        if (coilInVo == null) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+        }
+        ComResponse<Boolean> response = memberService.dealWorkOrderUpdateMemberData(coilInVo);
+        return response;
+
+    }*/
+
+    @ApiOperation("顾客管理-订单签收后更新顾客信息")
+    @PostMapping("/v1/orderSignUpdateMemberData")
+    public ComResponse<Boolean> orderSignUpdateMemberData(@RequestBody OrderSignInfo4MqVO orderInfo4MqVo) {
+        if (orderInfo4MqVo == null) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+        }
+        ComResponse<Boolean> response = memberService.orderSignUpdateMemberData(orderInfo4MqVo);
         return response;
 
     }

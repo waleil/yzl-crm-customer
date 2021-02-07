@@ -9,6 +9,7 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 
 import java.util.List;
 
@@ -154,5 +155,18 @@ public interface MemberService {
      * @param coilInVo
      * @return
      */
+
     public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(MemberCoilInVO coilInVo);
+
+    //public ComResponse<MemberGroupCodeDTO> coilInSaveMemberData(MemberCoilInVO coilInVo);
+
+    /**
+     * 订单签收是更新顾客关联的信息
+     * wanghe
+     * 2021-02-07
+     * @param orderInfo4MqVo
+     * @return
+     */
+    ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo);
+
 }

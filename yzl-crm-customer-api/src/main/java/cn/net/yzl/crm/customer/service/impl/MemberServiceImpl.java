@@ -2,7 +2,6 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.net.yzl.activity.model.responseModel.ActivityProductResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -14,13 +13,12 @@ import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.member.*;
-import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
-import cn.net.yzl.crm.customer.feign.client.product.ProductFien;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
+import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.service.impl.phone.MemberPhoneServiceImpl;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -30,7 +28,7 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
-import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
+import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -62,12 +59,10 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     MemberLabelDao memberLabelDao;
     @Autowired
-    ActivityFien activityFien;
-    @Autowired
-    ProductFien productFien;
-    @Autowired
     ProductConsultationMapper productConsultationMapper;
 
+    @Autowired
+    MemberProductEffectService memberProductEffectService;
 
     private String memberCountkey="memeberCount";
 
@@ -397,9 +392,81 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo) {
-       return memberDiseaseMapper.updateMemberDiseaseByDiseaseId(vo);
+    public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO orderVo) {
+       return memberDiseaseMapper.updateMemberDiseaseByDiseaseId(orderVo);
     }
+
+//    @Override
+//    public ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo) {
+//        //获取顾客的商品服用效果表 member_product_effect，更新里面的
+//        MemberProductEffectSelectVO effectVo = new MemberProductEffectSelectVO();
+//
+//
+//        ComResponse<List<MemberProductEffectDTO>> productEffectResult = memberProductEffectService.getProductEffects(effectVo);
+//        List<MemberProductEffectDTO> productEffectList = productEffectResult.getData();
+//        //查询历史商品服用效果
+//        Map<String, MemberProductEffectDTO> dtoMap= new HashMap<>();
+//        if (CollectionUtil.isNotEmpty(productEffectList)) {
+//            for (MemberProductEffectDTO dto : productEffectList) {
+//                dtoMap.put(dto.getProductCode(), dto);
+//            }
+//        }
+
+//        //订单购买的商品
+//        List<OrderProductVO> productList = orderInfo4MqVo.getProductList();
+//        //之前没有购买过的商品
+//        List<MemberProductEffectInsertVO> productVoList = new ArrayList<>();
+//        for (OrderProductVO productVO : productList) {
+//            MemberProductEffectDTO dto = dtoMap.get(productVO.getProductCode());
+//            //没有则新增
+//            if (dto == null) {
+//                MemberProductEffectInsertVO vo = new MemberProductEffectInsertVO();
+//                vo.setMemberCard();
+//            }
+//        }
+
+
+
+/*
+
+        查询客户所有的商品服用效果记录，更新
+        product_name
+        product_last_num(++) 商品剩余量
+        due_date  商品服用完日期
+        product_count 购买商品数量
+        upate_time
+        updator
+
+        //更新member_order_stat
+        total_counsum_amount 累计消费金额
+        累计订单总金额 total_order_amount    【这个是下单的时候更新还是签收的时候更新】
+        累计订单应收总金额 order_rec_amount 【这个需要更新吗】
+        //最后一次下单时间 last_order_time
+        //最后一次购买商品 last_buy_product_code
+        order_high_am 订单最低金额
+        order_low_am 订单最高金额
+        order_avg_am 订单平均金额
+        //product_type_cnt 购买产品种类个数
+        总平均购买天数 day_avg_count (现在时间 - 首次下单时间)/订单数
+        年度平均购买天数   year_avg_count
+        最后一次签收时间 last_sign_time
+
+
+        从DMC获取顾客级别，判断顾客是否升级；修改member里面的会员级别   ，修改 member_grade_record 会员信息
+
+
+        更新member_label*/
+
+
+
+
+
+
+
+
+
+//        return null;
+//    }
 
 
     /**
@@ -525,6 +592,11 @@ public class MemberServiceImpl implements MemberService {
         dto.setMemberGroupCode(groupId);
 
         return ComResponse.success(dto);
+    }
+
+    @Override
+    public ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo) {
+        return null;
     }
 
 
