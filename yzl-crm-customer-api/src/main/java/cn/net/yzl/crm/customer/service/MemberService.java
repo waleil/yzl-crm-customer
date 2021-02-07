@@ -154,5 +154,5 @@ public interface MemberService {
      * @param coilInVo
      * @return
      */
-    public ComResponse<MemberGroupCodeDTO> coilInSaveMemberData(MemberCoilInVO coilInVo);
+    public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(MemberCoilInVO coilInVo);
 }

@@ -326,13 +326,13 @@ public class CustomerController {
      * @param coilInVo
      * @return
      */
-    @ApiOperation("顾客管理-实时进线时，保存顾客信息")
-    @PostMapping("/v1/coilInSaveMemberData")
-    public ComResponse<MemberGroupCodeDTO> coilInSaveMemberData(@RequestBody MemberCoilInVO coilInVo) {
+    @ApiOperation("顾客管理-实时进线时，处理顾客信息")
+    @PostMapping("/v1/coilInDealMemberData")
+    public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(@RequestBody MemberCoilInVO coilInVo) {
         if (coilInVo == null) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
         }
-        ComResponse<MemberGroupCodeDTO> response = memberService.coilInSaveMemberData(coilInVo);
+        ComResponse<MemberGroupCodeDTO> response = memberService.coilInDealMemberData(coilInVo);
         return response;
 
     }

@@ -409,7 +409,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public ComResponse<MemberGroupCodeDTO> coilInSaveMemberData(MemberCoilInVO coilInVo){
+    public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(MemberCoilInVO coilInVo){
         //判断当前号码是否已经使用
         ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(coilInVo.getCallerPhone());
         Integer status = response.getStatus();
