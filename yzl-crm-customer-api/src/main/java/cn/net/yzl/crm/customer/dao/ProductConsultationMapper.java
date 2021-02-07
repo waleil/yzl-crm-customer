@@ -1,7 +1,10 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.ProductConsultation;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ProductConsultationMapper {
@@ -52,4 +55,8 @@ public interface ProductConsultationMapper {
      * @mbggenerated Mon Jan 25 17:10:49 CST 2021
      */
     int updateByPrimaryKey(ProductConsultation record);
+
+
+    //根据会员卡号删除客户对应编号的商品
+    int deleteByMemberCardAndProductCodes(String memberCard, @Param("list") List<String> list);
 }

@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.net.yzl.activity.model.responseModel.ActivityProductResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -12,9 +13,10 @@ import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
-import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
 import cn.net.yzl.crm.customer.dto.member.*;
-import cn.net.yzl.crm.customer.model.Member;
+import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
+import cn.net.yzl.crm.customer.feign.client.product.ProductFien;
+import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
@@ -28,14 +30,15 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import cn.net.yzl.crm.customer.model.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -58,6 +61,12 @@ public class MemberServiceImpl implements MemberService {
     MemberPhoneServiceImpl memberPhoneService;
     @Autowired
     MemberLabelDao memberLabelDao;
+    @Autowired
+    ActivityFien activityFien;
+    @Autowired
+    ProductFien productFien;
+    @Autowired
+    ProductConsultationMapper productConsultationMapper;
 
 
     private String memberCountkey="memeberCount";
@@ -346,8 +355,6 @@ public class MemberServiceImpl implements MemberService {
         memberCrowdGroupDao.updateMemberToMongo(member);
     }
 
-    @Autowired
-    private ProductConsultationMapper productConsultationMapper;
 
     @Override
     @Transactional
@@ -445,16 +452,49 @@ public class MemberServiceImpl implements MemberService {
             label.setAdverCode(coilInVo.getAdvId());
             label.setAdverName(coilInVo.getAdvName());
             memberLabelDao.save(label);
-            //TODO 添加会员咨询商品记录（更新product_consultation 去重）【这个表里面有咨询时间，还要去重吗？？？】
-
-
+            //添加会员咨询商品记录（更新product_consultation 去重）
+            ComResponse<List<ActivityProductResponse>> activityProducts
+                    = activityFien.getProductListByActivityBusNo((long) coilInVo.getAdvId());
+            List<ActivityProductResponse> productList = activityProducts.getData();
+            StringBuilder sb = new StringBuilder();
+            if (CollectionUtil.isNotEmpty(productList)) {
+                for (ActivityProductResponse product : productList) {
+                    sb.append(product.getProductCode()).append(",");
+                }
+            }
+            String productCodeStr = sb.length() > 0 ? sb.substring(0,sb.length()-1) : "";
+            if (StringUtils.isNotEmpty(productCodeStr)) {
+                ComResponse<List<ProductMainDTO>> productResult = productFien.queryByProductCodes(productCodeStr);
+                List<ProductMainDTO> products = productResult.getData();
+                //用于删除商品
+                List<String> pcCodeList = new ArrayList<>();
+                //咨询的商品集合
+                List<ProductConsultationInsertVO> pcList = new ArrayList<>();
+                Date date = new Date();
+                for (ProductMainDTO dto : products) {
+                    ProductConsultationInsertVO pc = new ProductConsultationInsertVO();
+                    pc.setConsultationTime(date);
+                    pc.setMemberCard(memberCard);
+                    pc.setMemberCard(dto.getProductCode());
+                    pc.setProductName(dto.getName());
+                    pcCodeList.add(dto.getProductCode());
+                    pcList.add(pc);
+                }
+                //删除该客户的匹配到的商品
+                productConsultationMapper.deleteByMemberCardAndProductCodes(memberCard, pcCodeList);
+                //批量保存
+                ComResponse<String> saveResult = this.addProductConsultation(pcList);
+            }
         }
-        //会员已经存在
+        //会员已经存在的情景
         else{
             //判断顾客是否已经被圈选
             groupId = customerGroupService.queryGroupIdByMemberCard(member.getMember_card());
-            label.setMemberCard(member.getMember_card());
-            label.setMemberCard(member.getMember_name());
+            //用于后面对该顾客进行圈选
+            if (StringUtils.isEmpty(groupId)) {
+                label.setMemberCard(member.getMember_card());
+                label.setMemberCard(member.getMember_name());
+            }
         }
         //没有圈选的客户进行圈选
         if (StringUtils.isEmpty(groupId)) {
@@ -480,9 +520,7 @@ public class MemberServiceImpl implements MemberService {
             }
         }
         //返回顾客编号、群组编号；
-
         MemberGroupCodeDTO dto = new MemberGroupCodeDTO();
-
         dto.setMemberCard(member.getMember_card());
         dto.setMemberGroupCode(groupId);
 
