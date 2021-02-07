@@ -13,6 +13,7 @@ import cn.net.yzl.crm.customer.utils.BeanUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
+import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
@@ -316,6 +317,23 @@ public class CustomerController {
         }
         Integer integer = memberService.updateMemberDiseaseByDiseaseId(memberDiseaseIdUpdateVO);
         return  ComResponse.success(integer);
+
+    }
+
+
+    /**
+     * 处理实时进线时，保存顾客信息
+     * @param coilInVo
+     * @return
+     */
+    @ApiOperation("顾客管理-实时进线时，保存顾客信息")
+    @PostMapping("/v1/coilInSaveMemberData")
+    public ComResponse<MemberGroupCodeDTO> coilInSaveMemberData(@RequestBody MemberCoilInVO coilInVo) {
+        if (coilInVo == null) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+        }
+        ComResponse<MemberGroupCodeDTO> response = memberService.coilInSaveMemberData(coilInVo);
+        return response;
 
     }
 

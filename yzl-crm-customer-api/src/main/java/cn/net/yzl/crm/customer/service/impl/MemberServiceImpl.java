@@ -1,9 +1,9 @@
 package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
-import cn.net.yzl.common.entity.PageParam;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.MemberDiseaseMapper;
@@ -11,17 +11,25 @@ import cn.net.yzl.crm.customer.dao.MemberGradeRecordDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
+import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
+import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
 import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.model.Member;
+import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
+import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
+import cn.net.yzl.crm.customer.service.CustomerGroupService;
 import cn.net.yzl.crm.customer.service.MemberService;
+import cn.net.yzl.crm.customer.service.impl.phone.MemberPhoneServiceImpl;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
+import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import com.github.pagehelper.PageHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import cn.net.yzl.crm.customer.model.*;
@@ -37,12 +45,19 @@ public class MemberServiceImpl implements MemberService {
     MemberMapper memberMapper;
     @Autowired
     MemberCrowdGroupDao memberCrowdGroupDao;
+    @Autowired
+    CustomerGroupService customerGroupService;
 
     @Autowired
     private RedisUtil redisUtil;
 
     @Autowired
     MemberDiseaseMapper memberDiseaseMapper;
+
+    @Autowired
+    MemberPhoneServiceImpl memberPhoneService;
+    @Autowired
+    MemberLabelDao memberLabelDao;
 
 
     private String memberCountkey="memeberCount";
@@ -377,6 +392,101 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo) {
        return memberDiseaseMapper.updateMemberDiseaseByDiseaseId(vo);
+    }
+
+
+    /**
+     * 处理实时进线时，保存顾客信息
+     * @param coilInVo
+     * @return
+     */
+    @Override
+    @Transactional
+    public ComResponse<MemberGroupCodeDTO> coilInSaveMemberData(MemberCoilInVO coilInVo){
+        //判断当前号码是否已经使用
+        ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(coilInVo.getCallerPhone());
+        Integer status = response.getStatus();
+        Member member = response.getData();
+        String memberCard = "";
+        String groupId = "";
+        MemberLabel label = new MemberLabel();
+        //会员不存在
+        if (member == null) {
+            //将顾客来电号码区分(座机/手机)插入member_phone表
+            //新建客户信息
+            ComResponse<String> addMemberResult = memberPhoneService.getMemberCardByphoneNumber(coilInVo.getCallerPhone());
+            status = addMemberResult.getStatus();
+            if (status != 200) {
+            }
+            if (addMemberResult.getData() == null) {
+                return ComResponse.fail(addMemberResult.getCode(), addMemberResult.getMessage());
+            }
+
+
+
+            //新添加的会员卡号
+            memberCard = addMemberResult.getData();
+            //通过会员卡号查询会员信息
+            member = selectMemberByCard(memberCard);
+            //更新会员级别
+            member.setMGradeId(1);
+            member.setMGradeName("无卡");
+            member.setM_grade_code(null);
+            //更新会员信息
+            int update = updateByMemberCardSelective(member);
+            if (update < 0) {
+                //TODO 更新会员信息失败
+            }
+
+            //将顾客信息插入顾客标签库：顾客编号、进线时间、咨询的商品、首次进线广告、媒体等；
+            label.setMemberCard(member.getMember_card());
+            label.setMediaId(coilInVo.getMediaId());
+            label.setMediaName(coilInVo.getMediaName());
+            label.setAdverCode(coilInVo.getAdvId());
+            label.setAdverName(coilInVo.getAdvName());
+            memberLabelDao.save(label);
+            //TODO 添加会员咨询商品记录（更新product_consultation 去重）【这个表里面有咨询时间，还要去重吗？？？】
+
+
+        }
+        //会员已经存在
+        else{
+            //判断顾客是否已经被圈选
+            groupId = customerGroupService.queryGroupIdByMemberCard(member.getMember_card());
+            label.setMemberCard(member.getMember_card());
+            label.setMemberCard(member.getMember_name());
+        }
+        //没有圈选的客户进行圈选
+        if (StringUtils.isEmpty(groupId)) {
+            /**
+             * 匹配是否有对应的圈选规则；（只匹配第一个符合的群组，同时将顾客编号和群组编号插入关系表中group_ref_member）
+             */
+            //查询出所有的规则，根据股则id圈选，选中的则跳出循环
+            List<member_crowd_group> ruleList =memberCrowdGroupDao.query4Task();
+
+            if (CollectionUtil.isNotEmpty(ruleList)) {
+                for (member_crowd_group group : ruleList) {
+                    if (customerGroupService.isCrowdGroupIncludeMemberCard(group, member.getMember_card())) {
+                        groupId = group.get_id();
+                        break;
+                    }
+                }
+                //根据规则插入客户信息
+                if (StringUtils.isNotEmpty(groupId)) {
+                    List<MemberLabel> labels = new ArrayList<>();
+                    labels.add(label);
+                    customerGroupService.memberCrowdGroupRunByLabels(groupId,labels);
+                }
+            }
+        }
+        //返回顾客编号、群组编号；
+
+        MemberGroupCodeDTO dto = new MemberGroupCodeDTO();
+
+        dto.setMemberCard(member.getMember_card());
+        dto.setMemberGroupCode(groupId);
+
+        return ComResponse.success(dto);
     }
 
 

@@ -186,6 +186,24 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return (int) memberLabelDao.memberCrowdGroupTrial(query);
     }
 
+    /**
+     * ，判断当前客户是否属于给定圈选规则
+     * @param memberCrowdGroup
+     * wangzhe
+     * 2020-02-07
+     * @param memberCard 会员卡号
+     * @return
+     */
+    @Override
+    public boolean isCrowdGroupIncludeMemberCard(member_crowd_group memberCrowdGroup,String memberCard) {
+        //进行顾客人群圈选
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        query.addCriteria(Criteria.where("memberCard").is(memberCard));
+        //圈选试算
+        long result = memberLabelDao.memberCrowdGroupTrial(query);
+        return result > 0 ;
+    }
+
 
     @Override
     public Page<MemberLabelDto> groupTrialPullData(member_crowd_group memberCrowdGroup) {
@@ -264,14 +282,54 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
         deleteMongoGroupRefMemberByGroupId(groupId,version);
+
+        //查询group_ref_member中，当前群组的顾客数量
+        Query getMemberCount = new Query();
+        getMemberCount.addCriteria(Criteria.where("groupId").is(groupId));
+        long count = memberLabelDao.count(getMemberCount, GroupRefMember.class);
+
         //设置本次匹配到圈选规则的条数
         Query updateCondition = new Query();
         updateCondition.addCriteria(Criteria.where("_id").is(groupId));
         Update update = new Update();
-        update.set("person_count",matchCount);
+        update.set("person_count",count);
         memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
         long groupRunEndTime = System.currentTimeMillis();
-        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,本次圈选总耗时:{}",groupId,matchCount,version,(groupRunEndTime-groupRunStartTime));
+        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount,version,count,(groupRunEndTime-groupRunStartTime));
+        return matchCount;
+    }
+
+
+    /**
+     * 把一组客户插入群组
+     * wangzhe
+     * 2021-02-07
+     * @param groupId
+     * @param labels
+     * @return
+     */
+    public int memberCrowdGroupRunByLabels(String groupId,List<MemberLabel> labels) {
+        long groupRunStartTime = System.currentTimeMillis();
+        //生成数据的版本号
+        Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMdd"));
+        int matchCount = doMemberCrowdGroupRun(groupId, labels,version);
+        labels.clear();
+
+        //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
+        deleteMongoGroupRefMemberByGroupId(groupId,version);
+        //查询group_ref_member中，当前群组的顾客数量
+        Query getMemberCount = new Query();
+        getMemberCount.addCriteria(Criteria.where("groupId").is(groupId));
+        long count = memberLabelDao.count(getMemberCount, GroupRefMember.class);
+
+        //设置本次匹配到圈选规则的条数
+        Query updateCondition = new Query();
+        updateCondition.addCriteria(Criteria.where("_id").is(groupId));
+        Update update = new Update();
+        update.set("person_count",count);
+        memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
+        long groupRunEndTime = System.currentTimeMillis();
+        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount,version,count,(groupRunEndTime-groupRunStartTime));
         return matchCount;
     }
 
@@ -385,7 +443,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
 
     /**
-     * 通过id查询给uize并进行u安萱试算
+     * 通过id查询给规则并进行圈选试算
      * wangzhe
      * 2021-01-21
      * @param crowdGroupOpVO

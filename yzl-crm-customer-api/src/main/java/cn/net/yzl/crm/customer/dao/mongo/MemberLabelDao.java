@@ -140,6 +140,11 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         List<GroupRefMember> list = mongoTemplate.find(query,GroupRefMember.class,group_ref_member);
         return list;
     }
+
+    public long count(Query query, Class<?> entityClass) {
+        Long totalCount = mongoTemplate.count(query, entityClass);
+        return totalCount;
+    }
     /**
      * @Author: lichanghong
      * @Description: 根据顾客编号查询顾客所属圈选群
