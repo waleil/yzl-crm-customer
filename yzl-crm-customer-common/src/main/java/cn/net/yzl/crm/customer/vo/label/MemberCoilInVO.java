@@ -1,8 +1,11 @@
 package cn.net.yzl.crm.customer.vo.label;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 @ApiModel(value = "MemberCoilInVO",description = "顾客实时进线信息接收")
@@ -28,6 +31,10 @@ public class MemberCoilInVO {
 
     @ApiModelProperty(value = "媒体名称",name="mediaName")
     private String mediaName;
+
+    @ApiModelProperty(value = "进线时间",name="callInTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date callInTime;
 
 
 
