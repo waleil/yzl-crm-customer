@@ -453,7 +453,7 @@ public class MemberServiceImpl implements MemberService {
             label.setAdverName(coilInVo.getAdvName());
             memberLabelDao.save(label);
             //添加会员咨询商品记录（更新product_consultation 去重）
-            ComResponse<List<ActivityProductResponse>> activityProducts
+           /* ComResponse<List<ActivityProductResponse>> activityProducts
                     = activityFien.getProductListByActivityBusNo((long) coilInVo.getAdvId());
             List<ActivityProductResponse> productList = activityProducts.getData();
             StringBuilder sb = new StringBuilder();
@@ -484,7 +484,7 @@ public class MemberServiceImpl implements MemberService {
                 productConsultationMapper.deleteByMemberCardAndProductCodes(memberCard, pcCodeList);
                 //批量保存
                 ComResponse<String> saveResult = this.addProductConsultation(pcList);
-            }
+            }*/
         }
         //会员已经存在的情景
         else{
