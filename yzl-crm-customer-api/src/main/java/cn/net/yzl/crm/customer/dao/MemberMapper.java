@@ -7,7 +7,9 @@ import cn.net.yzl.crm.customer.dto.member.MemberDiseaseCustomerDto;
 import cn.net.yzl.crm.customer.dto.member.MemberDiseaseDto;
 import cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.model.mogo.ActionDict;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
+import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import org.apache.ibatis.annotations.Param;
@@ -146,4 +148,12 @@ public interface MemberMapper {
      * @return
      */
     int updateLastOrderTime(@Param("memberCard") String memberCard,@Param("now") Date now);
+
+    List<MemberLabel> queryMemberLabelByCodes(List<String> memberCodes);
+
+    List<MemberDisease> queryDiseaseByMemberCodes(List<String> memberCodes);
+
+    List<ActionDict> queryActionByMemberCodes(List<String> memberCodes);
+
+    List<MemberProduct> queryProductByMemberCodes(List<String> memberCodes);
 }
