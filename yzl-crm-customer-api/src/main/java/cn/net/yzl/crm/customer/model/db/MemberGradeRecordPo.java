@@ -33,4 +33,15 @@ public class MemberGradeRecordPo implements Serializable {
     private Date createTime;
 
     private static final long serialVersionUID = 1L;
+
+
+    /**
+     * 修改前的会员级别id
+     */
+    private Integer beforeGradeId;
+
+    /**
+     * 修改前的会员级别名称
+     */
+    private String beforeGradeName;
 }

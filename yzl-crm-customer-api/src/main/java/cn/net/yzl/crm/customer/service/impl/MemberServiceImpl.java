@@ -6,14 +6,13 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.AssemblerResultUtil;
-import cn.net.yzl.crm.customer.dao.MemberDiseaseMapper;
-import cn.net.yzl.crm.customer.dao.MemberGradeRecordDao;
-import cn.net.yzl.crm.customer.dao.MemberMapper;
-import cn.net.yzl.crm.customer.dao.ProductConsultationMapper;
+import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.member.*;
+import cn.net.yzl.crm.customer.feign.client.product.ProductFien;
 import cn.net.yzl.crm.customer.model.*;
+import cn.net.yzl.crm.customer.model.db.MemberGradeRecordPo;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
@@ -26,17 +25,25 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
+import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
+import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
+import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
+import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
+import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
+import cn.net.yzl.order.model.vo.order.OrderInfoResDTO;
+import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -63,6 +70,16 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberProductEffectService memberProductEffectService;
+
+    @Autowired
+    MemberOrderStatMapper memberOrderStatMapper;
+
+    @Autowired
+    private MemberGradeRecordDao memberGradeRecordDao;
+
+
+    @Autowired
+    ProductFien productFien;
 
     private String memberCountkey="memeberCount";
 
@@ -372,8 +389,6 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.getMembereAddressAndLevelByMemberCards(memberCardList);
     }
 
-    @Autowired
-    private MemberGradeRecordDao memberGradeRecordDao;
     @Override
     public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(String memberCard) {
 
@@ -519,39 +534,6 @@ public class MemberServiceImpl implements MemberService {
             label.setAdverCode(coilInVo.getAdvId());
             label.setAdverName(coilInVo.getAdvName());
             memberLabelDao.save(label);
-            //添加会员咨询商品记录（更新product_consultation 去重）
-           /* ComResponse<List<ActivityProductResponse>> activityProducts
-                    = activityFien.getProductListByActivityBusNo((long) coilInVo.getAdvId());
-            List<ActivityProductResponse> productList = activityProducts.getData();
-            StringBuilder sb = new StringBuilder();
-            if (CollectionUtil.isNotEmpty(productList)) {
-                for (ActivityProductResponse product : productList) {
-                    sb.append(product.getProductCode()).append(",");
-                }
-            }
-            String productCodeStr = sb.length() > 0 ? sb.substring(0,sb.length()-1) : "";
-            if (StringUtils.isNotEmpty(productCodeStr)) {
-                ComResponse<List<ProductMainDTO>> productResult = productFien.queryByProductCodes(productCodeStr);
-                List<ProductMainDTO> products = productResult.getData();
-                //用于删除商品
-                List<String> pcCodeList = new ArrayList<>();
-                //咨询的商品集合
-                List<ProductConsultationInsertVO> pcList = new ArrayList<>();
-                Date date = new Date();
-                for (ProductMainDTO dto : products) {
-                    ProductConsultationInsertVO pc = new ProductConsultationInsertVO();
-                    pc.setConsultationTime(date);
-                    pc.setMemberCard(memberCard);
-                    pc.setMemberCard(dto.getProductCode());
-                    pc.setProductName(dto.getName());
-                    pcCodeList.add(dto.getProductCode());
-                    pcList.add(pc);
-                }
-                //删除该客户的匹配到的商品
-                productConsultationMapper.deleteByMemberCardAndProductCodes(memberCard, pcCodeList);
-                //批量保存
-                ComResponse<String> saveResult = this.addProductConsultation(pcList);
-            }*/
         }
         //会员已经存在的情景
         else{
@@ -594,9 +576,245 @@ public class MemberServiceImpl implements MemberService {
         return ComResponse.success(dto);
     }
 
+    /**
+     * 订单签收的时候更新
+     * wangzhe
+     * 2021-02-08
+     * @param orderInfo4MqVo
+     * @return
+     */
+    @Transactional
     @Override
     public ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo) {
+        String memberCard = orderInfo4MqVo.getMemberCardNo();
+        List<OrderProductVO> buyProductList = orderInfo4MqVo.getProductList();//订单购买的商品
+        StringBuilder buyProductCodes = new StringBuilder();
+
+        for (OrderProductVO productVO : buyProductList) {
+            buyProductCodes.append(productVO.getProductCode()).append(",");
+        }
+        String codes = "";
+        if (buyProductCodes.length() > 0) {
+            codes = buyProductCodes.substring(0, buyProductCodes.length() - 1);
+        }
+
+        //通过商品编号，获取商品信息
+        ComResponse<List<ProductMainDTO>> response = productFien.queryByProductCodes(codes.split(","));
+        List<ProductMainDTO> data = response.getData();
+        Map<String, ProductMainDTO> productMap = new HashMap<>();
+        for (ProductMainDTO mainDTO : data) {
+            productMap.put(mainDTO.getProductCode(), mainDTO);
+        }
+
+        //查询客户对应的商品服用效果
+        MemberProductEffectSelectVO effectVo = new MemberProductEffectSelectVO();
+        effectVo.setMemberCard(memberCard);
+        Map<String, MemberProductEffectDTO> dtoMap = new HashMap<>();
+        ComResponse<List<MemberProductEffectDTO>> productEffectResult = memberProductEffectService.getProductEffects(effectVo);
+        List<MemberProductEffectDTO> productEffectList = productEffectResult.getData();
+        if (CollectionUtil.isNotEmpty(productEffectList)) {
+            for (MemberProductEffectDTO dto : productEffectList) {
+                dtoMap.put(dto.getProductCode(), dto);
+            }
+        }
+
+        //之前没有购买过的商品
+        List<MemberProductEffectInsertVO> addProductVoList = new ArrayList<>();
+        List<MemberProductEffectInsertVO> updateProductVoList = new ArrayList<>();
+
+        for (OrderProductVO productVO : buyProductList) {
+            MemberProductEffectDTO dto = dtoMap.get(productVO.getProductCode());
+            //没有则新增
+            MemberProductEffectInsertVO vo = new MemberProductEffectInsertVO();
+            if (dto != null) {
+                BeanUtil.copyProperties(dto, vo);
+                updateProductVoList.add(vo);
+            } else {
+                vo.setMemberCard(memberCard);
+                vo.setProductCode(productVO.getProductCode());
+                addProductVoList.add(vo);
+            }
+            //获取商品的信息(主要是规格)
+            ProductMainDTO ProductMainDTO = productMap.get(productVO.getProductCode());
+            if (ProductMainDTO == null) {
+                continue;
+            }
+            String totalUseNum = ProductMainDTO.getTotalUseNum();
+            vo.setProductLastNum(Integer.valueOf(totalUseNum) + vo.getProductLastNum());//商品剩余量
+            vo.setProductName(ProductMainDTO.getName());//商品名称
+            vo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
+            vo.setProductLastNum(productVO.getProductCount());
+            vo.setProductCount(vo.getProductCount() + productVO.getProductCount());//购买商品数量
+
+            if (vo.getOneToTimes() == null) {
+                vo.setOneToTimes(ProductMainDTO.getOneToTimes());
+            }
+            if (vo.getOneUseNum() == null) {
+                vo.setOneUseNum(ProductMainDTO.getOneUseNum());
+            }
+        }
+        //保存
+        if (addProductVoList.size() > 0) {
+            memberProductEffectService.batchSaveProductEffect(addProductVoList);
+        }
+        //更新
+        if (updateProductVoList.size() > 0) {
+            memberProductEffectService.batchSaveProductEffect(updateProductVoList);
+        }
+
+        //更新member_order_stat
+        List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
+        cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat;
+        //存在则更新最后下单时间
+        if (CollectionUtil.isNotEmpty(memberOrderStats)) {
+            memberOrderStat = memberOrderStats.get(0);
+            //累计消费金额
+            Integer totalCounsumAmount = memberOrderStat.getTotalCounsumAmount() == null ? 0 : memberOrderStat.getTotalCounsumAmount();
+            totalCounsumAmount += orderInfo4MqVo.getSpend();
+            memberOrderStat.setTotalCounsumAmount(totalCounsumAmount);
+
+            //累计充值金额
+            Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
+            totalInvestAmount += orderInfo4MqVo.getDeposit();
+            memberOrderStat.setTotalInvestAmount(totalInvestAmount);
+
+            //累计订单总金额
+            Integer totalOrderAmount = memberOrderStat.getTotalOrderAmount() == null ? 0 : memberOrderStat.getTotalOrderAmount();
+            totalOrderAmount += orderInfo4MqVo.getTotalAll();
+            memberOrderStat.setTotalOrderAmount(totalOrderAmount);
+
+            //累计订单应收总金额
+            Integer orderRecAmount = memberOrderStat.getOrderRecAmount() == null ? 0 : memberOrderStat.getOrderRecAmount();
+            orderRecAmount += orderInfo4MqVo.getCash();
+            memberOrderStat.setOrderRecAmount(orderRecAmount);
+
+
+            memberOrderStat.setLastBuyProductCode(codes);//最后一次购买商品
+            //首次购买商品
+            if (StringUtils.isEmpty(memberOrderStat.getFirstBuyProductCode())) {
+                memberOrderStat.setFirstBuyProductCode(memberOrderStat.getLastBuyProductCode());
+            }
+            if (memberOrderStat.getFirstOrderAm() == null) {
+                memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//首单金额
+            }
+            if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getTotalAll()) {
+                memberOrderStat.setOrderHighAm(orderInfo4MqVo.getTotalAll());//订单最高金额
+            }
+
+            if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
+                memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最高金额
+            }
+
+            if (memberOrderStat.getBuyCount() == null) {
+                memberOrderStat.setBuyCount(0);
+            }
+            memberOrderStat.setBuyCount(memberOrderStat.getBuyCount() + 1);//累计购买次数
+            memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
+            memberOrderStat.setProductTypeCnt(addProductVoList.size() + productEffectList.size());//购买产品种类个数
+
+            //总平均购买天数
+            //memberOrderStat.getLastOrderTime() - memberOrderStat.getFirstOrderTime() / memberOrderStat.getBuyCount()
+            //memberOrderStat.setDayAvgCount();
+            //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
+            memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+
+
+            //从DMC获取顾客级别，判断顾客是否升级；修改member里面的会员级别   ，修改 member_grade_record 会员信息
+
+            List<MemberGradeRecordDto> recordList = memberGradeRecordDao.getMemberGradeRecordList(memberCard);
+            MemberGradeRecordPo vo = new MemberGradeRecordPo();
+            if (CollectionUtil.isNotEmpty(recordList)) {
+                MemberGradeRecordDto dto = recordList.get(0);
+                BeanUtil.copyProperties(dto, vo);
+                //从DMC获取顾客级别 ->判断是否可以升级
+                boolean upLevel = false;
+                //更新会员级别
+                if (upLevel) {
+                    vo.setBeforeGradeId(vo.getMGradeId());
+                    vo.setBeforeGradeName(vo.getMGradeName());
+                    //vo.setMGradeId();
+                    //vo.setMGradeName();
+                    memberGradeRecordDao.updateByPrimaryKeySelective(vo);
+                }
+            }
+            //设置reids缓存
+            redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
+        }
+        return ComResponse.success(true);
+    }
+
+    /**
+     * 处理工单时更新
+     * @param workOrderInfoVO
+     * @return
+     */
+    @Override
+    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
+        //
+
+
+
+
         return null;
+    }
+
+    /**
+     * 下单时，
+     *  更新最后下单时间
+     * @param orderCreateInfoVO
+     * @return
+     */
+    @Override
+    public ComResponse<Boolean> dealOrderCreateUpdateMemberData(OrderCreateInfoVO orderCreateInfoVO) {
+        String memberCard = orderCreateInfoVO.getMemberCard();
+        memberMapper.updateLastOrderTime(memberCard,orderCreateInfoVO.getCreateTime());
+        //member_order_stat
+        List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
+        cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat;
+        //存在则更新最后下单时间
+        if (CollectionUtil.isNotEmpty(memberOrderStats)) {
+            memberOrderStat = memberOrderStats.get(0);
+            memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
+            memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+        }
+        //不存在则添加记录
+        else {
+            memberOrderStat = new cn.net.yzl.crm.customer.model.db.MemberOrderStat();
+            memberOrderStat.setMemberCard(memberCard);//会员卡号
+            memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
+            memberOrderStat.setLastOrderTime(orderCreateInfoVO.getCreateTime());//最后一次下单时间
+            memberOrderStat.setFirstOrderStaffNo(orderCreateInfoVO.getStaffNo());//首单下单员工
+            memberOrderStat.setFirstOrderNo(orderCreateInfoVO.getOrderNo());//首单订单编号
+            memberOrderStatMapper.insertSelective(memberOrderStat);
+        }
+        //设置reids缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
+        return null;
+    }
+
+
+    /**
+     * 保存工单的时候
+     * @param memberHangUpVO
+     * @return
+     */
+    @Override
+    public ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO) {
+        //设置reids缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberHangUpVO.getMemberCard());
+
+        return ComResponse.success(true);
+    }
+
+
+    /**
+     * 同步member_label
+     * @param id
+     * @return
+     */
+    @Override
+    public boolean updateMemberLabel(int id) {
+        return false;
     }
 
 

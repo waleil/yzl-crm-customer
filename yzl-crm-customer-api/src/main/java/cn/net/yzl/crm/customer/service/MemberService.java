@@ -9,7 +9,10 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
+import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
+import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
 
 import java.util.List;
 
@@ -169,4 +172,11 @@ public interface MemberService {
      */
     ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo);
 
+    ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO);
+
+    ComResponse<Boolean> dealOrderCreateUpdateMemberData(OrderCreateInfoVO orderCreateInfoVO);
+
+    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
+
+    boolean updateMemberLabel(int id);
 }

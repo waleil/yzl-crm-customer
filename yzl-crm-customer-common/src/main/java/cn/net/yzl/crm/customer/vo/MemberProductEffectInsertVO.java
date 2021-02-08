@@ -43,6 +43,9 @@ public class MemberProductEffectInsertVO implements Serializable {
     @ApiModelProperty(value = "商品剩余量",name="productLastNum",required = true)
     private Integer productLastNum;
 
+    @ApiModelProperty(value = "购买商品数量",name="productCount",required = true)
+    private Integer productCount;
+
     @ApiModelProperty(value = "修改人编号",name="updator")
     private String updator;
 
