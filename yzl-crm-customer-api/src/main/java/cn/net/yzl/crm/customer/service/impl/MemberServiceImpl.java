@@ -43,7 +43,6 @@ import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
-import cn.net.yzl.order.model.vo.order.OrderInfoResDTO;
 import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -692,7 +691,7 @@ public class MemberServiceImpl implements MemberService {
 
             //累计充值金额
             Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
-            totalInvestAmount += orderInfo4MqVo.getDeposit();
+            totalInvestAmount += orderInfo4MqVo.getCash1();
             memberOrderStat.setTotalInvestAmount(totalInvestAmount);
 
             //累计订单总金额

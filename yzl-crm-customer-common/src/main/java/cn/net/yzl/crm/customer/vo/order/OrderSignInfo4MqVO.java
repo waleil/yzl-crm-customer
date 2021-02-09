@@ -27,9 +27,6 @@ public class OrderSignInfo4MqVO {
     @ApiModelProperty(value = "状态：1=签收，2=取消签收")
     private Integer status;
 
-    @ApiModelProperty(value = "商品列表")
-    private List<OrderProductVO> productList;
-
     @ApiModelProperty(value = "订单总金额")
     private Integer totalAll;
 
@@ -37,14 +34,18 @@ public class OrderSignInfo4MqVO {
     private Integer cash;
 
     @ApiModelProperty(value = "预存金额 分为单位")
-    private Integer deposit;
+    private Integer cash1;
 
     @ApiModelProperty(value = "消费金额(订单总额-优惠) 分为单位")
     private Integer spend;
 
-    @ApiModelProperty(value = "下单时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTime;
+    @ApiModelProperty(value = "商品列表")
+    private List<OrderProductVO> productList;
+
+
+//    @ApiModelProperty(value = "下单时间")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+//    private Date createTime;
 
 
 }
