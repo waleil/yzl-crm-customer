@@ -385,7 +385,7 @@ public class CustomerController {
 
     }
     @ApiOperation("同步顾客标签数据")
-    @GetMapping("/member/updateMemberLabel")
+    @GetMapping("/member/updateMemberLabelTimedTask")
     public boolean updateMemberLabel(@RequestParam(defaultValue = "0") int id){
         return memberService.updateMemberLabel(id);
     }

@@ -17,7 +17,7 @@ import java.util.Date;
  * action_dict
  * @author 
  */
-@ApiModel(value = "actionDictDto", description = "顾客综合行为字典")
+@ApiModel(value = "actionDictDto", description = "顾客综合行为 - 行为字典")
 @Data
 @Valid
 public class ActionDictDto implements Serializable {
@@ -42,6 +42,9 @@ public class ActionDictDto implements Serializable {
 
     @ApiModelProperty(value = "创建人",hidden = true)
     private String creator;
+
+    @ApiModelProperty(value = "删除标识",hidden = true)
+    private int delFlag;
 
     @ApiModelProperty(value ="操作人")
     @NotBlank

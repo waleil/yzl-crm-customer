@@ -37,6 +37,15 @@ public class ActionDictController {
         return  actionDictService.saveUpdateActionDict(ageDictDtos);
     }
 
+    @ApiOperation(value="字典管理-定时器T+1同步行为偏好字典")
+    @PostMapping("v1/syncActionDictTimer")
+    public ComResponse<Integer> syncActionDictTimer(){
+        return actionDictService.updateActionDictWhereStatusIs2();
+    }
+
+
+
+
 
 
 }

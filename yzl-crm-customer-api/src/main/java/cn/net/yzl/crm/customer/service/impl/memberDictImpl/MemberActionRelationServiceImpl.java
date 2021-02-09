@@ -12,6 +12,7 @@ import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
     @Override
     public ComResponse<List<MemberActionRelationList>> selectRelationTreeByMemberCard(String card) {
         List<MemberActionRelationList> memberActionRelations = memberActionRelationMapper.selectRelationTreeByMemberCard(card);
-        if(memberActionRelations==null || memberActionRelations.size()<1){
+        if(CollectionUtil.isEmpty(memberActionRelations)){
             return  ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(),ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getMessage());
         }
         return ComResponse.success(memberActionRelations);
@@ -69,27 +70,33 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
         return ComResponse.success(insert);
     }
 
+    @Transactional
     @Override
     public ComResponse<Integer> addRelationWithDict(MemberActionRelationDto memberActionRelationDto) {
-        int insert;
-        //TODO 当getDid()不为空的时候是不是要判断字典表中该id是否存在???
-        if(memberActionRelationDto.getDid()==null){
-            int did;//新生成的字典编号
+        //id不为空的时候判断字典表是否存在，当字典表中不存在的时候，则认为id输入错误
+        Integer actionId = memberActionRelationDto.getId();
+        if (actionId != null) {
+            ActionDict actionDict = actionDictMapper.selectByPrimaryKey(actionId);
+            if (actionDict == null) {
+                return  ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
+            }
+        }else{
             //根据类型和名称获取行为偏好字典
             List<ActionDict> actionDicts = actionDictMapper.selectByTypeAndName(memberActionRelationDto.getType(), memberActionRelationDto.getDname());
-            if(CollectionUtil.isNotEmpty(actionDicts)){
-                did = actionDicts.get(0).getId();
-            }
-            //生成字典
-            else{
-                ActionDictDto actionDict=new ActionDictDto();
+            if(CollectionUtil.isEmpty(actionDicts)){
+                //没有查询到 ->新增字典
+                ActionDictDto actionDict = new ActionDictDto();
                 actionDict.setCreator(memberActionRelationDto.getCreator());
                 actionDict.setName(memberActionRelationDto.getDname());
                 actionDict.setType(memberActionRelationDto.getType());
+                actionDict.setDelFlag(2);
                 actionDictMapper.insertSelective(actionDict);
-                did=actionDict.getId();
+                actionId = actionDict.getId();
+            }else{
+                //有着直接使用
+                actionId = actionDicts.get(0).getId();
             }
-            memberActionRelationDto.setDid(did);
+            memberActionRelationDto.setDid(actionId);
         }
         //查询顾客行为偏好（通过会员卡号、did）
         List<MemberActionRelation> memberActionRelations = memberActionRelationMapper.selectRelationByMemberCardAndDid(memberActionRelationDto.getMemberCard(), memberActionRelationDto.getDid());
@@ -98,7 +105,7 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
             return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getCode(), ResponseCodeEnums.MEMBER_ACTION_EXIST_ERROR.getMessage());
         }
         //顾客不存在该行为则 - 新增
-        insert = memberActionRelationMapper.insert(memberActionRelationDto);
+        int insert = memberActionRelationMapper.insert(memberActionRelationDto);
         if(insert<1){
             return  ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
         }
