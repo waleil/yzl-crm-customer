@@ -894,7 +894,7 @@
                     member_street_no,member_street_name,
                     member_address,create_code,update_code
 
-            from reveiver_address where member_card=#{member_card}
+            from reveiver_address where member_card=#{member_card} order by status desc,update_time desc
     </select>
 
     <select id="getMemberOrderStat" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberOrderStat">
