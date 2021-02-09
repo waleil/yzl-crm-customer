@@ -28,7 +28,7 @@ public interface ActivityFien {
 
     @ApiOperation(value = "会员管理-会员级别管理-根据id查看详情")
     @GetMapping("/db/v1/memberLevelManager/getById")
-    public ComResponse<MemberLevelDetailResponse> getFGrandById(@RequestParam("id")Integer id);
+    public ComResponse<MemberLevelDetailResponse> getGrandById(@RequestParam("id")Integer id);
 
 
     @ApiOperation(value = "根据单个会员卡号获取 每个顾客的优惠券 积分 红包")

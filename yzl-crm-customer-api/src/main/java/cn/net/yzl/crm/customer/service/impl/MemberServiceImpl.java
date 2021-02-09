@@ -116,6 +116,11 @@ public class MemberServiceImpl implements MemberService {
         member.setMember_card(String.valueOf(maxMemberCard));
         //保存数据
         int result = memberMapper.insertSelective(member);
+
+        //TODO 保存 memberPhone List
+
+
+
         return result;
     }
 
@@ -718,7 +723,7 @@ public class MemberServiceImpl implements MemberService {
             }
 
             if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
-                memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最高金额
+                memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最低金额
             }
 
             if (memberOrderStat.getBuyCount() == null) {
@@ -766,9 +771,8 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
-        //
-
-
+        //设置reids缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),workOrderInfoVO.getMemberCard());
 
 
         return null;
@@ -790,7 +794,7 @@ public class MemberServiceImpl implements MemberService {
         //存在则更新最后下单时间
         if (CollectionUtil.isNotEmpty(memberOrderStats)) {
             memberOrderStat = memberOrderStats.get(0);
-            memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
+            memberOrderStat.setLastOrderTime(orderCreateInfoVO.getCreateTime());//最后一次下单时间
             memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
         }
         //不存在则添加记录
@@ -814,13 +818,13 @@ public class MemberServiceImpl implements MemberService {
      * @param memberHangUpVO
      * @return
      */
-    @Override
-    public ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO) {
-        //设置reids缓存
-        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberHangUpVO.getMemberCard());
-
-        return ComResponse.success(true);
-    }
+//    @Override
+//    public ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO) {
+//        //设置reids缓存
+//        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberHangUpVO.getMemberCard());
+//
+//        return ComResponse.success(true);
+//    }
 
     /**
      * 同步member_label
@@ -828,7 +832,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public boolean updateMemberLabel(int id) {
+    public boolean updateMemberLabel() {
         //获取redis缓存
         Set<Object> memberSet = redisUtil.sGet(CacheKeyUtil.syncMemberLabelCacheKey());
         /*Set<Object> memberSet = new HashSet<>();
@@ -996,13 +1000,64 @@ public class MemberServiceImpl implements MemberService {
             ComResponse<List<MemberLevelPagesResponse>> dmcLevelResponse = activityFien.getMemberLevelPages(1, 20);
             List<MemberLevelPagesResponse> dmcLevelData = dmcLevelResponse.getData();
             if (dmcLevelData != null) {
-                for (MemberLevelPagesResponse level : dmcLevelData) {
-                    String memberLevelName = level.getMemberLevelName();
-                    Integer gradeId = level.getMemberLevelGrade();
-                    BigDecimal disposableAdvanceMoney = level.getDisposableAdvanceMoney();//一次性预存款
-                    BigDecimal disposableSpendMoney = level.getDisposableSpendMoney();//一次性消费满多少"
-                    BigDecimal yearTotalSpendMoney = level.getYearTotalSpendMoney();//一年累计消费满
+                //等级倒叙排序
+                Comparator<MemberLevelPagesResponse> comparator = new Comparator<MemberLevelPagesResponse>(){
+                    @Override
+                    public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2) {
+                        return o1.getMemberLevelGrade() - o2.getMemberLevelGrade();
+                    }
+                };
+                MemberGradeRecordPo record;
+                Integer counsumAmount = 0;
+                List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
+                if (CollectionUtil.isNotEmpty(memberOrderStats)) {
+                    cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat = memberOrderStats.get(0);
+                    counsumAmount = memberOrderStat.getTotalCounsumAmount() == null ? 0 : memberOrderStat.getTotalCounsumAmount();
                 }
+                MemberLevelPagesResponse level = null;
+                //遍历DMC会员级别信息，判断顾客当前属于那个级别
+                for (MemberLevelPagesResponse levelData : dmcLevelData) {
+                    if (new BigDecimal(String.valueOf(counsumAmount)).compareTo(levelData.getYearTotalSpendMoney()) >= 0){
+                        level = levelData;
+                        break;
+                    }
+                }
+                if (level != null) {
+                    //当前顾客的会员级别信息
+                    MemberGradeRecordPo memberLevel = new MemberGradeRecordPo();
+                    //查询顾客当前的会员级别信息
+                    List<MemberGradeRecordDto> memberGradeRecordList = memberGradeRecordDao.getMemberGradeRecordList(memberCard);
+                    if (CollectionUtil.isNotEmpty(memberGradeRecordList)) {
+                        MemberGradeRecordDto oldLevel = memberGradeRecordList.get(0);
+                        memberLevel.setBeforeGradeId(oldLevel.getMGradeId());
+                        memberLevel.setBeforeGradeName(oldLevel.getMGradeName());
+                        memberLevel.setId(oldLevel.getId());
+                    }else{
+                        //新建会员等级信息
+                        memberLevel = new MemberGradeRecordPo();
+                        memberLevel.setCreateTime(new Date());
+                    }
+                    memberLevel.setMGradeId(level.getMemberLevelGrade());
+                    memberLevel.setMGradeName(level.getMemberLevelName());
+                    if (memberLevel.getId() == null) {
+                        memberGradeRecordDao.insertSelective(memberLevel);
+                    }else{
+                        memberGradeRecordDao.updateByPrimaryKeySelective(memberLevel);
+                    }
+                    //查询顾客表信息
+                    Member member = memberMapper.selectMemberByCard(memberCard);
+                    member.setMGradeId(memberLevel.getMGradeId());
+                    member.setMGradeName(memberLevel.getMGradeName());
+                    memberMapper.updateByMemberCardSelective(member);
+                }
+
+//                for (MemberLevelPagesResponse level : dmcLevelData) {
+//                    String memberLevelName = level.getMemberLevelName();
+//                    Integer gradeId = level.getMemberLevelGrade();
+//                    BigDecimal disposableAdvanceMoney = level.getDisposableAdvanceMoney();//一次性预存款
+//                    BigDecimal disposableSpendMoney = level.getDisposableSpendMoney();//一次性消费满多少"
+//                    BigDecimal yearTotalSpendMoney = level.getYearTotalSpendMoney();//一年累计消费满
+//                }
             }
 
             //获取当前顾客的综合行为

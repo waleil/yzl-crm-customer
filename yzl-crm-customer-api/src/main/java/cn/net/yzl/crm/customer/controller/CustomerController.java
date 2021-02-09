@@ -374,7 +374,7 @@ public class CustomerController {
 
     }
 
-    @ApiOperation("顾客管理-结束通话后更新顾客信息")
+    /*@ApiOperation("顾客管理-结束通话后更新顾客信息")
     @PostMapping("/v1/hangUpUpdateMemberData")
     public ComResponse<Boolean> hangUpUpdateMemberData(@RequestBody MemberHangUpVO memberHangUpVO) {
         if (memberHangUpVO == null) {
@@ -383,12 +383,13 @@ public class CustomerController {
         ComResponse<Boolean> response = memberService.hangUpUpdateMemberData(memberHangUpVO);
         return response;
 
-    }
+    }*/
     @ApiOperation("同步顾客标签数据")
     @GetMapping("/member/updateMemberLabelTimedTask")
-    public boolean updateMemberLabel(@RequestParam(defaultValue = "0") int id){
-        return memberService.updateMemberLabel(id);
+    public boolean updateMemberLabel(){
+        return memberService.updateMemberLabel();
     }
+
 
 
 

@@ -176,7 +176,7 @@ public interface MemberService {
 
     ComResponse<Boolean> dealOrderCreateUpdateMemberData(OrderCreateInfoVO orderCreateInfoVO);
 
-    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
+//    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
 
-    boolean updateMemberLabel(int id);
+    boolean updateMemberLabel();
 }

@@ -2,7 +2,9 @@ package cn.net.yzl.crm.customer.vo.work;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
 @ApiModel(value="处理工单",description="处理工单类" )
 public class MemberWorkOrderInfoVO {
 
