@@ -1,9 +1,6 @@
 package cn.net.yzl.crm.customer.feign.client.Activity;
 
-import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
-import cn.net.yzl.activity.model.responseModel.ActivityProductResponse;
-import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
-import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
+import cn.net.yzl.activity.model.responseModel.*;
 import cn.net.yzl.common.entity.ComResponse;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -25,9 +22,13 @@ public interface ActivityFien {
 
 
 
-    @ApiOperation(value = "获取会员等级")
+    @ApiOperation(value = "获取所有会员等级")
     @GetMapping("/db/v1/memberLevelManager/getMemberLevelPages")
     public ComResponse<List<MemberLevelPagesResponse>> getMemberLevelPages(@RequestParam("pageNo")Integer pageNo, @RequestParam("pageSize")Integer pageSize);
+
+    @ApiOperation(value = "会员管理-会员级别管理-根据id查看详情")
+    @GetMapping("/db/v1/memberLevelManager/getById")
+    public ComResponse<MemberLevelDetailResponse> getFGrandById(@RequestParam("id")Integer id);
 
 
     @ApiOperation(value = "根据单个会员卡号获取 每个顾客的优惠券 积分 红包")
