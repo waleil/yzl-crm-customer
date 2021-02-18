@@ -60,7 +60,7 @@ public class WorkOrderBeanVO implements Serializable {
     private String memberCard;
 
     @ApiModelProperty(value = "员工部门id（热线每日更新）")
-    private String deptId;
+    private Integer deptId;
 
     @ApiModelProperty(value = "部门名称（热线每日更新）")
     private String deptName;
