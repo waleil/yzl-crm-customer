@@ -12,11 +12,11 @@ import java.util.List;
 @FeignClient(name = "yzl-order-server")
 public interface OrderFien {
 
-    @GetMapping("/orderSearch/v1/selectOrderInfo")
-    public ComResponse<List<OrderInfoResDTO>> selectOrderInfo(@RequestParam String orderNo);
+//    @GetMapping("/orderSearch/v1/selectOrderInfo")
+//    public ComResponse<List<OrderInfoResDTO>> selectOrderInfo(@RequestParam String orderNo);
 
     @GetMapping("/order/v1/querymemberorder")
-    public ComResponse<List<MemberOrderObject>> querymemberorder(@RequestParam List<String> memberCards);
+    public ComResponse<List<MemberOrderObject>> querymemberorder(@RequestParam("memberCards") List<String> memberCards);
 
 }
 
