@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
 import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
@@ -16,6 +17,7 @@ import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
 import cn.net.yzl.crm.customer.feign.client.product.ProductFien;
+import cn.net.yzl.crm.customer.feign.client.workorder.WorkOrderClient;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.model.db.MemberGradeRecordPo;
 import cn.net.yzl.crm.customer.model.mogo.ActionDict;
@@ -96,6 +98,8 @@ public class MemberServiceImpl implements MemberService {
     OrderFien orderFien;
     @Autowired
     ActivityFien activityFien;
+    @Autowired
+    WorkOrderClient workOrderClient;
 
     private String memberCountkey="memeberCount";
 
@@ -828,7 +832,8 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 同步member_label
-     * @param id
+     * wangzhe
+     * 2021-02-18
      * @return
      */
     @Override
@@ -1128,82 +1133,27 @@ public class MemberServiceImpl implements MemberService {
                 memberLabel.setHaveOrder(0);
             }
 
-//            //查询进线(意向客户 from yixiangcustomer where member_card in)
-//            List<Yixiangcustomer> yixiangcustomers= yixiangcustomerDao.queryByMemberCard(memberCodes);
-//            Map<String, List<Yixiangcustomer>> yixiangcustomerMap = yixiangcustomers.stream()
-//                    .collect(Collectors.groupingBy(Yixiangcustomer::getMemberCard));
-//
-//            //查询最后一次通话记录( from member_lastcallin where member_card_no in) //
-//            List<MemberLastcallin> lastcallinList = memberLastcallinDao.queryCallInByMemberCard(memberCodes);
-//            Map<String, List<MemberLastcallin>> lastcallinListMap = lastcallinList.stream()
-//                    .collect(Collectors.groupingBy(MemberLastcallin::getMemberCard));
+            //顾客最后一次进线，最后一次通话
+            ComResponse lastCallManage = workOrderClient.getLastCallManageByMemberCard(memberCard);
+            if (200 != lastCallManage.getCode()){
+                log.error("获取顾客最后进线、通过时间异常");
+            }else{
+                MemberLastCallInDTO lastCallData = (MemberLastCallInDTO)lastCallManage.getData();
+                //最后一次进线时间
+                String lastCallInTime = lastCallData.getLastCallInTime();
+                //最后一次拨打时间
+                String lastCallTime = lastCallData.getLastDialTime();
 
-
-            //最后一次拨打时间
-            Date lastCallTime = null;
-            //最后一次进线时间
-            Date lastCallInTime = null;
-            //处理进线记录
-//                List<Yixiangcustomer> yixiangcustomerList= yixiangcustomerMap.get(memberCard);
-//                if(!CollectionUtils.isEmpty(yixiangcustomerList)){
-//                    Set<String> set = new HashSet<>();
-//                    for(Yixiangcustomer y:yixiangcustomerList){
-//                        set.add(y.getProductCode());
-//                        //最后一次拨打时间
-//                        if(lastCallTime==null && y.getLastCallTime()!=null){
-//                            lastCallTime = y.getLastCallTime();
-//                        }
-//                        if(lastCallTime!=null && y.getLastCallTime()!=null){
-//                            if(y.getLastCallTime().after(lastCallTime)){
-//                                lastCallTime = y.getLastCallTime();
-//                            }
-//                        }
-//                        //最后一次进线时间
-//                        if(lastCallInTime==null && y.getLastCallInTime()!=null){
-//                            lastCallInTime = y.getLastCallInTime();
-//                        }
-//                        if(lastCallInTime!=null && y.getLastCallInTime()!=null){
-//                            if(y.getLastCallInTime().after(lastCallInTime)){
-//                                lastCallInTime = y.getLastCallInTime();
-//                            }
-//                        }
-//                    }
-//                    //最后一次进线广告关联的商品编号
-//                    memberLabel.setAdvertProducts(new ArrayList<>(set));
-//                }
-//                //最后一次拨打时间
-//                if(lastCallTime!=null){
-//                    memberLabel.setLastCallTime(MongoDateHelper.getMongoDate(lastCallTime));
-//                }
-//                //设置最后一次进线时间
-//                if(lastCallInTime!=null){
-//                    memberLabel.setLastCallInTime(MongoDateHelper.getMongoDate(lastCallInTime));
-//                }
-//
-//                //处理最后一次通话记录
-//                List<MemberLastcallin> lastcallins =lastcallinListMap.get(memberCard);
-//                if(!CollectionUtils.isEmpty(lastcallins)){
-//                    for(MemberLastcallin in :lastcallins){
-//                        //最后一次拨打时间
-//                        if(lastCallTime==null && in.getLastCallTime()!=null){
-//                            lastCallTime = in.getLastCallTime();
-//                        }
-//                        if(lastCallTime!=null && in.getLastCallTime()!=null){
-//                            if(in.getLastCallTime().after(lastCallTime)){
-//                                lastCallTime = in.getLastCallTime();
-//                            }
-//                        }
-//                        //最后一次进线时间
-//                        if(lastCallInTime==null && in.getLastCallInTime()!=null){
-//                            lastCallInTime = in.getLastCallInTime();
-//                        }
-//                        if(lastCallInTime!=null && in.getLastCallInTime()!=null){
-//                            if(in.getLastCallInTime().after(lastCallInTime)){
-//                                lastCallInTime = in.getLastCallInTime();
-//                            }
-//                        }
-//                    }
-//                }
+                //最后一次拨打时间
+                if(StringUtils.isNotEmpty(lastCallTime)){
+                    memberLabel.setLastCallTime(MongoDateHelper.getMongoDate(DateUtil.parse(lastCallInTime)));
+                }
+                //设置最后一次进线时间
+                if(StringUtils.isNotEmpty(lastCallTime)){
+                    memberLabel.setLastCallInTime(MongoDateHelper.getMongoDate(DateUtil.parse(lastCallTime)));
+                }
+            }
+            //保存到mongo数据库
             memberLabelDao.save(memberLabel);
         }
         list.clear();

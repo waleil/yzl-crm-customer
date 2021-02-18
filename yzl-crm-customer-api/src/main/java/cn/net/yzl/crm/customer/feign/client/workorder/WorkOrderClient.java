@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.feign.client.workorder;
 
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.crm.customer.model.MemberLastCallInDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,9 @@ public interface WorkOrderClient {
     @PostMapping(value = "workOrder/v1/productDosage")
     ComResponse<Boolean> productDosage(@RequestParam("memberCard") List<String> memberCard);
 
+
+    @GetMapping(value = "callManage/v1/getMemberLastCallInMessagesByMemberCard")
+    ComResponse getLastCallManageByMemberCard(String memberCard);
 
 }
 
