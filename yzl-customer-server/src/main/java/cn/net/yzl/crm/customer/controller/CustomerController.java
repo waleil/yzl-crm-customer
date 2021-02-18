@@ -385,7 +385,7 @@ public class CustomerController {
 
     }*/
     @ApiOperation("同步顾客标签数据")
-    @GetMapping("/v1/updateMemberLabelTimedTask")
+    @PostMapping("/v1/updateMemberLabelTimedTask")
     public ComResponse<Boolean> updateMemberLabel(){
         boolean b = memberService.updateMemberLabel();
         return ComResponse.success(b);
