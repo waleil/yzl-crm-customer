@@ -40,6 +40,7 @@ import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
@@ -744,7 +745,8 @@ public class MemberServiceImpl implements MemberService {
 
 
             //从DMC获取顾客级别，判断顾客是否升级；修改member里面的会员级别   ，修改 member_grade_record 会员信息
-
+            //TODO 从DMC获取顾客级别定义
+            //todo 从订单中心获取本年度的累计消费金额与本次消费金额、本次预存金额
             List<MemberGradeRecordDto> recordList = memberGradeRecordDao.getMemberGradeRecordList(memberCard);
             MemberGradeRecordPo vo = new MemberGradeRecordPo();
             if (CollectionUtil.isNotEmpty(recordList)) {
@@ -875,13 +877,13 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
 
 
-        ComResponse<List<MemberOrderObject>> querymemberorder = orderFien.querymemberorder(memberCodes);
+        ComResponse<List<memberOrderObject>> querymemberorder = orderFien.querymemberorder(memberCodes);
         //获取会员订单信息
-        List<MemberOrderObject> data = querymemberorder.getData();
+        List<memberOrderObject> data = querymemberorder.getData();
         List<MemberOrder> memberRefOrders = new ArrayList<>();
-        MemberOrderObject memberOrder1 = data.get(0);
-        List<MemberOrderDTO> orders = memberOrder1.getOrders();
-        for (MemberOrderDTO order : orders) {
+        memberOrderObject memberOrder1 = data.get(0);
+        List<memberOrderDTO> orders = memberOrder1.getOrders();
+        for (memberOrderDTO order : orders) {
             MemberOrder memberOrder = new MemberOrder();
             memberOrder.setMemberCard(memberOrder1.getMemberCardNo());
             if (order.getActivityNo() != null) {

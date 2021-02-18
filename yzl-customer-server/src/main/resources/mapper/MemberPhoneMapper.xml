@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.net.yzl.crm.customer.dao.MemberPhoneMapper" >
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.db.MemberPhone" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="member_card" property="memberCard" jdbcType="VARCHAR" />
+    <result column="phone_number" property="phoneNumber" jdbcType="VARCHAR" />
+    <result column="phone_place" property="phonePlace" jdbcType="VARCHAR" />
+    <result column="service_provider" property="serviceProvider" jdbcType="BIT" />
+    <result column="phone_type" property="phoneType" jdbcType="BIT" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="creator_no" property="creatorNo" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="updator_no" property="updatorNo" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, member_card, phone_number, phone_place, service_provider, phone_type, enabled,
+    creator_no, create_time, updator_no, update_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from member_phone
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+    <select id="getMemberCardByPhoneNumber" resultType="java.lang.String">
+        select
+            member_card
+        from
+            member_phone
+        where phone_number in
+      <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </select>
+
+  <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.MemberPhone" >
+    insert into member_phone (id, member_card, phone_number,
+      phone_place, service_provider, phone_type, 
+      enabled, creator_no, create_time, 
+      updator_no, update_time)
+    values (#{id,jdbcType=INTEGER}, #{member_card,jdbcType=VARCHAR}, #{phone_number,jdbcType=VARCHAR},
+      #{phone_place,jdbcType=VARCHAR}, #{service_provider,jdbcType=BIT}, #{phone_type,jdbcType=BIT},
+      #{enabled,jdbcType=BIT}, #{creator_no,jdbcType=VARCHAR}, #{create_time,jdbcType=TIMESTAMP},
+      #{updator_no,jdbcType=VARCHAR}, #{update_time,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.MemberPhone" >
+    insert into member_phone
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="memberCard != null" >
+        member_card,
+      </if>
+      <if test="phoneNumber != null" >
+        phone_number,
+      </if>
+      <if test="phonePlace != null" >
+        phone_place,
+      </if>
+      <if test="serviceProvider != null" >
+        service_provider,
+      </if>
+      <if test="phoneType != null" >
+        phone_type,
+      </if>
+      <if test="enabled != null" >
+        enabled,
+      </if>
+      <if test="creatorNo != null" >
+        creator_no,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updatorNo != null" >
+        updator_no,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="memberCard != null" >
+        #{memberCard,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneNumber != null" >
+        #{phoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="phonePlace != null" >
+        #{phonePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceProvider != null" >
+        #{serviceProvider,jdbcType=BIT},
+      </if>
+      <if test="phoneType != null" >
+        #{phoneType,jdbcType=BIT},
+      </if>
+      <if test="enabled != null" >
+        #{enabled,jdbcType=BIT},
+      </if>
+      <if test="creatorNo != null" >
+        #{creatorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatorNo != null" >
+        #{updatorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberPhone" >
+    update member_phone
+    <set >
+      <if test="memberCard != null" >
+        member_card = #{memberCard,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneNumber != null" >
+        phone_number = #{phoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="phonePlace != null" >
+        phone_place = #{phonePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceProvider != null" >
+        service_provider = #{serviceProvider,jdbcType=BIT},
+      </if>
+      <if test="phoneType != null" >
+        phone_type = #{phoneType,jdbcType=BIT},
+      </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      <if test="creatorNo != null" >
+        creator_no = #{creatorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatorNo != null" >
+        updator_no = #{updatorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.db.MemberPhone" >
+    update member_phone
+    set member_card = #{memberCard,jdbcType=VARCHAR},
+      phone_number = #{phoneNumber,jdbcType=VARCHAR},
+      phone_place = #{phonePlace,jdbcType=VARCHAR},
+      service_provider = #{serviceProvider,jdbcType=BIT},
+      phone_type = #{phoneType,jdbcType=BIT},
+      enabled = #{enabled,jdbcType=BIT},
+      creator_no = #{creatorNo,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      updator_no = #{updatorNo,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

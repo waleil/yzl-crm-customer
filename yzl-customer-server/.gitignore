@@ -33,3 +33,4 @@ build/
 
 ### VS Code ###
 .vscode/
+SYS_LOG_HOME_IS_UNDEFINED

@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: yzl-crm-customer-api
-  profiles:
-    active: dev
