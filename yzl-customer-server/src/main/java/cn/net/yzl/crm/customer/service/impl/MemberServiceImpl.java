@@ -860,7 +860,7 @@ public class MemberServiceImpl implements MemberService {
         }
         //设置reids缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
-        return null;
+        return ComResponse.success(true);
     }
 
 
