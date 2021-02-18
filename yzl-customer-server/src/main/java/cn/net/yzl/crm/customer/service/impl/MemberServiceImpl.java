@@ -745,7 +745,8 @@ public class MemberServiceImpl implements MemberService {
 
 
             //从DMC获取顾客级别，判断顾客是否升级；修改member里面的会员级别   ，修改 member_grade_record 会员信息
-
+            //TODO 从DMC获取顾客级别定义
+            //todo 从订单中心获取本年度的累计消费金额与本次消费金额、本次预存金额
             List<MemberGradeRecordDto> recordList = memberGradeRecordDao.getMemberGradeRecordList(memberCard);
             MemberGradeRecordPo vo = new MemberGradeRecordPo();
             if (CollectionUtil.isNotEmpty(recordList)) {
