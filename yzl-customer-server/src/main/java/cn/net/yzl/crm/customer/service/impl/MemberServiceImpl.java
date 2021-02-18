@@ -826,9 +826,7 @@ public class MemberServiceImpl implements MemberService {
     public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
         //设置reids缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),workOrderInfoVO.getMemberCard());
-
-
-        return null;
+        return ComResponse.success(true);
     }
 
     /**
