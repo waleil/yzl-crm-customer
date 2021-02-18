@@ -14,7 +14,7 @@ public class MemberLabelDto {
     private String memberName;
 
     @ApiModelProperty(value = "会员卡号")
-    private Integer memberCard;
+    private String memberCard;
 
     @ApiModelProperty(value = "性别")
     private Integer sex;
