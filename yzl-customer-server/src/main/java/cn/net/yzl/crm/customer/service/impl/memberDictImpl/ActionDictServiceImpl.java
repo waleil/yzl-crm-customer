@@ -86,4 +86,9 @@ public class ActionDictServiceImpl implements ActionDictService {
 
         return ComResponse.success(num);
     }
+
+    @Override
+    public Integer updateActionDictWhereStatusIs2() {
+        return actionDictMapper.updateActionDictWhereStatusIs2();
+    }
 }

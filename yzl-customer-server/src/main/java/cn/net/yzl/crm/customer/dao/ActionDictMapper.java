@@ -34,4 +34,6 @@ public interface ActionDictMapper {
     int selectCountForRelationByDid(Integer id);
 
     int selectCountForRelationByType(Integer type);
+
+    Integer updateActionDictWhereStatusIs2();
 }

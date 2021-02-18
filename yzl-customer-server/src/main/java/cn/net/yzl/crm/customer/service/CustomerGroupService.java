@@ -5,6 +5,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
 import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
+import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
@@ -86,4 +87,10 @@ public interface CustomerGroupService {
      * @Return: java.lang.Boolean
      */
     Boolean memberGroupTimedTask();
+
+
+    boolean isCrowdGroupIncludeMemberCard(member_crowd_group memberCrowdGroup, String memberCard);
+
+    public int memberCrowdGroupRunByLabels(String groupId, List<MemberLabel> labels);
+
 }

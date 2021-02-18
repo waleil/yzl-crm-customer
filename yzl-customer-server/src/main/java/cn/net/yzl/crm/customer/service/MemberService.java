@@ -2,14 +2,17 @@ package cn.net.yzl.crm.customer.service;
 
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
-import cn.net.yzl.crm.customer.dto.CrowdGroupDTO;
 import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.model.*;
-import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
+import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
+import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
+import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
+import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
 
 import java.util.List;
 
@@ -148,4 +151,32 @@ public interface MemberService {
     ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(String memberCard);
 
     public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo);
+
+    /**
+     * 处理实时进线时，保存顾客信息
+     *
+     * @param coilInVo
+     * @return
+     */
+
+    public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(MemberCoilInVO coilInVo);
+
+    //public ComResponse<MemberGroupCodeDTO> coilInSaveMemberData(MemberCoilInVO coilInVo);
+
+    /**
+     * 订单签收是更新顾客关联的信息
+     * wanghe
+     * 2021-02-07
+     * @param orderInfo4MqVo
+     * @return
+     */
+    ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo);
+
+    ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO);
+
+    ComResponse<Boolean> dealOrderCreateUpdateMemberData(OrderCreateInfoVO orderCreateInfoVO);
+
+//    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
+
+    boolean updateMemberLabel();
 }

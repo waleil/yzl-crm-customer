@@ -14,4 +14,5 @@ public interface ActionDictService {
 
     public ComResponse<Integer> saveUpdateActionDict(List<ActionDictDto> actionDictDtos);
 
+    Integer updateActionDictWhereStatusIs2();
 }

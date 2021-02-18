@@ -62,6 +62,12 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         if (num < 1) {
             throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "数据保存失败");
         }
+        reveiverAddress.setReveiverAddressCode(reveiverAddress.getId());
+        //更新code
+        num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
+        if (num < 1) {
+            throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "数据保存失败");
+        }
 
         // 添加记录
         ReveiverAddressRecordPo reveiverAddressRecordPo = new ReveiverAddressRecordPo();

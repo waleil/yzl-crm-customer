@@ -88,7 +88,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         memberProductEffect.setEatingTime(oneNum);
         //商品服用完日期
         Integer eatDay = null;
-        if (oneNum > 0 && productLastNum>0) {
+        if (oneNum != null && oneNum > 0 && productLastNum>0) {
             eatDay = productLastNum % oneNum == 0 ? productLastNum / oneNum : productLastNum / oneNum + 1;
             //获取当前时间
             Calendar current = Calendar.getInstance();

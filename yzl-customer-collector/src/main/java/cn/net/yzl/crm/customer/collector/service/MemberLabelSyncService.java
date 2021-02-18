@@ -89,7 +89,7 @@ public class MemberLabelSyncService {
                     Map<String, List<MemberProduct>> memberProductsMap = memberProducts.stream()
                             .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
 
-                    ////通过会员卡号查询订单表( from order_m where member_card in)
+                    ////通过会员卡号查询订单表( from order_m where member_card in)  TODO 订单接口
                     List<MemberOrder> memberRefOrders = orderMDao.queryOrderByMemberCard(memberCodes);
                     Map<String, List<MemberOrder>> memberRefOrderMap = memberRefOrders.stream()
                             .collect(Collectors.groupingBy(MemberOrder::getMemberCard));
@@ -99,7 +99,7 @@ public class MemberLabelSyncService {
                     Map<String, List<Yixiangcustomer>> yixiangcustomerMap = yixiangcustomers.stream()
                             .collect(Collectors.groupingBy(Yixiangcustomer::getMemberCard));
 
-                    //查询最后一次通话记录( from member_lastcallin where member_card_no in)
+                    //查询最后一次通话记录( from member_lastcallin where member_card_no in) // TODO 工单     DMc  有无优惠券 会员是否升级
                     List<MemberLastcallin> lastcallinList = memberLastcallinDao.queryCallInByMemberCard(memberCodes);
                     Map<String, List<MemberLastcallin>> lastcallinListMap = lastcallinList.stream()
                             .collect(Collectors.groupingBy(MemberLastcallin::getMemberCard));

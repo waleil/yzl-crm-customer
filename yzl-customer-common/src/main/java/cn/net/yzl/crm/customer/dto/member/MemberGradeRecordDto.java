@@ -16,6 +16,8 @@ import java.util.Date;
 public class MemberGradeRecordDto implements Serializable {
 
 
+    @ApiModelProperty(value ="主键id",name="id",hidden = true)
+    private Integer id;
     @ApiModelProperty(value ="顾客卡号",name="memberCard")
     private String memberCard;
 

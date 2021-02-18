@@ -33,6 +33,6 @@ public interface MemberProductEffectService {
 
     ComResponse<List<MemberProductEffectDTO>> getProductEffects(MemberProductEffectSelectVO productEffect);
 
-    ComResponse updateMemberProductLastNumAndCreateWorkOrder();
+    ComResponse<Boolean> updateMemberProductLastNumAndCreateWorkOrder();
 }
 

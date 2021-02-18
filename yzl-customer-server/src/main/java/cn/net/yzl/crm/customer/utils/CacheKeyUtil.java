@@ -27,4 +27,16 @@ public class CacheKeyUtil {
     public static String groupRunCacheKey(String suffix){
         return new StringBuilder("all{").append(serverName).append("-").append("memberGroupRun").append("}").append(suffix).toString();
     }
+
+
+
+    /**
+     * 同步memberLabel缓存key
+     * wangzhe
+     * 2021-01-25
+     * @return
+     */
+    public static String syncMemberLabelCacheKey(){
+        return new StringBuilder("all{").append(serverName).append("-").append("memberLabel-sync").append("}").toString();
+    }
 }

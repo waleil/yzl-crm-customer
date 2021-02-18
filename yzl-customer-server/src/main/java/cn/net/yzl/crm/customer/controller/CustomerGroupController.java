@@ -207,7 +207,7 @@ public class CustomerGroupController {
      * @Return: cn.net.yzl.common.entity.ComResponse<java.lang.Boolean>
      */
     @ApiOperation("顾客人群圈选定时任务")
-    @GetMapping("/v1/memberGroupTimedTask")
+    @PostMapping("/v1/memberGroupTimedTask")
     public ComResponse<Boolean> memberGroupTimedTask() {
 
         customerGroupService.memberGroupTimedTask();

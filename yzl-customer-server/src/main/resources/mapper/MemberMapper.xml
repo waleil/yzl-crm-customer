@@ -894,7 +894,7 @@
                     member_street_no,member_street_name,
                     member_address,create_code,update_code
 
-            from reveiver_address where member_card=#{member_card}
+            from reveiver_address where member_card=#{member_card} order by status desc,update_time desc
     </select>
 
     <select id="getMemberOrderStat" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberOrderStat">
@@ -1355,5 +1355,107 @@
             <!--                and d.disease_id = #{diseasePid}-->
             <!--            </if>-->
         </where>
+    </select>
+
+
+    <select id="queryMemberLabelByCodes" resultType="cn.net.yzl.crm.customer.model.mogo.MemberLabel">
+        select
+        m.member_card as memberCard,
+        m.member_name as memberName,
+        m.nick_name as nickName,
+        m.age,
+        m.sex,
+        m.adver_code as adverCode,
+        m.adver_name as adverName,
+        m.m_grade_code as mGradeCode,
+        m.m_grade_id as mGradeId,
+        m.member_type as memberType,
+        m.is_active as active,
+        m.member_status as memberStatus,
+        m.activity as activity,
+        m.region_code as regionCode,
+        m.region_name as regionName,
+        m.province_code as provinceCode,
+        m.province_name as provinceName,
+        m.city_code as cityCode,
+        m.city_name as cityName,
+        m.area_code as areaCode,
+        m.area_name as areaName,
+        m.total_amount as totalAmount,
+        m.qq,
+        m.wechat,
+        m.email,
+        m.source,
+        m.address,
+        m.birthday,
+        m.job_code as jobCode,
+        m.first_order_time as firstOrderTime,
+        m.last_order_time as lastOrderTime,
+        m.master_card as masterCard,
+        m.first_order_am as firstOrderAm,
+        m.order_num as orderNum,
+        m.media_id as mediaId,
+        m.media_name as mediaName,
+        m.media_type_code as mediaTypeCode,
+        m.media_type_name as mediaTypeName,
+        m.create_time as createTime,
+        m.update_time as updateTime,
+        m.vip_flag as vipFlag,
+        m.buy_intention as buyIntention,
+        o.total_counsum_amount as totalCounsumAmount,
+        o.total_invest_amount as totalInvestAmount,
+        o.total_order_amount as totalOrderAmount,
+        o.order_rec_amount as orderRecAmount,
+        o.last_buy_product_code as lastBuyProductCode,
+        o.first_order_no as firstOrderNo,
+        o.first_buy_product_code as firstBuyProductCod,
+        o.order_high_am as orderHighAm,
+        o.order_low_am as orderLowAm,
+        o.order_avg_am as orderAvgAm,
+        o.product_type_cnt as productTypeCnt,
+        o.buy_count as buyCount,
+        o.day_avg_count as dayAvgCount,
+        o.year_avg_count as yearAvgCount,
+        o.return_goods_rate as returnGoodsRate,
+        o.last_sign_time as lastSignTime,
+        a.total_money as totalMoney
+        from member m
+        left join member_order_stat o on m.member_card= o.member_card
+        left join member_amount a on a.member_card=m.member_card
+        where m.member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryDiseaseByMemberCodes" resultType="cn.net.yzl.crm.customer.model.mogo.MemberDisease" parameterType="list" >
+        select
+        member_card as memberCard, disease_id as diseaseId, disease_name as diseaseName
+        from member_disease
+        where member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryActionByMemberCodes" parameterType="list" resultType="cn.net.yzl.crm.customer.model.mogo.ActionDict">
+        select mar.member_card as memberCard,ad.id,ad.`name`,ad.`type` from member_action_relation mar
+        left join action_dict ad on mar.did = ad.id and ad.del_flag =0
+        where mar.member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <select id="queryProductByMemberCodes" parameterType="list" resultType="cn.net.yzl.crm.customer.model.mogo.MemberProduct" >
+        select
+        member_card memberCard,
+        product_code productCode
+        from member_product_effect
+        where member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
 </mapper>

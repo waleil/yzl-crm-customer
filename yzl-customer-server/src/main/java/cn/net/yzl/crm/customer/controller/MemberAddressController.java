@@ -1,27 +1,23 @@
 package cn.net.yzl.crm.customer.controller;
 
 import cn.net.yzl.common.entity.ComResponse;
-import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
-import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
-import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
-import cn.net.yzl.crm.customer.model.ReveiverAddress;
 import cn.net.yzl.crm.customer.service.MemberAddressService;
-import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.utils.BeanUtil;
-import cn.net.yzl.crm.customer.vo.MemberAmountDetailVO;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressUpdateVO;
-import io.netty.util.internal.StringUtil;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -36,6 +32,12 @@ public class MemberAddressController {
     @ApiOperation(value = "顾客收货地址-添加顾客收货地址", notes = "顾客收货地址-添加顾客收货地址")
     @RequestMapping(value = "v1/addReveiverAddress", method = RequestMethod.POST)
     public ComResponse<String> addReveiverAddress(@RequestBody  @Validated ReveiverAddressInsertVO reveiverAddressInsertVO) throws IllegalAccessException {
+        if (StringUtils.isEmpty(reveiverAddressInsertVO.getCreateCode()) && StringUtils.isNotEmpty(reveiverAddressInsertVO.getUpdateCode())) {
+            reveiverAddressInsertVO.setCreateCode(reveiverAddressInsertVO.getUpdateCode());
+        }
+        if (StringUtils.isNotEmpty(reveiverAddressInsertVO.getCreateCode()) && StringUtils.isEmpty(reveiverAddressInsertVO.getUpdateCode())) {
+            reveiverAddressInsertVO.setUpdateCode(reveiverAddressInsertVO.getCreateCode());
+        }
         reveiverAddressInsertVO = BeanUtil.setNullValue(reveiverAddressInsertVO);
         return memberAddressService.addReveiverAddress(reveiverAddressInsertVO);
     }

@@ -23,7 +23,7 @@ import java.util.List;
  * 2021-01-27
  */
 @RestController
-@RequestMapping("/memberProductEffect")
+@RequestMapping("memberProductEffect")
 @Api(value = "顾客商品服用效果", tags = {"顾客商品服用效果"})
 @Validated
 public class MemberProductEffectController {
@@ -83,8 +83,8 @@ public class MemberProductEffectController {
 
 
     @ApiOperation(value = "商品服用效果，根据配置查询出距离商品服用完日期不足多少天的库存的会员号，进行回访", notes = "商品服用效果，根据配置查询出距离商品服用完日期不足多少天的库存的会员号，进行回访")
-    @RequestMapping(value = "/v1/udateMemberProductLastNumAndCreateWorkOrder", method = RequestMethod.GET)
-    public ComResponse udateMemberProductLastNumAndCreateWorkOrder() {
+    @RequestMapping(value = "/v1/updateMemberProductLastNumAndCreateWorkOrder", method = RequestMethod.POST)
+    public ComResponse<Boolean> updateMemberProductLastNumAndCreateWorkOrder() {
         ComResponse result = memberProductEffectService.updateMemberProductLastNumAndCreateWorkOrder();
         return result;
     }
