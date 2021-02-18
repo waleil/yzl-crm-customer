@@ -36,16 +36,14 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
-import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
-import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
-import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
-import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
+import cn.net.yzl.crm.customer.vo.*;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
+import cn.net.yzl.crm.customer.vo.work.WorkOrderBeanVO;
 import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -1208,6 +1206,56 @@ public class MemberServiceImpl implements MemberService {
 
         log.info("数据同步完成");
         return true;
+    }
+
+    @Transactional
+    @Override
+    public int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO) {
+        Member memberVO = memberReferralVO.getMemberVO();
+        WorkOrderBeanVO workOrderBeanVO = memberReferralVO.getWorkOrderBeanVO();
+        //保存用户信息
+        int result = this.insert(memberVO);
+        if (result > 0) {
+            Date now = new Date();
+            //保存工单
+            String memberCard = memberVO.getMember_card();
+            workOrderBeanVO.setMemberCard(memberCard);
+            workOrderBeanVO.setAcceptStatus(2);//工单接收状态：已接收
+            //workOrderBeanVO.setActivity(3);
+            workOrderBeanVO.setAllocateTime(now);//分配时间
+            workOrderBeanVO.setApplyUpStatus(0);//上交状态：未上交
+            workOrderBeanVO.setCallFlag(0);//员工当日拨打状态：未拨打
+            workOrderBeanVO.setCallTimes(0);//坐席已拨打次数：0次
+            List<MemberPhone> memberPhoneList = memberVO.getMemberPhoneList();
+            if (CollectionUtil.isNotEmpty(memberPhoneList)) {
+                workOrderBeanVO.setCalledPhone(memberPhoneList.get(0).getPhone_number());//被叫号码
+            }
+            //workOrderBeanVO.setCallerPhone("400-");//主叫号码
+            if (workOrderBeanVO.getCreateTime() == null) {
+                workOrderBeanVO.setCreateTime(now);//创建时间
+            }
+
+
+            workOrderBeanVO.setHistoryFlag(0);//非历史数据
+            workOrderBeanVO.setIsVisiable(1);//可见
+            workOrderBeanVO.setIsWorkOrder(0);//不是建档工单
+            if (StringUtils.isEmpty(workOrderBeanVO.getMemberName())) {
+                workOrderBeanVO.setMemberName(memberVO.getMember_name());//会员名称
+            }
+            workOrderBeanVO.setMGradeCode("1");
+            workOrderBeanVO.setSouce(3);//工单来源：自有的
+            workOrderBeanVO.setStatus(1);//工单处理状态：未处理
+            workOrderBeanVO.setTradeStatus(2);//工单成交状态：未成交
+            workOrderBeanVO.setTransTimes(0);//调整次数：0
+            if (workOrderBeanVO.getUpdateTime() == null) {
+                workOrderBeanVO.setUpdateTime(now);//修改时间
+            }
+            workOrderBeanVO.setVisitType(2);//工单类别：常规回访
+            workOrderBeanVO.setWorkOrderMoney(new BigDecimal("0.00"));
+            workOrderBeanVO.setWorkOrderType(1);//工单类型：热线工单
+            workOrderClient.addWorkOrder(workOrderBeanVO);
+        }
+        return result;
     }
 
     private static Integer getMonth(String date) {
