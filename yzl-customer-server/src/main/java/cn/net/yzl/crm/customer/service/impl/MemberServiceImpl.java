@@ -1069,10 +1069,10 @@ public class MemberServiceImpl implements MemberService {
                 MemberLevelPagesResponse level = null;
                 //遍历DMC会员级别信息，判断顾客当前属于那个级别
                 for (MemberLevelPagesResponse levelData : dmcLevelData) {
-                    if (new BigDecimal(String.valueOf(counsumAmount)).compareTo(levelData.getYearTotalSpendMoney()) >= 0){
+                   /* if (new BigDecimal(String.valueOf(counsumAmount)).compareTo(levelData.getYearTotalSpendMoney()) >= 0){
                         level = levelData;
                         break;
-                    }
+                    }*/
                 }
                 if (level != null) {
                     //当前顾客的会员级别信息
