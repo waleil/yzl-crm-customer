@@ -21,6 +21,10 @@ import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
+import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
+import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
+import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -377,6 +381,31 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo) {
        return memberDiseaseMapper.updateMemberDiseaseByDiseaseId(vo);
+    }
+
+    @Override
+    public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(MemberCoilInVO coilInVo) {
+        return null;
+    }
+
+    @Override
+    public ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo) {
+        return null;
+    }
+
+    @Override
+    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
+        return null;
+    }
+
+    @Override
+    public ComResponse<Boolean> dealOrderCreateUpdateMemberData(OrderCreateInfoVO orderCreateInfoVO) {
+        return null;
+    }
+
+    @Override
+    public boolean updateMemberLabel() {
+        return false;
     }
 
 
