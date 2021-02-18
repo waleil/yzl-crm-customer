@@ -27,6 +27,7 @@ import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
+import cn.net.yzl.crm.customer.service.MemberAddressService;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.service.impl.phone.MemberPhoneServiceImpl;
@@ -39,8 +40,8 @@ import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
+import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
-import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
@@ -91,6 +92,9 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private MemberGradeRecordDao memberGradeRecordDao;
 
+    @Autowired
+    private MemberAddressService memberAddressService;
+
 
     @Autowired
     ProductFien productFien;
@@ -100,6 +104,9 @@ public class MemberServiceImpl implements MemberService {
     ActivityFien activityFien;
     @Autowired
     WorkOrderClient workOrderClient;
+
+    @Autowired
+    MemberPhoneMapper phoneMapper;
 
     private String memberCountkey="memeberCount";
 
@@ -121,10 +128,51 @@ public class MemberServiceImpl implements MemberService {
         //保存数据
         int result = memberMapper.insertSelective(member);
 
-        //TODO 保存 memberPhone List
+        //保存memberPhoneList
+        List<MemberPhone> memberPhoneList = member.getMemberPhoneList();
+        if (CollectionUtil.isNotEmpty(memberPhoneList)) {
+            for (MemberPhone memberPhone : memberPhoneList) {
+                if (StringUtils.isEmpty(memberPhone.getPhone_number())) {
+                    continue;
+                }
+                //设置会员卡号
+                memberPhone.setMember_card(member.getMember_card());
+                result = phoneMapper.insert(memberPhone);
+            }
+        }
 
-
-
+        //保存receiveAddressList
+        List<ReveiverAddress> receiveAddressList = member.getReceive_address_list();
+        ComResponse<String> addressResult = null;
+        if (CollectionUtil.isNotEmpty(receiveAddressList)) {
+            for (ReveiverAddress address : receiveAddressList) {
+                //设置会员卡号
+                address.setMember_card(member.getMember_card());
+                if (StringUtils.isEmpty(address.getMember_name())){
+                    address.setMember_name(member.getMember_name());
+                }
+                ReveiverAddressInsertVO insertVO = new ReveiverAddressInsertVO();
+                insertVO.setMemberCard(address.getMember_card());
+                insertVO.setMemberName(address.getMember_name());
+                insertVO.setMemberMobile(address.getMember_mobile());
+                insertVO.setMemberProvinceNo(address.getMember_province_no());
+                insertVO.setMemberProvinceName(address.getMember_province_name());
+                insertVO.setMemberCityNo(address.getMember_city_no());
+                insertVO.setMemberCityName(address.getMember_city_name());
+                insertVO.setMemberCountyNo(address.getMember_country_no());
+                insertVO.setMemberCountyName(address.getMember_country_name());
+                insertVO.setMemberStreetNo(address.getMember_street_no());
+                insertVO.setMemberStreetName(address.getMember_street_name());
+                insertVO.setMemberAddress(address.getMember_address());
+                insertVO.setCreateCode(address.getCreate_code());
+                insertVO.setUpdateCode(address.getUpdate_code());
+                addressResult = memberAddressService.addReveiverAddress(insertVO);
+                Integer status = addressResult.getStatus();
+                if (status != 1) {
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "收货地址保存失败!");
+                }
+            }
+        }
         return result;
     }
 
@@ -778,9 +826,7 @@ public class MemberServiceImpl implements MemberService {
     public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
         //设置reids缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),workOrderInfoVO.getMemberCard());
-
-
-        return null;
+        return ComResponse.success(true);
     }
 
     /**
@@ -877,13 +923,13 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
 
 
-        ComResponse<List<memberOrderObject>> querymemberorder = orderFien.querymemberorder(memberCodes);
+        ComResponse<List<MemberOrderObject>> querymemberorder = orderFien.querymemberorder(memberCodes);
         //获取会员订单信息
-        List<memberOrderObject> data = querymemberorder.getData();
+        List<MemberOrderObject> data = querymemberorder.getData();
         List<MemberOrder> memberRefOrders = new ArrayList<>();
-        memberOrderObject memberOrder1 = data.get(0);
-        List<memberOrderDTO> orders = memberOrder1.getOrders();
-        for (memberOrderDTO order : orders) {
+        MemberOrderObject memberOrder1 = data.get(0);
+        List<MemberOrderDTO> orders = memberOrder1.getOrders();
+        for (MemberOrderDTO order : orders) {
             MemberOrder memberOrder = new MemberOrder();
             memberOrder.setMemberCard(memberOrder1.getMemberCardNo());
             if (order.getActivityNo() != null) {
@@ -1023,7 +1069,7 @@ public class MemberServiceImpl implements MemberService {
                 MemberLevelPagesResponse level = null;
                 //遍历DMC会员级别信息，判断顾客当前属于那个级别
                 for (MemberLevelPagesResponse levelData : dmcLevelData) {
-                    if (new BigDecimal(String.valueOf(counsumAmount)).compareTo(levelData.getYearTotalSpendMoney()) >= 0){
+                    if (new BigDecimal(String.valueOf(counsumAmount)).compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0){
                         level = levelData;
                         break;
                     }
