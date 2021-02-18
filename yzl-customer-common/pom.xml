@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yzl-crm-customer-platform</artifactId>
+        <artifactId>yzl-customer</artifactId>
         <groupId>cn.net.yzl.crm.customer</groupId>
         <version>1.0-RELEASE</version>
     </parent>
@@ -11,9 +11,9 @@
 
 
     <packaging>jar</packaging>
-    <artifactId>yzl-crm-customer-common</artifactId>
+    <artifactId>yzl-customer-common</artifactId>
     <description>crm客户公共服务</description>
-    <name>yzl-crm-customer-common</name>
+    <name>yzl-customer-common</name>
     <version>1.0-SNAPSHOT</version>
     <properties>
         <java.version>1.8</java.version>

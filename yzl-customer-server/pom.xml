@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>yzl-crm-customer-platform</artifactId>
+        <artifactId>yzl-customer</artifactId>
         <groupId>cn.net.yzl.crm.customer</groupId>
         <version>1.0-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yzl-crm-customer-api</artifactId>
+    <artifactId>yzl-customer-server</artifactId>
     <packaging>jar</packaging>
     <description>crm客户服务</description>
 <!--    <version>1.0-SNAPSHOT</version>-->
@@ -115,7 +115,7 @@
 
         <dependency>
             <groupId>cn.net.yzl.crm.customer</groupId>
-            <artifactId>yzl-crm-customer-common</artifactId>
+            <artifactId>yzl-customer-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -155,7 +155,7 @@
     </repositories>
 
     <build>
-        <finalName>yzl-crm-customer-api</finalName>
+        <finalName>yzl-customer-server</finalName>
         <plugins>
 <!--            <plugin>-->
 <!--                <groupId>org.mybatis.generator</groupId>-->
