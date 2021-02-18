@@ -3,14 +3,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>yzl-crm-customer-platform</artifactId>
+    <artifactId>yzl-customer</artifactId>
     <groupId>cn.net.yzl.crm.customer</groupId>
     <version>1.0-RELEASE</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <name>yzl-crm-customer-collector</name>
-  <artifactId>yzl-crm-customer-collector</artifactId>
+  <name>yzl-customer-collector</name>
+  <artifactId>yzl-customer-collector</artifactId>
   <packaging>jar</packaging>
   <description>顾客标签初始化程序</description>
   <version>1.0-SNAPSHOT</version>
@@ -39,7 +39,7 @@
     </dependency>
     <dependency>
       <groupId>cn.net.yzl.crm.customer</groupId>
-      <artifactId>yzl-crm-customer-common</artifactId>
+      <artifactId>yzl-customer-common</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
