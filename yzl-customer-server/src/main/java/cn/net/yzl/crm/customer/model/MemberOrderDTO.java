@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-public class memberOrderDTO {
+public class MemberOrderDTO {
         @ApiModelProperty("订单编号")
         private String orderNo;
         @ApiModelProperty("支付方式")

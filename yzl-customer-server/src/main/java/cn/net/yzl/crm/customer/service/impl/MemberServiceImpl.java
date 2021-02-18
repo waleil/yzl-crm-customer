@@ -40,7 +40,6 @@ import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
-import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
@@ -877,13 +876,13 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
 
 
-        ComResponse<List<memberOrderObject>> querymemberorder = orderFien.querymemberorder(memberCodes);
+        ComResponse<List<MemberOrderObject>> querymemberorder = orderFien.querymemberorder(memberCodes);
         //获取会员订单信息
-        List<memberOrderObject> data = querymemberorder.getData();
+        List<MemberOrderObject> data = querymemberorder.getData();
         List<MemberOrder> memberRefOrders = new ArrayList<>();
-        memberOrderObject memberOrder1 = data.get(0);
-        List<memberOrderDTO> orders = memberOrder1.getOrders();
-        for (memberOrderDTO order : orders) {
+        MemberOrderObject memberOrder1 = data.get(0);
+        List<MemberOrderDTO> orders = memberOrder1.getOrders();
+        for (MemberOrderDTO order : orders) {
             MemberOrder memberOrder = new MemberOrder();
             memberOrder.setMemberCard(memberOrder1.getMemberCardNo());
             if (order.getActivityNo() != null) {
