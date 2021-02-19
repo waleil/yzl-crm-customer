@@ -893,7 +893,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean updateMemberLabel() {
         //获取redis缓存
-        Date yesterdayStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getYesterdayStart();
+        Date yesterdayStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getCurrentDateStart();
         String version = DateUtil.format(yesterdayStart, "yyyyMMdd");
         String key = CacheKeyUtil.syncMemberLabelCacheKey(version);
 
@@ -901,6 +901,23 @@ public class MemberServiceImpl implements MemberService {
         if (CollectionUtil.isEmpty(memberSet)) {
             log.info("CacheKeyUtil.syncMemberLabelCacheKey() - 数据同步：当前没有需要同步的数据");
             return true;
+        }
+
+        //获取会员等级，判断是否升级
+        List<MemberLevelPagesResponse> dmcLevelData = null;
+        PageParam pageParam = new PageParam();
+        pageParam.setPageNo(1);
+        pageParam.setPageSize(20);
+        ComResponse<Page<MemberLevelPagesResponse>> dmcLevelResponse = activityFien.getMemberLevelPages(pageParam);
+        Page<MemberLevelPagesResponse> data = dmcLevelResponse.getData();
+        if (dmcLevelResponse != null && data != null && CollectionUtil.isNotEmpty(data.getItems())) {
+            dmcLevelData = data.getItems();
+            //等级倒叙排序
+            Collections.sort(dmcLevelData, new Comparator<MemberLevelPagesResponse>() {
+                public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2) {
+                    return o2.getMemberLevelGrade() - o1.getMemberLevelGrade();
+                }
+            });
         }
 
         Map<String, Integer> activityMap = new HashMap<>();
@@ -937,10 +954,10 @@ public class MemberServiceImpl implements MemberService {
         try {
             querymemberorder = orderFien.querymemberorder(memberCodes);
             //获取会员订单信息
-            List<MemberOrderObject> data = querymemberorder.getData();
+            List<MemberOrderObject> orderData = querymemberorder.getData();
             List<MemberOrder> memberRefOrders = new ArrayList<>();
-            if (CollectionUtil.isNotEmpty(data)) {
-                MemberOrderObject memberOrder1 = data.get(0);
+            if (CollectionUtil.isNotEmpty(orderData)) {
+                MemberOrderObject memberOrder1 = orderData.get(0);
                 List<MemberOrderDTO> orders = memberOrder1.getOrders();
                 for (MemberOrderDTO order : orders) {
                     MemberOrder memberOrder = new MemberOrder();
@@ -1079,28 +1096,11 @@ public class MemberServiceImpl implements MemberService {
                 //更新
                 memberAmountRedbagIntegralMapper.updateByPrimaryKeySelective(memberAmountRedbagIntegral);
             }
-
-
-            //TODO 怎么获取 一次性预存款 一次性消费满多少 一年累计消费满
             //获取会员信息
             //Member member1 = selectMemberByCard(memberCard);
-            //获取会员等级，判断是否升级
-            PageParam pageParam = new PageParam();
-            pageParam.setPageNo(1);
-            pageParam.setPageSize(20);
-            ComResponse<Page<MemberLevelPagesResponse>> dmcLevelResponse = activityFien.getMemberLevelPages(pageParam);
-            Page<MemberLevelPagesResponse> data = dmcLevelResponse.getData();
-            if (dmcLevelResponse != null && data != null && CollectionUtil.isNotEmpty(data.getItems())) {
-                List<MemberLevelPagesResponse> dmcLevelData = data.getItems();
-                //等级倒叙排序
-                Collections.sort(dmcLevelData, new Comparator<MemberLevelPagesResponse>()
-                {
-                    public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2)
-                    {
-                        return o2.getMemberLevelGrade() - o1.getMemberLevelGrade();
-                    }
-                });
-
+            //判断是否升级
+            if (CollectionUtil.isNotEmpty(dmcLevelData)) {
+                //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
                 ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(memberCodes);
                 List<MemberTotal> memberTotalData = memberTotalResponse.getData();
                 if (CollectionUtil.isNotEmpty(memberTotalData)) {
@@ -1122,34 +1122,28 @@ public class MemberServiceImpl implements MemberService {
                             level = levelData;
                             break;
                         }
-                        if (level != null) {
+                    }
+                    if (level != null) {
+                        //查询顾客表信息
+                        Member member = memberMapper.selectMemberByCard(memberCard);
+                        //等级相同不更新
+                        if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
                             //当前顾客的会员级别信息
-                            MemberGradeRecordPo memberLevel = new MemberGradeRecordPo();
-                            //查询顾客当前的会员级别信息
-                            List<MemberGradeRecordDto> memberGradeRecordList = memberGradeRecordDao.getMemberGradeRecordList(memberCard);
-                            if (CollectionUtil.isNotEmpty(memberGradeRecordList)) {
-                                MemberGradeRecordDto oldLevel = memberGradeRecordList.get(0);
-                                memberLevel.setBeforeGradeId(oldLevel.getMGradeId());
-                                memberLevel.setBeforeGradeName(oldLevel.getMGradeName());
-                                memberLevel.setId(oldLevel.getId());
-                            } else {
-                                //新建会员等级信息
-                                memberLevel = new MemberGradeRecordPo();
-                                memberLevel.setCreateTime(new Date());
-                            }
-                            memberLevel.setMGradeId(level.getMemberLevelGrade());
-                            memberLevel.setMGradeName(level.getMemberLevelName());
-                            if (memberLevel.getId() == null) {
-                                memberGradeRecordDao.insertSelective(memberLevel);
-                            } else {
-                                memberGradeRecordDao.updateByPrimaryKeySelective(memberLevel);
-                            }
-                            //查询顾客表信息
-                            Member member = memberMapper.selectMemberByCard(memberCard);
-                            member.setMGradeId(memberLevel.getMGradeId());
-                            member.setMGradeName(memberLevel.getMGradeName());
+                            MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                            memberGradeRecord = new MemberGradeRecordPo();
+                            memberGradeRecord.setMemberCard(memberCard);
+                            memberGradeRecord.setCreateTime(new Date());
+                            memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                            memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                            memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
+                            memberGradeRecord.setMGradeName(level.getMemberLevelName());
+                            memberGradeRecordDao.insertSelective(memberGradeRecord);
+                            //更新顾客表的会员信息
+                            member.setMGradeId(memberGradeRecord.getMGradeId());
+                            member.setMGradeName(memberGradeRecord.getMGradeName());
                             memberMapper.updateByMemberCardSelective(member);
                         }
+
                     }
                 }
             }
