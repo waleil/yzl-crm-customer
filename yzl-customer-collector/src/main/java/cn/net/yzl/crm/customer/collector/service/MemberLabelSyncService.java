@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.collector.service;
 import cn.net.yzl.crm.customer.collector.dao.*;
 import cn.net.yzl.crm.customer.collector.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.collector.model.CustomerDistinct;
+import cn.net.yzl.crm.customer.collector.model.MemberAmountRedbagIntegral;
 import cn.net.yzl.crm.customer.collector.model.MemberLastcallin;
 import cn.net.yzl.crm.customer.collector.model.Yixiangcustomer;
 import cn.net.yzl.crm.customer.collector.model.mogo.*;
@@ -42,6 +43,8 @@ public class MemberLabelSyncService {
 
     @Autowired
     private CustomerDistinctDao customerDistinctDao;
+    @Autowired
+    private MemberAmountRedbagIntegralDao memberAmountRedbagIntegralDao;
     /**
      * 每次同步1000条数据
      */
@@ -103,6 +106,11 @@ public class MemberLabelSyncService {
                     List<MemberLastcallin> lastcallinList = memberLastcallinDao.queryCallInByMemberCard(memberCodes);
                     Map<String, List<MemberLastcallin>> lastcallinListMap = lastcallinList.stream()
                             .collect(Collectors.groupingBy(MemberLastcallin::getMemberCard));
+                    //用户关联的优惠券、积分、红包
+                    List<MemberAmountRedbagIntegral> amountRedbagIntegrals= memberAmountRedbagIntegralDao.queryMemberCards(memberCodes);
+
+                    Map<String, List<MemberAmountRedbagIntegral>> stringListMap = amountRedbagIntegrals.stream()
+                            .collect(Collectors.groupingBy(MemberAmountRedbagIntegral::getMemberCard));
                     //封装标签数据
                     for (MemberLabel memberLabel : list) {
                         //是否有QQ
@@ -175,7 +183,28 @@ public class MemberLabelSyncService {
 
 
                         //TODO 是否有积分、红包、优惠券要从DMC获取
-
+                        List<MemberAmountRedbagIntegral> mari=stringListMap.get(memberCard);
+                        if(!CollectionUtils.isEmpty(mari)){
+                            MemberAmountRedbagIntegral amountRedbagIntegral = mari.get(0);
+                            //积分
+                            if(amountRedbagIntegral.getLastIntegral()>0){
+                                memberLabel.setHasIntegral(true);
+                            }else{
+                                memberLabel.setHasIntegral(false);
+                            }
+                            //红包
+                            if(amountRedbagIntegral.getLastRedBag()>0){
+                                memberLabel.setHasTedBag(true);
+                            }else{
+                                memberLabel.setHasTedBag(false);
+                            }
+                            //默认都没有优惠券
+                            memberLabel.setHasTicket(false);
+                        }else{
+                            memberLabel.setHasIntegral(false);
+                            memberLabel.setHasTicket(false);
+                            memberLabel.setHasTedBag(false);
+                        }
 
 
                         //获取当前顾客的综合行为

@@ -9,17 +9,14 @@ import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.mongo.PageUtil;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Field;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Component;
@@ -352,7 +349,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = in.get(i);
-                    and.add(Criteria.where("mGradeId").is(Integer.parseInt(c.getId())));
+                    if (c.getId() != null) {
+                        and.add(Criteria.where("mGradeId").is(Integer.parseInt(c.getId())));
+                    }
                 }
                 //criteria.andOperator(andArray);
             }
@@ -417,26 +416,72 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //首单下单时间>=
         if (memberCrowdGroup.getFirst_order_to_days() != null) {
-            int days = memberCrowdGroup.getFirst_order_to_days();
-            if (days > 10000) {
-                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "首单下单时间不能大于10000");
+//            int days = memberCrowdGroup.getFirst_order_to_days();
+            DayParam days = memberCrowdGroup.getFirst_order_to_days();
+            if (days.getDay() != null && StringUtils.isNotEmpty(days.getSymbol())) {
+                if (days.getDay() > 10000) {
+                    throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "首单下单时间不能大于10000");
+                }
+                Date date = getPastDate(days.getDay());
+                String symbol = days.getSymbol();
+                if (">=".equals(symbol)){
+                    and.add(Criteria.where("firstOrderTime").gte(MongoDateHelper.getMongoDate(date)));
+                }else if (">".equals(symbol)){
+                    and.add(Criteria.where("firstOrderTime").gt(MongoDateHelper.getMongoDate(date)));
+                }else if ("=".equals(symbol)){
+                    and.add(Criteria.where("firstOrderTime").is(MongoDateHelper.getMongoDate(date)));
+                }else if ("<=".equals(symbol)){
+                    and.add(Criteria.where("firstOrderTime").lte(MongoDateHelper.getMongoDate(date)));
+                }else if ("<".equals(symbol)){
+                    and.add(Criteria.where("firstOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+                }
+
             }
-            Date date = getPastDate(days);
-            and.add(Criteria.where("firstOrderTime").gte(MongoDateHelper.getMongoDate(date)));
         }
+
         //首次订单金额>=
         if (memberCrowdGroup.getFirst_order_am() != null) {
-            int am = BigDecimal.valueOf(memberCrowdGroup.getFirst_order_am() * 100).intValue();
-            and.add(Criteria.where("firstOrderAm").gte(am));
+            AmountParam firstOrderAm = memberCrowdGroup.getFirst_order_am();
+            if (firstOrderAm.getAmount() != null && StringUtils.isNotEmpty(firstOrderAm.getSymbol())) {
+                Double amount = firstOrderAm.getAmount();
+                String symbol = firstOrderAm.getSymbol();
+                int am = BigDecimal.valueOf(amount * 100).intValue();
+                and.add(Criteria.where("firstOrderAm").gte(am));
+                if (">=".equals(symbol)){
+                    and.add(Criteria.where("firstOrderAm").gte(am));
+                }else if (">".equals(symbol)){
+                    and.add(Criteria.where("firstOrderAm").gt(am));
+                }else if ("=".equals(symbol)){
+                    and.add(Criteria.where("firstOrderAm").is(am));
+                }else if ("<=".equals(symbol)){
+                    and.add(Criteria.where("firstOrderAm").lte(am));
+                }else if ("<".equals(symbol)){
+                    and.add(Criteria.where("firstOrderAm").lt(am));
+                }
+            }
+
+
         }
         //最后一次下单时间>=
         if (memberCrowdGroup.getLast_order_to_days() != null) {
-            int days = memberCrowdGroup.getLast_order_to_days();
+            DayParam day = memberCrowdGroup.getLast_order_to_days();
+            Integer days = day.getDay();
+            String symbol = day.getSymbol();
             if (days > 10000) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
             }
             Date date = getPastDate(days);
-            and.add(Criteria.where("lastOrderTime").gte(MongoDateHelper.getMongoDate(date)));
+            if (">=".equals(symbol)){
+                and.add(Criteria.where("lastOrderTime").gte(MongoDateHelper.getMongoDate(date)));
+            }else if (">".equals(symbol)){
+                and.add(Criteria.where("lastOrderTime").gt(MongoDateHelper.getMongoDate(date)));
+            }else if ("=".equals(symbol)){
+                and.add(Criteria.where("lastOrderTime").is(MongoDateHelper.getMongoDate(date)));
+            }else if ("<=".equals(symbol)){
+                and.add(Criteria.where("lastOrderTime").lte(MongoDateHelper.getMongoDate(date)));
+            }else if ("<".equals(symbol)){
+                and.add(Criteria.where("lastOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+            }
         }
         //生日月份
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getMember_month())) {
@@ -522,12 +567,24 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //签收时间时间>=
         if (memberCrowdGroup.getSign_date_to_days() != null) {
-            int days = memberCrowdGroup.getSign_date_to_days();
+            DayParam day = memberCrowdGroup.getSign_date_to_days();
+            Integer days = day.getDay();
+            String symbol = day.getSymbol();
             if (days > 10000) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次签收时间不能大于10000");
             }
             Date date = getPastDate(days);
-            and.add(Criteria.where("lastSignTime").gte(MongoDateHelper.getMongoDate(date)));
+            if (">=".equals(symbol)){
+                and.add(Criteria.where("lastSignTime").gte(MongoDateHelper.getMongoDate(date)));
+            }else if (">".equals(symbol)){
+                and.add(Criteria.where("lastSignTime").gt(MongoDateHelper.getMongoDate(date)));
+            }else if ("=".equals(symbol)){
+                and.add(Criteria.where("lastSignTime").is(MongoDateHelper.getMongoDate(date)));
+            }else if ("<=".equals(symbol)){
+                and.add(Criteria.where("lastSignTime").lte(MongoDateHelper.getMongoDate(date)));
+            }else if ("<".equals(symbol)){
+                and.add(Criteria.where("lastOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+            }
         }
         //方便接电话时间
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getPhone_time())) {
@@ -951,31 +1008,98 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //累计消费金额//大于等于
         if(memberCrowdGroup.getTotal_amount()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getTotal_amount() * 100).intValue();
-            and.add(Criteria.where("totalCounsumAmount").gte(am));
+            AmountParam totalAmount = memberCrowdGroup.getTotal_amount();
+            Double amount = totalAmount.getAmount();
+            String symbol = totalAmount.getSymbol();
+
+            int am = BigDecimal.valueOf(amount * 100).intValue();
+            if (">=".equals(symbol)){
+                and.add(Criteria.where("totalCounsumAmount").gte(am));
+            }else if (">".equals(symbol)){
+                and.add(Criteria.where("totalCounsumAmount").gt(am));
+            }else if ("=".equals(symbol)){
+                and.add(Criteria.where("totalCounsumAmount").is(am));
+            }else if ("<=".equals(symbol)){
+                and.add(Criteria.where("totalCounsumAmount").lte(am));
+            }else if ("<".equals(symbol)){
+                and.add(Criteria.where("totalCounsumAmount").lt(am));
+            }
         }
         //订单总金额//大于等于
         if(memberCrowdGroup.getOrder_total_amount()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_total_amount() * 100).intValue();
-            and.add(Criteria.where("totalOrderAmount").gte(am));
+            AmountParam orderTotalAmount = memberCrowdGroup.getOrder_total_amount();
+            Double amount = orderTotalAmount.getAmount();
+            String symbol = orderTotalAmount.getSymbol();
+            int am = BigDecimal.valueOf(amount * 100).intValue();
+            if (">=".equals(symbol)){
+                and.add(Criteria.where("totalOrderAmount").gte(am));
+            }else if (">".equals(symbol)){
+                and.add(Criteria.where("totalOrderAmount").gt(am));
+            }else if ("=".equals(symbol)){
+                and.add(Criteria.where("totalOrderAmount").is(am));
+            }else if ("<=".equals(symbol)){
+                and.add(Criteria.where("totalOrderAmount").lte(am));
+            }else if ("<".equals(symbol)){
+                and.add(Criteria.where("totalOrderAmount").lt(am));
+            }
         }
         //订单应收总金额//大于等于
         if(memberCrowdGroup.getOrder_rec_amount()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_rec_amount() * 100).intValue();
-            and.add(Criteria.where("orderRecAmount").gte(am));
+            AmountParam orderTotalAmount = memberCrowdGroup.getOrder_rec_amount();
+            Double amount = orderTotalAmount.getAmount();
+            String symbol = orderTotalAmount.getSymbol();
+            int am = BigDecimal.valueOf(amount * 100).intValue();
+            if (">=".equals(symbol)){
+                and.add(Criteria.where("orderRecAmount").gte(am));
+            }else if (">".equals(symbol)){
+                and.add(Criteria.where("orderRecAmount").gt(am));
+            }else if ("=".equals(symbol)){
+                and.add(Criteria.where("orderRecAmount").is(am));
+            }else if ("<=".equals(symbol)){
+                and.add(Criteria.where("orderRecAmount").lte(am));
+            }else if ("<".equals(symbol)){
+                and.add(Criteria.where("orderRecAmount").lt(am));
+            }
+
         }
 
         //
         //最高订单金额（单）//大于等于
         if(memberCrowdGroup.getOrder_high_am()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_high_am() * 100).intValue();
-            and.add(Criteria.where("orderHighAm").gte(am));
+            AmountParam orderRecAmount = memberCrowdGroup.getOrder_high_am();
+            Double amount = orderRecAmount.getAmount();
+            String symbol = orderRecAmount.getSymbol();
+            int am = BigDecimal.valueOf(amount * 100).intValue();
+            if (">=".equals(symbol)){
+                and.add(Criteria.where("orderHighAm").gte(am));
+            }else if (">".equals(symbol)){
+                and.add(Criteria.where("orderHighAm").gt(am));
+            }else if ("=".equals(symbol)){
+                and.add(Criteria.where("orderHighAm").is(am));
+            }else if ("<=".equals(symbol)){
+                and.add(Criteria.where("orderHighAm").lte(am));
+            }else if ("<".equals(symbol)){
+                and.add(Criteria.where("orderHighAm").lt(am));
+            }
         }
 
         //最低订单金额（单）//大于等于
         if(memberCrowdGroup.getOrder_low_am()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_low_am() * 100).intValue();
-            and.add(Criteria.where("orderLowAm").gte(am));
+            AmountParam orderLowAm = memberCrowdGroup.getOrder_low_am();
+            Double amount = orderLowAm.getAmount();
+            String symbol = orderLowAm.getSymbol();
+            int am = BigDecimal.valueOf(amount * 100).intValue();
+            if (">=".equals(symbol)){
+                and.add(Criteria.where("orderLowAm").gte(am));
+            }else if (">".equals(symbol)){
+                and.add(Criteria.where("orderLowAm").gt(am));
+            }else if ("=".equals(symbol)){
+                and.add(Criteria.where("orderLowAm").is(am));
+            }else if ("<=".equals(symbol)){
+                and.add(Criteria.where("orderLowAm").lte(am));
+            }else if ("<".equals(symbol)){
+                and.add(Criteria.where("orderLowAm").lt(am));
+            }
         }
         //是否下单
         if(memberCrowdGroup.getHave_order()!=null){
@@ -1009,12 +1133,26 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //最后一次进线时间
         if(memberCrowdGroup.getLastCallDays()!=null){
-            int days = memberCrowdGroup.getLastCallDays();
-            if (days > 10000) {
-                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
+            DayParam days = memberCrowdGroup.getLastCallDays();
+            if (days.getDay() != null && StringUtils.isNotEmpty(days.getSymbol())) {
+                if (days.getDay() > 10000) {
+                    throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
+                }
+                Date date = getPastDate(days.getDay());
+                String symbol = days.getSymbol();
+                if (">=".equals(symbol)){
+                    and.add(Criteria.where("lastCallInTime").gte(MongoDateHelper.getMongoDate(date)));
+                }else if (">".equals(symbol)){
+                    and.add(Criteria.where("lastCallInTime").gt(MongoDateHelper.getMongoDate(date)));
+                }else if ("=".equals(symbol)){
+                    and.add(Criteria.where("lastCallInTime").is(MongoDateHelper.getMongoDate(date)));
+                }else if ("<=".equals(symbol)){
+                    and.add(Criteria.where("lastCallInTime").lte(MongoDateHelper.getMongoDate(date)));
+                }else if ("<".equals(symbol)){
+                    and.add(Criteria.where("lastCallInTime").lt(MongoDateHelper.getMongoDate(date)));
+                }
+
             }
-            Date date = getPastDate(days);
-            and.add(Criteria.where("lastCallInTime").gte(MongoDateHelper.getMongoDate(date)));
         }
         //购买的商品
         if (!CollectionUtils.isEmpty(memberCrowdGroup.getAdvertProducts())) {
