@@ -2,7 +2,6 @@ package cn.net.yzl.crm.customer.service.impl.memberDictImpl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
-import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.ActionDictMapper;
 import cn.net.yzl.crm.customer.dao.MemberActionRelationMapper;
@@ -12,7 +11,7 @@ import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
-import org.apache.commons.lang3.StringUtils;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionDictList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +40,16 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
     @Override
     public ComResponse<List<MemberActionRelationList>> selectRelationTreeByMemberCard(String card) {
         List<MemberActionRelationList> memberActionRelations = memberActionRelationMapper.selectRelationTreeByMemberCard(card);
+        if(CollectionUtil.isEmpty(memberActionRelations)){
+            return  ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(),ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getMessage());
+        }
+        return ComResponse.success(memberActionRelations);
+    }
+
+
+    @Override
+    public ComResponse<List<MemberActionDictList>> getActionDictByMemberCard(String memberCard) {
+        List<MemberActionDictList> memberActionRelations = memberActionRelationMapper.getActionDictByMemberCard(memberCard);
         if(CollectionUtil.isEmpty(memberActionRelations)){
             return  ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(),ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getMessage());
         }
