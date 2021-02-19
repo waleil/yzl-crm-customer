@@ -918,7 +918,7 @@ public class MemberServiceImpl implements MemberService {
             log.error("没有查询到顾客信息");
             return false;
         }
-        //查询相关病症信息
+
         List<cn.net.yzl.crm.customer.model.mogo.MemberDisease> memberDiseaseList = memberDiseaseMapper.queryByMemberCodes(memberCodes);
         Map<String, List<cn.net.yzl.crm.customer.model.mogo.MemberDisease>> memberDiseaseListMap = memberDiseaseList.stream()
                 .collect(Collectors.groupingBy(cn.net.yzl.crm.customer.model.mogo.MemberDisease::getMemberCard));

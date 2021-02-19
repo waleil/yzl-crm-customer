@@ -1,7 +1,6 @@
 package cn.net.yzl.crm.customer.collector.dao;
 
 import cn.net.yzl.crm.customer.collector.model.mogo.*;
-import cn.net.yzl.crm.customer.model.Member;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
@@ -25,8 +24,4 @@ public interface MemberMapper {
     List<ActionDict> queryActionByMemberCodes(List<String> codes);
 
     List<MemberProduct> queryProductByMemberCodes(List<String> codes);
-
-    Member selectMemberByCard(String memberCard);
-
-    int updateByMemberCardSelective(Member dto);
 }

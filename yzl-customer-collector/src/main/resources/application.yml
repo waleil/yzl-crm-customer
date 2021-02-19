@@ -36,9 +36,3 @@ mysql:
 #logging:
 #  file:
 #    path: logback-spring.xml
-api:
-  gateway:
-    url: http://api.staff.yuzhilin.net.cn
-ribbon:
-  ReadTimeout: 60000
-  ConnectTimeout: 60000
