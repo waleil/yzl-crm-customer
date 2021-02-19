@@ -893,7 +893,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean updateMemberLabel() {
         //获取redis缓存
-        Date yesterdayStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getCurrentDateStart();
+        Date yesterdayStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getYesterdayStart();
         String version = DateUtil.format(yesterdayStart, "yyyyMMdd");
         String key = CacheKeyUtil.syncMemberLabelCacheKey(version);
 
