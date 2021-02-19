@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("圈选会员类型")
+@ApiModel("圈选金额类型")
 @Data
 public class AmountParam {
 

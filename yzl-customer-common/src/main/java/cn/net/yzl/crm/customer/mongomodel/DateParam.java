@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.Date;
 
 
-@ApiModel("日期类型")
+@ApiModel("圈选日期类型")
 @Data
 public class DateParam {
 
