@@ -6,6 +6,7 @@ import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.MemberAndAddWorkOrderVO;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
@@ -179,4 +180,6 @@ public interface MemberService {
 //    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
 
     boolean updateMemberLabel();
+
+    int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO);
 }
