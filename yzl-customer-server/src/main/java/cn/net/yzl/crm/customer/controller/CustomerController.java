@@ -11,10 +11,10 @@ import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.BeanUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.vo.MemberAndAddWorkOrderVO;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
-import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +58,23 @@ public class CustomerController {
         }
 
     }
+
+    @ApiOperation(value = "保存转介绍用户")
+    @PostMapping("v1/saveMemberReferral")
+    public GeneralResult<Boolean> saveMemberReferral(@RequestBody MemberAndAddWorkOrderVO memberReferralVO) {
+        if (memberReferralVO == null || memberReferralVO.getMemberVO() ==null || memberReferralVO.getWorkOrderBeanVO() == null){
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        }
+        int result = memberService.saveMemberReferral(memberReferralVO);
+        if (result == 1) {
+            return GeneralResult.success(Boolean.TRUE);
+        } else {
+            return GeneralResult.success(Boolean.FALSE);
+        }
+    }
+
+
+
 
     @ApiOperation(value = "更新会员基本信息")
     @PostMapping("v1/updateByMemberCard")
