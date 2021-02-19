@@ -29,6 +29,20 @@
     <collection property="items" resultMap="memberActionrRelationItem"/>
   </resultMap>
 
+  <resultMap id="BaseAllResultListMap" type="cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionDictList">
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="type_name" jdbcType="VARCHAR" property="typeName" />
+    <collection property="items" resultMap="memberAllActionrRelationItem"/>
+  </resultMap>
+
+  <resultMap id="memberAllActionrRelationItem" type="cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionrDictItem">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="value2" jdbcType="VARCHAR" property="value2" />
+  </resultMap>
+
   <sql id="Base_Column_List">
     t.id, t.member_card, t.type, t.did, b.name as dname, b.value,b.value2
   </sql>
@@ -74,6 +88,38 @@
     inner join action_dict b on t.did=b.id
     where t.member_card = #{memberCard,jdbcType=VARCHAR}
         and b.del_flag != 1
+  </select>
+
+
+  <select id="getActionDictByMemberCard"  resultMap="BaseAllResultListMap">
+      SELECT
+      `id`, `name`, `type`, case type when 1 then '方便接电话时间'
+                   when 2 then '性格偏好'
+                   when 3 then '响应时间'
+                   when 4 then '坐席偏好'
+                   when 5 then '综合行为'
+                   when 6 then '下单行为'
+                   when 7 then '活动偏好'
+                   when 8 then '代表年龄段'
+                   else '其他' end as type_name,`value`, `value2`
+      FROM
+          action_dict
+      WHERE
+          del_flag = 0 UNION
+      SELECT
+          `id`, `name`, `type`, case  type when 1 then '方便接电话时间'
+                       when 2 then '性格偏好'
+                       when 3 then '响应时间'
+                       when 4 then '坐席偏好'
+                       when 5 then '综合行为'
+                       when 6 then '下单行为'
+                       when 7 then '活动偏好'
+                       when 8 then '代表年龄段'
+                       else '其他' end as type_name,`value`, `value2`
+      FROM
+          action_dict b
+      WHERE
+          del_flag = 2  and EXISTS (SELECT 1 from member_action_relation t where member_card = #{memberCard,jdbcType=VARCHAR} and t.did=b.id)
   </select>
 
     <select id="selectRelationByMemberCard"  resultMap="BaseResultMap">

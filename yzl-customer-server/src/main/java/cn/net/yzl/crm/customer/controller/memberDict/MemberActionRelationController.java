@@ -1,12 +1,12 @@
 package cn.net.yzl.crm.customer.controller.memberDict;
 
 import cn.net.yzl.common.entity.ComResponse;
-import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.utils.ValidList;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
 import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelationList;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionDictList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,12 @@ public class MemberActionRelationController {
     @GetMapping("v1/getRelationByMemberCard")
     public ComResponse<List<MemberActionRelationList>> getRelationByMemberCard(@RequestParam("cardNo") @NotBlank  String cardNo){
         return  memberActionRelationService.selectRelationTreeByMemberCard(cardNo);
+    }
+
+    @ApiOperation(value="客户行为关联-根据顾客编号查询行为字典",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @GetMapping("v1/getActionDictByMemberCard")
+    public ComResponse<List<MemberActionDictList>> getActionDictByMemberCard(@RequestParam("memberCard") @NotBlank  String memberCard){
+        return  memberActionRelationService.getActionDictByMemberCard(memberCard);
     }
 
     @ApiOperation(value="客户行为关联-客户一类综合行为关联查询",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
