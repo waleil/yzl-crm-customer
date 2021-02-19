@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.yzl.crm.customer.collector.dao.MemberAmountRedbagIntegralDao">
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.collector.model.MemberAmountRedbagIntegral">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
+    <result column="last_integral" jdbcType="INTEGER" property="lastIntegral" />
+    <result column="last_red_bag" jdbcType="INTEGER" property="lastRedBag" />
+    <result column="is_history" jdbcType="BOOLEAN" property="isHistory" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, member_card, last_integral, last_red_bag, is_history
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from member_amount_redbag_integral
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from member_amount_redbag_integral
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.collector.model.MemberAmountRedbagIntegral" useGeneratedKeys="true">
+    insert into member_amount_redbag_integral (member_card, last_integral, last_red_bag, 
+      is_history)
+    values (#{memberCard,jdbcType=VARCHAR}, #{lastIntegral,jdbcType=INTEGER}, #{lastRedBag,jdbcType=INTEGER}, 
+      #{isHistory,jdbcType=BOOLEAN})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.collector.model.MemberAmountRedbagIntegral" useGeneratedKeys="true">
+    insert into member_amount_redbag_integral
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="memberCard != null">
+        member_card,
+      </if>
+      <if test="lastIntegral != null">
+        last_integral,
+      </if>
+      <if test="lastRedBag != null">
+        last_red_bag,
+      </if>
+      <if test="isHistory != null">
+        is_history,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="memberCard != null">
+        #{memberCard,jdbcType=VARCHAR},
+      </if>
+      <if test="lastIntegral != null">
+        #{lastIntegral,jdbcType=INTEGER},
+      </if>
+      <if test="lastRedBag != null">
+        #{lastRedBag,jdbcType=INTEGER},
+      </if>
+      <if test="isHistory != null">
+        #{isHistory,jdbcType=BOOLEAN},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.collector.model.MemberAmountRedbagIntegral">
+    update member_amount_redbag_integral
+    <set>
+      <if test="memberCard != null">
+        member_card = #{memberCard,jdbcType=VARCHAR},
+      </if>
+      <if test="lastIntegral != null">
+        last_integral = #{lastIntegral,jdbcType=INTEGER},
+      </if>
+      <if test="lastRedBag != null">
+        last_red_bag = #{lastRedBag,jdbcType=INTEGER},
+      </if>
+      <if test="isHistory != null">
+        is_history = #{isHistory,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.collector.model.MemberAmountRedbagIntegral">
+    update member_amount_redbag_integral
+    set member_card = #{memberCard,jdbcType=VARCHAR},
+      last_integral = #{lastIntegral,jdbcType=INTEGER},
+      last_red_bag = #{lastRedBag,jdbcType=INTEGER},
+      is_history = #{isHistory,jdbcType=BOOLEAN}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="queryMemberCards" parameterType="list" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from
+    member_amount_redbag_integral
+    where
+    member_card
+    in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+</mapper>
