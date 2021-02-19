@@ -663,77 +663,94 @@ public class MemberServiceImpl implements MemberService {
         String memberCard = orderInfo4MqVo.getMemberCardNo();
         List<OrderProductVO> buyProductList = orderInfo4MqVo.getProductList();//订单购买的商品
         StringBuilder buyProductCodes = new StringBuilder();
-
-        for (OrderProductVO productVO : buyProductList) {
-            buyProductCodes.append(productVO.getProductCode()).append(",");
-        }
         String codes = "";
-        if (buyProductCodes.length() > 0) {
-            codes = buyProductCodes.substring(0, buyProductCodes.length() - 1);
-        }
-
-        //通过商品编号，获取商品信息
-        ComResponse<List<ProductMainDTO>> response = productFien.queryByProductCodes(codes.split(","));
-        List<ProductMainDTO> data = response.getData();
-        Map<String, ProductMainDTO> productMap = new HashMap<>();
-        for (ProductMainDTO mainDTO : data) {
-            productMap.put(mainDTO.getProductCode(), mainDTO);
-        }
-
-        //查询客户对应的商品服用效果
-        MemberProductEffectSelectVO effectVo = new MemberProductEffectSelectVO();
-        effectVo.setMemberCard(memberCard);
-        Map<String, MemberProductEffectDTO> dtoMap = new HashMap<>();
-        ComResponse<List<MemberProductEffectDTO>> productEffectResult = memberProductEffectService.getProductEffects(effectVo);
-        List<MemberProductEffectDTO> productEffectList = productEffectResult.getData();
-        if (CollectionUtil.isNotEmpty(productEffectList)) {
-            for (MemberProductEffectDTO dto : productEffectList) {
-                dtoMap.put(dto.getProductCode(), dto);
-            }
-        }
-
         //之前没有购买过的商品
         List<MemberProductEffectInsertVO> addProductVoList = new ArrayList<>();
-        List<MemberProductEffectInsertVO> updateProductVoList = new ArrayList<>();
+        List<MemberProductEffectUpdateVO> updateProductVoList = new ArrayList<>();
+        List<MemberProductEffectDTO> productEffectList = null;
+        if (CollectionUtil.isNotEmpty(buyProductList)) {
+            for (OrderProductVO productVO : buyProductList) {
+                buyProductCodes.append(productVO.getProductCode()).append(",");
+            }
+            if (buyProductCodes.length() > 0) {
+                codes = buyProductCodes.substring(0, buyProductCodes.length() - 1);
+            }
 
-        for (OrderProductVO productVO : buyProductList) {
-            MemberProductEffectDTO dto = dtoMap.get(productVO.getProductCode());
-            //没有则新增
-            MemberProductEffectInsertVO vo = new MemberProductEffectInsertVO();
-            if (dto != null) {
-                BeanUtil.copyProperties(dto, vo);
-                updateProductVoList.add(vo);
-            } else {
-                vo.setMemberCard(memberCard);
-                vo.setProductCode(productVO.getProductCode());
-                addProductVoList.add(vo);
-            }
-            //获取商品的信息(主要是规格)
-            ProductMainDTO ProductMainDTO = productMap.get(productVO.getProductCode());
-            if (ProductMainDTO == null) {
-                continue;
-            }
-            String totalUseNum = ProductMainDTO.getTotalUseNum();
-            vo.setProductLastNum(Integer.valueOf(totalUseNum) + vo.getProductLastNum());//商品剩余量
-            vo.setProductName(ProductMainDTO.getName());//商品名称
-            vo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
-            vo.setProductLastNum(productVO.getProductCount());
-            vo.setProductCount(vo.getProductCount() + productVO.getProductCount());//购买商品数量
+            Map<String, ProductMainDTO> productMap = new HashMap<>();
 
-            if (vo.getOneToTimes() == null) {
-                vo.setOneToTimes(ProductMainDTO.getOneToTimes());
+            //通过商品编号，获取商品信息
+            ComResponse<List<ProductMainDTO>> response = productFien.queryByProductCodes(codes.split(","));
+            if (response != null && CollectionUtil.isNotEmpty(response.getData())) {
+                List<ProductMainDTO> productList = response.getData();
+                for (ProductMainDTO mainDTO : productList) {
+                    productMap.put(mainDTO.getProductCode(), mainDTO);
+                }
             }
-            if (vo.getOneUseNum() == null) {
-                vo.setOneUseNum(ProductMainDTO.getOneUseNum());
+
+            //查询客户对应的商品服用效果
+            MemberProductEffectSelectVO effectVo = new MemberProductEffectSelectVO();
+            effectVo.setMemberCard(memberCard);
+            Map<String, MemberProductEffectDTO> dtoMap = new HashMap<>();
+            ComResponse<List<MemberProductEffectDTO>> productEffectResult = memberProductEffectService.getProductEffects(effectVo);
+            productEffectList = productEffectResult.getData();
+            if (productEffectResult != null && CollectionUtil.isNotEmpty(productEffectList)) {
+                for (MemberProductEffectDTO dto : productEffectList) {
+                    dtoMap.put(dto.getProductCode(), dto);
+                }
             }
-        }
-        //保存
-        if (addProductVoList.size() > 0) {
-            memberProductEffectService.batchSaveProductEffect(addProductVoList);
-        }
-        //更新
-        if (updateProductVoList.size() > 0) {
-            memberProductEffectService.batchSaveProductEffect(updateProductVoList);
+
+            for (OrderProductVO productVO : buyProductList) {
+                MemberProductEffectDTO dto = dtoMap.get(productVO.getProductCode());
+                MemberProductEffectInsertVO addVo = null;
+                MemberProductEffectUpdateVO upVo = null;
+                //没有则新增
+                if (dto != null) {
+                    upVo = new MemberProductEffectUpdateVO();
+                    BeanUtil.copyProperties(dto, upVo);
+                    updateProductVoList.add(upVo);
+                } else {
+                    addVo = new MemberProductEffectInsertVO();
+                    addVo.setMemberCard(memberCard);
+                    addVo.setProductCode(productVO.getProductCode());
+                    addProductVoList.add(addVo);
+                }
+                //获取商品的信息(主要是规格)
+                ProductMainDTO ProductMainDTO = productMap.get(productVO.getProductCode());
+                if (ProductMainDTO == null) {
+                    continue;
+                }
+                String totalUseNum = ProductMainDTO.getTotalUseNum();
+                if (addVo != null) {
+                    addVo.setProductLastNum(Integer.valueOf(totalUseNum));//商品剩余量
+                    addVo.setProductName(ProductMainDTO.getName());//商品名称
+                    addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
+                    addVo.setProductLastNum(productVO.getProductCount());
+                    addVo.setProductCount(productVO.getProductCount());//购买商品数量
+
+                    addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
+                    addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
+                }else if (upVo != null){
+                    upVo.setProductLastNum(Integer.valueOf(totalUseNum) + dto.getProductLastNum());//商品剩余量
+                    upVo.setProductName(ProductMainDTO.getName());//商品名称
+                    upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
+                    upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
+
+                    if (dto.getOneToTimes() == null) {
+                        upVo.setOneToTimes(ProductMainDTO.getOneToTimes());
+                    }
+                    if (dto.getOneUseNum() == null) {
+                        upVo.setOneUseNum(ProductMainDTO.getOneUseNum());
+                    }
+                }
+            }
+            //保存
+            if (addProductVoList.size() > 0) {
+                memberProductEffectService.batchSaveProductEffect(addProductVoList);
+            }
+            //更新
+            if (updateProductVoList.size() > 0) {
+                memberProductEffectService.batchModifyProductEffect(updateProductVoList);
+            }
         }
 
         //更新member_order_stat
@@ -784,7 +801,8 @@ public class MemberServiceImpl implements MemberService {
             }
             memberOrderStat.setBuyCount(memberOrderStat.getBuyCount() + 1);//累计购买次数
             memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
-            memberOrderStat.setProductTypeCnt(addProductVoList.size() + productEffectList.size());//购买产品种类个数
+            int orgNum = productEffectList == null ? 0 : productEffectList.size();
+            memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
 
             //总平均购买天数
             //memberOrderStat.getLastOrderTime() - memberOrderStat.getFirstOrderTime() / memberOrderStat.getBuyCount()
@@ -792,31 +810,11 @@ public class MemberServiceImpl implements MemberService {
             //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
             memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
 
-
-            //从DMC获取顾客级别，判断顾客是否升级；修改member里面的会员级别   ，修改 member_grade_record 会员信息
-            //TODO 从DMC获取顾客级别定义
-            //todo 从订单中心获取本年度的累计消费金额与本次消费金额、本次预存金额
-            List<MemberGradeRecordDto> recordList = memberGradeRecordDao.getMemberGradeRecordList(memberCard);
-            MemberGradeRecordPo vo = new MemberGradeRecordPo();
-            if (CollectionUtil.isNotEmpty(recordList)) {
-                MemberGradeRecordDto dto = recordList.get(0);
-                BeanUtil.copyProperties(dto, vo);
-                //从DMC获取顾客级别 ->判断是否可以升级
-                boolean upLevel = false;
-                //更新会员级别
-                if (upLevel) {
-                    vo.setBeforeGradeId(vo.getMGradeId());
-                    vo.setBeforeGradeName(vo.getMGradeName());
-                    //vo.setMGradeId();
-                    //vo.setMGradeName();
-                    memberGradeRecordDao.updateByPrimaryKeySelective(vo);
-                }
-            }
             //设置reids缓存
             Date currentDateStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getCurrentDateStart();
             String version = DateUtil.format(currentDateStart, "yyyyMMdd");
 
-
+            //设置缓存
             redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(version),memberCard);
         }
         return ComResponse.success(true);
@@ -905,6 +903,23 @@ public class MemberServiceImpl implements MemberService {
             return true;
         }
 
+        //获取会员等级，判断是否升级
+        List<MemberLevelPagesResponse> dmcLevelData = null;
+        PageParam pageParam = new PageParam();
+        pageParam.setPageNo(1);
+        pageParam.setPageSize(20);
+        ComResponse<Page<MemberLevelPagesResponse>> dmcLevelResponse = activityFien.getMemberLevelPages(pageParam);
+        Page<MemberLevelPagesResponse> data = dmcLevelResponse.getData();
+        if (dmcLevelResponse != null && data != null && CollectionUtil.isNotEmpty(data.getItems())) {
+            dmcLevelData = data.getItems();
+            //等级倒叙排序
+            Collections.sort(dmcLevelData, new Comparator<MemberLevelPagesResponse>() {
+                public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2) {
+                    return o2.getMemberLevelGrade() - o1.getMemberLevelGrade();
+                }
+            });
+        }
+
         Map<String, Integer> activityMap = new HashMap<>();
 
         List<String> memberCodes = new ArrayList<>();
@@ -939,10 +954,10 @@ public class MemberServiceImpl implements MemberService {
         try {
             querymemberorder = orderFien.querymemberorder(memberCodes);
             //获取会员订单信息
-            List<MemberOrderObject> data = querymemberorder.getData();
+            List<MemberOrderObject> orderData = querymemberorder.getData();
             List<MemberOrder> memberRefOrders = new ArrayList<>();
-            if (CollectionUtil.isNotEmpty(data)) {
-                MemberOrderObject memberOrder1 = data.get(0);
+            if (CollectionUtil.isNotEmpty(orderData)) {
+                MemberOrderObject memberOrder1 = orderData.get(0);
                 List<MemberOrderDTO> orders = memberOrder1.getOrders();
                 for (MemberOrderDTO order : orders) {
                     MemberOrder memberOrder = new MemberOrder();
@@ -1081,28 +1096,11 @@ public class MemberServiceImpl implements MemberService {
                 //更新
                 memberAmountRedbagIntegralMapper.updateByPrimaryKeySelective(memberAmountRedbagIntegral);
             }
-
-
-            //TODO 怎么获取 一次性预存款 一次性消费满多少 一年累计消费满
             //获取会员信息
             //Member member1 = selectMemberByCard(memberCard);
-            //获取会员等级，判断是否升级
-            PageParam pageParam = new PageParam();
-            pageParam.setPageNo(1);
-            pageParam.setPageSize(20);
-            ComResponse<Page<MemberLevelPagesResponse>> dmcLevelResponse = activityFien.getMemberLevelPages(pageParam);
-            Page<MemberLevelPagesResponse> data = dmcLevelResponse.getData();
-            if (dmcLevelResponse != null && data != null && CollectionUtil.isNotEmpty(data.getItems())) {
-                List<MemberLevelPagesResponse> dmcLevelData = data.getItems();
-                //等级倒叙排序
-                Collections.sort(dmcLevelData, new Comparator<MemberLevelPagesResponse>()
-                {
-                    public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2)
-                    {
-                        return o2.getMemberLevelGrade() - o1.getMemberLevelGrade();
-                    }
-                });
-
+            //判断是否升级
+            if (CollectionUtil.isNotEmpty(dmcLevelData)) {
+                //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
                 ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(memberCodes);
                 List<MemberTotal> memberTotalData = memberTotalResponse.getData();
                 if (CollectionUtil.isNotEmpty(memberTotalData)) {
@@ -1124,34 +1122,28 @@ public class MemberServiceImpl implements MemberService {
                             level = levelData;
                             break;
                         }
-                        if (level != null) {
+                    }
+                    if (level != null) {
+                        //查询顾客表信息
+                        Member member = memberMapper.selectMemberByCard(memberCard);
+                        //等级相同不更新
+                        if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
                             //当前顾客的会员级别信息
-                            MemberGradeRecordPo memberLevel = new MemberGradeRecordPo();
-                            //查询顾客当前的会员级别信息
-                            List<MemberGradeRecordDto> memberGradeRecordList = memberGradeRecordDao.getMemberGradeRecordList(memberCard);
-                            if (CollectionUtil.isNotEmpty(memberGradeRecordList)) {
-                                MemberGradeRecordDto oldLevel = memberGradeRecordList.get(0);
-                                memberLevel.setBeforeGradeId(oldLevel.getMGradeId());
-                                memberLevel.setBeforeGradeName(oldLevel.getMGradeName());
-                                memberLevel.setId(oldLevel.getId());
-                            } else {
-                                //新建会员等级信息
-                                memberLevel = new MemberGradeRecordPo();
-                                memberLevel.setCreateTime(new Date());
-                            }
-                            memberLevel.setMGradeId(level.getMemberLevelGrade());
-                            memberLevel.setMGradeName(level.getMemberLevelName());
-                            if (memberLevel.getId() == null) {
-                                memberGradeRecordDao.insertSelective(memberLevel);
-                            } else {
-                                memberGradeRecordDao.updateByPrimaryKeySelective(memberLevel);
-                            }
-                            //查询顾客表信息
-                            Member member = memberMapper.selectMemberByCard(memberCard);
-                            member.setMGradeId(memberLevel.getMGradeId());
-                            member.setMGradeName(memberLevel.getMGradeName());
+                            MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                            memberGradeRecord = new MemberGradeRecordPo();
+                            memberGradeRecord.setMemberCard(memberCard);
+                            memberGradeRecord.setCreateTime(new Date());
+                            memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                            memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                            memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
+                            memberGradeRecord.setMGradeName(level.getMemberLevelName());
+                            memberGradeRecordDao.insertSelective(memberGradeRecord);
+                            //更新顾客表的会员信息
+                            member.setMGradeId(memberGradeRecord.getMGradeId());
+                            member.setMGradeName(memberGradeRecord.getMGradeName());
                             memberMapper.updateByMemberCardSelective(member);
                         }
+
                     }
                 }
             }
