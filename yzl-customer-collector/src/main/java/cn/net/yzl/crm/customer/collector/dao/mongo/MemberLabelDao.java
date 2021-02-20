@@ -44,7 +44,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Date: 2021/1/26 11:42 上午
      * @Return: java.lang.Integer
      */
-    public Integer memberCrowdGroupRun(member_crowd_group memberCrowdGroup){
+    /*public Integer memberCrowdGroupRun(member_crowd_group memberCrowdGroup){
         Query query = initQuery(memberCrowdGroup);
         query.fields().include("memberCard").include("memberName").exclude("_id");
        List<MemberLabel> labels= mongoTemplate.find(query, MemberLabel.class, COLLECTION_NAME);
@@ -58,7 +58,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         mongoTemplate.insertAll(list);
        return labels.size();
-    }
+    }*/
     /**
      * @Author: lichanghong
      * @Description: 根据分组编号查询关联的顾客
@@ -99,10 +99,10 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Date: 2021/1/26 11:42 上午
      * @Return: java.lang.Integer
      */
-    public Integer memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
+    /*public Integer memberCrowdGroupTrial(member_crowd_group memberCrowdGroup) {
         Query query = initQuery(memberCrowdGroup);
         return (int) mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
-    }
+    }*/
 
     /**
      * @param memberCrowdGroup
@@ -111,7 +111,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Date: 2021/1/27 10:06 上午
      * @Return: org.springframework.data.mongodb.core.query.Query
      */
-    private static Query initQuery(member_crowd_group memberCrowdGroup) {
+    /*private static Query initQuery(member_crowd_group memberCrowdGroup) {
         Query query = new Query();
         //and查询
         List<Criteria> and = new ArrayList<>();
@@ -954,7 +954,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
 
         query.addCriteria(criteria1);
         return query;
-    }
+    }*/
 
     /**
      * @param past 天数
