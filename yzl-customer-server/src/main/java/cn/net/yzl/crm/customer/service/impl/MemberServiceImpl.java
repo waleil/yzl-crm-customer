@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
+import cn.net.yzl.activity.model.responseModel.ActivityProductResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
 import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
 import cn.net.yzl.common.entity.ComResponse;
@@ -823,6 +824,78 @@ public class MemberServiceImpl implements MemberService {
             //设置reids缓存
             Date currentDateStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getCurrentDateStart();
             String version = DateUtil.format(currentDateStart, "yyyyMMdd");
+
+
+            //获取会员等级，判断是否升级
+            List<MemberLevelPagesResponse> dmcLevelData = null;
+            PageParam pageParam = new PageParam();
+            pageParam.setPageNo(1);
+            pageParam.setPageSize(20);
+            ComResponse<Page<MemberLevelPagesResponse>> dmcLevelResponse = null;
+            try {
+                dmcLevelResponse = activityFien.getMemberLevelPages(pageParam);
+                Page<MemberLevelPagesResponse> data = dmcLevelResponse.getData();
+                if (dmcLevelResponse != null && data != null && CollectionUtil.isNotEmpty(data.getItems())) {
+                    dmcLevelData = data.getItems();
+                    //等级倒叙排序
+                    Collections.sort(dmcLevelData, new Comparator<MemberLevelPagesResponse>() {
+                        public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2) {
+                            return o2.getMemberLevelGrade() - o1.getMemberLevelGrade();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                log.error("获取DMC会员级别异常");
+            }
+            //判断是否升级
+            if (CollectionUtil.isNotEmpty(dmcLevelData)) {
+                //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
+                ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(Arrays.asList(memberCard));
+                List<MemberTotal> memberTotalData = memberTotalResponse.getData();
+                if (CollectionUtil.isNotEmpty(memberTotalData)) {
+                    MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
+                    BigDecimal totalSpend = memberTotal.getTotalSpend() == null ? BigDecimal.ZERO : memberTotal.getTotalSpend();//累计消费
+                    BigDecimal maxSpend = memberTotal.getMaxSpend() == null ? BigDecimal.ZERO : memberTotal.getMaxSpend();//最高消费
+                    BigDecimal maxCash1 = memberTotal.getMaxCash1() == null ? BigDecimal.ZERO : memberTotal.getMaxCash1();//最高预存
+
+                    MemberLevelPagesResponse level = null;
+                    //遍历DMC会员级别信息，判断顾客当前属于那个级别
+                    for (MemberLevelPagesResponse levelData : dmcLevelData) {
+                        if (totalSpend.compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0) {//一年累计消费满
+                            level = levelData;
+                            break;
+                        } else if (maxSpend.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableSpendMoney()))) >= 0) {//一次性消费满多少
+                            level = levelData;
+                            break;
+                        } else if (maxCash1.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableAdvanceMoney()))) >= 0) {//一次性预存款
+                            level = levelData;
+                            break;
+                        }
+                    }
+                    if (level != null) {
+                        //查询顾客表信息
+                        Member member = memberMapper.selectMemberByCard(memberCard);
+                        //等级相同不更新
+                        if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
+                            //当前顾客的会员级别信息
+                            MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                            memberGradeRecord = new MemberGradeRecordPo();
+                            memberGradeRecord.setMemberCard(memberCard);
+                            memberGradeRecord.setCreateTime(new Date());
+                            memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                            memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                            memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
+                            memberGradeRecord.setMGradeName(level.getMemberLevelName());
+                            memberGradeRecordDao.insertSelective(memberGradeRecord);
+                            //更新顾客表的会员信息
+                            member.setMGradeId(memberGradeRecord.getMGradeId());
+                            member.setMGradeName(memberGradeRecord.getMGradeName());
+                            memberMapper.updateByMemberCardSelective(member);
+                        }
+
+                    }
+                }
+            }
 
             //设置缓存
             redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(version),memberCard);
