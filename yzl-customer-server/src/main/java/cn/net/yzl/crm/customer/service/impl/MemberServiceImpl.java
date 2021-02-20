@@ -968,10 +968,37 @@ public class MemberServiceImpl implements MemberService {
     public boolean updateMemberLabel() {
         //获取redis缓存
         String key = CacheKeyUtil.syncMemberLabelCacheKey();
-
+        redisUtil.setRemove(key, "");
         Set<Object> memberSet = redisUtil.sGet(key);
         if (CollectionUtil.isEmpty(memberSet)) {
-            log.info("CacheKeyUtil.syncMemberLabelCacheKey() - 数据同步：当前没有需要同步的数据");
+            log.info("同步顾客标签数据:当前没有需要同步的数据！");
+            return true;
+        }
+
+        Map<String, Integer> activityMap = new HashMap<>();
+
+        List<String> memberCodes = new ArrayList<>();
+        for (Object m : memberSet) {
+            String memberCard = m.toString();
+            memberCodes.add(memberCard);
+        }
+        //查询MySql数据库中客户的相关信息
+        List<MemberLabel> list = memberMapper.queryMemberLabelByCodes(memberCodes);
+        //不存在的用户
+        if (memberCodes.size() != list.size()) {
+            Set<String> notExist = new HashSet<>();
+            for (String memberCode : memberCodes) {
+                if (!list.contains(memberCode)) {
+                    notExist.add(memberCode);
+                }
+            }
+            if (notExist.size() > 0) {
+                redisUtil.setRemove(key,notExist.toArray());
+                log.error("没有查询到顾客信息",notExist.toArray());
+            }
+        }
+        if (list.size() == 0) {
+            log.info("同步顾客标签数据:当前没有需要同步的数据！");
             return true;
         }
 
@@ -996,22 +1023,6 @@ public class MemberServiceImpl implements MemberService {
             log.error("同步顾客标签数据异常：" + e.getMessage());
         }
 
-        Map<String, Integer> activityMap = new HashMap<>();
-
-        List<String> memberCodes = new ArrayList<>();
-        for (Object m : memberSet) {
-            String memberCard = m.toString();
-            if (StringUtils.isEmpty(memberCard)) {
-                continue;
-            }
-            memberCodes.add(memberCard);
-        }
-        //查询MySql数据库中客户的相关信息
-        List<MemberLabel> list = memberMapper.queryMemberLabelByCodes(memberCodes);
-        if (CollectionUtils.isEmpty(list)) {
-            log.error("没有查询到顾客信息");
-            return false;
-        }
         Map<String,String> mongoMemberLabels = memberLabelDao.queryByCodes(memberCodes);
         List<cn.net.yzl.crm.customer.model.mogo.MemberDisease> memberDiseaseList = memberDiseaseMapper.queryByMemberCodes(memberCodes);
         Map<String, List<cn.net.yzl.crm.customer.model.mogo.MemberDisease>> memberDiseaseListMap = memberDiseaseList.stream()
@@ -1222,7 +1233,7 @@ public class MemberServiceImpl implements MemberService {
                             //更新顾客表的会员信息
                             member.setMGradeId(memberGradeRecord.getMGradeId());
                             member.setMGradeName(memberGradeRecord.getMGradeName());
-                            memberMapper.updateByMemberCardSelective(member);
+                            int ret = memberMapper.updateByMemberGradeByMember(member);
                         }
 
                     }
