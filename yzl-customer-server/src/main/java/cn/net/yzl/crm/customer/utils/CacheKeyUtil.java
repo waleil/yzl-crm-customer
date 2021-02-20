@@ -36,8 +36,8 @@ public class CacheKeyUtil {
      * 2021-01-25
      * @return
      */
-    public static String syncMemberLabelCacheKey(String version){
-        return new StringBuilder("all{").append(serverName).append("-").append("memberLabel-sync-").append(version).append("}").toString();
+    public static String syncMemberLabelCacheKey(){
+        return new StringBuilder("all{").append(serverName).append("-").append("memberLabel-sync").append("}").toString();
     }
 
 }
