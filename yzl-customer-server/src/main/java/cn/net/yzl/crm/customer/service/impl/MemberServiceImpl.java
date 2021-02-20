@@ -1012,7 +1012,7 @@ public class MemberServiceImpl implements MemberService {
             log.error("没有查询到顾客信息");
             return false;
         }
-
+        Map<String,String> mongoMemberLabels = memberLabelDao.queryByCodes(memberCodes);
         List<cn.net.yzl.crm.customer.model.mogo.MemberDisease> memberDiseaseList = memberDiseaseMapper.queryByMemberCodes(memberCodes);
         Map<String, List<cn.net.yzl.crm.customer.model.mogo.MemberDisease>> memberDiseaseListMap = memberDiseaseList.stream()
                 .collect(Collectors.groupingBy(cn.net.yzl.crm.customer.model.mogo.MemberDisease::getMemberCard));
@@ -1124,8 +1124,10 @@ public class MemberServiceImpl implements MemberService {
 
             String memberCard = memberLabel.getMemberCard();
             //设置会员卡号
-            memberLabel.set_id(memberCard);
-
+            String _id = mongoMemberLabels.get(memberCard);
+            if(StringUtils.isNotEmpty(_id)){
+                memberLabel.set_id(_id);
+            }
             //获取对应会员卡号的顾客的服用效果下信息
             List<MemberProduct> products = memberProductsMap.get(memberCard);
             //设置顾客服用效果
