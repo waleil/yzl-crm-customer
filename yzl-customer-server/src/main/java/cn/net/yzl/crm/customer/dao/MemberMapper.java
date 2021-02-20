@@ -156,4 +156,6 @@ public interface MemberMapper {
     List<ActionDict> queryActionByMemberCodes(List<String> memberCodes);
 
     List<MemberProduct> queryProductByMemberCodes(List<String> memberCodes);
+
+    int updateByMemberGradeByMember(Member member);
 }

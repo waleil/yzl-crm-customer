@@ -630,6 +630,19 @@
         where member_card = #{member_card,jdbcType=VARCHAR}
     </update>
 
+    <update id="updateByMemberGradeByMember" parameterType="cn.net.yzl.crm.customer.model.Member">
+        update member
+        <set>
+            <if test="mGradeId != null">
+                m_grade_id = #{mGradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="mGradeName != null">
+                m_grade_name = #{mGradeName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where member_card = #{member_card,jdbcType=VARCHAR}
+    </update>
+
     <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.Member">
     update member
     set member_card = #{member_card,jdbcType=VARCHAR},
