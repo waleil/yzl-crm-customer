@@ -19,6 +19,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
+    <!--ES连接信息-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+    </dependency>
     <!--mysql-->
     <dependency>
       <groupId>mysql</groupId>
@@ -51,6 +56,12 @@
       <groupId>cn.net.yzl</groupId>
       <artifactId>yzl-common</artifactId>
       <version>1.0-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>javassist</artifactId>
+          <groupId>org.javassist</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -61,6 +72,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

@@ -1,19 +1,25 @@
 package cn.net.yzl.crm.customer.collector.service;
 
+import cn.net.yzl.common.util.JsonUtil;
 import cn.net.yzl.crm.customer.collector.dao.*;
-import cn.net.yzl.crm.customer.collector.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.collector.model.CustomerDistinct;
 import cn.net.yzl.crm.customer.collector.model.MemberAmountRedbagIntegral;
 import cn.net.yzl.crm.customer.collector.model.MemberLastcallin;
 import cn.net.yzl.crm.customer.collector.model.Yixiangcustomer;
 import cn.net.yzl.crm.customer.collector.model.mogo.*;
-import cn.net.yzl.crm.customer.collector.utils.MongoDateHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class MemberLabelSyncService {
+public class MemberLabelSyncESService {
     @Autowired
     private MemberMapper memberMapper;
 
@@ -36,7 +42,7 @@ public class MemberLabelSyncService {
     @Autowired
     private YixiangcustomerDao yixiangcustomerDao;
     @Autowired
-    private MemberLabelDao memberLabelDao;
+    private RestHighLevelClient restHighLevelClient;
 
     @Autowired
     private MemberLastcallinDao memberLastcallinDao;
@@ -57,7 +63,7 @@ public class MemberLabelSyncService {
      * @Date: 2021/2/1 2:01 下午
      * @Return: boolean
      */
-    public boolean syncMember(int id) {
+    public boolean syncMember(int id) throws IOException {
         int tempId = id;
         while (true) {
             //customer_distinct表中包含了：3年内有下单 1年内有通话记录 1年内有进线 有意向的客户的编号
@@ -111,6 +117,7 @@ public class MemberLabelSyncService {
 
                     Map<String, List<MemberAmountRedbagIntegral>> stringListMap = amountRedbagIntegrals.stream()
                             .collect(Collectors.groupingBy(MemberAmountRedbagIntegral::getMemberCard));
+                    BulkRequest bulkRequest = new BulkRequest();
                     //封装标签数据
                     for (MemberLabel memberLabel : list) {
                         //是否有QQ
@@ -143,20 +150,19 @@ public class MemberLabelSyncService {
                         }
                         //处理创建时间，修改时间，首次下单时间，最后一个下单时间
                         if(Objects.nonNull(memberLabel.getCreateTime())){
-                            memberLabel.setCreateTime(MongoDateHelper.getMongoDate(memberLabel.getCreateTime()));
+                            memberLabel.setCreateTime(memberLabel.getCreateTime());
                         }
                         if(Objects.nonNull(memberLabel.getLastSignTime())){
-                            memberLabel.setLastSignTime(MongoDateHelper.getMongoDate(memberLabel.getLastSignTime()));
+                            memberLabel.setLastSignTime(memberLabel.getLastSignTime());
                         }
                         if(Objects.nonNull(memberLabel.getUpdateTime())){
-                            memberLabel.setUpdateTime(MongoDateHelper.getMongoDate(memberLabel.getUpdateTime()));
+                            memberLabel.setUpdateTime(memberLabel.getUpdateTime());
                         }
                         if(Objects.nonNull(memberLabel.getFirstOrderTime())){
-                            memberLabel.setFirstOrderTime(MongoDateHelper.getMongoDate(memberLabel.getFirstOrderTime()));
-
+                            memberLabel.setFirstOrderTime(memberLabel.getFirstOrderTime());
                         }
                         if(Objects.nonNull(memberLabel.getLastOrderTime())){
-                            memberLabel.setLastOrderTime(MongoDateHelper.getMongoDate(memberLabel.getLastOrderTime()));
+                            memberLabel.setLastOrderTime(memberLabel.getLastOrderTime());
                         }
                         //首次购买商品
                         if(StringUtils.hasText(memberLabel.getFirstBuyProductCod())){
@@ -171,8 +177,7 @@ public class MemberLabelSyncService {
                         }
 
                         String memberCard = memberLabel.getMemberCard();
-                        //设置会员卡号
-                       // memberLabel.set_id(memberCard);
+
 
                         //获取对应会员卡号的顾客的服用效果下信息
                         List<MemberProduct> products = memberProductsMap.get(memberCard);
@@ -293,11 +298,11 @@ public class MemberLabelSyncService {
                         }
                         //最后一次拨打时间
                         if(lastCallTime!=null){
-                            memberLabel.setLastCallTime(MongoDateHelper.getMongoDate(lastCallTime));
+                            memberLabel.setLastCallTime(lastCallTime);
                         }
                         //设置最后一次进线时间
                         if(lastCallInTime!=null){
-                            memberLabel.setLastCallInTime(MongoDateHelper.getMongoDate(lastCallInTime));
+                            memberLabel.setLastCallInTime(lastCallInTime);
                         }
 
                         //处理最后一次通话记录
@@ -324,11 +329,14 @@ public class MemberLabelSyncService {
                                 }
                             }
                         }
-                        //memberLabelDao.save(memberLabel);
+                        IndexRequest request = new IndexRequest("member_label");
+                        request.id(memberCard);
+                        request.source(JsonUtil.toJsonStr(memberLabel), XContentType.JSON);
+                        bulkRequest.add(request);
+                        //restHighLevelClient.save(memberLabel);
                     }
-                    memberLabelDao.batchInsert(list,"member_label");
+                    bulk(bulkRequest);
                     list.clear();
-
                 }
                 if (tempSize < pageSize) {
                     break;
@@ -339,6 +347,16 @@ public class MemberLabelSyncService {
             }
         }
         return true;
+    }
+    private void bulk(BulkRequest bulkRequest)  {
+        try {
+            BulkResponse  responses = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+            log.info(responses.status().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     private static Integer getMonth(String date) {

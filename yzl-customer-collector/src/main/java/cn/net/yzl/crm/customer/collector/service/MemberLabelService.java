@@ -125,7 +125,7 @@ public class MemberLabelService {
                         Set<String> set = StringUtils.commaDelimitedListToSet(memberLabel.getLastBuyProductCode());
                         memberLabel.setLastBuyProductCodes(new ArrayList<>(set));
                     }
-                    memberLabel.set_id(memberLabel.getMemberCard());
+
                     String memberCard = memberLabel.getMemberCard();
                     //获取对应会员卡号的顾客的服用效果下信息
                     List<MemberProduct> products = memberProductsMap.get(memberCard);
@@ -310,7 +310,6 @@ public class MemberLabelService {
                             Set<String> set = StringUtils.commaDelimitedListToSet(memberLabel.getLastBuyProductCode());
                             memberLabel.setLastBuyProductCodes(new ArrayList<>(set));
                         }
-                        memberLabel.set_id(memberLabel.getMemberCard());
                         String memberCard = memberLabel.getMemberCard();
                         //获取对应会员卡号的顾客的服用效果下信息
                         List<MemberProduct> products = memberProductsMap.get(memberCard);

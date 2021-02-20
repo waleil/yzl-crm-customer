@@ -3,8 +3,7 @@ spring:
     name: yzl-crm-customer-collector
   data:
     mongodb:
-      uri: mongodb://yzl:yzl123@192.168.32.138:27017,192.168.32.139:27017,192.168.32.140:27017/yzl?replicaSet=set0&safe=true&write=2&connectTimeoutMS=300000
-
+      uri: mongodb://yzl:yzl123@mongos.staff.yuzhilin.net.cn:27017/yzl?readPreference=secondary&maxStalenessSeconds=120&connectTimeoutMS=300000
   profiles:
     active: dev
 server:
@@ -33,6 +32,16 @@ mysql:
       maxPoolPreparedStatementPerConnectionSize: 50
       removeAbandoned: true
       filters: stat
-#logging:
-#  file:
-#    path: logback-spring.xml
+logging:
+  file:
+    path: logback-spring.xml
+elasticsearch:
+  url: 192.168.32.145:9200,192.168.32.146:9200,192.168.32.147:9200
+  schema: http
+  connect-time-out: 1000
+  socket-time-out: 30000
+  connection-request-time-out: 500
+  max-connect-num: 100
+  max-connect-per-route: 100
+  user-name: elastic
+  password: 123456
