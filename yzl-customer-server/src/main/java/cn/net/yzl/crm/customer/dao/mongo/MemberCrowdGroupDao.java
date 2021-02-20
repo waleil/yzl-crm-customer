@@ -14,6 +14,8 @@ import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.MongoQueryUtil;
 import cn.net.yzl.crm.customer.utils.QueryUpdate;
+import cn.net.yzl.logger.annotate.SysAccessLog;
+import cn.net.yzl.logger.enums.DefaultDataEnums;
 import io.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -49,18 +51,20 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      * @param
      * @Return: java.util.List<cn.net.yzl.crm.customer.mongomodel.member_crowd_group>
      */
+    @SysAccessLog(source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public List<member_crowd_group> query4Task(){
         Query query = new Query();
         query.addCriteria(Criteria.where("enable").is(1).and("del").is(false));
 
         return mongoTemplate.find(query,member_crowd_group.class);
     }
+    @SysAccessLog(logKey = "saveMemberCrowdGroup",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.ADD)
     public void saveMemberCrowdGroup(member_crowd_group member_crowd_group) {
         if (member_crowd_group == null )
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         mongoTemplate.save(member_crowd_group);
     }
-
+    @SysAccessLog(logKeyParamName = "crowdId",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public member_crowd_group getMemberCrowdGroup(String crowdId) {
         if (StringUtil.isNullOrEmpty(crowdId)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         Query query = new Query();
@@ -86,6 +90,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      *
      * @param crowdId
      */
+    @SysAccessLog(logKeyParamName = "crowdId",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.DEL)
     public void delMemberCrowdGroup(String crowdId) {
         if (StringUtil.isNullOrEmpty(crowdId))
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
@@ -102,6 +107,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      * @param crowdIds
      * @return
      */
+    @SysAccessLog(logKeyParamName = "crowdIds",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public List<member_crowd_group> getMemberCrowdGroupByIds(List<String> crowdIds) {
         // Query query = MongoQueryUtil.getBatchQuery(crowdIds,CrowdGroup.class);
         List<member_crowd_group> crowdGroupList = new ArrayList<>();
@@ -117,7 +123,7 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         //  mongoTemplate.find(query,CrowdGroup.class,"member_crowd_group");
         return crowdGroupList;
     }
-
+    @SysAccessLog(logKeyParamName = "crowdGroupDTO",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public Page<member_crowd_group> findCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
         List<Criteria> criteriaList = new ArrayList<>();
 

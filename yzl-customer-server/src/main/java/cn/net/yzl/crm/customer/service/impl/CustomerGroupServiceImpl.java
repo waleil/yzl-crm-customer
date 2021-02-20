@@ -21,6 +21,8 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.CacheUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
+import cn.net.yzl.logger.annotate.SysAccessLog;
+import cn.net.yzl.logger.enums.DefaultDataEnums;
 import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -206,6 +208,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
 
     @Override
+    @SysAccessLog(logKeyParamName = "memberCrowdGroup",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public Page<MemberLabelDto> groupTrialPullData(member_crowd_group memberCrowdGroup) {
         //进行顾客人群圈选
         Query query = memberLabelDao.initQuery(memberCrowdGroup);

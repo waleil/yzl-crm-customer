@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer;
 
 import cn.net.yzl.crm.customer.collector.CollectorApplication;
+import cn.net.yzl.crm.customer.collector.service.MemberLabelSyncESService;
 import cn.net.yzl.crm.customer.collector.service.MongoTransactionManagerServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,14 +16,14 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @description todo
  * @date: 2021/1/30 4:14 下午
  */
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(classes = CollectorApplication.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = CollectorApplication.class)
 public class TestM {
     @Autowired
-    private MongoTransactionManagerServer mongoTransactionManagerServer;
+    private MemberLabelSyncESService esService;
     @Test
     public void tt() throws Throwable {
-        mongoTransactionManagerServer.testTransaction("1","2");
+        esService.syncMember(1000000);
     }
 
 }
