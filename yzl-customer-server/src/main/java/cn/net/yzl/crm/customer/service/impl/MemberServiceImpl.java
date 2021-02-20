@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
@@ -49,6 +50,7 @@ import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,6 +110,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberPhoneMapper phoneMapper;
+
+    @Autowired
+    private RabbitTemplate template;
 
     private String memberCountkey="memeberCount";
 
@@ -803,10 +808,15 @@ public class MemberServiceImpl implements MemberService {
             memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
             int orgNum = productEffectList == null ? 0 : productEffectList.size();
             memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
+            memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
 
             //总平均购买天数
-            //memberOrderStat.getLastOrderTime() - memberOrderStat.getFirstOrderTime() / memberOrderStat.getBuyCount()
-            //memberOrderStat.setDayAvgCount();
+            if (memberOrderStat.getLastOrderTime() != null && memberOrderStat.getFirstOrderTime() != null) {
+                long betweenDay = DateUtil.between(memberOrderStat.getFirstOrderTime(), memberOrderStat.getLastOrderTime(), DateUnit.DAY);
+                Integer buyDay = Math.round(betweenDay / (float) memberOrderStat.getBuyCount());
+                memberOrderStat.setDayAvgCount(buyDay);
+            }
+
             //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
             memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
 

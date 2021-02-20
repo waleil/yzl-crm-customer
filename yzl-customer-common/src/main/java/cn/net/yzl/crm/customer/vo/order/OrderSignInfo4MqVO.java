@@ -16,7 +16,7 @@ public class OrderSignInfo4MqVO {
     private String orderNo;
 
     @ApiModelProperty(value = "签收时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(timezone = "GMT+8")
     private Date signTime;
 
     @ApiModelProperty(value = "坐席编号")
