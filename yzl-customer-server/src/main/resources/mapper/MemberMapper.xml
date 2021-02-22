@@ -639,6 +639,9 @@
             <if test="mGradeName != null">
                 m_grade_name = #{mGradeName,jdbcType=VARCHAR},
             </if>
+            <if test="total_amount != null" >
+                total_amount = #{total_amount,jdbcType=INTEGER},
+            </if>
         </set>
         where member_card = #{member_card,jdbcType=VARCHAR}
     </update>

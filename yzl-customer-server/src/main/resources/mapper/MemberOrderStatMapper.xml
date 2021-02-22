@@ -48,7 +48,7 @@
 
 </select>
 
-  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderStat" >
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderStat" useGeneratedKeys="true">
     insert into member_order_stat
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="memberCard != null" >
