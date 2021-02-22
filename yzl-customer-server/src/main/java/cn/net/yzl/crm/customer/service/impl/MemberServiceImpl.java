@@ -901,7 +901,7 @@ public class MemberServiceImpl implements MemberService {
                 }
             }
             //更新客户表订单总金额
-            member.setTotal_amount(totalOrderAmount);
+            member.setTotal_amount(totalCounsumAmount);//累计消费金额
             if (StringUtils.isEmpty(member.getFirst_order_staff_no())) {
                 member.setFirst_order_staff_no(orderInfo4MqVo.getStaffNo());
                 member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
