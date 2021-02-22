@@ -642,6 +642,10 @@
             <if test="total_amount != null" >
                 total_amount = #{total_amount,jdbcType=INTEGER},
             </if>
+            <if test="first_order_staff_no != null and first_order_staff_no != ''" >
+                first_order_staff_no = #{first_order_staff_no,jdbcType=VARCHAR},
+                first_order_am = #{first_order_am,jdbcType=INTEGER},
+            </if>
         </set>
         where member_card = #{member_card,jdbcType=VARCHAR}
     </update>

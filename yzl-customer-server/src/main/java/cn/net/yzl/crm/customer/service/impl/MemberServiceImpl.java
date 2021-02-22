@@ -902,6 +902,11 @@ public class MemberServiceImpl implements MemberService {
             }
             //更新客户表订单总金额
             member.setTotal_amount(totalOrderAmount);
+            if (StringUtils.isEmpty(member.getFirst_order_staff_no())) {
+                member.setFirst_order_staff_no(orderInfo4MqVo.getStaffNo());
+                member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
+
+            }
             int ret = memberMapper.updateByMemberGradeByMember(member);
 
             //设置缓存
