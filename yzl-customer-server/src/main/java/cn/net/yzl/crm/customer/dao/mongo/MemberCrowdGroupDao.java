@@ -55,6 +55,9 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
     public List<member_crowd_group> query4Task(){
         Query query = new Query();
         query.addCriteria(Criteria.where("enable").is(1).and("del").is(false));
+        //圈选规则按优先级排序,更新时间降序
+        query.with(Sort.by(Sort.Direction.ASC, "seq"));
+        query.with(Sort.by(Sort.Direction.DESC,"update_time"));
 
         return mongoTemplate.find(query,member_crowd_group.class);
     }

@@ -202,4 +202,7 @@ public class member_crowd_group extends BaseObject {
 
     @ApiModelProperty("最后一次进线截止天数")
     private DayParam lastCallDays;
+
+    @ApiModelProperty("规则执行优先级")
+    private Integer seq;
 }
