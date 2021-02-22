@@ -13,3 +13,13 @@ logging:
 ribbon:
   ReadTimeout: 60000
   ConnectTimeout: 60000
+elasticsearch:
+  url: 192.168.32.145:9200,192.168.32.146:9200,192.168.32.147:9200
+  schema: http
+  connect-time-out: 1000
+  socket-time-out: 30000
+  connection-request-time-out: 500
+  max-connect-num: 100
+  max-connect-per-route: 100
+  user-name: elastic
+  password: 123456
