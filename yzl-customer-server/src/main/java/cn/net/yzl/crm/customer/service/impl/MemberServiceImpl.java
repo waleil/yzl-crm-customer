@@ -762,6 +762,14 @@ public class MemberServiceImpl implements MemberService {
         //更新member_order_stat
         List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
         cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat;
+        if (CollectionUtil.isEmpty(memberOrderStats)) {
+            memberOrderStat = new cn.net.yzl.crm.customer.model.db.MemberOrderStat();
+            memberOrderStat.setMemberCard(memberCard);
+            memberOrderStat.setCreateTime(new Date());
+            memberOrderStatMapper.insertSelective(memberOrderStat);
+            memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
+        }
+
         //存在则更新最后下单时间
         if (CollectionUtil.isNotEmpty(memberOrderStats)) {
             memberOrderStat = memberOrderStats.get(0);
@@ -842,6 +850,10 @@ public class MemberServiceImpl implements MemberService {
             } catch (Exception e) {
                 log.error("获取DMC会员级别异常");
             }
+
+            //查询顾客表信息
+            Member member = memberMapper.selectMemberByCard(memberCard);
+
             //判断是否升级
             if (CollectionUtil.isNotEmpty(dmcLevelData)) {
                 //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
@@ -868,8 +880,6 @@ public class MemberServiceImpl implements MemberService {
                         }
                     }
                     if (level != null) {
-                        //查询顾客表信息
-                        Member member = memberMapper.selectMemberByCard(memberCard);
                         //等级相同不更新
                         if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
                             //当前顾客的会员级别信息
@@ -885,12 +895,19 @@ public class MemberServiceImpl implements MemberService {
                             //更新顾客表的会员信息
                             member.setMGradeId(memberGradeRecord.getMGradeId());
                             member.setMGradeName(memberGradeRecord.getMGradeName());
-                            memberMapper.updateByMemberCardSelective(member);
                         }
 
                     }
                 }
             }
+            //更新客户表订单总金额
+            member.setTotal_amount(totalCounsumAmount);//累计消费金额
+            if (StringUtils.isEmpty(member.getFirst_order_staff_no())) {
+                member.setFirst_order_staff_no(orderInfo4MqVo.getStaffNo());
+                member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
+
+            }
+            int ret = memberMapper.updateByMemberGradeByMember(member);
 
             //设置缓存
             redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);

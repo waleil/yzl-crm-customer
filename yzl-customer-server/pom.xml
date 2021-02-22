@@ -151,7 +151,7 @@
         <dependency>
             <groupId>cn.net.yzl</groupId>
             <artifactId>yzl-logger</artifactId>
-            <version>1.0-RELEASE</version>
+            <version>1.2-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>cn.net.yzl</groupId>

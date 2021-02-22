@@ -10,6 +10,7 @@ import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.MemberCrowdGroupOpVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
+import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
 
@@ -93,4 +94,7 @@ public interface CustomerGroupService {
 
     public int memberCrowdGroupRunByLabels(String groupId, List<MemberLabel> labels);
 
+    Query convertMongoCondition(member_crowd_group memberCrowdGroup);
+
+    Query convertIdToMongoCondition(MemberCrowdGroupOpVO crowdGroupOpVO);
 }

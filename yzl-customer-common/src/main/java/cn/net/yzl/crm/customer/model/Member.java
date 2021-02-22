@@ -118,6 +118,7 @@ public class Member {
 
     private List<MemberPhone> memberPhoneList;
     @ApiModelProperty("建档时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private  Date create_time;
     @ApiModelProperty("顾客类型")
     private String member_type;
@@ -146,6 +147,7 @@ public class Member {
     @ApiModelProperty("编辑人姓名")
     private String updator_name;
     @ApiModelProperty("修改时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date update_time;
 
 

@@ -336,6 +336,19 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return matchCount;
     }
 
+    @Override
+    public Query convertMongoCondition(member_crowd_group memberCrowdGroup) {
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        return query;
+    }
+
+    @Override
+    public Query convertIdToMongoCondition(MemberCrowdGroupOpVO crowdGroupOpVO) {
+        member_crowd_group memberCrowdGroup = memberCrowdGroupDao.getMemberCrowdGroup(crowdGroupOpVO.get_id());
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        return query;
+    }
+
 
     /**
      * wangzhe
