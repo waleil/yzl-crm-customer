@@ -1,15 +1,10 @@
 package cn.net.yzl.crm.customer.model;
 
 import cn.net.yzl.crm.customer.BaseObject;
-import cn.net.yzl.crm.customer.annotations.FieldForMongo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.util.List;
 
 @ApiModel("人群圈选实体类")
 @Data
@@ -18,7 +13,7 @@ public class CrowdGroup extends BaseObject {
     private String _id;
     @ApiModelProperty("群组名称")
     @Field("crowd_name")
-    private String name;
+    private String crowd_name;
     @ApiModelProperty("群组描述")
     private String description;
     @ApiModelProperty("是否启用:0=否，1=是")
