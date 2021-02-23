@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.crm.customer.config.ESConfig;
 import cn.net.yzl.crm.customer.mongomodel.*;
 
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -15,6 +16,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
  * @description todo
  * @date: 2021/2/22 3:22 下午
  */
+@ConditionalOnBean(value = RestHighLevelClient.class)
 @Component
 public class MemberLabelESDao {
     private final static String index = "member_label";

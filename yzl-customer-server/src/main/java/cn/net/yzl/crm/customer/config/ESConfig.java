@@ -11,8 +11,8 @@ import org.springframework.util.StringUtils;
  * @description todo
  * @date: 2021/2/19 4:42 下午
  */
-@Configuration
-@ConfigurationProperties(prefix = "elasticsearch")
+//@Configuration
+//@ConfigurationProperties(prefix = "elasticsearch")
 public class ESConfig {
     private String url;
     private String schema = "http";
