@@ -411,7 +411,7 @@ public class CustomerController {
     }
 
     @ApiOperation("根据DMC规则初始化会员级别")
-    @PostMapping("/v1/updateMemberGrandValidityInit")
+    @PostMapping("/v1/updateMemberGrandValidityInitTimedTask")
     public ComResponse<Boolean> updateMemberGrandValidityInit() throws IOException {
         boolean b = memberService.updateMemberGrandValidityInit();
         return ComResponse.success(b);
