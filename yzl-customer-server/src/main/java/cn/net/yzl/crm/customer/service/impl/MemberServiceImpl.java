@@ -1431,49 +1431,15 @@ public class MemberServiceImpl implements MemberService {
     @Override
     //@Transactional
     public boolean updateMemberGrandValidityInit() throws IOException {//MemberSysParamDetailResponse
-        ComResponse<MemberSysParamDetailResponse> response = null;
-        for (int i = 0; i < 3; i++) {
-            response = activityFien.getMemberSysParamByType(0);//会员
-            if (200 != response.getCode()) {
-                log.error("updateMemberGrandValidityInit:获取DMC会员级别管理接口异常!");
-            }else{
-                break;
-            }
-        }
-        if (response == null ||  response.getData() == null || 200 != response.getCode()) {
-            log.error("updateMemberGrandValidityInit:获取DMC会员级别管理接口异常!");
-            return false;
-        }
-        MemberSysParamDetailResponse data = response.getData();
-
-//        data.setValidityType(1);
-//        data.setValidityMonth("2");
-//        data.setValidityDay("23");
-
-        if (data.getValidityType() == null || data.getValidityType() == 0) {
+        //获取DMC的会员到期时间
+        String validDate = getMemberGradeValidDate();
+        if ("0".equals(validDate)) {
             log.info("updateMemberGrandValidityInit:会员有效期类型为长期有效！");
             return true;
         }
-
-        if (StringUtils.isEmpty(data.getValidityMonth()) || StringUtils.isEmpty(data.getValidityDay())){
-            log.error("updateMemberGrandValidityInit:接口参数日期为空:{}-{}",data.getValidityMonth(),data.getValidityDay());
-            return false;
-        }
-
-        //获取会员到期的年月日，格式：yyyy-MM-dd
-        if (data.getValidityMonth().length() == 1){
-            data.setValidityMonth("0" + data.getValidityMonth());
-        }
-        if (data.getValidityDay().length() == 1){
-            data.setValidityMonth("0" + data.getValidityDay());
-        }
-
-        String valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
-        //Date validDate = DateUtil.parse(valid, "yyyy-MM-dd");
-        ////当前日期字符串，格式：yyyy-MM-dd
         String today= DateUtil.today();
-        if (!today.equals(valid)) {
-            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",today,valid);
+        if (!today.equals(validDate)) {
+            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",today,validDate);
             return true;
         }
 
