@@ -38,4 +38,8 @@ public interface ActivityFien {
     @GetMapping("/db/v1/getAccountByMemberCard")
     public ComResponse<MemberAccountResponse> getAccountByMemberCard(@RequestParam("memberCard")String memberCard);
 
+    @ApiOperation(value = "会员管理-会员级别管理-查看会员等级有效期限详情")
+    @GetMapping("/db/v1/memberLevelManager/getMemberSysParamByType")
+    public ComResponse<MemberSysParamDetailResponse> getMemberSysParamByType(@RequestParam("type") Integer type);
+
 }

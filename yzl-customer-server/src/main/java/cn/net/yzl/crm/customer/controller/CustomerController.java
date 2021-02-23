@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -406,6 +407,13 @@ public class CustomerController {
     @PostMapping("/v1/updateMemberLabelTimedTask")
     public ComResponse<Boolean> updateMemberLabel(){
         boolean b = memberService.updateMemberLabel();
+        return ComResponse.success(b);
+    }
+
+    @ApiOperation("根据DMC规则初始化会员级别")
+    @PostMapping("/v1/updateMemberGrandValidityInit")
+    public ComResponse<Boolean> updateMemberGrandValidityInit() throws IOException {
+        boolean b = memberService.updateMemberGrandValidityInit();
         return ComResponse.success(b);
     }
 

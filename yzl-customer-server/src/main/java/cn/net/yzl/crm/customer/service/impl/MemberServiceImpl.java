@@ -5,9 +5,9 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
-import cn.net.yzl.activity.model.responseModel.ActivityProductResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
 import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
+import cn.net.yzl.activity.model.responseModel.MemberSysParamDetailResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -57,6 +57,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1403,6 +1404,95 @@ public class MemberServiceImpl implements MemberService {
             workOrderClient.addWorkOrder(workOrderBeanVO);
         }
         return result;
+    }
+
+    @Override
+    //@Transactional
+    public boolean updateMemberGrandValidityInit() throws IOException {//MemberSysParamDetailResponse
+        ComResponse<MemberSysParamDetailResponse> response = null;
+        for (int i = 0; i < 3; i++) {
+            response = activityFien.getMemberSysParamByType(0);//会员
+            if (200 != response.getCode()) {
+                log.error("updateMemberGrandValidityInit:获取DMC会员级别管理接口异常!");
+            }else{
+                break;
+            }
+        }
+        if (response == null ||  response.getData() == null || 200 != response.getCode()) {
+            log.error("updateMemberGrandValidityInit:获取DMC会员级别管理接口异常!");
+            return false;
+        }
+        MemberSysParamDetailResponse data = response.getData();
+
+//        data.setValidityType(1);
+//        data.setValidityMonth("2");
+//        data.setValidityDay("23");
+
+        if (data.getValidityType() == null || data.getValidityType() == 0) {
+            log.info("updateMemberGrandValidityInit:会员有效期类型为长期有效！");
+            return true;
+        }
+
+        if (StringUtils.isEmpty(data.getValidityMonth()) || StringUtils.isEmpty(data.getValidityDay())){
+            log.error("updateMemberGrandValidityInit:接口参数日期为空:{}-{}",data.getValidityMonth(),data.getValidityDay());
+            return false;
+        }
+
+        //获取会员到期的年月日，格式：yyyy-MM-dd
+        if (data.getValidityMonth().length() == 1){
+            data.setValidityMonth("0" + data.getValidityMonth());
+        }
+        if (data.getValidityDay().length() == 1){
+            data.setValidityMonth("0" + data.getValidityDay());
+        }
+
+        String valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
+        //Date validDate = DateUtil.parse(valid, "yyyy-MM-dd");
+        ////当前日期字符串，格式：yyyy-MM-dd
+        String today= DateUtil.today();
+        if (!today.equals(valid)) {
+            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",today,valid);
+            return true;
+        }
+
+        int pageNo = 1,pageSize = 2;
+
+        MemberSerchConditionDTO dto = new MemberSerchConditionDTO();
+        dto.setPageSize(pageSize);
+        List<Member> list = null;
+        do {
+            dto.setCurrentPage(pageNo);
+            PageHelper.startPage(pageNo,pageSize);
+
+            list = memberMapper.scanMemberByPage(dto);
+            if (CollectionUtil.isEmpty(list)) {
+                break;
+            }
+            for (Member member : list) {
+                //当前顾客的会员级别信息
+                MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                memberGradeRecord = new MemberGradeRecordPo();
+                memberGradeRecord.setMemberCard(member.getMember_card());
+                memberGradeRecord.setCreateTime(new Date());
+                memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                memberGradeRecord.setMGradeId(1);
+                memberGradeRecord.setMGradeName("无卡");
+                memberGradeRecordDao.insertSelective(memberGradeRecord);
+                //更新顾客表的会员信息
+                member.setMGradeId(memberGradeRecord.getMGradeId());
+                member.setMGradeName(memberGradeRecord.getMGradeName());
+                int ret = memberMapper.updateByMemberGradeByMember(member);
+            }
+
+            if (list.size() < pageSize) {
+                list.clear();
+                break;
+            }
+            list.clear();
+            pageNo++;
+        } while (true);
+        return false;
     }
 
     private static Integer getMonth(String date) {
