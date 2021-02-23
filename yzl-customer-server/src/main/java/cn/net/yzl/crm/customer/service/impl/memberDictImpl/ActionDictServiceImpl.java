@@ -9,6 +9,7 @@ import cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,7 @@ public class ActionDictServiceImpl implements ActionDictService {
                         if(i<1){
                             num+=actionDictMapper.deleteByType(type,updator);
                         }else{
+                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//手动回滚
                             return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getMessage());
                         }
 
@@ -77,6 +79,7 @@ public class ActionDictServiceImpl implements ActionDictService {
                     if(i<1){
                         num+=actionDictMapper.deleteByPrimaryKey(contactTimeDict.getId(),updator);
                     }else{
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();//手动回滚
                         return ComResponse.fail(ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getCode(),ResponseCodeEnums.MEMBER_ACTION_USED_DELETE_ERROR.getMessage());
                     }
 
