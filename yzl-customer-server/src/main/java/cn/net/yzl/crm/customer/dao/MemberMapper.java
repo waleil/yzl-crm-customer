@@ -13,6 +13,8 @@ import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.cursor.Cursor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -158,4 +160,6 @@ public interface MemberMapper {
     List<MemberProduct> queryProductByMemberCodes(List<String> memberCodes);
 
     int updateByMemberGradeByMember(Member member);
+
+    List<Member> scanMemberByPage(MemberSerchConditionDTO dto);
 }

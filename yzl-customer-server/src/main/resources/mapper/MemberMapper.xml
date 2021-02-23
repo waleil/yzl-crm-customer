@@ -1478,4 +1478,20 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="scanMemberByPage" resultType="cn.net.yzl.crm.customer.model.Member"
+            parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
+        SELECT
+        m.id,
+        m.member_card ,
+        m.m_grade_code ,
+        m.m_grade_id mGradeId,
+        m.m_grade_name mGradeName
+
+        FROM
+        member m where m_grade_id &lt;&gt; 1
+
+        order by create_time asc
+
+    </select>
 </mapper>

@@ -4,10 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Pair;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
-import cn.net.yzl.activity.model.responseModel.ActivityProductResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
 import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
+import cn.net.yzl.activity.model.responseModel.MemberSysParamDetailResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -57,7 +58,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -856,47 +859,55 @@ public class MemberServiceImpl implements MemberService {
 
             //判断是否升级
             if (CollectionUtil.isNotEmpty(dmcLevelData)) {
-                //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
-                ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(Arrays.asList(memberCard));
-                List<MemberTotal> memberTotalData = memberTotalResponse.getData();
-                if (CollectionUtil.isNotEmpty(memberTotalData)) {
-                    MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
-                    BigDecimal totalSpend = memberTotal.getTotalSpend() == null ? BigDecimal.ZERO : memberTotal.getTotalSpend();//累计消费
-                    BigDecimal maxSpend = memberTotal.getMaxSpend() == null ? BigDecimal.ZERO : memberTotal.getMaxSpend();//最高消费
-                    BigDecimal maxCash1 = memberTotal.getMaxCash1() == null ? BigDecimal.ZERO : memberTotal.getMaxCash1();//最高预存
+                //获取DMC的会员到期时间
+                String validDate = getMemberGradeValidDate();
+                if ("-1".equals(validDate)) {
+                    log.error("获取会员级别到期时间异常!");
+                }else{
+                    Pair<Date, Date> dateScope = getDateScope(validDate);
 
-                    MemberLevelPagesResponse level = null;
-                    //遍历DMC会员级别信息，判断顾客当前属于那个级别
-                    for (MemberLevelPagesResponse levelData : dmcLevelData) {
-                        if (totalSpend.compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0) {//一年累计消费满
-                            level = levelData;
-                            break;
-                        } else if (maxSpend.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableSpendMoney()))) >= 0) {//一次性消费满多少
-                            level = levelData;
-                            break;
-                        } else if (maxCash1.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableAdvanceMoney()))) >= 0) {//一次性预存款
-                            level = levelData;
-                            break;
-                        }
-                    }
-                    if (level != null) {
-                        //等级相同不更新
-                        if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
-                            //当前顾客的会员级别信息
-                            MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
-                            memberGradeRecord = new MemberGradeRecordPo();
-                            memberGradeRecord.setMemberCard(memberCard);
-                            memberGradeRecord.setCreateTime(new Date());
-                            memberGradeRecord.setBeforeGradeId(member.getMGradeId());
-                            memberGradeRecord.setBeforeGradeName(member.getMGradeName());
-                            memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
-                            memberGradeRecord.setMGradeName(level.getMemberLevelName());
-                            memberGradeRecordDao.insertSelective(memberGradeRecord);
-                            //更新顾客表的会员信息
-                            member.setMGradeId(memberGradeRecord.getMGradeId());
-                            member.setMGradeName(memberGradeRecord.getMGradeName());
-                        }
+                    //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
+                    ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(Arrays.asList(memberCard),dateScope.getKey(),dateScope.getValue());
+                    List<MemberTotal> memberTotalData = memberTotalResponse.getData();
+                    if (CollectionUtil.isNotEmpty(memberTotalData)) {
+                        MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
+                        BigDecimal totalSpend = memberTotal.getTotalSpend() == null ? BigDecimal.ZERO : memberTotal.getTotalSpend();//累计消费
+                        BigDecimal maxSpend = memberTotal.getMaxSpend() == null ? BigDecimal.ZERO : memberTotal.getMaxSpend();//最高消费
+                        BigDecimal maxCash1 = memberTotal.getMaxCash1() == null ? BigDecimal.ZERO : memberTotal.getMaxCash1();//最高预存
 
+                        MemberLevelPagesResponse level = null;
+                        //遍历DMC会员级别信息，判断顾客当前属于那个级别
+                        for (MemberLevelPagesResponse levelData : dmcLevelData) {
+                            if (totalSpend.compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0) {//一年累计消费满
+                                level = levelData;
+                                break;
+                            } else if (maxSpend.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableSpendMoney()))) >= 0) {//一次性消费满多少
+                                level = levelData;
+                                break;
+                            } else if (maxCash1.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableAdvanceMoney()))) >= 0) {//一次性预存款
+                                level = levelData;
+                                break;
+                            }
+                        }
+                        if (level != null) {
+                            //等级相同不更新
+                            if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
+                                //当前顾客的会员级别信息
+                                MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                                memberGradeRecord = new MemberGradeRecordPo();
+                                memberGradeRecord.setMemberCard(memberCard);
+                                memberGradeRecord.setCreateTime(new Date());
+                                memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                                memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                                memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
+                                memberGradeRecord.setMGradeName(level.getMemberLevelName());
+                                memberGradeRecordDao.insertSelective(memberGradeRecord);
+                                //更新顾客表的会员信息
+                                member.setMGradeId(memberGradeRecord.getMGradeId());
+                                member.setMGradeName(memberGradeRecord.getMGradeName());
+                            }
+
+                        }
                     }
                 }
             }
@@ -1038,6 +1049,14 @@ public class MemberServiceImpl implements MemberService {
             }
         } catch (Exception e) {
             log.error("同步顾客标签数据异常：" + e.getMessage());
+        }
+
+
+        //获取DMC的会员到期时间
+        String validDate = getMemberGradeValidDate();
+        Pair<Date, Date> dateScope = null;
+        if (!"-1".equals(validDate)) {
+            dateScope = getDateScope(validDate);
         }
 
         Map<String,String> mongoMemberLabels = memberLabelDao.queryByCodes(memberCodes);
@@ -1183,7 +1202,7 @@ public class MemberServiceImpl implements MemberService {
             }
 
             //红包
-            if (dmcData.getMemberRedBag() != null && dmcData.getMemberRedBag() > 0) {
+            if (dmcData.getMemberRedBag() != null) {
                 memberLabel.setHasTedBag(true);
                 memberAmountRedbagIntegral.setLastRedBag(dmcData.getMemberRedBag().intValue());
             }else{
@@ -1209,51 +1228,55 @@ public class MemberServiceImpl implements MemberService {
             //Member member1 = selectMemberByCard(memberCard);
             //判断是否升级
             if (CollectionUtil.isNotEmpty(dmcLevelData)) {
-                //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
-                ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(memberCodes);
-                List<MemberTotal> memberTotalData = memberTotalResponse.getData();
-                if (CollectionUtil.isNotEmpty(memberTotalData)) {
-                    MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
-                    BigDecimal totalSpend = memberTotal.getTotalSpend() == null ? BigDecimal.ZERO : memberTotal.getTotalSpend();//累计消费
-                    BigDecimal maxSpend = memberTotal.getMaxSpend() == null ? BigDecimal.ZERO : memberTotal.getMaxSpend();//最高消费
-                    BigDecimal maxCash1 = memberTotal.getMaxCash1() == null ? BigDecimal.ZERO : memberTotal.getMaxCash1();//最高预存
+                if (dateScope != null) {
 
-                    MemberLevelPagesResponse level = null;
-                    //遍历DMC会员级别信息，判断顾客当前属于那个级别
-                    for (MemberLevelPagesResponse levelData : dmcLevelData) {
-                        if (totalSpend.compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0) {//一年累计消费满
-                            level = levelData;
-                            break;
-                        } else if (maxSpend.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableSpendMoney()))) >= 0) {//一次性消费满多少
-                            level = levelData;
-                            break;
-                        } else if (maxCash1.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableAdvanceMoney()))) >= 0) {//一次性预存款
-                            level = levelData;
-                            break;
+                    //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
+                    ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(Arrays.asList(memberCard),dateScope.getKey(),dateScope.getValue());
+                    List<MemberTotal> memberTotalData = memberTotalResponse.getData();
+                    if (CollectionUtil.isNotEmpty(memberTotalData)) {
+                        MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
+                        BigDecimal totalSpend = memberTotal.getTotalSpend() == null ? BigDecimal.ZERO : memberTotal.getTotalSpend();//累计消费
+                        BigDecimal maxSpend = memberTotal.getMaxSpend() == null ? BigDecimal.ZERO : memberTotal.getMaxSpend();//最高消费
+                        BigDecimal maxCash1 = memberTotal.getMaxCash1() == null ? BigDecimal.ZERO : memberTotal.getMaxCash1();//最高预存
+
+                        MemberLevelPagesResponse level = null;
+                        //遍历DMC会员级别信息，判断顾客当前属于那个级别
+                        for (MemberLevelPagesResponse levelData : dmcLevelData) {
+                            if (totalSpend.compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0) {//一年累计消费满
+                                level = levelData;
+                                break;
+                            } else if (maxSpend.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableSpendMoney()))) >= 0) {//一次性消费满多少
+                                level = levelData;
+                                break;
+                            } else if (maxCash1.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableAdvanceMoney()))) >= 0) {//一次性预存款
+                                level = levelData;
+                                break;
+                            }
+                        }
+                        if (level != null) {
+                            //查询顾客表信息
+                            Member member = memberMapper.selectMemberByCard(memberCard);
+                            //等级相同不更新
+                            if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
+                                //当前顾客的会员级别信息
+                                MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                                memberGradeRecord = new MemberGradeRecordPo();
+                                memberGradeRecord.setMemberCard(memberCard);
+                                memberGradeRecord.setCreateTime(new Date());
+                                memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                                memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                                memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
+                                memberGradeRecord.setMGradeName(level.getMemberLevelName());
+                                memberGradeRecordDao.insertSelective(memberGradeRecord);
+                                //更新顾客表的会员信息
+                                member.setMGradeId(memberGradeRecord.getMGradeId());
+                                member.setMGradeName(memberGradeRecord.getMGradeName());
+                                int ret = memberMapper.updateByMemberGradeByMember(member);
+                            }
+
                         }
                     }
-                    if (level != null) {
-                        //查询顾客表信息
-                        Member member = memberMapper.selectMemberByCard(memberCard);
-                        //等级相同不更新
-                        if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
-                            //当前顾客的会员级别信息
-                            MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
-                            memberGradeRecord = new MemberGradeRecordPo();
-                            memberGradeRecord.setMemberCard(memberCard);
-                            memberGradeRecord.setCreateTime(new Date());
-                            memberGradeRecord.setBeforeGradeId(member.getMGradeId());
-                            memberGradeRecord.setBeforeGradeName(member.getMGradeName());
-                            memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
-                            memberGradeRecord.setMGradeName(level.getMemberLevelName());
-                            memberGradeRecordDao.insertSelective(memberGradeRecord);
-                            //更新顾客表的会员信息
-                            member.setMGradeId(memberGradeRecord.getMGradeId());
-                            member.setMGradeName(memberGradeRecord.getMGradeName());
-                            int ret = memberMapper.updateByMemberGradeByMember(member);
-                        }
 
-                    }
                 }
             }
 
@@ -1405,13 +1428,145 @@ public class MemberServiceImpl implements MemberService {
         return result;
     }
 
+    @Override
+    //@Transactional
+    public boolean updateMemberGrandValidityInit() throws IOException {//MemberSysParamDetailResponse
+        //获取DMC的会员到期时间
+        String validDate = getMemberGradeValidDate();
+        if ("0".equals(validDate)) {
+            log.info("updateMemberGrandValidityInit:会员有效期类型为长期有效！");
+            return true;
+        }
+        String today= DateUtil.today();
+        if (!today.equals(validDate)) {
+            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",today,validDate);
+            return true;
+        }
+
+        int pageNo = 1,pageSize = 2;
+
+        MemberSerchConditionDTO dto = new MemberSerchConditionDTO();
+        dto.setPageSize(pageSize);
+        List<Member> list = null;
+        do {
+            dto.setCurrentPage(pageNo);
+            PageHelper.startPage(pageNo,pageSize);
+
+            list = memberMapper.scanMemberByPage(dto);
+            if (CollectionUtil.isEmpty(list)) {
+                break;
+            }
+            for (Member member : list) {
+                //当前顾客的会员级别信息
+                MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                memberGradeRecord = new MemberGradeRecordPo();
+                memberGradeRecord.setMemberCard(member.getMember_card());
+                memberGradeRecord.setCreateTime(new Date());
+                memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                memberGradeRecord.setMGradeId(1);
+                memberGradeRecord.setMGradeName("无卡");
+                memberGradeRecordDao.insertSelective(memberGradeRecord);
+                //更新顾客表的会员信息
+                member.setMGradeId(memberGradeRecord.getMGradeId());
+                member.setMGradeName(memberGradeRecord.getMGradeName());
+                int ret = memberMapper.updateByMemberGradeByMember(member);
+            }
+
+            if (list.size() < pageSize) {
+                list.clear();
+                break;
+            }
+            list.clear();
+            pageNo++;
+        } while (true);
+        return false;
+    }
+
     private static Integer getMonth(String date) {
         String[] str = date.split("-");
         if(str.length>2){
             return Integer.parseInt(str[1]);
         }
         return 0;
+    }
+
+
+    /**
+     * 获取会员到期时间
+     * @return
+     */
+    private String getMemberGradeValidDate(){
+        ComResponse<MemberSysParamDetailResponse> response = null;
+        for (int i = 0; i < 3; i++) {
+            response = activityFien.getMemberSysParamByType(0);//会员
+            if (200 != response.getCode()) {
+                log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
+            }else{
+                break;
+            }
         }
+        if (response == null ||  response.getData() == null || 200 != response.getCode()) {
+            log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
+            return "-1";
+        }
+        MemberSysParamDetailResponse data = response.getData();
+
+        if (data.getValidityType() == null || data.getValidityType() == 0) {
+            log.info("getMemberSysParamByType:会员有效期类型为长期有效！");
+            return "0";
+        }
+
+        if (StringUtils.isEmpty(data.getValidityMonth()) || StringUtils.isEmpty(data.getValidityDay())){
+            log.error("getMemberSysParamByType:接口参数日期为空:{}-{}",data.getValidityMonth(),data.getValidityDay());
+            return "-1";
+        }
+
+        //获取会员到期的年月日，格式：yyyy-MM-dd
+        if (data.getValidityMonth().length() == 1){
+            data.setValidityMonth("0" + data.getValidityMonth());
+        }
+        if (data.getValidityDay().length() == 1){
+            data.setValidityDay("0" + data.getValidityDay());
+        }
+
+        String valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
+        return valid;
+    }
+
+
+    public Pair<Date,Date> getDateScope(String validDate) {
+        Date startDate = null;
+        Date endDate = null;
+        //0表示不限制会员到期时间
+        if ("0".equals(validDate)) {
+            return Pair.of(startDate, endDate);
+        }
+        //格式化会员到期时间
+        Date valid = DateUtil.parse(validDate, "yyyy-MM-dd");
+
+        //当前日期字符串，格式：yyyy-MM-dd
+        String today= DateUtil.today();
+        Date todayDate = DateUtil.parse(today);
+        long between = DateUtil.between(todayDate, valid, DateUnit.DAY, false);
+        if (between <= 0) {
+            startDate = DateUtil.offsetDay(valid, 1);
+            endDate = DateUtil.endOfDay(DateUtil.date());//一天的结束，结果：2017-03-01 23:59:59
+        }else {
+            //没过:到期时间一年前 到今天
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar c = Calendar.getInstance();
+            c.setTime(valid);
+            c.add(Calendar.YEAR, -1);
+            c.add(Calendar.DATE,1);
+            startDate = DateUtil.beginOfDay(c.getTime());//一年前 + 1天
+            //今天的结束，结果：2017-03-01 23:59:59
+            endDate = DateUtil.endOfDay(DateUtil.date());//今天
+        }
+        return Pair.of(startDate, endDate);
+    }
+
+
 
 
 }

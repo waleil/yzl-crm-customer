@@ -55,6 +55,12 @@
       <if test="mGradeName != null">
         m_grade_name,
       </if>
+      <if test="beforeGradeId != null">
+        before_grade_id,
+      </if>
+      <if test="beforeGradeName != null">
+        before_grade_name,
+      </if>
       <if test="createTime != null">
         create_time,
       </if>
@@ -71,6 +77,12 @@
       </if>
       <if test="mGradeName != null">
         #{mGradeName,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeGradeId != null">
+        #{beforeGradeId,jdbcType=INTEGER},
+      </if>
+      <if test="beforeGradeName != null">
+        #{beforeGradeName,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},

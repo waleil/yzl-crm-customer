@@ -10,6 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Date;
 import java.util.List;
 
 @FeignClient(name = "yzl-order-server")
@@ -23,7 +24,9 @@ public interface OrderFien {
 
     @GetMapping("/order/v1/querymembertotal")
     @ApiOperation(value = "统计本年度累计消费金额、本年度最高消费金额、本年度最高预存金额", notes = "统计本年度累计消费金额、本年度最高消费金额、本年度最高预存金额")
-    public ComResponse<List<MemberTotal>> queryMemberTotal(@RequestParam(required = true, value = "memberCards") List<String> memberCards);
+    public ComResponse<List<MemberTotal>> queryMemberTotal(@RequestParam(required = true, value = "memberCards") List<String> memberCards,
+                                                           @RequestParam(required = false, value = "startDate")Date startDate,
+                                                           @RequestParam(required = false, value = "endDate")Date endDate);
 
 }
 
