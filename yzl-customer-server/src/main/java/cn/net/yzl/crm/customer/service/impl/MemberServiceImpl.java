@@ -1443,7 +1443,7 @@ public class MemberServiceImpl implements MemberService {
             return true;
         }
 
-        int pageNo = 1,pageSize = 2;
+        int pageNo = 1,pageSize = 1_000;
 
         MemberSerchConditionDTO dto = new MemberSerchConditionDTO();
         dto.setPageSize(pageSize);
