@@ -871,20 +871,20 @@ public class MemberServiceImpl implements MemberService {
                     List<MemberTotal> memberTotalData = memberTotalResponse.getData();
                     if (CollectionUtil.isNotEmpty(memberTotalData)) {
                         MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
-                        BigDecimal totalSpend = memberTotal.getTotalSpend() == null ? BigDecimal.ZERO : memberTotal.getTotalSpend();//累计消费
-                        BigDecimal maxSpend = memberTotal.getMaxSpend() == null ? BigDecimal.ZERO : memberTotal.getMaxSpend();//最高消费
-                        BigDecimal maxCash1 = memberTotal.getMaxCash1() == null ? BigDecimal.ZERO : memberTotal.getMaxCash1();//最高预存
+                        Integer totalSpend = memberTotal.getTotalSpend() == null ? 0 : memberTotal.getTotalSpend();//累计消费
+                        Integer maxSpend = memberTotal.getMaxSpend() == null ? 0 : memberTotal.getMaxSpend();//最高消费
+                        Integer maxCash1 = memberTotal.getMaxCash1() == null ? 0 : memberTotal.getMaxCash1();//最高预存
 
                         MemberLevelPagesResponse level = null;
                         //遍历DMC会员级别信息，判断顾客当前属于那个级别
                         for (MemberLevelPagesResponse levelData : dmcLevelData) {
-                            if (totalSpend.compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0) {//一年累计消费满
+                            if (totalSpend - levelData.getYearTotalSpendMoney() >= 0) {//一年累计消费满
                                 level = levelData;
                                 break;
-                            } else if (maxSpend.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableSpendMoney()))) >= 0) {//一次性消费满多少
+                            } else if (maxSpend-levelData.getDisposableSpendMoney() >= 0) {//一次性消费满多少
                                 level = levelData;
                                 break;
-                            } else if (maxCash1.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableAdvanceMoney()))) >= 0) {//一次性预存款
+                            } else if (maxCash1-levelData.getDisposableAdvanceMoney() >= 0) {//一次性预存款
                                 level = levelData;
                                 break;
                             }
@@ -1235,20 +1235,20 @@ public class MemberServiceImpl implements MemberService {
                     List<MemberTotal> memberTotalData = memberTotalResponse.getData();
                     if (CollectionUtil.isNotEmpty(memberTotalData)) {
                         MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
-                        BigDecimal totalSpend = memberTotal.getTotalSpend() == null ? BigDecimal.ZERO : memberTotal.getTotalSpend();//累计消费
-                        BigDecimal maxSpend = memberTotal.getMaxSpend() == null ? BigDecimal.ZERO : memberTotal.getMaxSpend();//最高消费
-                        BigDecimal maxCash1 = memberTotal.getMaxCash1() == null ? BigDecimal.ZERO : memberTotal.getMaxCash1();//最高预存
+                        Integer totalSpend = memberTotal.getTotalSpend() == null ? 0 : memberTotal.getTotalSpend();//累计消费
+                        Integer maxSpend = memberTotal.getMaxSpend() == null ? 0 : memberTotal.getMaxSpend();//最高消费
+                        Integer maxCash1 = memberTotal.getMaxCash1() == null ? 0 : memberTotal.getMaxCash1();//最高预存
 
                         MemberLevelPagesResponse level = null;
                         //遍历DMC会员级别信息，判断顾客当前属于那个级别
                         for (MemberLevelPagesResponse levelData : dmcLevelData) {
-                            if (totalSpend.compareTo(new BigDecimal(String.valueOf(levelData.getYearTotalSpendMoney()))) >= 0) {//一年累计消费满
+                            if (totalSpend-levelData.getYearTotalSpendMoney() >= 0) {//一年累计消费满
                                 level = levelData;
                                 break;
-                            } else if (maxSpend.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableSpendMoney()))) >= 0) {//一次性消费满多少
+                            } else if (maxSpend-levelData.getDisposableSpendMoney() >= 0) {//一次性消费满多少
                                 level = levelData;
                                 break;
-                            } else if (maxCash1.compareTo(new BigDecimal(String.valueOf(levelData.getDisposableAdvanceMoney()))) >= 0) {//一次性预存款
+                            } else if (maxCash1-levelData.getDisposableAdvanceMoney() >= 0) {//一次性预存款
                                 level = levelData;
                                 break;
                             }
