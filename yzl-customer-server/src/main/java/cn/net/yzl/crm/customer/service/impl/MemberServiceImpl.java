@@ -604,6 +604,11 @@ public class MemberServiceImpl implements MemberService {
             member.setMGradeId(1);
             member.setMGradeName("无卡");
             member.setM_grade_code(null);
+            member.setMedia_id(coilInVo.getMediaId());
+            member.setMedia_name(coilInVo.getMediaName());
+            member.setAdver_code(coilInVo.getAdvId());
+            member.setAdver_name(coilInVo.getAdvName());
+
             //更新会员信息
             int update = updateByMemberCardSelective(member);
             if (update < 0) {

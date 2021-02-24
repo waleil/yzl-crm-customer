@@ -898,4 +898,56 @@ public class MemberLabelESDao {
         Date today = calendar.getTime();
         return today;
     }
+
+    /**
+     * 构造int范围查询调教
+     * wangzhe
+     * 2021-02-24
+     * @param esAttr es的属性
+     * @param symbol 符号
+     * @param num 数值
+     * @return
+     */
+    private RangeQueryBuilder intRangeQuery (String esAttr,String symbol,int num){
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(esAttr);
+        if (">=".equals(symbol)){
+            rangeQuery.gte(num);
+        }else if (">".equals(symbol)){
+            rangeQuery.gt(num);
+        }else if ("=".equals(symbol)){
+            rangeQuery.gte(num);
+            rangeQuery.lte(num);
+        }else if ("<=".equals(symbol)){
+            rangeQuery.lte(num);
+        }else if ("<".equals(symbol)){
+            rangeQuery.lt(num);
+        }
+        return rangeQuery;
+    }
+
+    /**
+     * 构造int范围查询调教
+     * wangzhe
+     * 2021-02-24
+     * @param esAttr es的属性
+     * @param symbol 符号
+     * @param date 目标日期
+     * @return
+     */
+    private RangeQueryBuilder dateRangeQuery (String esAttr,String symbol,Date date){
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(esAttr);
+        if (">=".equals(symbol)) {
+            rangeQuery.gte(date.getTime());
+        } else if (">".equals(symbol)) {
+            rangeQuery.gt(date.getTime());
+        } else if ("=".equals(symbol)) {
+            date = formatDate(date);
+            rangeQuery.gte(date.getTime()).lte(date.getTime() + (24 * 60 * 60 * 1000));
+        } else if ("<=".equals(symbol)) {
+            rangeQuery.lte(date.getTime());
+        } else if ("<".equals(symbol)) {
+            rangeQuery.lt(date.getTime());
+        }
+        return rangeQuery;
+    }
 }
