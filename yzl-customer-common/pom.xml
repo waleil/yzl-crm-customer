@@ -14,7 +14,7 @@
     <artifactId>yzl-customer-common</artifactId>
     <description>crm客户公共服务</description>
     <name>yzl-customer-common</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-RELEASE</version>
     <properties>
         <java.version>1.8</java.version>
         <validation-api.version>2.0.1.Final</validation-api.version>

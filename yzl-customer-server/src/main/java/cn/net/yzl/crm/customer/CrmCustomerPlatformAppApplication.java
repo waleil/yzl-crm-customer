@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 @EnableSwagger
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"cn.net.yzl.crm.customer", "cn.net.yzl.logger"})
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = {"cn.net.yzl.crm.customer.feign"})
 @EnableTransactionManagement

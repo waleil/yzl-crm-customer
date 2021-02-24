@@ -15,6 +15,7 @@ import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface MemberService {
@@ -182,4 +183,6 @@ public interface MemberService {
     boolean updateMemberLabel();
 
     int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO);
+
+    boolean updateMemberGrandValidityInit() throws IOException;
 }

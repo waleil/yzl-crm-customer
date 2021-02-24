@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.dao.mongo;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
@@ -9,6 +10,8 @@ import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.mongo.PageUtil;
+import cn.net.yzl.logger.annotate.SysAccessLog;
+import cn.net.yzl.logger.enums.DefaultDataEnums;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import lombok.extern.slf4j.Slf4j;
@@ -137,7 +140,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         List<GroupRefMember> list = mongoTemplate.find(query,GroupRefMember.class,group_ref_member);
         return list;
     }
-
+    @SysAccessLog(logKeyParamName = "query",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public long count(Query query, Class<?> entityClass) {
         Long totalCount = mongoTemplate.count(query, entityClass);
         return totalCount;
@@ -168,6 +171,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
      * @Date: 2021/1/26 11:42 上午
      * @Return: java.lang.Integer
      */
+    @SysAccessLog(logKeyParamName = "query",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public long memberCrowdGroupTrial(Query query) {
         return mongoTemplate.count(query, MemberLabel.class, COLLECTION_NAME);
     }
@@ -1218,5 +1222,27 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         Date today = calendar.getTime();
         return today;
     }
+    /**
+     * @Author: lichanghong
+     * @Description: 根据顾客编号查询objectId
+     * @Date: 2021/2/20 1:59 下午
+     * @param memberCodes
+     * @Return: java.util.Map<java.lang.String,java.lang.String>
+     */
+    public Map<String,String> queryByCodes(List<String> memberCodes) {
 
+        Query query = new Query();
+        query.addCriteria(Criteria.where("memberCard").in(memberCodes));
+        query.fields().include("_id").include("memberCard");
+        List<MemberLabel> list = mongoTemplate.find(query,this.getEntityClass(),COLLECTION_NAME);
+        if(!CollectionUtil.isEmpty(list)){
+            Map<String,String> map = new HashMap<>(list.size()*2);
+            for (MemberLabel label : list) {
+                map.put(label.getMemberCard(),label.get_id());
+            }
+            return map;
+        }
+
+        return Collections.EMPTY_MAP;
+    }
 }

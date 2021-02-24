@@ -21,6 +21,8 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.CacheUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
+import cn.net.yzl.logger.annotate.SysAccessLog;
+import cn.net.yzl.logger.enums.DefaultDataEnums;
 import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -206,6 +208,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
 
     @Override
+    @SysAccessLog(logKeyParamName = "memberCrowdGroup",source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public Page<MemberLabelDto> groupTrialPullData(member_crowd_group memberCrowdGroup) {
         //进行顾客人群圈选
         Query query = memberLabelDao.initQuery(memberCrowdGroup);
@@ -331,6 +334,19 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         long groupRunEndTime = System.currentTimeMillis();
         log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount,version,count,(groupRunEndTime-groupRunStartTime));
         return matchCount;
+    }
+
+    @Override
+    public Query convertMongoCondition(member_crowd_group memberCrowdGroup) {
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        return query;
+    }
+
+    @Override
+    public Query convertIdToMongoCondition(MemberCrowdGroupOpVO crowdGroupOpVO) {
+        member_crowd_group memberCrowdGroup = memberCrowdGroupDao.getMemberCrowdGroup(crowdGroupOpVO.get_id());
+        Query query = memberLabelDao.initQuery(memberCrowdGroup);
+        return query;
     }
 
 

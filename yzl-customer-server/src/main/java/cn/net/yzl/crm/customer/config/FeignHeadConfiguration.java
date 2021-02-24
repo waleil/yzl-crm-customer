@@ -28,19 +28,20 @@ public class FeignHeadConfiguration {
         return requestTemplate -> {
             ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attrs != null) {
-                requestTemplate.header("appId", nacosValue.getAppId());
-
-                //将traceId和spanId添加到新的请求头中转发到下游服务
-                requestTemplate.header("traceId", QueryIds.tranceId.get());
-
-                String appName = requestTemplate.feignTarget().name();
-                String cSpanId = UUIDGenerator.getUUID() + ":" + appName;
-                requestTemplate.header("spanId", cSpanId);
-
-
-                log.info("crm request:[{}], traceId:[{}], spanId:[{}], cSpanId:{}", appName, QueryIds.tranceId.get(), QueryIds.spanId.get(), cSpanId);
 
             }
+            
+            requestTemplate.header("appId", nacosValue.getAppId());
+
+            //将traceId和spanId添加到新的请求头中转发到下游服务
+            requestTemplate.header("traceId", QueryIds.tranceId.get());
+
+            String appName = requestTemplate.feignTarget().name();
+            String cSpanId = UUIDGenerator.getUUID() + ":" + appName;
+            requestTemplate.header("spanId", cSpanId);
+
+
+            log.info("crm request:[{}], traceId:[{}], spanId:[{}], cSpanId:{}", appName, QueryIds.tranceId.get(), QueryIds.spanId.get(), cSpanId);
         };
     }
 

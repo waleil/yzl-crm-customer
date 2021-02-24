@@ -106,8 +106,7 @@
     update action_dict
     SET del_flag = 0
     WHERE
-        del_flag = 2
-        AND date_format( create_time, '%Y-%m-%d' ) = date_sub(CURDATE(),INTERVAL 1 DAY);
+        del_flag = 2 AND create_time &lt; NOW();
   </update>
 
   <select id="selectCountForRelationByDid"  resultType="java.lang.Integer">

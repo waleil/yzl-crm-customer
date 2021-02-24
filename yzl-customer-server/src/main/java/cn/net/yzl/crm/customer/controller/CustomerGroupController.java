@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -212,6 +213,24 @@ public class CustomerGroupController {
 
         customerGroupService.memberGroupTimedTask();
         return ComResponse.success(true);
+    }
+
+    @ApiOperation("将前端数据转成圈选条件(用于方便测试)")
+    @PostMapping("/v1/convertMongoCondition")
+    public ComResponse<Query> convertMongoCondition(@RequestBody member_crowd_group memberCrowdGroup) {
+        if (memberCrowdGroup == null)
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        Query query = customerGroupService.convertMongoCondition(memberCrowdGroup);
+        return ComResponse.success(query);
+    }
+
+    @ApiOperation("将圈选规则Id转成圈选条件(用于方便测试)")
+    @PostMapping("/v1/convertIdToMongoCondition")
+    public ComResponse<Query> convertIdToMongoCondition(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO) {
+        if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id()))
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        Query query = customerGroupService.convertIdToMongoCondition(crowdGroupOpVO);
+        return ComResponse.success(query);
     }
 
 }

@@ -264,6 +264,7 @@
   <select id="getProductEffects" parameterType="cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO"
           resultType="cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO">
     select
+    id,
       member_card memberCard,
       order_no orderNo,
       product_code productCode,

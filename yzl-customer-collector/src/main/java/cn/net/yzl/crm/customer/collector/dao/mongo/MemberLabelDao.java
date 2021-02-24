@@ -313,7 +313,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //首单下单时间>=
         if (memberCrowdGroup.getFirst_order_to_days() != null) {
-            int days = memberCrowdGroup.getFirst_order_to_days();
+            int days = 0;
             if (days > 10000) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "首单下单时间不能大于10000");
             }
@@ -322,12 +322,12 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //首次订单金额>=
         if (memberCrowdGroup.getFirst_order_am() != null) {
-            int am = BigDecimal.valueOf(memberCrowdGroup.getFirst_order_am() * 100).intValue();
+            int am = 0;
             and.add(Criteria.where("firstOrderAm").gte(am));
         }
         //最后一次下单时间>=
         if (memberCrowdGroup.getLast_order_to_days() != null) {
-            int days = memberCrowdGroup.getLast_order_to_days();
+            int days = 0;
             if (days > 10000) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
             }
@@ -414,7 +414,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //签收时间时间>=
         if (memberCrowdGroup.getSign_date_to_days() != null) {
-            int days = memberCrowdGroup.getSign_date_to_days();
+            int days = 0;
             if (days > 10000) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次签收时间不能大于10000");
             }
@@ -841,30 +841,30 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //累计消费金额
         if(memberCrowdGroup.getTotal_amount()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getTotal_amount() * 100).intValue();
+            int am = 0;
             and.add(Criteria.where("totalCounsumAmount").gte(am));
         }
         //订单总金额
         if(memberCrowdGroup.getOrder_total_amount()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_total_amount() * 100).intValue();
+            int am =0;
             and.add(Criteria.where("totalOrderAmount").gte(am));
         }
         //订单应收总金额
         if(memberCrowdGroup.getOrder_rec_amount()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_rec_amount() * 100).intValue();
+            int am = 0;
             and.add(Criteria.where("orderRecAmount").gte(am));
         }
 
         //
         //最高订单金额（单）
         if(memberCrowdGroup.getOrder_high_am()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_high_am() * 100).intValue();
+            int am = 0;
             and.add(Criteria.where("orderHighAm").gte(am));
         }
 
         //最低订单金额（单）
         if(memberCrowdGroup.getOrder_low_am()!=null){
-            int am = BigDecimal.valueOf(memberCrowdGroup.getOrder_low_am() * 100).intValue();
+            int am = 0;
             and.add(Criteria.where("orderLowAm").gte(am));
         }
         //是否下单
@@ -899,7 +899,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //最后一次进线时间
         if(memberCrowdGroup.getLastCallDays()!=null){
-            int days = memberCrowdGroup.getLastCallDays();
+            int days = 0;
             if (days > 10000) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
             }
