@@ -332,11 +332,16 @@ public class CustomerController {
     }
 
     @ApiOperation("根据时间范围获取会员级别记录")
-    @PostMapping("v1/getMemberGradeRecordListByTimeRange")
+    @RequestMapping(value = "/getMemberGradeRecordListByTimeRange", method = RequestMethod.POST)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query") })
-    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(@NotBlank String memberCard,String startTime,String endTime){
-        return  memberService.getMemberGradeRecordListByTimeRange(memberCard,startTime,endTime);
+            @ApiImplicitParam(name = "memberCard", value = "顾客卡号", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "startDate", value = "开始时间", required = false, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "endDate", value = "结束时间", required = false, dataType = "string", paramType = "query"),
+    })
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(String memberCard,
+                                                                                       String startDate,
+                                                                                       String endDate){
+        return  memberService.getMemberGradeRecordListByTimeRange(memberCard,startDate,endDate);
     }
 
 
