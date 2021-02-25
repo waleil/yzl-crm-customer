@@ -331,6 +331,14 @@ public class CustomerController {
 
     }
 
+    @ApiOperation("根据时间范围获取会员级别记录")
+    @PostMapping("v1/getMemberGradeRecordListByTimeRange")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query") })
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(@NotBlank String memberCard,String startTime,String endTime){
+        return  memberService.getMemberGradeRecordListByTimeRange(memberCard,startTime,endTime);
+    }
+
 
     @ApiOperation("顾客病症-根据病症id更新顾客病症")
     @PostMapping("/v1/updateMemberDiseaseByDiseaseId")

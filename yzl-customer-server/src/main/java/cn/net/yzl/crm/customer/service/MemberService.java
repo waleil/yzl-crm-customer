@@ -152,6 +152,8 @@ public interface MemberService {
 
     ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(String memberCard);
 
+    ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(String memberCard,String startTime,String endTime);
+
     public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo);
 
     /**

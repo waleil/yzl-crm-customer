@@ -483,6 +483,17 @@ public class MemberServiceImpl implements MemberService {
         return ComResponse.success(list);
     }
 
+    @Override
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(String memberCard,String startTime,String endTime) {
+
+        List<MemberGradeRecordDto> list =  memberGradeRecordDao.getMemberGradeRecordListByTimeRange(memberCard,startTime,endTime);
+
+        if(list==null || list.size()<1){
+            return ComResponse.nodata();
+        }
+        return ComResponse.success(list);
+    }
+
 
     /**
      * 更新顾客病症id
