@@ -159,7 +159,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         //每天吃多少(计算)
         //Integer eatingTime = record.getEatingTime();
         //商品余量
-        Integer productLastNum = record.getProductLastNum();
+        Integer productLastNum = memberProductEffectBefore.getProductLastNum();
 
         //每天用量
         Integer oneNum = null;
@@ -170,7 +170,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         memberProductEffect.setEatingTime(oneNum);
         //商品服用完日期
         Integer eatDay = null;
-        if (oneNum != null && oneNum > 0 && productLastNum>0) {
+        if (oneNum != null && oneNum > 0 && productLastNum != null && productLastNum>0) {
             eatDay = productLastNum % oneNum == 0 ? productLastNum / oneNum : productLastNum / oneNum + 1;
             //获取当前时间
             Calendar current = Calendar.getInstance();

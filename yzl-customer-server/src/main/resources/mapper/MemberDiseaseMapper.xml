@@ -20,6 +20,9 @@
     id, member_card, disease_id, disease_name, disease_descrip, del_flag, create_no, 
     create_time
   </sql>
+  <delete id="deleteMemberDiseaseByMemberCard">
+     delete from member_disease where member_card = #{memberCard,jdbcType=VARCHAR}
+  </delete>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
@@ -151,6 +154,13 @@
     <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
       #{item}
     </foreach>
+  </select>
+  <select id="getMemberDiseaseByMemberCard" resultType="cn.net.yzl.crm.customer.model.MemberDisease">
+    select
+    <include refid="Base_Column_List" />
+    from member_disease
+    where member_card = #{memberCard,jdbcType=VARCHAR}
+
   </select>
 
 </mapper>

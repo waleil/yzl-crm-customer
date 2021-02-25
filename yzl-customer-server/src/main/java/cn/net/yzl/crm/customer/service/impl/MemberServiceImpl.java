@@ -46,19 +46,24 @@ import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
+import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderDiseaseVo;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
+import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 import cn.net.yzl.crm.customer.vo.work.WorkOrderBeanVO;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
 import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -951,12 +956,12 @@ public class MemberServiceImpl implements MemberService {
      * @param workOrderInfoVO
      * @return
      */
-    @Override
-    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
-        //设置reids缓存
-        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),workOrderInfoVO.getMemberCard());
-        return ComResponse.success(true);
-    }
+//    @Override
+//    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
+//        //设置reids缓存
+//        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),workOrderInfoVO.getMemberCard());
+//        return ComResponse.success(true);
+//    }
 
     /**
      * 下单时，
@@ -1503,6 +1508,34 @@ public class MemberServiceImpl implements MemberService {
         return false;
     }
 
+    @Override
+    @Transactional
+    public ComResponse<Boolean> memeberWorkOrderSubmit(MemeberWorkOrderSubmitVo vo) {
+        //更新顾客信息
+        ComResponse<Boolean> response = updateMember(vo);
+        if (response.getCode() != 200) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return response;
+        }
+        //更新顾客病症
+        Integer result = updateMemberDisease(vo.getMemberCard(), vo.getStaffNo(), vo.getMemberDiseaseList());
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+        }
+
+        //更更新商品服用效果
+        ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(vo.getProductEffectList());
+        if (comResponse.getCode() != 200) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+        }
+        //设置reids缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),vo.getMemberCard());
+
+        return ComResponse.success(true);
+    }
+
     private static Integer getMonth(String date) {
         String[] str = date.split("-");
         if(str.length>2){
@@ -1586,7 +1619,144 @@ public class MemberServiceImpl implements MemberService {
         return Pair.of(startDate, endDate);
     }
 
+    /**
+     * 更新顾客病症
+     * wangzhe
+     * 2021-02-25
+     * @param memberCard 会员卡号
+     * @param createNo 员工编号
+     * @param memberDiseaseList 病症
+     * @return
+     */
+    @Transactional
+    public Integer updateMemberDisease(String memberCard,String createNo, List<MemberWorkOrderDiseaseVo> memberDiseaseList){
+        if (CollectionUtil.isEmpty(memberDiseaseList)) {
+            return 1;
+        }
+        //删除顾客所有的病症，重新添加
+        int result =  memberDiseaseMapper.deleteMemberDiseaseByMemberCard(memberCard);
+        Date now = new Date();
+        for (MemberWorkOrderDiseaseVo memberDisease : memberDiseaseList) {
+            cn.net.yzl.crm.customer.model.db.MemberDisease disease = new cn.net.yzl.crm.customer.model.db.MemberDisease();
+            disease.setCreateTime(now);
+            disease.setMemberCard(memberCard);
+            disease.setCreateNo(createNo);
+            disease.setDiseaseId(memberDisease.getDiseaseId());
+            disease.setDiseaseName(memberDisease.getDiseaseName());
+
+            result = memberDiseaseMapper.insertSelective(disease);
+        }
+
+        return result;
 
 
+    }
+
+    @Transactional
+    public ComResponse<Boolean> updateMember(MemeberWorkOrderSubmitVo vo){
+        String noZeroNumber = "";
+        String haveZeroNumber = "";
+        String phoneNumber = vo.getMemberPhone();
+
+        //是否以0开头 --> 去掉0
+        if (phoneNumber.startsWith("0")){
+            noZeroNumber = phoneNumber.substring(1);
+            haveZeroNumber = phoneNumber;
+        }else{
+            noZeroNumber = phoneNumber;
+            haveZeroNumber = "0" + phoneNumber;
+        }
+        //校验手机号
+        int phoneType = 0;
+        if (memberPhoneService.isMobile(noZeroNumber)) {
+            phoneType = 1;
+        }
+        //不是手机号时，要校验是否为电话号
+        if (phoneType == 0 && memberPhoneService.isPhone(phoneNumber)){
+            phoneType = 2;
+        }
+        if (phoneType == 0) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!");
+        }
+        /**
+         * 2.查询member_phone中电话号码是否存在
+         *      1.存在时：
+         *          说明已经绑定了
+         *
+         *      2.不存在时：
+         *          判断入参传入的电话号码是座机还是手机号(phone_type: '1 移动电话，2座机')
+         *          添加一条member_phne记录
+         *          添加一条member记录
+         */
+        String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
+        if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!");
+        }
+
+        Member member = new Member();
+        member.setMember_card(vo.getMemberCard());//会员卡号
+        member.setMember_name(vo.getMemberName());//会员名称
+        member.setSex(vo.getSex());//性别
+        member.setAge(vo.getAge());//年龄
+
+        member.setEmail(vo.getEmail());
+        member.setQq(vo.getQq());
+        member.setWechat(vo.getWechat());
+        member.setProvince_code(vo.getProvinceCode());
+        member.setProvince_name(vo.getProvinceName());
+
+        member.setCity_code(vo.getCityCode());
+        member.setCity_name(vo.getCityName());
+        member.setArea_code(vo.getAreaCode());
+        member.setArea_name(vo.getAreaName());
+        member.setUpdator_no(vo.getStaffNo());
+        member.setUpdator_name(vo.getStaffName());//修改人
+        member.setUpdate_time(new Date());
+
+        member.setAddress(vo.getAddress());
+
+        member.setBuy_intention(vo.getBuyIntention());//购买意向
+        member.setActivity(vo.getActivity());//活跃度 1 活跃 2 冷淡 3 一般
+
+        String phone = vo.getMemberPhone();
+
+        //1.更新顾客信息
+        int result = this.updateByMemberCardSelective(member);
+
+        if (result > 0) {
+            //更新memberPhone
+            MemberPhone memberPhone = new MemberPhone();
+            List<MemberPhone> memberPhoneList = phoneMapper.getMemberPhoneByMemberCard(member.getMember_card());
+            if (CollectionUtil.isNotEmpty(memberPhoneList)) {
+                memberPhone = memberPhoneList.get(0);
+                for (MemberPhone item : memberPhoneList) {
+                    if (noZeroNumber.equals(item.getPhone_number()) || noZeroNumber.equals(item.getPhone_number())) {
+                        memberPhone = item;
+                       break;
+                    }
+                }
+            }
+
+            memberPhone.setPhone_number(phone);
+            memberPhone.setUpdator_no(vo.getStaffNo());//修改人id
+            memberPhone.setUpdate_time(new Date());//修改时间
+            memberPhone.setPhone_type(phoneType);
+            //新增记录
+            if (memberPhone.getId() == null) {
+                memberPhone.setMember_card(member.getMember_card());
+                memberPhone.setCreator_no(memberPhone.getUpdator_no());
+                memberPhone.setCreate_time(memberPhone.getUpdate_time());
+                result = phoneMapper.insertSelective(memberPhone);
+            }
+            //更新记录
+            else{
+                result = phoneMapper.updateByPrimaryKeySelective(memberPhone);
+            }
+        }
+        if (result < 1) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+        }
+        return ComResponse.success(true);
+    }
 
 }

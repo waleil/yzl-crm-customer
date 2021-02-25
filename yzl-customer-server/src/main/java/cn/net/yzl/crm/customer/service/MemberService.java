@@ -13,7 +13,9 @@ import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
+import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderDiseaseVo;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
+import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 
 import java.io.IOException;
 import java.util.List;
@@ -176,8 +178,6 @@ public interface MemberService {
      */
     ComResponse<Boolean> orderSignUpdateMemberData(OrderSignInfo4MqVO orderInfo4MqVo);
 
-    ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO);
-
     ComResponse<Boolean> dealOrderCreateUpdateMemberData(OrderCreateInfoVO orderCreateInfoVO);
 
 //    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
@@ -187,4 +187,14 @@ public interface MemberService {
     int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO);
 
     boolean updateMemberGrandValidityInit() throws IOException;
+
+    /**
+     * 提交工单时处理业务
+     * @param workOrderSubmitVo
+     * @return
+     */
+    ComResponse<Boolean> memeberWorkOrderSubmit(MemeberWorkOrderSubmitVo workOrderSubmitVo);
+
+
+    public Integer updateMemberDisease(String memberCard,String createNo, List<MemberWorkOrderDiseaseVo> memberDiseaseList);
 }

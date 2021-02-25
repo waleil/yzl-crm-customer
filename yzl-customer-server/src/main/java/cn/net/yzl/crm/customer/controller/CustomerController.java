@@ -19,6 +19,7 @@ import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
+import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
@@ -367,15 +368,14 @@ public class CustomerController {
 
     }
 
-    @ApiOperation("顾客管理-处理工单时更新顾客信息")
+    @ApiOperation("顾客管理-提交工单时更新顾客信息")
     @PostMapping("/v1/dealWorkOrderUpdateMemberData")
-    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(@RequestBody MemberWorkOrderInfoVO workOrderInfoVO) {
-        if (workOrderInfoVO == null) {
+    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(@RequestBody MemeberWorkOrderSubmitVo workOrderSubmitVo) {
+        if (workOrderSubmitVo == null) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
         }
-        ComResponse<Boolean> response = memberService.dealWorkOrderUpdateMemberData(workOrderInfoVO);
+        ComResponse<Boolean> response = memberService.memeberWorkOrderSubmit(workOrderSubmitVo);
         return response;
-
     }
 
     @ApiOperation("顾客管理-处理下单时更新顾客信息")
