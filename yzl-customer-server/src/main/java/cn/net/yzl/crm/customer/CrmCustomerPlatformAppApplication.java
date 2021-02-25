@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableFeignClients(basePackages = {"cn.net.yzl.crm.customer.feign"})
 @EnableTransactionManagement
 @MapperScan("cn.net.yzl.crm.customer.dao")
+//@EnableScheduling
+//@EnableAsync//方法异步调用
 public class CrmCustomerPlatformAppApplication {
 
 	public static void main(String[] args) {

@@ -15,6 +15,7 @@ import cn.net.yzl.crm.customer.vo.MemberAndAddWorkOrderVO;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
@@ -332,11 +333,9 @@ public class CustomerController {
     }
 
     @ApiOperation("根据时间范围获取会员级别记录")
-    @PostMapping("v1/getMemberGradeRecordListByTimeRange")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query") })
-    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(@NotBlank String memberCard,String startTime,String endTime){
-        return  memberService.getMemberGradeRecordListByTimeRange(memberCard,startTime,endTime);
+    @RequestMapping(value = "v1/getMemberGradeRecordListByTimeRange", method = RequestMethod.POST)
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(@RequestBody MemberGrandSelectVo vo){
+        return  memberService.getMemberGradeRecordListByTimeRange(vo);
     }
 
 

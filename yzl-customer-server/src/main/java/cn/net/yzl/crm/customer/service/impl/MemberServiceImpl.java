@@ -42,6 +42,7 @@ import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.*;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
@@ -484,9 +485,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(String memberCard,String startTime,String endTime) {
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(MemberGrandSelectVo vo) {
 
-        List<MemberGradeRecordDto> list =  memberGradeRecordDao.getMemberGradeRecordListByTimeRange(memberCard,startTime,endTime);
+        List<MemberGradeRecordDto> list =  memberGradeRecordDao.getMemberGradeRecordListByTimeRange(vo.getMemberCard(),vo.getStartDate(),vo.getEndDate());
 
         if(list==null || list.size()<1){
             return ComResponse.nodata();

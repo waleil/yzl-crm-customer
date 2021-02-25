@@ -4,6 +4,7 @@ import cn.net.yzl.crm.customer.dto.member.MemberGradeRecordDto;
 import cn.net.yzl.crm.customer.model.db.MemberGradeRecordPo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface MemberGradeRecordDao {
@@ -21,5 +22,5 @@ public interface MemberGradeRecordDao {
 
     List<MemberGradeRecordDto> getMemberGradeRecordList(@Param("memberCard") String memberCard);
 
-    List<MemberGradeRecordDto> getMemberGradeRecordListByTimeRange(String memberCard, String startTime, String endTime);
+    List<MemberGradeRecordDto> getMemberGradeRecordListByTimeRange(@Param("memberCard")String memberCard, @Param("startTime") Date startTime, @Param("endTime")Date endTime);
 }
