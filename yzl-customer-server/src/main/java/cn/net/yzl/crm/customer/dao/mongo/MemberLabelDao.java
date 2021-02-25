@@ -1168,7 +1168,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 for (int i = 0; i < size; i++) {
                     crowd_product c = in.get(i);
                     Criteria criteria = new Criteria();
-                    and.add(Criteria.where("advertProducts").elemMatch(Criteria.where("productCode").is(c.getId())));
+                    and.add(Criteria.where("advertProducts").in(String.valueOf(c.getId())));
 
                 }
 //                criteria.andOperator(andArray);
@@ -1178,7 +1178,7 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 for (int i = 0; i < size; i++) {
                     crowd_product c = ex.get(i);
                     Criteria criteria = new Criteria();
-                    not.add(Criteria.where("advertProducts").elemMatch(Criteria.where("productCode").is(c.getId())));
+                    not.add(Criteria.where("advertProducts").in(String.valueOf(c.getId())));
                 }
                 // criteria.norOperator(exArray);
             }
