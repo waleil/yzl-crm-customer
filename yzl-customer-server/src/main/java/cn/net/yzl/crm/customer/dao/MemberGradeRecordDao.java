@@ -20,4 +20,6 @@ public interface MemberGradeRecordDao {
     int updateByPrimaryKey(MemberGradeRecordPo record);
 
     List<MemberGradeRecordDto> getMemberGradeRecordList(@Param("memberCard") String memberCard);
+
+    List<MemberGradeRecordDto> getMemberGradeRecordListByTimeRange(String memberCard, String startTime, String endTime);
 }

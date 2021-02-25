@@ -17,7 +17,6 @@ ribbon:
 
 
 # 异步线程配置
-
 async:
   executor:
     thread:
@@ -30,3 +29,15 @@ async:
       name:
         # 配置线程池中的线程的名称前缀
         prefix: async-service-yzl-customer-
+elasticsearch:
+
+
+  url: 192.168.32.145:9200,192.168.32.146:9200,192.168.32.147:9200
+  schema: http
+  connect-time-out: 1000
+  socket-time-out: 30000
+  connection-request-time-out: 500
+  max-connect-num: 100
+  max-connect-per-route: 100
+  user-name: elastic
+  password: 123456

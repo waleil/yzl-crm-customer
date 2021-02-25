@@ -483,6 +483,17 @@ public class MemberServiceImpl implements MemberService {
         return ComResponse.success(list);
     }
 
+    @Override
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(String memberCard,String startTime,String endTime) {
+
+        List<MemberGradeRecordDto> list =  memberGradeRecordDao.getMemberGradeRecordListByTimeRange(memberCard,startTime,endTime);
+
+        if(list==null || list.size()<1){
+            return ComResponse.nodata();
+        }
+        return ComResponse.success(list);
+    }
+
 
     /**
      * 更新顾客病症id
@@ -604,6 +615,12 @@ public class MemberServiceImpl implements MemberService {
             member.setMGradeId(1);
             member.setMGradeName("无卡");
             member.setM_grade_code(null);
+            member.setMedia_id(coilInVo.getMediaId());
+            member.setMedia_name(coilInVo.getMediaName());
+            member.setAdver_code(coilInVo.getAdvId());
+            member.setAdver_name(coilInVo.getAdvName());
+            member.setSource(coilInVo.getSource());//获客来源
+
             //更新会员信息
             int update = updateByMemberCardSelective(member);
             if (update < 0) {
@@ -916,7 +933,9 @@ public class MemberServiceImpl implements MemberService {
             if (StringUtils.isEmpty(member.getFirst_order_staff_no())) {
                 member.setFirst_order_staff_no(orderInfo4MqVo.getStaffNo());
                 member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
-
+            }
+            if (!member.isVip_flag()) {
+                this.setMemberToVip(memberCard);
             }
             int ret = memberMapper.updateByMemberGradeByMember(member);
 

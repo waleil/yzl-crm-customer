@@ -450,7 +450,6 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 Double amount = firstOrderAm.getAmount();
                 String symbol = firstOrderAm.getSymbol();
                 int am = BigDecimal.valueOf(amount * 100).intValue();
-                and.add(Criteria.where("firstOrderAm").gte(am));
                 if (">=".equals(symbol)){
                     and.add(Criteria.where("firstOrderAm").gte(am));
                 }else if (">".equals(symbol)){
