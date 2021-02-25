@@ -37,10 +37,10 @@ public class RedissonAutoConfiguration {
         clusterServersConfig.setKeepAlive(true);
         clusterServersConfig.setScanInterval(2000);
         clusterServersConfig.setIdleConnectionTimeout(1000);
-        clusterServersConfig.setMasterConnectionPoolSize(64);
-        clusterServersConfig.setMasterConnectionMinimumIdleSize(32);
-        clusterServersConfig.setSlaveConnectionPoolSize(64);
-        clusterServersConfig.setSlaveConnectionMinimumIdleSize(32);
+        clusterServersConfig.setMasterConnectionPoolSize(32);
+        clusterServersConfig.setMasterConnectionMinimumIdleSize(8);
+        clusterServersConfig.setSlaveConnectionPoolSize(32);
+        clusterServersConfig.setSlaveConnectionMinimumIdleSize(8);
         clusterServersConfig.setIdleConnectionTimeout(1000);
         clusterServersConfig.setPingConnectionInterval(1000);
         clusterServersConfig.setRetryAttempts(3);

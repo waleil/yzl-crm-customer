@@ -30,6 +30,24 @@
           member_card = #{memberCard}
 
   </select>
+  <select id="getMemberGradeRecordListByTimeRange" resultType="cn.net.yzl.crm.customer.dto.member.MemberGradeRecordDto">
+    SELECT
+          id,
+          member_card memberCard,
+          m_grade_id mGradeId,
+          m_grade_name mGradeName,
+          create_time createTime
+      FROM
+          member_grade_record
+      WHERE
+          member_card = #{memberCard}
+          <if test="startTime != null">
+            and create_time &gt;= #{startTime,jdbcType=TIMESTAMP}
+          </if>
+          <if test="endTime != null">
+            and create_time &lt; #{endTime,jdbcType=TIMESTAMP}
+          </if>
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from member_grade_record
     where id = #{id,jdbcType=INTEGER}

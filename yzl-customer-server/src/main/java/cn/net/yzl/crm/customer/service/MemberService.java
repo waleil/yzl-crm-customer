@@ -10,7 +10,7 @@ import cn.net.yzl.crm.customer.vo.MemberAndAddWorkOrderVO;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
-import cn.net.yzl.crm.customer.vo.label.MemberHangUpVO;
+import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
@@ -151,6 +151,8 @@ public interface MemberService {
     List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList);
 
     ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(String memberCard);
+
+    ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(MemberGrandSelectVo vo);
 
     public Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo);
 

@@ -70,7 +70,7 @@ public class Member {
     private String wechat;
     @ApiModelProperty(value = "邮箱")
     private String email;
-    @ApiModelProperty(value = "获客来源渠道id")
+    @ApiModelProperty(value = "获客来源渠道id：1 tv 2 internet 3 paper 4 radio 5 introduce 6 other")
     private Integer source;
     @ApiModelProperty(value = "联系地址")
     private String address;

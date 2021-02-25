@@ -31,18 +31,18 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
     @Override
     public ComResponse<List<MemberActionRelation>> selectRelationByMemberCardAndType(String card, Integer type) {
         List<MemberActionRelation> memberActionRelations = memberActionRelationMapper.selectRelationByMemberCardAndType(card, type);
-        if(memberActionRelations==null || memberActionRelations.size()<1){
+       /* if(memberActionRelations==null || memberActionRelations.size()<1){
             return  ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(),ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getMessage());
-        }
+        }*/
         return ComResponse.success(memberActionRelations);
     }
 
     @Override
     public ComResponse<List<MemberActionRelationList>> selectRelationTreeByMemberCard(String card) {
         List<MemberActionRelationList> memberActionRelations = memberActionRelationMapper.selectRelationTreeByMemberCard(card);
-        if(CollectionUtil.isEmpty(memberActionRelations)){
+        /*if(CollectionUtil.isEmpty(memberActionRelations)){
             return  ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(),ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getMessage());
-        }
+        }*/
         return ComResponse.success(memberActionRelations);
     }
 
