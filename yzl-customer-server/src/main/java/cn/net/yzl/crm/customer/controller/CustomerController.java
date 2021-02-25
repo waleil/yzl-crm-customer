@@ -15,6 +15,7 @@ import cn.net.yzl.crm.customer.vo.MemberAndAddWorkOrderVO;
 import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
+import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
@@ -332,16 +333,9 @@ public class CustomerController {
     }
 
     @ApiOperation("根据时间范围获取会员级别记录")
-    @RequestMapping(value = "/getMemberGradeRecordListByTimeRange", method = RequestMethod.POST)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "memberCard", value = "顾客卡号", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "startDate", value = "开始时间", required = false, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "endDate", value = "结束时间", required = false, dataType = "string", paramType = "query"),
-    })
-    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(String memberCard,
-                                                                                       String startDate,
-                                                                                       String endDate){
-        return  memberService.getMemberGradeRecordListByTimeRange(memberCard,startDate,endDate);
+    @RequestMapping(value = "v1/getMemberGradeRecordListByTimeRange", method = RequestMethod.POST)
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(@RequestBody MemberGrandSelectVo vo){
+        return  memberService.getMemberGradeRecordListByTimeRange(vo);
     }
 
 
