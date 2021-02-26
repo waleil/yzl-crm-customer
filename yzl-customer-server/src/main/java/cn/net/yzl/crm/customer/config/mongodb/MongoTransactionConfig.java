@@ -24,14 +24,14 @@ public class MongoTransactionConfig {
     MongoTransactionManager transactionManager(MongoDatabaseFactory factory){
         return new MongoTransactionManager(factory);
     }
-    @Bean
-    public MappingMongoConverter mappingMongoConverter(MongoMappingContext mongoMappingContext, MongoDatabaseFactory factory) {
-        mongoMappingContext.setAutoIndexCreation(true);
-        mongoMappingContext.afterPropertiesSet();
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
-        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
-        // 此处是去除插入数据库的 _class 字段
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-        return converter;
-    }
+//    @Bean
+//    public MappingMongoConverter mappingMongoConverter(MongoMappingContext mongoMappingContext, MongoDatabaseFactory factory) {
+//        mongoMappingContext.setAutoIndexCreation(true);
+//        mongoMappingContext.afterPropertiesSet();
+//        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
+//        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
+//        // 此处是去除插入数据库的 _class 字段
+//        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+//        return converter;
+//    }
 }
