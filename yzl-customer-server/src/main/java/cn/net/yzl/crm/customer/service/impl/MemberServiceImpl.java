@@ -808,7 +808,7 @@ public class MemberServiceImpl implements MemberService {
             }
             //更新
             if (updateProductVoList.size() > 0) {
-                memberProductEffectService.batchModifyProductEffect(updateProductVoList);
+                memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(),updateProductVoList);
             }
         }
 

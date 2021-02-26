@@ -40,7 +40,7 @@ public class MemberProductEffectController {
     })
     public ComResponse batchModifyProductEffect(@RequestBody List<MemberProductEffectUpdateVO> productEffects) {
 
-        ComResponse result = memberProductEffectService.batchModifyProductEffect(productEffects);
+        ComResponse result = memberProductEffectService.batchModifyProductEffect(null,productEffects);
         return result;
     }
 
