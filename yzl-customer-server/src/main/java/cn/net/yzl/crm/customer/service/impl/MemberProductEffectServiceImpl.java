@@ -235,11 +235,15 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * @return
      */
     @Transactional
-    public ComResponse batchModifyProductEffect(List<MemberProductEffectUpdateVO> records) {
+    public ComResponse batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> records) {
         if (CollectionUtil.isEmpty(records)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空!");
         }
         for (MemberProductEffectUpdateVO record : records) {
+            //修改人赋值
+            if (StringUtils.isEmpty(record.getUpdator())) {
+                record.setUpdator(userNo);
+            }
             int result = this.modify(record);
             if (result != 1) {
                 return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
