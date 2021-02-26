@@ -18,11 +18,11 @@ public class Member {
     @NotEmpty
     private String member_card;
     @ApiModelProperty(value = "顾客名称")
-
-    private String passwd;
-    @ApiModelProperty(value = "密码")
-
     private String member_name;
+
+    @ApiModelProperty(value = "密码")
+    private String passwd;
+
     @ApiModelProperty(value = "称谓")
     private String nick_name;
     @ApiModelProperty(value = "年龄")
