@@ -1720,7 +1720,7 @@ public class MemberServiceImpl implements MemberService {
             phoneType = 2;
         }
         if (phoneType == 0) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!",false);
         }
         /**
          * 2.查询member_phone中电话号码是否存在
@@ -1734,7 +1734,7 @@ public class MemberServiceImpl implements MemberService {
          */
         String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
         if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!",false);
         }
 
         Member member = new Member();
@@ -1798,7 +1798,7 @@ public class MemberServiceImpl implements MemberService {
             }
         }
         if (result < 1) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!",false);
         }
         return ComResponse.success(true);
     }
