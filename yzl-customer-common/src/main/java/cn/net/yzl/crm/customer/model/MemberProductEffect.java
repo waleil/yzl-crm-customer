@@ -10,7 +10,7 @@ import java.util.Date;
 @ApiModel("顾客购买商品效果")
 @Data
 public class MemberProductEffect {
-
+    @ApiModelProperty("主键id")
     private Integer id;
 
     @ApiModelProperty("会员卡号")
