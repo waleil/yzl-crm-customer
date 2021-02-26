@@ -104,7 +104,7 @@
   </update>
   <update id="updateActionDictWhereStatusIs2">
     update action_dict
-    SET del_flag = 0
+    SET del_flag = 0,update_time =NOW(),updator='SYSTEM'
     WHERE
         del_flag = 2 AND create_time &lt; NOW();
   </update>
