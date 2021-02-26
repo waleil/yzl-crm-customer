@@ -21,7 +21,7 @@ public interface ActivityFien {
 
     @ApiOperation(value = "通过活动编号查询活动商品信息")
     @PostMapping("/db/v1/productSales/getListByBusNos")
-    public ComResponse<List<ActivityDetailResponse>> getListByBusNos(@RequestParam("activityBusNo") List<Integer> activityBusNo);
+    public ComResponse<List<ActivityDetailResponse>> getListByBusNos(List<Integer> activityBusNo);
 
 
 

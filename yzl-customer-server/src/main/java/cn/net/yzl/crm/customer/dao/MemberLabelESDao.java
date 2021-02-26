@@ -1,7 +1,6 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.common.enums.ResponseCodeEnums;
-import cn.net.yzl.crm.customer.config.ESConfig;
 import cn.net.yzl.crm.customer.mongomodel.*;
 
 import cn.net.yzl.crm.customer.sys.BizException;

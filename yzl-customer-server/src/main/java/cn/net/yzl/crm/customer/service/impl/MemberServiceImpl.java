@@ -1108,27 +1108,33 @@ public class MemberServiceImpl implements MemberService {
             List<MemberOrderObject> orderData = querymemberorder.getData();
             List<MemberOrder> memberRefOrders = new ArrayList<>();
             if (CollectionUtil.isNotEmpty(orderData)) {
-                MemberOrderObject memberOrder1 = orderData.get(0);
-                List<MemberOrderDTO> orders = memberOrder1.getOrders();
-                for (MemberOrderDTO order : orders) {
-                    MemberOrder memberOrder = new MemberOrder();
-                    memberOrder.setMemberCard(memberOrder1.getMemberCardNo());
-                    if (order.getActivityNo() != null) {
-                        memberOrder.setActivityCode(String.valueOf(order.getActivityNo()));
+                for (MemberOrderObject orderObject : orderData) {
+                    List<MemberOrderDTO> orders = orderObject.getOrders();
+                    if (CollectionUtil.isEmpty(orders)) {
+                        continue;
                     }
-                    memberOrder.setOrderCode(order.getOrderNo());
-                    memberOrder.setLogisticsStatus(order.getLogisticsStatus());
-                    memberOrder.setCompanyCode(order.getExpressCompanyCode());
-                    memberOrder.setStatus(order.getOrderStatus());
-                    if (order.getPayType() != null) {
-                        memberOrder.setPayType(Integer.valueOf(order.getPayType()));
+                    //用户订单集合
+                    for (MemberOrderDTO order : orders) {
+                        MemberOrder memberOrder = new MemberOrder();
+                        memberOrder.setMemberCard(orderObject.getMemberCardNo());
+                        if (order.getActivityNo() != null) {
+                            memberOrder.setActivityCode(String.valueOf(order.getActivityNo()));
+                        }
+                        memberOrder.setOrderCode(order.getOrderNo());
+                        memberOrder.setLogisticsStatus(order.getLogisticsStatus());
+                        memberOrder.setCompanyCode(order.getExpressCompanyCode());
+                        memberOrder.setStatus(order.getOrderStatus());
+                        if (order.getPayType() != null) {
+                            memberOrder.setPayType(Integer.valueOf(order.getPayType()));
+                        }
+                        memberOrder.setPayMode(order.getPayMode());
+                        memberOrder.setSource(String.valueOf(order.getMediaNo()));
+                        if (order.getPayStatus() !=null){
+                            memberOrder.setPayStatus(Integer.valueOf(order.getPayStatus()));
+                        }
+                        memberRefOrders.add(memberOrder);
                     }
-                    memberOrder.setPayMode(order.getPayMode());
-                    memberOrder.setSource(String.valueOf(order.getMediaNo()));
-                    if (order.getPayStatus() !=null){
-                        memberOrder.setPayStatus(Integer.valueOf(order.getPayStatus()));
-                    }
-                    memberRefOrders.add(memberOrder);
+
                 }
                 memberRefOrderMap = memberRefOrders.stream()
                         .collect(Collectors.groupingBy(MemberOrder::getMemberCard));
@@ -1210,6 +1216,7 @@ public class MemberServiceImpl implements MemberService {
             //获取顾客的红包 积分 优惠券记录
             MemberAmountRedbagIntegral memberAmountRedbagIntegral = memberAmountRedbagIntegralMapper.selectByMemberCard(memberCard);
             if (memberAmountRedbagIntegral == null) {
+                memberAmountRedbagIntegral = new MemberAmountRedbagIntegral();
                 memberAmountRedbagIntegral.setMemberCard(memberCard);
             }
 
