@@ -49,23 +49,25 @@ public class ActivityClientAPI {
 
 
     /**
-     * 获取会员到期时间
+     * 获取今年的会员到期时间
+     * wangzhe
+     * 2021-02-26
      * @return
      */
-    public static String getMemberSysParamByType(){
+    public static String getMemberGradeValidDate(){
         ComResponse<MemberSysParamDetailResponse> response = null;
         for (int i = 0; i < 3; i++) {
             response = activityClientAPI.activityFien.getMemberSysParamByType(0);//会员
             if (200 != response.getCode()) {
                 log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-                throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"getMemberSysParamByType:获取DMC会员级别管理接口异常!");
+                throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"activityFien:getMemberGradeValidDate:获取DMC会员级别管理接口异常!");
             }else{
                 break;
             }
         }
         if (response == null ||  response.getData() == null || 200 != response.getCode()) {
             log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-            throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"getMemberSysParamByType:获取DMC会员级别管理接口异常!");
+            throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"activityFien:getMemberGradeValidDate:获取DMC会员级别管理接口异常!");
         }
         MemberSysParamDetailResponse data = response.getData();
 
@@ -76,7 +78,7 @@ public class ActivityClientAPI {
 
         if (StringUtils.isEmpty(data.getValidityMonth()) || StringUtils.isEmpty(data.getValidityDay())){
             log.error("getMemberSysParamByType:接口参数日期为空:{}-{}",data.getValidityMonth(),data.getValidityDay());
-            throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"getMemberSysParamByType:获取DMC的数据异常!");
+            throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"activityFien:getMemberGradeValidDate:获取DMC的数据异常!");
         }
 
         //获取会员到期的年月日，格式：yyyy-MM-dd

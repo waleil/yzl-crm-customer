@@ -17,6 +17,7 @@ import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.member.*;
+import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
 import cn.net.yzl.crm.customer.feign.client.product.ProductFien;
@@ -910,7 +911,7 @@ public class MemberServiceImpl implements MemberService {
             //判断是否升级
             if (CollectionUtil.isNotEmpty(dmcLevelData)) {
                 //获取DMC的会员到期时间
-                String validDate = getMemberGradeValidDate();
+                String validDate = ActivityClientAPI.getMemberGradeValidDate();
                 if ("-1".equals(validDate)) {
                     log.error("获取会员级别到期时间异常!");
                 }else{
@@ -1105,7 +1106,7 @@ public class MemberServiceImpl implements MemberService {
 
 
         //获取DMC的会员到期时间
-        String validDate = getMemberGradeValidDate();
+        String validDate = ActivityClientAPI.getMemberGradeValidDate();
         Pair<Date, Date> dateScope = null;
         if (!"-1".equals(validDate)) {
             dateScope = getDateScope(validDate);
@@ -1493,7 +1494,7 @@ public class MemberServiceImpl implements MemberService {
     //@Transactional
     public boolean updateMemberGrandValidityInit() throws IOException {//MemberSysParamDetailResponse
         //获取DMC的会员到期时间
-        String validDate = getMemberGradeValidDate();
+        String validDate = ActivityClientAPI.getMemberGradeValidDate();
         if ("0".equals(validDate)) {
             log.info("updateMemberGrandValidityInit:会员有效期类型为长期有效！");
             return true;
@@ -1586,49 +1587,6 @@ public class MemberServiceImpl implements MemberService {
             return Integer.parseInt(str[1]);
         }
         return 0;
-    }
-
-
-    /**
-     * 获取会员到期时间
-     * @return
-     */
-    private String getMemberGradeValidDate(){
-        ComResponse<MemberSysParamDetailResponse> response = null;
-        for (int i = 0; i < 3; i++) {
-            response = activityFien.getMemberSysParamByType(0);//会员
-            if (200 != response.getCode()) {
-                log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-            }else{
-                break;
-            }
-        }
-        if (response == null ||  response.getData() == null || 200 != response.getCode()) {
-            log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-            return "-1";
-        }
-        MemberSysParamDetailResponse data = response.getData();
-
-        if (data.getValidityType() == null || data.getValidityType() == 0) {
-            log.info("getMemberSysParamByType:会员有效期类型为长期有效！");
-            return "0";
-        }
-
-        if (StringUtils.isEmpty(data.getValidityMonth()) || StringUtils.isEmpty(data.getValidityDay())){
-            log.error("getMemberSysParamByType:接口参数日期为空:{}-{}",data.getValidityMonth(),data.getValidityDay());
-            return "-1";
-        }
-
-        //获取会员到期的年月日，格式：yyyy-MM-dd
-        if (data.getValidityMonth().length() == 1){
-            data.setValidityMonth("0" + data.getValidityMonth());
-        }
-        if (data.getValidityDay().length() == 1){
-            data.setValidityDay("0" + data.getValidityDay());
-        }
-
-        String valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
-        return valid;
     }
 
 

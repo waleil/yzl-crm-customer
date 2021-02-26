@@ -1,10 +1,12 @@
 package cn.net.yzl.crm.customer.controller;
 
+import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.*;
+import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberService;
@@ -372,7 +374,7 @@ public class CustomerController {
     @PostMapping("/v1/dealWorkOrderUpdateMemberData")
     public ComResponse<Boolean> dealWorkOrderUpdateMemberData(@RequestBody MemeberWorkOrderSubmitVo workOrderSubmitVo) {
         if (workOrderSubmitVo == null) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空",false);
         }
         ComResponse<Boolean> response = memberService.memeberWorkOrderSubmit(workOrderSubmitVo);
         return response;
@@ -422,6 +424,18 @@ public class CustomerController {
     public ComResponse<Boolean> updateMemberGrandValidityInit() throws IOException {
         boolean b = memberService.updateMemberGrandValidityInit();
         return ComResponse.success(b);
+    }
+
+
+    @Deprecated
+    @ApiOperation("测试静态方法")
+    @PostMapping("/v1/testStaticMethod")
+    public ComResponse<Boolean> testStaticMethod() throws IOException {
+
+        //ActivityDetailResponse activityProductByBusNo = ActivityClientAPI.getActivityProductByBusNo(1);
+        String date = ActivityClientAPI.getMemberGradeValidDate();
+        System.out.println(date);
+        return ComResponse.success(true);
     }
 
 
