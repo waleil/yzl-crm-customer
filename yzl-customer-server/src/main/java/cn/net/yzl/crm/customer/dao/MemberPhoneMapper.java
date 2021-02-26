@@ -35,5 +35,6 @@ public interface MemberPhoneMapper {
      */
     String getMemberCardByPhoneNumber(@Param("list") List phoneNumbers);
 
+    List<MemberPhone> getMemberPhoneByMemberCard(@Param("memberCard") String memberCard);
 
 }

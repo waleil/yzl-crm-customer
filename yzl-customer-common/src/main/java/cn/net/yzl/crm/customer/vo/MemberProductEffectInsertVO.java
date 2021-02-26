@@ -13,7 +13,7 @@ import java.util.Date;
  * @author 
  */
 @Data
-@ApiModel(value = "MemberProductEffectVO",description = "顾客服用效果实体")
+@ApiModel(value = "MemberProductEffectInsertVO",description = "顾客服用效果实体")
 public class MemberProductEffectInsertVO implements Serializable {
 //    @ApiModelProperty(value = "id",name = "id",required = true)
 //    private Integer id;

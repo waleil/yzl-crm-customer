@@ -159,7 +159,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         //每天吃多少(计算)
         //Integer eatingTime = record.getEatingTime();
         //商品余量
-        Integer productLastNum = record.getProductLastNum();
+        Integer productLastNum = memberProductEffectBefore.getProductLastNum();
 
         //每天用量
         Integer oneNum = null;
@@ -170,7 +170,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         memberProductEffect.setEatingTime(oneNum);
         //商品服用完日期
         Integer eatDay = null;
-        if (oneNum != null && oneNum > 0 && productLastNum>0) {
+        if (oneNum != null && oneNum > 0 && productLastNum != null && productLastNum>0) {
             eatDay = productLastNum % oneNum == 0 ? productLastNum / oneNum : productLastNum / oneNum + 1;
             //获取当前时间
             Calendar current = Calendar.getInstance();
@@ -235,11 +235,15 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * @return
      */
     @Transactional
-    public ComResponse batchModifyProductEffect(List<MemberProductEffectUpdateVO> records) {
+    public ComResponse batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> records) {
         if (CollectionUtil.isEmpty(records)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空!");
         }
         for (MemberProductEffectUpdateVO record : records) {
+            //修改人赋值
+            if (StringUtils.isEmpty(record.getUpdator())) {
+                record.setUpdator(userNo);
+            }
             int result = this.modify(record);
             if (result != 1) {
                 return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");

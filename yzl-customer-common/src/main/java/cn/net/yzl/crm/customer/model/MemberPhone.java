@@ -11,7 +11,7 @@ import java.util.Date;
 @Data
 public class MemberPhone {
     @ApiModelProperty("主键id")
-    private int id;
+    private Integer id;
 
     @ApiModelProperty("会员卡号")
     private String member_card;
@@ -23,9 +23,9 @@ public class MemberPhone {
     private String phone_place;
 
     @ApiModelProperty("服务提供商，1 移动，2联通，3电信")
-    private int service_provider;
+    private Integer service_provider;
     @ApiModelProperty("1 移动电话，2座机")
-    private int phone_type;
+    private Integer phone_type;
 
     @ApiModelProperty("创建人no")
     private String creator_no;

@@ -26,10 +26,11 @@ public interface MemberProductEffectService {
      * 批量添加记录
      * wangzhe
      * 20221-01-27
+     * @param userNo
      * @param record
      * @return
      */
-    ComResponse batchModifyProductEffect(List<MemberProductEffectUpdateVO> record);
+    ComResponse batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> record);
 
     ComResponse<List<MemberProductEffectDTO>> getProductEffects(MemberProductEffectSelectVO productEffect);
 
