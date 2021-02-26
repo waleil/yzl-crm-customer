@@ -676,7 +676,7 @@ public class MemberServiceImpl implements MemberService {
             //用于后面对该顾客进行圈选
             if (StringUtils.isEmpty(groupId)) {
                 label.setMemberCard(member.getMember_card());
-                label.setMemberCard(member.getMember_name());
+                label.setMemberName(member.getMember_name());
             }
         }
         //没有圈选的客户进行圈选
