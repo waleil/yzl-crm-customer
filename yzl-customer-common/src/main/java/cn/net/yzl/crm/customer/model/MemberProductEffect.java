@@ -28,6 +28,9 @@ public class MemberProductEffect {
     @ApiModelProperty("每天吃多少")
     private int eating_perday;
 
+    @ApiModelProperty("每次吃多少")
+    private int one_use_num;
+
     @ApiModelProperty("商品剩余量")
     private int product_last_num;
 
