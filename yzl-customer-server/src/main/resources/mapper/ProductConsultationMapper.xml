@@ -94,6 +94,22 @@
       </if>
     </trim>
   </insert>
+  <insert id="batchInsert" parameterType="cn.net.yzl.crm.customer.model.db.ProductConsultation">
+        INSERT INTO product_consultation (
+            member_card,
+            product_code,
+            product_name,
+            consultation_time)
+    values
+    <foreach collection ="list" item="item" index= "index" separator =",">
+        (
+          #{item.memberCard,jdbcType=VARCHAR},
+          #{item.productCode,jdbcType=VARCHAR},
+          #{item.productName,jdbcType=VARCHAR},
+          #{item.consultationTime,jdbcType=TIMESTAMP}
+        )
+    </foreach >
+  </insert>
   <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.ProductConsultation" >
     <!--
       WARNING - @mbggenerated

@@ -47,13 +47,11 @@ import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderDiseaseVo;
-import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
 import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 import cn.net.yzl.crm.customer.vo.work.WorkOrderBeanVO;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
 import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -63,7 +61,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -473,6 +470,32 @@ public class MemberServiceImpl implements MemberService {
             if(num<0) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
             }
+        }
+        return ComResponse.success();
+    }
+
+    /**
+     * wangzhe
+     * 2021-02-26
+     * @param productConsultationInsertVOList
+     * @return
+     */
+    @Override
+    @Transactional
+    public ComResponse<String> batchSaveProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList) {
+        //为空的时候不报错
+        if (CollectionUtil.isEmpty(productConsultationInsertVOList)) {
+            return ComResponse.success();
+        }
+        for (ProductConsultationInsertVO productConsultationInsertVO : productConsultationInsertVOList) {
+            cn.net.yzl.crm.customer.model.db.ProductConsultation productConsultation = new cn.net.yzl.crm.customer.model.db.ProductConsultation();
+            BeanUtil.copyProperties(productConsultationInsertVO,productConsultation);
+        }
+
+        //批量插入
+        int num =  productConsultationMapper.batchInsert(productConsultationInsertVOList);
+        if(num< 1) {
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
         }
         return ComResponse.success();
     }
@@ -1545,7 +1568,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         //更新顾客咨询商品
-        ComResponse<String> consultation = addProductConsultation(vo.getProductConsultationInsertVOList());
+        ComResponse<String> consultation = batchSaveProductConsultation(vo.getProductConsultationInsertVOList());
         if (consultation.getCode() != 200) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(顾客咨询商品)记录数据保存失败!");

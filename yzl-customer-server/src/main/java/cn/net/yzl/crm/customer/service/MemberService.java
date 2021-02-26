@@ -150,6 +150,15 @@ public interface MemberService {
     // 添加顾客咨询商品
     ComResponse<String> addProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList);
 
+    /**
+     * 添加顾客咨询商品(批量Intert保存)
+     * wangzhe
+     * 2021-02-26
+     * @param productConsultationInsertVOList
+     * @return
+     */
+    ComResponse<String> batchSaveProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList);
+
     List<MemberAddressAndLevelDTO> getMembereAddressAndLevelByMemberCards(List<String> memberCardList);
 
     ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(String memberCard);
