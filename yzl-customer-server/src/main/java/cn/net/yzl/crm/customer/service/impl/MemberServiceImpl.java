@@ -460,6 +460,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public ComResponse<String> addProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList) {
+        //为空的时候不报错
+        if (CollectionUtil.isEmpty(productConsultationInsertVOList)) {
+            return ComResponse.success();
+        }
         for (ProductConsultationInsertVO productConsultationInsertVO : productConsultationInsertVOList) {
 
             cn.net.yzl.crm.customer.model.db.ProductConsultation productConsultation = new cn.net.yzl.crm.customer.model.db.ProductConsultation();
@@ -1528,15 +1532,23 @@ public class MemberServiceImpl implements MemberService {
         Integer result = updateMemberDisease(vo.getMemberCard(), vo.getStaffNo(), vo.getMemberDiseaseList());
         if (result < 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(顾客病症)记录数据保存失败!");
         }
 
-        //更更新商品服用效果
+        //更新商品服用效果
         ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(vo.getProductEffectList());
         if (comResponse.getCode() != 200) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(商品服用效果)记录数据保存失败!");
         }
+
+        //更新顾客咨询商品
+        ComResponse<String> consultation = addProductConsultation(vo.getProductConsultationInsertVOList());
+        if (consultation.getCode() != 200) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(顾客咨询商品)记录数据保存失败!");
+        }
+
         //设置reids缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),vo.getMemberCard());
 
