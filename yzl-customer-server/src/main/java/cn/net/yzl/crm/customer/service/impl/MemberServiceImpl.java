@@ -629,7 +629,7 @@ public class MemberServiceImpl implements MemberService {
             member.setMedia_name(coilInVo.getMediaName());
             member.setAdver_code(coilInVo.getAdvId());
             member.setAdver_name(coilInVo.getAdvName());
-            member.setSource(coilInVo.getSource());//获客来源
+            member.setSource(coilInVo.getMediaType());//获客来源
 
             //更新会员信息
             int update = updateByMemberCardSelective(member);
@@ -1419,6 +1419,8 @@ public class MemberServiceImpl implements MemberService {
     public int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO) {
         Member memberVO = memberReferralVO.getMemberVO();
         WorkOrderBeanVO workOrderBeanVO = memberReferralVO.getWorkOrderBeanVO();
+        //99:转介绍客户"
+        memberVO.setSource(99);
         //保存用户信息
         int result = this.insert(memberVO);
         if (result > 0) {
