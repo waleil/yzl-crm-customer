@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.vo.work;
 
 import cn.net.yzl.crm.customer.model.MemberDisease;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectUpdateVO;
+import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -93,5 +94,8 @@ public class MemeberWorkOrderSubmitVo {
 
     @ApiModelProperty(value = "商品服用效果集合", name = "productEffectList", required = false)
     private List<MemberProductEffectUpdateVO> productEffectList;
+
+    @ApiModelProperty(value = "顾客咨询商品", name = "productConsultationInsertVOList", required = false)
+    private List<ProductConsultationInsertVO> productConsultationInsertVOList;
 
 }
