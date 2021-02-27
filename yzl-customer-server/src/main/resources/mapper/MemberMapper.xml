@@ -534,13 +534,27 @@
                 province_name = #{province_name,jdbcType=VARCHAR},
             </if>
             <if test="city_code != null">
-                city_code = #{city_code,jdbcType=INTEGER},
+                <choose>
+                    <when test="city_code == -999">
+                        city_code = null,
+                    </when>
+                    <otherwise>
+                        city_code = #{city_code,jdbcType=INTEGER},
+                    </otherwise>
+                </choose>
             </if>
             <if test="city_name != null">
                 city_name = #{city_name,jdbcType=VARCHAR},
             </if>
             <if test="area_code != null">
-                area_code = #{area_code,jdbcType=INTEGER},
+                <choose>
+                    <when test="area_code == -999">
+                        area_code = null,
+                    </when>
+                    <otherwise>
+                        area_code = #{area_code,jdbcType=INTEGER},
+                    </otherwise>
+                </choose>
             </if>
             <if test="area_name != null">
                 area_name = #{area_name,jdbcType=VARCHAR},

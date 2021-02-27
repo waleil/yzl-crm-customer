@@ -1704,13 +1704,17 @@ public class MemberServiceImpl implements MemberService {
         member.setEmail(vo.getEmail());
         member.setQq(vo.getQq());
         member.setWechat(vo.getWechat());
+
+        member.setRegion_code(vo.getRegionCode());
+        member.setRegion_name(vo.getRegionName());
+
         member.setProvince_code(vo.getProvinceCode());
         member.setProvince_name(vo.getProvinceName());
 
-        member.setCity_code(vo.getCityCode());
-        member.setCity_name(vo.getCityName());
-        member.setArea_code(vo.getAreaCode());
-        member.setArea_name(vo.getAreaName());
+        member.setCity_code(/*vo.getCityCode()*/-999);
+        member.setCity_name(/*vo.getCityName()*/"");
+        member.setArea_code(/*vo.getAreaCode()*/-999);
+        member.setArea_name(/*vo.getAreaName()*/"");
         member.setUpdator_no(vo.getStaffNo());
         member.setUpdator_name(vo.getStaffName());//修改人
         member.setUpdate_time(new Date());
