@@ -198,6 +198,9 @@ public class MemberServiceImpl implements MemberService {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话:"+memberPhone.getPhone_number()+"格式不正确!");
             }
             memberPhone.setPhone_type(phoneType);
+            if (memberPhone.getEnabled() == null) {
+                memberPhone.setEnabled(1);//默认可用
+            }
 
             result = phoneMapper.insert(memberPhone);
             if (result < 1) {
@@ -1817,7 +1820,9 @@ public class MemberServiceImpl implements MemberService {
             memberPhone.setUpdator_no(vo.getStaffNo());//修改人id
             memberPhone.setUpdate_time(new Date());//修改时间
             memberPhone.setPhone_type(phoneType);
-            memberPhone.setEnabled(1);
+            if (memberPhone.getEnabled() == null) {
+                memberPhone.setEnabled(1);//默认可用
+            }
             //新增记录
             if (memberPhone.getId() == null) {
                 memberPhone.setMember_card(member.getMember_card());

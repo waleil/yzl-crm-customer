@@ -95,6 +95,9 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
                 memberPhone.setCreate_time(new Date());
                 memberPhone.setUpdator_no(memberPhone.getCreator_no());
                 memberPhone.setUpdate_time(memberPhone.getCreate_time());
+                if (memberPhone.getEnabled() == null) {
+                    memberPhone.setEnabled(1);//默认可用
+                }
                 result = memberPhoneMapper.insert(memberPhone);
             }
             if (result == 1) {
