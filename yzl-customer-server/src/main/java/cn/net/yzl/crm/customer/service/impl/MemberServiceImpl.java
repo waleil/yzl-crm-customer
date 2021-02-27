@@ -198,6 +198,9 @@ public class MemberServiceImpl implements MemberService {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话:"+memberPhone.getPhone_number()+"格式不正确!");
             }
             memberPhone.setPhone_type(phoneType);
+            if (memberPhone.getEnabled() == null) {
+                memberPhone.setEnabled(1);//默认可用
+            }
 
             result = phoneMapper.insert(memberPhone);
             if (result < 1) {
@@ -677,10 +680,14 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(MemberCoilInVO coilInVo){
+        String callerPhone = coilInVo.getCallerPhone();
+        if (StringUtils.isEmpty(callerPhone)) {
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号码不能为空!");
+        }
         //判断当前号码是否已经使用
         ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(coilInVo.getCallerPhone());
         if (response.getCode() != 200 || response.getData() != null) {
-            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号码:"+coilInVo.getCallerPhone()+"已经被使用!");
         }
         Member member = response.getData();
         String memberCard = "";//会员卡号
@@ -1817,7 +1824,9 @@ public class MemberServiceImpl implements MemberService {
             memberPhone.setUpdator_no(vo.getStaffNo());//修改人id
             memberPhone.setUpdate_time(new Date());//修改时间
             memberPhone.setPhone_type(phoneType);
-            memberPhone.setEnabled(1);
+            if (memberPhone.getEnabled() == null) {
+                memberPhone.setEnabled(1);//默认可用
+            }
             //新增记录
             if (memberPhone.getId() == null) {
                 memberPhone.setMember_card(member.getMember_card());
