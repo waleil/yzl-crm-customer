@@ -37,6 +37,9 @@ public class MemeberWorkOrderSubmitVo {
     @ApiModelProperty(value = "手机号",required = true)
     private String memberPhone;
 
+    @ApiModelProperty(value = "座机号",required = false)
+    private String fixedPhoneNum;
+
     @ApiModelProperty(value = "邮箱")
     private String email;
 

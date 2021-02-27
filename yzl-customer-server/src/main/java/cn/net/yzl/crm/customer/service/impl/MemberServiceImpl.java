@@ -55,6 +55,7 @@ import cn.net.yzl.order.model.vo.member.MemberTotal;
 import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.language.bm.Rule;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1731,47 +1732,105 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
+    /**
+     *
+     * @param vo
+     * @return
+     */
     @Transactional
     public ComResponse<Boolean> updateMember(MemeberWorkOrderSubmitVo vo){
+        Map<Integer, String> phoneMapList = new HashMap<>();
+        int result;
         String noZeroNumber = "";
         String haveZeroNumber = "";
-        String phoneNumber = vo.getMemberPhone();
+        //手机号
+        if (vo.getMemberPhone() != null) {
+            phoneMapList.put(1,vo.getMemberPhone());
+        }
+        //座机号
+        if (StringUtils.isNotEmpty(vo.getFixedPhoneNum())) {
+            phoneMapList.put(2,vo.getFixedPhoneNum());
+        }
+        if (CollectionUtil.isNotEmpty(phoneMapList)) {
+            //查询顾客电话信息
+            List<MemberPhone> memberPhoneList = phoneMapper.getMemberPhoneByMemberCard(vo.getMemberCard());
+            for (Map.Entry<Integer, String> entry : phoneMapList.entrySet()) {
+                Integer type = entry.getKey();
+                String phoneNumber = entry.getValue();
+                //是否以0开头 --> 去掉0
+                if (phoneNumber.startsWith("0")){
+                    noZeroNumber = phoneNumber.substring(1);
+                    haveZeroNumber = phoneNumber;
+                }else{
+                    noZeroNumber = phoneNumber;
+                    haveZeroNumber = "0" + phoneNumber;
+                }
+                //校验手机号
+                int phoneType = 0;
+                if (memberPhoneService.isMobile(noZeroNumber)) {
+                    phoneType = 1;
+                }
+                //不是手机号时，要校验是否为电话号
+                if (phoneType == 0 && memberPhoneService.isPhone(phoneNumber)){
+                    phoneType = 2;
+                }
+                if (phoneType != type.intValue()) {
+                    if (phoneType == 1) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号格式不正确!",false);
+                    }else{
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!",false);
+                    }
+                }
 
-        //是否以0开头 --> 去掉0
-        if (phoneNumber.startsWith("0")){
-            noZeroNumber = phoneNumber.substring(1);
-            haveZeroNumber = phoneNumber;
-        }else{
-            noZeroNumber = phoneNumber;
-            haveZeroNumber = "0" + phoneNumber;
-        }
-        //校验手机号
-        int phoneType = 0;
-        if (memberPhoneService.isMobile(noZeroNumber)) {
-            phoneType = 1;
-        }
-        //不是手机号时，要校验是否为电话号
-        if (phoneType == 0 && memberPhoneService.isPhone(phoneNumber)){
-            phoneType = 2;
-        }
-        if (phoneType == 0) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!",false);
-        }
-        /**
-         * 2.查询member_phone中电话号码是否存在
-         *      1.存在时：
-         *          说明已经绑定了
-         *
-         *      2.不存在时：
-         *          判断入参传入的电话号码是座机还是手机号(phone_type: '1 移动电话，2座机')
-         *          添加一条member_phne记录
-         *          添加一条member记录
-         */
-        String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
-        if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!",false);
+                String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
+                if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!",false);
+                }
+                MemberPhone memberPhone = new MemberPhone();
+                if (CollectionUtil.isNotEmpty(memberPhoneList)) {
+                    for (MemberPhone item : memberPhoneList) {
+                        //类型相同的
+                        if (haveZeroNumber.equals(item.getPhone_number()) || noZeroNumber.equals(item.getPhone_number()) ) {
+                            memberPhone = item;
+                            break;
+                        }
+                    }
+                }
+                memberPhone.setPhone_type(phoneType);
+                memberPhone.setPhone_number(phoneNumber);
+                memberPhone.setUpdator_no(vo.getStaffNo());//修改人id
+                memberPhone.setUpdate_time(new Date());//修改时间
+                memberPhone.setPhone_type(phoneType);
+                if (memberPhone.getEnabled() == null) {
+                    memberPhone.setEnabled(1);//默认可用
+                }
+                //新增记录
+                if (memberPhone.getId() == null) {
+                    memberPhone.setMember_card(vo.getMemberCard());
+                    memberPhone.setCreator_no(memberPhone.getUpdator_no());
+                    memberPhone.setCreate_time(memberPhone.getUpdate_time());
+                    result = phoneMapper.insertSelective(memberPhone);
+                    if (result < 1) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"保存电话号:"+phoneNumber+"失败!",false);
+                    }
+                } else{
+                    //更新记录
+                    memberPhone.setPhone_place("");
+                    memberPhone.setService_provider(0);
+                    result = phoneMapper.updateByPrimaryKeySelective(memberPhone);
+                    if (result < 1) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"修改电话号:"+phoneNumber+"失败!",false);
+                    }
+                }
+            }
         }
 
+        //保存顾客信息
         Member member = new Member();
         member.setMember_card(vo.getMemberCard());//会员卡号
         member.setMember_name(vo.getMemberName());//会员名称
@@ -1801,47 +1860,11 @@ public class MemberServiceImpl implements MemberService {
         member.setBuy_intention(vo.getBuyIntention());//购买意向
         member.setActivity(vo.getActivity());//活跃度 1 活跃 2 冷淡 3 一般
 
-        String phone = vo.getMemberPhone();
-
         //1.更新顾客信息
-        int result = this.updateByMemberCardSelective(member);
+        result = this.updateByMemberCardSelective(member);
 
-        if (result > 0) {
-            //更新memberPhone
-            MemberPhone memberPhone = new MemberPhone();
-            List<MemberPhone> memberPhoneList = phoneMapper.getMemberPhoneByMemberCard(member.getMember_card());
-            if (CollectionUtil.isNotEmpty(memberPhoneList)) {
-                memberPhone = memberPhoneList.get(0);
-                for (MemberPhone item : memberPhoneList) {
-                    if (noZeroNumber.equals(item.getPhone_number()) || noZeroNumber.equals(item.getPhone_number())) {
-                        memberPhone = item;
-                       break;
-                    }
-                }
-            }
-
-            memberPhone.setPhone_number(phone);
-            memberPhone.setUpdator_no(vo.getStaffNo());//修改人id
-            memberPhone.setUpdate_time(new Date());//修改时间
-            memberPhone.setPhone_type(phoneType);
-            if (memberPhone.getEnabled() == null) {
-                memberPhone.setEnabled(1);//默认可用
-            }
-            //新增记录
-            if (memberPhone.getId() == null) {
-                memberPhone.setMember_card(member.getMember_card());
-                memberPhone.setCreator_no(memberPhone.getUpdator_no());
-                memberPhone.setCreate_time(memberPhone.getUpdate_time());
-                result = phoneMapper.insertSelective(memberPhone);
-            }
-            //更新记录
-            else{
-                memberPhone.setPhone_place("");
-                memberPhone.setService_provider(0);
-                result = phoneMapper.updateByPrimaryKeySelective(memberPhone);
-            }
-        }
         if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!",false);
         }
         return ComResponse.success(true);
@@ -2191,64 +2214,6 @@ public class MemberServiceImpl implements MemberService {
         memberLabel.setHaveOrder(1);
         return true;
     }
-
-
-    /**
-     * 处理顾客的是否有红包、优惠券
-     * wangzhe
-     * 2021-02-27
-     * @param memberCard
-     * @param memberLabel
-     * @return
-     */
-    public boolean dealMemberRedbagIntegral(String memberCard, MemberLabel memberLabel) {
-        //获取顾客的红包 积分 优惠券记录
-        MemberAmountRedbagIntegral memberAmountRedbagIntegral = memberAmountRedbagIntegralMapper.selectByMemberCard(memberCard);
-        if (memberAmountRedbagIntegral == null) {
-            memberAmountRedbagIntegral = new MemberAmountRedbagIntegral();
-            memberAmountRedbagIntegral.setMemberCard(memberCard);
-        }
-
-
-        //是否有积分、红包、优惠券要从DMC获取
-        ComResponse<MemberAccountResponse> dmcResponse = activityFien.getAccountByMemberCard(memberCard);
-        MemberAccountResponse dmcData = dmcResponse.getData();
-        //积分
-        if (dmcData.getMemberIntegral() != null && dmcData.getMemberIntegral() > 0) {
-            memberLabel.setHasIntegral(true);
-            memberAmountRedbagIntegral.setLastIntegral(dmcData.getMemberIntegral());
-        }else{
-            memberLabel.setHasIntegral(false);
-            memberAmountRedbagIntegral.setLastIntegral(0);
-        }
-
-        //红包
-        if (dmcData.getMemberRedBag() != null) {
-            memberLabel.setHasTedBag(true);
-            memberAmountRedbagIntegral.setLastRedBag(dmcData.getMemberRedBag().intValue());
-        }else{
-            memberLabel.setHasTedBag(false);
-            memberAmountRedbagIntegral.setLastRedBag(0);
-        }
-
-        //优惠券
-        if (dmcData.getMemberCouponSize() != null && dmcData.getMemberCouponSize() > 0) {
-            memberLabel.setHasIntegral(true);
-        }else{
-            memberLabel.setHasIntegral(false);
-        }
-
-        //新增
-        if (memberAmountRedbagIntegral.getId() == null) {
-            memberAmountRedbagIntegralMapper.insertSelective(memberAmountRedbagIntegral);
-        }else{
-            //更新
-            memberAmountRedbagIntegralMapper.updateByPrimaryKeySelective(memberAmountRedbagIntegral);
-        }
-        return true;
-
-    }
-
 
     /**
      * 处理顾客最后一次进线、最后一次通话
