@@ -319,7 +319,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         labels.clear();
 
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
-        deleteMongoGroupRefMemberByGroupId(groupId,version);
+        boolean result = deleteMongoGroupRefMemberByGroupId(groupId, version);
         //查询group_ref_member中，当前群组的顾客数量
         Query getMemberCount = new Query();
         getMemberCount.addCriteria(Criteria.where("groupId").is(groupId));

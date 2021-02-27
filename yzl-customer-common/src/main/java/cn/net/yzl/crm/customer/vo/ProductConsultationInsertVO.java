@@ -23,7 +23,7 @@ public class ProductConsultationInsertVO {
     @NotBlank
     private String productName;
     @ApiModelProperty(value = "咨询时间(时间格式:yyyy-MM-dd HH:mm:ss)", name = "consultationTime", required = true)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date consultationTime;
 
 

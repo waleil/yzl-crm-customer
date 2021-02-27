@@ -18,11 +18,11 @@ public class Member {
     @NotEmpty
     private String member_card;
     @ApiModelProperty(value = "顾客名称")
-
-    private String passwd;
-    @ApiModelProperty(value = "密码")
-
     private String member_name;
+
+    @ApiModelProperty(value = "密码")
+    private String passwd;
+
     @ApiModelProperty(value = "称谓")
     private String nick_name;
     @ApiModelProperty(value = "年龄")
@@ -70,7 +70,8 @@ public class Member {
     private String wechat;
     @ApiModelProperty(value = "邮箱")
     private String email;
-    @ApiModelProperty(value = "获客来源渠道id：1 tv 2 internet 3 paper 4 radio 5 introduce 6 other")
+    //@ApiModelProperty(value = "获客来源渠道id：1 tv 2 internet 3 paper 4 radio 5 introduce 6 other")
+    @ApiModelProperty(value = "获客来源渠道(媒介类型) -1：其他，0:电视媒体, 1:广播电台媒体，2：社区媒体，3：户外媒体，4：印刷媒体，5：互联网媒体，6：电商站内流量媒体 99:转介绍客户",name="source")
     private Integer source;
     @ApiModelProperty(value = "联系地址")
     private String address;

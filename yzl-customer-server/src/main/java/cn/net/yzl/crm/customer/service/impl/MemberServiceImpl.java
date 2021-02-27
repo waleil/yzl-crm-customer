@@ -17,6 +17,7 @@ import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.member.*;
+import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
 import cn.net.yzl.crm.customer.feign.client.product.ProductFien;
@@ -46,7 +47,8 @@ import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
-import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
+import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderDiseaseVo;
+import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 import cn.net.yzl.crm.customer.vo.work.WorkOrderBeanVO;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
 import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
@@ -57,6 +59,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -455,6 +458,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public ComResponse<String> addProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList) {
+        //为空的时候不报错
+        if (CollectionUtil.isEmpty(productConsultationInsertVOList)) {
+            return ComResponse.success();
+        }
         for (ProductConsultationInsertVO productConsultationInsertVO : productConsultationInsertVOList) {
 
             cn.net.yzl.crm.customer.model.db.ProductConsultation productConsultation = new cn.net.yzl.crm.customer.model.db.ProductConsultation();
@@ -464,6 +471,32 @@ public class MemberServiceImpl implements MemberService {
             if(num<0) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
             }
+        }
+        return ComResponse.success();
+    }
+
+    /**
+     * wangzhe
+     * 2021-02-26
+     * @param productConsultationInsertVOList
+     * @return
+     */
+    @Override
+    @Transactional
+    public ComResponse<String> batchSaveProductConsultation(List<ProductConsultationInsertVO> productConsultationInsertVOList) {
+        //为空的时候不报错
+        if (CollectionUtil.isEmpty(productConsultationInsertVOList)) {
+            return ComResponse.success();
+        }
+        for (ProductConsultationInsertVO productConsultationInsertVO : productConsultationInsertVOList) {
+            cn.net.yzl.crm.customer.model.db.ProductConsultation productConsultation = new cn.net.yzl.crm.customer.model.db.ProductConsultation();
+            BeanUtil.copyProperties(productConsultationInsertVO,productConsultation);
+        }
+
+        //批量插入
+        int num =  productConsultationMapper.batchInsert(productConsultationInsertVOList);
+        if(num< 1) {
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
         }
         return ComResponse.success();
     }
@@ -620,7 +653,7 @@ public class MemberServiceImpl implements MemberService {
             member.setMedia_name(coilInVo.getMediaName());
             member.setAdver_code(coilInVo.getAdvId());
             member.setAdver_name(coilInVo.getAdvName());
-            member.setSource(coilInVo.getSource());//获客来源
+            member.setSource(coilInVo.getMediaType());//获客来源
 
             //更新会员信息
             int update = updateByMemberCardSelective(member);
@@ -643,7 +676,7 @@ public class MemberServiceImpl implements MemberService {
             //用于后面对该顾客进行圈选
             if (StringUtils.isEmpty(groupId)) {
                 label.setMemberCard(member.getMember_card());
-                label.setMemberCard(member.getMember_name());
+                label.setMemberName(member.getMember_name());
             }
         }
         //没有圈选的客户进行圈选
@@ -776,7 +809,7 @@ public class MemberServiceImpl implements MemberService {
             }
             //更新
             if (updateProductVoList.size() > 0) {
-                memberProductEffectService.batchModifyProductEffect(updateProductVoList);
+                memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(),updateProductVoList);
             }
         }
 
@@ -878,7 +911,7 @@ public class MemberServiceImpl implements MemberService {
             //判断是否升级
             if (CollectionUtil.isNotEmpty(dmcLevelData)) {
                 //获取DMC的会员到期时间
-                String validDate = getMemberGradeValidDate();
+                String validDate = ActivityClientAPI.getMemberGradeValidDate();
                 if ("-1".equals(validDate)) {
                     log.error("获取会员级别到期时间异常!");
                 }else{
@@ -951,12 +984,12 @@ public class MemberServiceImpl implements MemberService {
      * @param workOrderInfoVO
      * @return
      */
-    @Override
-    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
-        //设置reids缓存
-        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),workOrderInfoVO.getMemberCard());
-        return ComResponse.success(true);
-    }
+//    @Override
+//    public ComResponse<Boolean> dealWorkOrderUpdateMemberData(MemberWorkOrderInfoVO workOrderInfoVO) {
+//        //设置reids缓存
+//        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),workOrderInfoVO.getMemberCard());
+//        return ComResponse.success(true);
+//    }
 
     /**
      * 下单时，
@@ -1073,7 +1106,7 @@ public class MemberServiceImpl implements MemberService {
 
 
         //获取DMC的会员到期时间
-        String validDate = getMemberGradeValidDate();
+        String validDate = ActivityClientAPI.getMemberGradeValidDate();
         Pair<Date, Date> dateScope = null;
         if (!"-1".equals(validDate)) {
             dateScope = getDateScope(validDate);
@@ -1103,27 +1136,33 @@ public class MemberServiceImpl implements MemberService {
             List<MemberOrderObject> orderData = querymemberorder.getData();
             List<MemberOrder> memberRefOrders = new ArrayList<>();
             if (CollectionUtil.isNotEmpty(orderData)) {
-                MemberOrderObject memberOrder1 = orderData.get(0);
-                List<MemberOrderDTO> orders = memberOrder1.getOrders();
-                for (MemberOrderDTO order : orders) {
-                    MemberOrder memberOrder = new MemberOrder();
-                    memberOrder.setMemberCard(memberOrder1.getMemberCardNo());
-                    if (order.getActivityNo() != null) {
-                        memberOrder.setActivityCode(String.valueOf(order.getActivityNo()));
+                for (MemberOrderObject orderObject : orderData) {
+                    List<MemberOrderDTO> orders = orderObject.getOrders();
+                    if (CollectionUtil.isEmpty(orders)) {
+                        continue;
                     }
-                    memberOrder.setOrderCode(order.getOrderNo());
-                    memberOrder.setLogisticsStatus(order.getLogisticsStatus());
-                    memberOrder.setCompanyCode(order.getExpressCompanyCode());
-                    memberOrder.setStatus(order.getOrderStatus());
-                    if (order.getPayType() != null) {
-                        memberOrder.setPayType(Integer.valueOf(order.getPayType()));
+                    //用户订单集合
+                    for (MemberOrderDTO order : orders) {
+                        MemberOrder memberOrder = new MemberOrder();
+                        memberOrder.setMemberCard(orderObject.getMemberCardNo());
+                        if (order.getActivityNo() != null) {
+                            memberOrder.setActivityCode(String.valueOf(order.getActivityNo()));
+                        }
+                        memberOrder.setOrderCode(order.getOrderNo());
+                        memberOrder.setLogisticsStatus(order.getLogisticsStatus());
+                        memberOrder.setCompanyCode(order.getExpressCompanyCode());
+                        memberOrder.setStatus(order.getOrderStatus());
+                        if (order.getPayType() != null) {
+                            memberOrder.setPayType(Integer.valueOf(order.getPayType()));
+                        }
+                        memberOrder.setPayMode(order.getPayMode());
+                        memberOrder.setSource(String.valueOf(order.getMediaNo()));
+                        if (order.getPayStatus() !=null){
+                            memberOrder.setPayStatus(Integer.valueOf(order.getPayStatus()));
+                        }
+                        memberRefOrders.add(memberOrder);
                     }
-                    memberOrder.setPayMode(order.getPayMode());
-                    memberOrder.setSource(String.valueOf(order.getMediaNo()));
-                    if (order.getPayStatus() !=null){
-                        memberOrder.setPayStatus(Integer.valueOf(order.getPayStatus()));
-                    }
-                    memberRefOrders.add(memberOrder);
+
                 }
                 memberRefOrderMap = memberRefOrders.stream()
                         .collect(Collectors.groupingBy(MemberOrder::getMemberCard));
@@ -1205,6 +1244,7 @@ public class MemberServiceImpl implements MemberService {
             //获取顾客的红包 积分 优惠券记录
             MemberAmountRedbagIntegral memberAmountRedbagIntegral = memberAmountRedbagIntegralMapper.selectByMemberCard(memberCard);
             if (memberAmountRedbagIntegral == null) {
+                memberAmountRedbagIntegral = new MemberAmountRedbagIntegral();
                 memberAmountRedbagIntegral.setMemberCard(memberCard);
             }
 
@@ -1403,6 +1443,8 @@ public class MemberServiceImpl implements MemberService {
     public int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO) {
         Member memberVO = memberReferralVO.getMemberVO();
         WorkOrderBeanVO workOrderBeanVO = memberReferralVO.getWorkOrderBeanVO();
+        //99:转介绍客户"
+        memberVO.setSource(99);
         //保存用户信息
         int result = this.insert(memberVO);
         if (result > 0) {
@@ -1452,7 +1494,7 @@ public class MemberServiceImpl implements MemberService {
     //@Transactional
     public boolean updateMemberGrandValidityInit() throws IOException {//MemberSysParamDetailResponse
         //获取DMC的会员到期时间
-        String validDate = getMemberGradeValidDate();
+        String validDate = ActivityClientAPI.getMemberGradeValidDate();
         if ("0".equals(validDate)) {
             log.info("updateMemberGrandValidityInit:会员有效期类型为长期有效！");
             return true;
@@ -1503,55 +1545,48 @@ public class MemberServiceImpl implements MemberService {
         return false;
     }
 
+    @Override
+    @Transactional
+    public ComResponse<Boolean> memeberWorkOrderSubmit(MemeberWorkOrderSubmitVo vo) {
+        //更新顾客信息
+        ComResponse<Boolean> response = updateMember(vo);
+        if (response.getCode() != 200) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return response;
+        }
+        //更新顾客病症
+        Integer result = updateMemberDisease(vo.getMemberCard(), vo.getStaffNo(), vo.getMemberDiseaseList());
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(顾客病症)记录数据保存失败!");
+        }
+
+        //更新商品服用效果
+        ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(vo.getStaffNo(), vo.getProductEffectList());
+        if (comResponse.getCode() != 200) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(商品服用效果)记录数据保存失败!");
+        }
+
+        //更新顾客咨询商品
+        ComResponse<String> consultation = batchSaveProductConsultation(vo.getProductConsultationInsertVOList());
+        if (consultation.getCode() != 200) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(顾客咨询商品)记录数据保存失败!");
+        }
+
+        //设置reids缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),vo.getMemberCard());
+
+        return ComResponse.success(true);
+    }
+
     private static Integer getMonth(String date) {
         String[] str = date.split("-");
         if(str.length>2){
             return Integer.parseInt(str[1]);
         }
         return 0;
-    }
-
-
-    /**
-     * 获取会员到期时间
-     * @return
-     */
-    private String getMemberGradeValidDate(){
-        ComResponse<MemberSysParamDetailResponse> response = null;
-        for (int i = 0; i < 3; i++) {
-            response = activityFien.getMemberSysParamByType(0);//会员
-            if (200 != response.getCode()) {
-                log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-            }else{
-                break;
-            }
-        }
-        if (response == null ||  response.getData() == null || 200 != response.getCode()) {
-            log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-            return "-1";
-        }
-        MemberSysParamDetailResponse data = response.getData();
-
-        if (data.getValidityType() == null || data.getValidityType() == 0) {
-            log.info("getMemberSysParamByType:会员有效期类型为长期有效！");
-            return "0";
-        }
-
-        if (StringUtils.isEmpty(data.getValidityMonth()) || StringUtils.isEmpty(data.getValidityDay())){
-            log.error("getMemberSysParamByType:接口参数日期为空:{}-{}",data.getValidityMonth(),data.getValidityDay());
-            return "-1";
-        }
-
-        //获取会员到期的年月日，格式：yyyy-MM-dd
-        if (data.getValidityMonth().length() == 1){
-            data.setValidityMonth("0" + data.getValidityMonth());
-        }
-        if (data.getValidityDay().length() == 1){
-            data.setValidityDay("0" + data.getValidityDay());
-        }
-
-        String valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
-        return valid;
     }
 
 
@@ -1586,7 +1621,148 @@ public class MemberServiceImpl implements MemberService {
         return Pair.of(startDate, endDate);
     }
 
+    /**
+     * 更新顾客病症
+     * wangzhe
+     * 2021-02-25
+     * @param memberCard 会员卡号
+     * @param createNo 员工编号
+     * @param memberDiseaseList 病症
+     * @return
+     */
+    @Transactional
+    public Integer updateMemberDisease(String memberCard,String createNo, List<MemberWorkOrderDiseaseVo> memberDiseaseList){
+        if (CollectionUtil.isEmpty(memberDiseaseList)) {
+            return 1;
+        }
+        //删除顾客所有的病症，重新添加
+        int result =  memberDiseaseMapper.deleteMemberDiseaseByMemberCard(memberCard);
+        Date now = new Date();
+        for (MemberWorkOrderDiseaseVo memberDisease : memberDiseaseList) {
+            cn.net.yzl.crm.customer.model.db.MemberDisease disease = new cn.net.yzl.crm.customer.model.db.MemberDisease();
+            disease.setCreateTime(now);
+            disease.setMemberCard(memberCard);
+            disease.setCreateNo(createNo);
+            disease.setDiseaseId(memberDisease.getDiseaseId());
+            disease.setDiseaseName(memberDisease.getDiseaseName());
+
+            result = memberDiseaseMapper.insertSelective(disease);
+        }
+
+        return result;
 
 
+    }
+
+    @Transactional
+    public ComResponse<Boolean> updateMember(MemeberWorkOrderSubmitVo vo){
+        String noZeroNumber = "";
+        String haveZeroNumber = "";
+        String phoneNumber = vo.getMemberPhone();
+
+        //是否以0开头 --> 去掉0
+        if (phoneNumber.startsWith("0")){
+            noZeroNumber = phoneNumber.substring(1);
+            haveZeroNumber = phoneNumber;
+        }else{
+            noZeroNumber = phoneNumber;
+            haveZeroNumber = "0" + phoneNumber;
+        }
+        //校验手机号
+        int phoneType = 0;
+        if (memberPhoneService.isMobile(noZeroNumber)) {
+            phoneType = 1;
+        }
+        //不是手机号时，要校验是否为电话号
+        if (phoneType == 0 && memberPhoneService.isPhone(phoneNumber)){
+            phoneType = 2;
+        }
+        if (phoneType == 0) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!",false);
+        }
+        /**
+         * 2.查询member_phone中电话号码是否存在
+         *      1.存在时：
+         *          说明已经绑定了
+         *
+         *      2.不存在时：
+         *          判断入参传入的电话号码是座机还是手机号(phone_type: '1 移动电话，2座机')
+         *          添加一条member_phne记录
+         *          添加一条member记录
+         */
+        String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
+        if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!",false);
+        }
+
+        Member member = new Member();
+        member.setMember_card(vo.getMemberCard());//会员卡号
+        member.setMember_name(vo.getMemberName());//会员名称
+        member.setSex(vo.getSex());//性别
+        member.setAge(vo.getAge());//年龄
+
+        member.setEmail(vo.getEmail());
+        member.setQq(vo.getQq());
+        member.setWechat(vo.getWechat());
+
+        member.setRegion_code(vo.getRegionCode());
+        member.setRegion_name(vo.getRegionName());
+
+        member.setProvince_code(vo.getProvinceCode());
+        member.setProvince_name(vo.getProvinceName());
+
+        member.setCity_code(/*vo.getCityCode()*/-999);
+        member.setCity_name(/*vo.getCityName()*/"");
+        member.setArea_code(/*vo.getAreaCode()*/-999);
+        member.setArea_name(/*vo.getAreaName()*/"");
+        member.setUpdator_no(vo.getStaffNo());
+        member.setUpdator_name(vo.getStaffName());//修改人
+        member.setUpdate_time(new Date());
+
+        member.setAddress(vo.getAddress());
+
+        member.setBuy_intention(vo.getBuyIntention());//购买意向
+        member.setActivity(vo.getActivity());//活跃度 1 活跃 2 冷淡 3 一般
+
+        String phone = vo.getMemberPhone();
+
+        //1.更新顾客信息
+        int result = this.updateByMemberCardSelective(member);
+
+        if (result > 0) {
+            //更新memberPhone
+            MemberPhone memberPhone = new MemberPhone();
+            List<MemberPhone> memberPhoneList = phoneMapper.getMemberPhoneByMemberCard(member.getMember_card());
+            if (CollectionUtil.isNotEmpty(memberPhoneList)) {
+                memberPhone = memberPhoneList.get(0);
+                for (MemberPhone item : memberPhoneList) {
+                    if (noZeroNumber.equals(item.getPhone_number()) || noZeroNumber.equals(item.getPhone_number())) {
+                        memberPhone = item;
+                       break;
+                    }
+                }
+            }
+
+            memberPhone.setPhone_number(phone);
+            memberPhone.setUpdator_no(vo.getStaffNo());//修改人id
+            memberPhone.setUpdate_time(new Date());//修改时间
+            memberPhone.setPhone_type(phoneType);
+            //新增记录
+            if (memberPhone.getId() == null) {
+                memberPhone.setMember_card(member.getMember_card());
+                memberPhone.setCreator_no(memberPhone.getUpdator_no());
+                memberPhone.setCreate_time(memberPhone.getUpdate_time());
+                result = phoneMapper.insertSelective(memberPhone);
+            }
+            //更新记录
+            else{
+                result = phoneMapper.updateByPrimaryKeySelective(memberPhone);
+            }
+        }
+        if (result < 1) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!",false);
+        }
+        return ComResponse.success(true);
+    }
 
 }

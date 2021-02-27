@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-@ApiModel("顾客病症")
+@ApiModel("顾客综合病症")
 @Data
 public class MemberDiseaseDto {
 

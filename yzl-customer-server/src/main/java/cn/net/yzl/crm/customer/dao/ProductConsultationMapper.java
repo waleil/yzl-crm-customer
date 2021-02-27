@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.ProductConsultation;
+import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -59,4 +60,6 @@ public interface ProductConsultationMapper {
 
     //根据会员卡号删除客户对应编号的商品
     int deleteByMemberCardAndProductCodes(String memberCard, @Param("list") List<String> list);
+
+    int batchInsert(@Param("list") List<ProductConsultationInsertVO> productConsultationInsertVOList);
 }

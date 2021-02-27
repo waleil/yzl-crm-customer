@@ -16,7 +16,7 @@ import java.util.Date;
  * @author 
  */
 @Data
-@ApiModel(value = "MemberProductEffectVO",description = "顾客服用效果实体")
+@ApiModel(value = "MemberProductEffectUpdateVO",description = "顾客服用效果实体")
 public class MemberProductEffectUpdateVO implements Serializable {
     @ApiModelProperty(value = "id",name = "id",required = true)
     private Integer id;
@@ -37,16 +37,16 @@ public class MemberProductEffectUpdateVO implements Serializable {
     @ApiModelProperty(value = "每次吃多少",name="oneUseNum",required = true)
     private Integer oneUseNum;
 
-    @ApiModelProperty(value = "商品编号",name="productCode",required = true)
+    @ApiModelProperty(value = "商品编号",name="productCode",required = false)
     private String productCode;
 
-    @ApiModelProperty(value = "商品名称",name="productName",required = true)
+    @ApiModelProperty(value = "商品名称",name="productName",required = false)
     private String productName;
 
-    @ApiModelProperty(value = "商品剩余量",name="productLastNum",required = true)
+    @ApiModelProperty(value = "商品剩余量",name="productLastNum",required = false,hidden = true)
     private Integer productLastNum;
 
-    @ApiModelProperty(value = "修改人编号",name="updator",required = true)
+    @ApiModelProperty(value = "修改人编号",name="updator",required = false,hidden = true)
     private String updator;
 
 //    @ApiModelProperty(value = "修改时间",name="upateTime")

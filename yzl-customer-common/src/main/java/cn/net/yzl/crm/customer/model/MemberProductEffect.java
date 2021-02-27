@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,8 +10,8 @@ import java.util.Date;
 @ApiModel("顾客购买商品效果")
 @Data
 public class MemberProductEffect {
-
-    private int id;
+    @ApiModelProperty("主键id")
+    private Integer id;
 
     @ApiModelProperty("会员卡号")
     private String member_card;
@@ -27,10 +28,14 @@ public class MemberProductEffect {
     @ApiModelProperty("每天吃多少")
     private int eating_perday;
 
+    @ApiModelProperty("每次吃多少")
+    private int one_use_num;
+
     @ApiModelProperty("商品剩余量")
     private int product_last_num;
 
     @ApiModelProperty("商品服用完日期")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date due_date;
     @ApiModelProperty("距离回访的天数")
     private int dueDateDays;

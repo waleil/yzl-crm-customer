@@ -66,4 +66,7 @@ public interface MemberDiseaseMapper {
      */
     Integer updateMemberDiseaseByDiseaseId(MemberDiseaseIdUpdateVO vo);
 
+    List<cn.net.yzl.crm.customer.model.MemberDisease> getMemberDiseaseByMemberCard(String memberCard);
+
+    int deleteMemberDiseaseByMemberCard(String memberCard);
 }
