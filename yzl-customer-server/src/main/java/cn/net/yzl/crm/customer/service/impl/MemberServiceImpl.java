@@ -1920,7 +1920,7 @@ public class MemberServiceImpl implements MemberService {
             levelList = ActivityClientAPI.getMemberLevelList();
             //获取DMC的会员到期时间
             String validDate = ActivityClientAPI.getMemberGradeValidDate();
-            if (!"-1".equals(validDate)) {
+            if (StringUtils.isNotEmpty(validDate) && !"-1".equals(validDate)) {
                 dateScope = getDateScope(validDate);
             }
         }
@@ -1975,6 +1975,7 @@ public class MemberServiceImpl implements MemberService {
             if (StringUtils.isNotEmpty(redisKey)) {
                 redisUtil.setRemove(redisKey, memberCard);
             }
+            log.info("数据同步,顾客卡号:{}数据同步完成！",memberCard);
 
         }
         log.info("数据同步完成,计划同步数据:{}条，实际从数据库中查询会员信息查询出:{}条",memberCodes.size(),list.size());
