@@ -167,7 +167,7 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
     @Override
     public ComResponse<Member> getMemberByphoneNumber(String phoneNumber) {
         if (StringUtils.isEmpty(phoneNumber)) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号不能为空!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码不能为空!");
         }
         phoneNumber = phoneNumber.trim();
 
