@@ -1781,9 +1781,9 @@ public class MemberServiceImpl implements MemberService {
         member.setProvince_code(vo.getProvinceCode());
         member.setProvince_name(vo.getProvinceName());
 
-        member.setCity_code(/*vo.getCityCode()*/-999);
+        member.setCity_code(/*vo.getCityCode()*/-9999);
         member.setCity_name(/*vo.getCityName()*/"");
-        member.setArea_code(/*vo.getAreaCode()*/-999);
+        member.setArea_code(/*vo.getAreaCode()*/-9999);
         member.setArea_name(/*vo.getAreaName()*/"");
         member.setUpdator_no(vo.getStaffNo());
         member.setUpdator_name(vo.getStaffName());//修改人
@@ -1817,6 +1817,7 @@ public class MemberServiceImpl implements MemberService {
             memberPhone.setUpdator_no(vo.getStaffNo());//修改人id
             memberPhone.setUpdate_time(new Date());//修改时间
             memberPhone.setPhone_type(phoneType);
+            memberPhone.setEnabled(1);
             //新增记录
             if (memberPhone.getId() == null) {
                 memberPhone.setMember_card(member.getMember_card());
@@ -1826,6 +1827,8 @@ public class MemberServiceImpl implements MemberService {
             }
             //更新记录
             else{
+                memberPhone.setPhone_place("");
+                memberPhone.setService_provider(0);
                 result = phoneMapper.updateByPrimaryKeySelective(memberPhone);
             }
         }
