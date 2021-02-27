@@ -30,6 +30,9 @@ public class MemberOrderStatViewModel {
     @ApiModelProperty(value = "顾客级别  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
     private String m_grade_code;
 
+    @ApiModelProperty(value = "顾客级别Id")
+    private Integer m_grade_id;
+
     @ApiModelProperty(value = "顾客级别名称  WK 无卡，PK 普卡，TK 铜卡，YK 银卡，JK 金卡，ZS钻卡，VIP VIP，CVIP 超级VIP")
     private String m_grade_name;
 
