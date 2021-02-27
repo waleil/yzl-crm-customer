@@ -686,8 +686,8 @@ public class MemberServiceImpl implements MemberService {
         }
         //判断当前号码是否已经使用
         ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(coilInVo.getCallerPhone());
-        if (response.getCode() != 200 || response.getData() != null) {
-            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号码:"+coilInVo.getCallerPhone()+"已经被使用!");
+        if (response.getCode() != 200) {
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
         }
         Member member = response.getData();
         String memberCard = "";//会员卡号
