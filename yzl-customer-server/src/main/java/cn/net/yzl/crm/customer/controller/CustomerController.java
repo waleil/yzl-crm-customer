@@ -66,15 +66,15 @@ public class CustomerController {
 
     @ApiOperation(value = "保存转介绍用户")
     @PostMapping("v1/saveMemberReferral")
-    public GeneralResult<Boolean> saveMemberReferral(@RequestBody MemberAndAddWorkOrderVO memberReferralVO) {
+    public ComResponse<Boolean> saveMemberReferral(@RequestBody MemberAndAddWorkOrderVO memberReferralVO) {
         if (memberReferralVO == null || memberReferralVO.getMemberVO() ==null || memberReferralVO.getWorkOrderBeanVO() == null){
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         }
         int result = memberService.saveMemberReferral(memberReferralVO);
         if (result == 1) {
-            return GeneralResult.success(Boolean.TRUE);
+            return ComResponse.success(true);
         } else {
-            return GeneralResult.success(Boolean.FALSE);
+            return ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),"保存客户信息失败!");
         }
     }
 
@@ -415,8 +415,9 @@ public class CustomerController {
     @ApiOperation("同步顾客标签数据")
     @PostMapping("/v1/updateMemberLabelTimedTask")
     public ComResponse<Boolean> updateMemberLabel(){
-        boolean b = memberService.updateMemberLabel();
-        return ComResponse.success(b);
+        //boolean result = memberService.updateMemberLabel();
+        boolean result = memberService.updateMemberLabelForTask();
+        return ComResponse.success(result);
     }
 
     @ApiOperation("根据DMC规则初始化会员级别")

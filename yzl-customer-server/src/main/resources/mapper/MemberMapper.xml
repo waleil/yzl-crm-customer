@@ -535,7 +535,7 @@
             </if>
             <if test="city_code != null">
                 <choose>
-                    <when test="city_code == -999">
+                    <when test="city_code == -9999">
                         city_code = null,
                     </when>
                     <otherwise>
@@ -548,7 +548,7 @@
             </if>
             <if test="area_code != null">
                 <choose>
-                    <when test="area_code == -999">
+                    <when test="area_code == -9999">
                         area_code = null,
                     </when>
                     <otherwise>
