@@ -192,6 +192,7 @@ public interface MemberService {
 //    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
 
     boolean updateMemberLabel();
+    boolean updateMemberLabelForTask();
 
     int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO);
 

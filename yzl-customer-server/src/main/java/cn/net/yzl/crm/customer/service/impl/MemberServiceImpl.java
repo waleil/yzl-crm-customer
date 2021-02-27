@@ -8,7 +8,6 @@ import cn.hutool.core.lang.Pair;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
 import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
-import cn.net.yzl.activity.model.responseModel.MemberSysParamDetailResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -18,6 +17,8 @@ import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
+import cn.net.yzl.crm.customer.feign.api.OrderClientAPI;
+import cn.net.yzl.crm.customer.feign.api.WorkOrderClientAPI;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
 import cn.net.yzl.crm.customer.feign.client.product.ProductFien;
@@ -125,6 +126,7 @@ public class MemberServiceImpl implements MemberService {
     private String memberCountkey="memeberCount";
 
     /**
+     * 新增顾客信息 同时 保存memberPhone 和顾客收货地址
      * wangzhe
      * 2021-01-25
      * @param member
@@ -133,6 +135,24 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public int insert(Member member) {
+        List<MemberPhone> memberPhoneList = member.getMemberPhoneList();
+        //真正要保存的数据(里面的电话号不为空)
+        List<MemberPhone> savePhoneList = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(memberPhoneList)) {
+            for (MemberPhone memberPhone : memberPhoneList) {
+                if (StringUtils.isEmpty(memberPhone.getPhone_number())) {
+                    continue;
+                }
+                savePhoneList.add(memberPhone);
+                //判断当前号码是否已经使用
+                ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(memberPhone.getPhone_number());
+                if (response.getCode() != 200 || response.getData() != null) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号:" + memberPhone.getPhone_number() + "已经被使用!");
+                }
+            }
+        }
+
         //生成顾客会员卡号缓存的key
         String cacheKey = CacheKeyUtil.maxMemberCardCacheKey();
         //生成顾客会员卡号
@@ -141,17 +161,48 @@ public class MemberServiceImpl implements MemberService {
         member.setMember_card(String.valueOf(maxMemberCard));
         //保存数据
         int result = memberMapper.insertSelective(member);
-
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员电话信息失败!");
+        }
+        Date now = new Date();
+        String phoneNumber = "",haveZeroNumber="",noZeroNumber = "";
         //保存memberPhoneList
-        List<MemberPhone> memberPhoneList = member.getMemberPhoneList();
-        if (CollectionUtil.isNotEmpty(memberPhoneList)) {
-            for (MemberPhone memberPhone : memberPhoneList) {
-                if (StringUtils.isEmpty(memberPhone.getPhone_number())) {
-                    continue;
-                }
-                //设置会员卡号
-                memberPhone.setMember_card(member.getMember_card());
-                result = phoneMapper.insert(memberPhone);
+        for (MemberPhone memberPhone : savePhoneList) {
+            if (StringUtils.isEmpty(memberPhone.getPhone_number())) {
+                continue;
+            }
+            //设置会员卡号
+            memberPhone.setMember_card(member.getMember_card());
+            memberPhone.setCreate_time(now);
+            memberPhone.setUpdate_time(now);
+            //是否以0开头 --> 去掉0
+            if (phoneNumber.startsWith("0")){
+                noZeroNumber = phoneNumber.substring(1);
+                haveZeroNumber = phoneNumber;
+            }else{
+                noZeroNumber = phoneNumber;
+                haveZeroNumber = "0" + phoneNumber;
+            }
+            //校验手机号
+            int phoneType = 0;
+            if (memberPhoneService.isMobile(noZeroNumber)) {
+                phoneType = 1;
+            }
+            //不是手机号时，要校验是否为电话号
+            if (phoneType == 0 && memberPhoneService.isPhone(phoneNumber)){
+                phoneType = 2;
+            }
+            if (phoneType == 0) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话:"+memberPhone.getPhone_number()+"格式不正确!");
+            }
+            memberPhone.setPhone_type(phoneType);
+
+            result = phoneMapper.insert(memberPhone);
+            if (result < 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员电话"+memberPhone.getPhone_number()+"失败!");
             }
         }
 
@@ -183,8 +234,14 @@ public class MemberServiceImpl implements MemberService {
                 addressResult = memberAddressService.addReveiverAddress(insertVO);
                 Integer status = addressResult.getStatus();
                 if (status != 1) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "收货地址保存失败!");
                 }
+                //将顾客信息保存到member_label(mongo)
+                //boolean ret = syncMemberLabel(Arrays.asList(member.getMember_card()), 2, null);
+
+                //设置缓存(2小时后同步)
+                redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),member.getMember_card());
             }
         }
         return result;
@@ -622,25 +679,21 @@ public class MemberServiceImpl implements MemberService {
     public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(MemberCoilInVO coilInVo){
         //判断当前号码是否已经使用
         ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(coilInVo.getCallerPhone());
-        Integer status = response.getStatus();
+        if (response.getCode() != 200 || response.getData() != null) {
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
+        }
         Member member = response.getData();
-        String memberCard = "";
+        String memberCard = "";//会员卡号
         String groupId = "";
-        MemberLabel label = new MemberLabel();
-        //会员不存在
+
+        //会员不存在 ->新建客户信息
         if (member == null) {
             //将顾客来电号码区分(座机/手机)插入member_phone表
-            //新建客户信息
             ComResponse<String> addMemberResult = memberPhoneService.getMemberCardByphoneNumber(coilInVo.getCallerPhone());
-            status = addMemberResult.getStatus();
-            if (status != 200) {
+            if (addMemberResult.getCode() != 200) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
             }
-            if (addMemberResult.getData() == null) {
-                return ComResponse.fail(addMemberResult.getCode(), addMemberResult.getMessage());
-            }
-
-
-
             //新添加的会员卡号
             memberCard = addMemberResult.getData();
             //通过会员卡号查询会员信息
@@ -657,30 +710,38 @@ public class MemberServiceImpl implements MemberService {
 
             //更新会员信息
             int update = updateByMemberCardSelective(member);
-            if (update < 0) {
-                //TODO 更新会员信息失败
+            if (update < 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
             }
 
-            //将顾客信息插入顾客标签库：顾客编号、进线时间、咨询的商品、首次进线广告、媒体等；
-            label.setMemberCard(member.getMember_card());
-            label.setMediaId(coilInVo.getMediaId());
-            label.setMediaName(coilInVo.getMediaName());
-            label.setAdverCode(coilInVo.getAdvId());
-            label.setAdverName(coilInVo.getAdvName());
-            memberLabelDao.save(label);
+//            //将顾客信息插入顾客标签库：顾客编号、进线时间、咨询的商品、首次进线广告、媒体等；
+//            label.setMemberCard(member.getMember_card());
+//            label.setMediaId(coilInVo.getMediaId());
+//            label.setMediaName(coilInVo.getMediaName());
+//            label.setAdverCode(coilInVo.getAdvId());
+//            label.setAdverName(coilInVo.getAdvName());
+//            memberLabelDao.save(label);
         }
-        //会员已经存在的情景
+        //会员已经存在的情景 ->判断顾客是否已经被圈选
         else{
-            //判断顾客是否已经被圈选
-            groupId = customerGroupService.queryGroupIdByMemberCard(member.getMember_card());
-            //用于后面对该顾客进行圈选
-            if (StringUtils.isEmpty(groupId)) {
-                label.setMemberCard(member.getMember_card());
-                label.setMemberName(member.getMember_name());
-            }
+            memberCard = member.getMember_card();//会员卡号
+            groupId = customerGroupService.queryGroupIdByMemberCard(memberCard);
         }
         //没有圈选的客户进行圈选
         if (StringUtils.isEmpty(groupId)) {
+            //查询顾客有没有memeber_label
+            List<String> memberCards = Arrays.asList(memberCard);
+            Map<String,String> mongoMemberLabels = memberLabelDao.queryByCodes(memberCards);
+            //没有member_label的顾客要新建
+            if (CollectionUtil.isEmpty(mongoMemberLabels)) {
+                boolean result = syncMemberLabel(memberCards, 2, null);
+                if (!result) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "收货地址保存失败!");
+                }
+            }
+
             /**
              * 匹配是否有对应的圈选规则；（只匹配第一个符合的群组，同时将顾客编号和群组编号插入关系表中group_ref_member）
              */
@@ -697,6 +758,8 @@ public class MemberServiceImpl implements MemberService {
                 //根据规则插入客户信息
                 if (StringUtils.isNotEmpty(groupId)) {
                     List<MemberLabel> labels = new ArrayList<>();
+                    MemberLabel label = new MemberLabel();
+                    label.setMemberCard(memberCard);
                     labels.add(label);
                     customerGroupService.memberCrowdGroupRunByLabels(groupId,labels);
                 }
@@ -1485,7 +1548,14 @@ public class MemberServiceImpl implements MemberService {
             workOrderBeanVO.setVisitType(2);//工单类别：常规回访
             workOrderBeanVO.setWorkOrderMoney(new BigDecimal("0.00"));
             workOrderBeanVO.setWorkOrderType(1);//工单类型：热线工单
-            workOrderClient.addWorkOrder(workOrderBeanVO);
+            ComResponse<Void> response = workOrderClient.addWorkOrder(workOrderBeanVO);
+            if (response.getCode() != 200) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存工单失败!");
+            }
+
+            //设置缓存(2小时后同步)
+            redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberVO.getMember_card());
         }
         return result;
     }
@@ -1764,5 +1834,574 @@ public class MemberServiceImpl implements MemberService {
         }
         return ComResponse.success(true);
     }
+
+
+    /**
+     * 定时器，定时获取redis中的set集合中的会员卡号进行同步会员标签信息到mongo
+     * 注:目前暂定为2小时同步一次
+     * wangzhe
+     * 2021-02-27
+     * @return
+     */
+    public boolean updateMemberLabelForTask() {
+        //获取redis缓存
+        String key = CacheKeyUtil.syncMemberLabelCacheKey();
+        redisUtil.setRemove(key, "");//防止redis中有""
+        Set<Object> memberSet = redisUtil.sGet(key);
+        //判断当前是否有需要同步数据
+        if (CollectionUtil.isEmpty(memberSet)) {
+            log.info("定时器同步顾客标签数据:当前没有需要同步的数据！");
+            return true;
+        }
+        //将Set<Object>转换为List<string>
+        List<String> memberCards = memberSet.stream().map(String::valueOf).collect(Collectors.toList());
+        //同步顾客的所有数据
+        boolean result = syncMemberLabel(memberCards, 1, key);
+
+        return result;
+    }
+
+    /**
+     * 根据顾客会员卡号同步顾客标签
+     * wangzhe
+     * 2021-02-26
+     * @param memberCodes
+     * @param type : type = 1 同步所有的数 2.只同步顾客的基本资料  3.去其他模块拉去数据
+     *
+     * @return
+     */
+    public boolean syncMemberLabel(List<String> memberCodes,int type,String redisKey) {
+        if (CollectionUtil.isEmpty(memberCodes)) {
+            return true;
+        }
+        //查询MySql数据库中客户的相关信息
+        List<MemberLabel> list = memberMapper.queryMemberLabelByCodes(memberCodes);
+        if (CollectionUtil.isEmpty(list)) {
+            log.error("本次要同步数据的客户编号都不存在,例如：{}",memberCodes.get(0));
+            return true;
+        }
+
+        log.info("本次要同步数据的类型为:{},redisKey为:{},同步数据的顾客会员卡号,包含:{}",type,redisKey,memberCodes.get(0));
+
+        //获取MONGO里面的顾客标签
+        Map<String,String> mongoMemberLabels = memberLabelDao.queryByCodes(memberCodes);
+
+        Map<String, List<cn.net.yzl.crm.customer.model.mogo.MemberDisease>> memberDiseaseListMap = new HashMap<>();//顾客病症
+        Map<String, List<ActionDict>> memberActionDictListMap = new HashMap<>();//顾客行为偏好
+        Map<String, List<MemberProduct>> memberProductListMap = new HashMap<>();//顾客产品服用效果
+
+        /**
+         * 从本项目同步数据
+         */
+        if (type == 1 || type == 2) {
+            //获取顾客病症
+            List<cn.net.yzl.crm.customer.model.mogo.MemberDisease> memberDiseaseList = memberDiseaseMapper.queryByMemberCodes(memberCodes);
+            memberDiseaseListMap = memberDiseaseList.stream()
+                    .collect(Collectors.groupingBy(cn.net.yzl.crm.customer.model.mogo.MemberDisease::getMemberCard));
+
+            //查询综合行为( from member_action_relation where member_card in)
+            List<ActionDict> actionDictList = memberMapper.queryActionByMemberCodes(memberCodes);
+            memberActionDictListMap = actionDictList.stream()
+                    .collect(Collectors.groupingBy(ActionDict::getMemberCard));
+
+            //通过会员卡号查询顾客服用效果( from member_product_effect where member_card in)
+            List<MemberProduct> memberProducts = memberMapper.queryProductByMemberCodes(memberCodes);
+            memberProductListMap = memberProducts.stream()
+                    .collect(Collectors.groupingBy(MemberProduct::getMemberCard));
+        }
+
+        /**
+         * 从其他模块同步数据
+         */
+        List<MemberLevelPagesResponse> levelList = null;
+        Pair<Date, Date> dateScope = null;
+        if (type == 1 || type == 3) {
+            //会员升级[已经按级别倒叙排序](DMC)
+            levelList = ActivityClientAPI.getMemberLevelList();
+            //获取DMC的会员到期时间
+            String validDate = ActivityClientAPI.getMemberGradeValidDate();
+            if (!"-1".equals(validDate)) {
+                dateScope = getDateScope(validDate);
+            }
+        }
+
+        boolean result = true;
+        String memberCard,_id;
+        //封装标签数据
+        for (MemberLabel memberLabel : list) {
+            //获取会员卡号
+            memberCard = memberLabel.getMemberCard();
+            //获取mongo里历史数据的_id
+            _id = mongoMemberLabels.get(memberCard);
+            //设置历史数据的_id
+            if(StringUtils.isNotEmpty(_id)){
+                memberLabel.set_id(_id);
+            }
+
+            //同步基础数据
+            if (type == 1 || type == 2) {
+                //处理顾客基本信息
+                dealMemberBase(memberLabel);
+                //处理顾客的服用效果
+                dealMemberProductEffect(memberLabel,memberProductListMap.get(memberCard));
+                //处理顾客病症
+                dealMemberDisease(memberLabel, memberDiseaseListMap.get(memberCard));
+                //处理顾客的综合行为
+                dealMemberAction(memberLabel,memberActionDictListMap.get(memberCard));
+            }
+
+            //同步其他应用数据
+            if (type == 1 || type == 3) {
+                //获取顾客的红包 积分 优惠券记录(DMC)
+                result = dealMemberAmountRedbagIntegral(memberCard, memberLabel);
+                //会员升级[已经按级别倒叙排序](DMC)
+                result = upgradedMembarVipLevel(memberCard, levelList, dateScope);
+                //处理会员订单
+                result = dealMemberOrder(memberCard, memberLabel);
+                //处理最后一次进线、最后一次通话
+                result = dealLastCallData(memberCard, memberLabel);
+            }
+
+            //判断是否操作成功
+            if (!result) {
+                log.error("同步其他应用数据,操作异常！当前处理的顾客的会员卡号为:{},请检查数据！",memberCard);
+                continue;
+            }
+
+            //保存到mongo数据库
+            memberLabelDao.save(memberLabel);
+
+            //删除redis set集合里缓存的顾客会员卡号
+            if (StringUtils.isNotEmpty(redisKey)) {
+                redisUtil.setRemove(redisKey, memberCard);
+            }
+
+        }
+        log.info("数据同步完成,计划同步数据:{}条，实际从数据库中查询会员信息查询出:{}条",memberCodes.size(),list.size());
+        return true;
+    }
+
+    /**
+     * 保存会员积分红包记录
+     * wangzhe
+     * 2021-02-27
+     * @param memberCard 顾客会员卡号
+     * @param memberLabel 顾客标签对象
+     * @return
+     */
+    public boolean dealMemberAmountRedbagIntegral(String memberCard, MemberLabel memberLabel){
+        int result = 0;
+        //获取顾客的红包 积分 优惠券记录
+        MemberAmountRedbagIntegral memberAmountRedbagIntegral = memberAmountRedbagIntegralMapper.selectByMemberCard(memberCard);
+        if (memberAmountRedbagIntegral == null) {
+            memberAmountRedbagIntegral = new MemberAmountRedbagIntegral();
+            memberAmountRedbagIntegral.setMemberCard(memberCard);
+        }
+        //From DMC:根据单个会员卡号获取 每个顾客的优惠券 积分 红包
+        MemberAccountResponse accountResponse = ActivityClientAPI.getAccountByMemberCard(memberCard);
+        if (accountResponse != null) {
+            //积分
+            if (accountResponse.getMemberIntegral() != null && accountResponse.getMemberIntegral() > 0) {
+                memberLabel.setHasIntegral(true);
+                memberAmountRedbagIntegral.setLastIntegral(accountResponse.getMemberIntegral());
+            }else{
+                memberLabel.setHasIntegral(false);
+                memberAmountRedbagIntegral.setLastIntegral(0);
+            }
+
+            //红包
+            if (accountResponse.getMemberRedBag() != null && accountResponse.getMemberRedBag().compareTo(BigDecimal.ZERO) > 0) {
+                memberLabel.setHasTedBag(true);
+                memberAmountRedbagIntegral.setLastRedBag(accountResponse.getMemberRedBag().intValue());
+            }else{
+                memberLabel.setHasTedBag(false);
+                memberAmountRedbagIntegral.setLastRedBag(0);
+            }
+
+            //优惠券
+            if (accountResponse.getMemberCouponSize() != null && accountResponse.getMemberCouponSize() > 0) {
+                memberLabel.setHasIntegral(true);
+            }else{
+                memberLabel.setHasIntegral(false);
+            }
+            //新增
+            if (memberAmountRedbagIntegral.getId() == null) {
+                result = memberAmountRedbagIntegralMapper.insertSelective(memberAmountRedbagIntegral);
+            }else{
+                //更新
+                result = memberAmountRedbagIntegralMapper.updateByPrimaryKeySelective(memberAmountRedbagIntegral);
+            }
+        }
+        return result > 0;
+    }
+
+
+    /**
+     * 会员升级
+     * wangzhe
+     * 2021-02-27
+     * @param memberCard 会员卡号
+     * @param levelList dmc会员等级列表
+     * @param dateScope 开始 结束时间
+     * @return
+     */
+    public boolean upgradedMembarVipLevel(String memberCard,List<MemberLevelPagesResponse> levelList,Pair<Date,Date> dateScope){
+        //会员升级[已经按级别倒叙排序](DMC)
+        //List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
+        //获取到DMC的会晕级别列表和会员到期时间后才去判断会员是否升级(注意:有了会员到期时间 才能 从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满)
+        if (CollectionUtil.isNotEmpty(levelList) && dateScope != null) {
+            //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
+            MemberTotal memberTotalData = OrderClientAPI.queryMemberTotalByMemberCard(memberCard,dateScope.getKey(),dateScope.getValue());
+            if (memberTotalData != null) {
+                Integer totalSpend = memberTotalData.getTotalSpend() == null ? 0 : memberTotalData.getTotalSpend();//累计消费
+                Integer maxSpend = memberTotalData.getMaxSpend() == null ? 0 : memberTotalData.getMaxSpend();//最高消费
+                Integer maxCash1 = memberTotalData.getMaxCash1() == null ? 0 : memberTotalData.getMaxCash1();//最高预存
+
+                MemberLevelPagesResponse level = null;
+                //遍历DMC会员级别信息，判断顾客当前属于那个级别
+                for (MemberLevelPagesResponse levelData : levelList) {
+                    if (totalSpend-levelData.getYearTotalSpendMoney() >= 0) {//一年累计消费满
+                        level = levelData;
+                        break;
+                    } else if (maxSpend-levelData.getDisposableSpendMoney() >= 0) {//一次性消费满多少
+                        level = levelData;
+                        break;
+                    } else if (maxCash1-levelData.getDisposableAdvanceMoney() >= 0) {//一次性预存款
+                        level = levelData;
+                        break;
+                    }
+                }
+                if (level != null) {
+                    //查询顾客表信息
+                    Member member = memberMapper.selectMemberByCard(memberCard);
+                    //等级相同不更新
+                    if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
+                        //当前顾客的会员级别信息
+                        MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
+                        memberGradeRecord = new MemberGradeRecordPo();
+                        memberGradeRecord.setMemberCard(memberCard);
+                        memberGradeRecord.setCreateTime(new Date());
+                        memberGradeRecord.setBeforeGradeId(member.getMGradeId());
+                        memberGradeRecord.setBeforeGradeName(member.getMGradeName());
+                        memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
+                        memberGradeRecord.setMGradeName(level.getMemberLevelName());
+                        int result = memberGradeRecordDao.insertSelective(memberGradeRecord);
+                        if (result < 1) {
+                            return false;
+                        }
+                        //更新顾客表的会员信息
+                        member.setMGradeId(memberGradeRecord.getMGradeId());
+                        member.setMGradeName(memberGradeRecord.getMGradeName());
+                        result = memberMapper.updateByMemberGradeByMember(member);
+                        if (result < 1) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+
+    }
+
+
+    /**
+     * 获取顾客订单书记并保存到mamberLabel中
+     * wangzhe
+     * 2021-02-27
+     * @param memberCard 顾客会员卡号
+     * @param memberLabel
+     * @return
+     */
+    public boolean dealMemberOrder(String memberCard,MemberLabel memberLabel){
+        MemberOrderObject orderObject = OrderClientAPI.querymemberorder(memberCard);
+        List<MemberOrder> memberRefOrders = new ArrayList<>();//用户存放转换后的订单数据
+        if (orderObject != null) {
+            List<MemberOrderDTO> orderDatas = orderObject.getOrders();//会员订单数据
+            if (CollectionUtil.isNotEmpty(orderDatas)) {
+                for (MemberOrderDTO order : orderDatas) {
+                    MemberOrder memberOrder = new MemberOrder();
+                    memberOrder.setMemberCard(orderObject.getMemberCardNo());
+                    if (order.getActivityNo() != null) {
+                        memberOrder.setActivityCode(String.valueOf(order.getActivityNo()));
+                    }
+                    memberOrder.setOrderCode(order.getOrderNo());
+                    memberOrder.setLogisticsStatus(order.getLogisticsStatus());
+                    memberOrder.setCompanyCode(order.getExpressCompanyCode());
+                    memberOrder.setStatus(order.getOrderStatus());
+                    if (order.getPayType() != null) {
+                        memberOrder.setPayType(Integer.valueOf(order.getPayType()));
+                    }
+                    memberOrder.setPayMode(order.getPayMode());
+                    memberOrder.setSource(String.valueOf(order.getMediaNo()));
+                    if (order.getPayStatus() !=null){
+                        memberOrder.setPayStatus(Integer.valueOf(order.getPayStatus()));
+                    }
+                    memberRefOrders.add(memberOrder);
+                }
+            }
+        }
+        //集合为空表示没有订单数据(存在调订单接口失败的情况，实际上可能是有数据的)
+        if (CollectionUtils.isEmpty(memberRefOrders)){
+            memberLabel.setHaveOrder(0);
+            return true;
+        }
+        //获取订单中的活动
+        List<Integer> activityCodes = new ArrayList<>();
+        List<MemberOrder> hasActOrders = new ArrayList<>();//有活动id的订单
+        for(MemberOrder memberOrder:memberRefOrders) {
+            if (StringUtils.isEmpty(memberOrder.getActivityCode())) {
+                continue;
+            }
+            activityCodes.add(Integer.valueOf(memberOrder.getActivityCode()));
+            hasActOrders.add(memberOrder);
+        }
+        Map<Integer,Integer> activityMap = new HashMap<>();
+        //调DMC获取活动
+        if (CollectionUtil.isNotEmpty(activityCodes)) {
+            List<ActivityDetailResponse> activityDetailResponses = ActivityClientAPI.getActivityProductByBusNos(activityCodes);
+            for (ActivityDetailResponse detail : activityDetailResponses) {
+                activityMap.put(detail.getBusNo().intValue(), detail.getActivityType());
+            }
+        }
+        Integer activityType;
+        for (MemberOrder order : hasActOrders) {
+            activityType = activityMap.get(order.getActivityCode());
+            if (activityType != null) {
+                order.setActivityType(String.valueOf(activityType));
+            }
+            order.setActivityFlag(true);
+        }
+
+        //将订单数据保存到memberLabel中
+        memberLabel.setMemberOrders(memberRefOrders);
+        memberLabel.setHaveOrder(1);
+        return true;
+    }
+
+
+    /**
+     * 处理顾客的是否有红包、优惠券
+     * wangzhe
+     * 2021-02-27
+     * @param memberCard
+     * @param memberLabel
+     * @return
+     */
+    public boolean dealMemberRedbagIntegral(String memberCard, MemberLabel memberLabel) {
+        //获取顾客的红包 积分 优惠券记录
+        MemberAmountRedbagIntegral memberAmountRedbagIntegral = memberAmountRedbagIntegralMapper.selectByMemberCard(memberCard);
+        if (memberAmountRedbagIntegral == null) {
+            memberAmountRedbagIntegral = new MemberAmountRedbagIntegral();
+            memberAmountRedbagIntegral.setMemberCard(memberCard);
+        }
+
+
+        //是否有积分、红包、优惠券要从DMC获取
+        ComResponse<MemberAccountResponse> dmcResponse = activityFien.getAccountByMemberCard(memberCard);
+        MemberAccountResponse dmcData = dmcResponse.getData();
+        //积分
+        if (dmcData.getMemberIntegral() != null && dmcData.getMemberIntegral() > 0) {
+            memberLabel.setHasIntegral(true);
+            memberAmountRedbagIntegral.setLastIntegral(dmcData.getMemberIntegral());
+        }else{
+            memberLabel.setHasIntegral(false);
+            memberAmountRedbagIntegral.setLastIntegral(0);
+        }
+
+        //红包
+        if (dmcData.getMemberRedBag() != null) {
+            memberLabel.setHasTedBag(true);
+            memberAmountRedbagIntegral.setLastRedBag(dmcData.getMemberRedBag().intValue());
+        }else{
+            memberLabel.setHasTedBag(false);
+            memberAmountRedbagIntegral.setLastRedBag(0);
+        }
+
+        //优惠券
+        if (dmcData.getMemberCouponSize() != null && dmcData.getMemberCouponSize() > 0) {
+            memberLabel.setHasIntegral(true);
+        }else{
+            memberLabel.setHasIntegral(false);
+        }
+
+        //新增
+        if (memberAmountRedbagIntegral.getId() == null) {
+            memberAmountRedbagIntegralMapper.insertSelective(memberAmountRedbagIntegral);
+        }else{
+            //更新
+            memberAmountRedbagIntegralMapper.updateByPrimaryKeySelective(memberAmountRedbagIntegral);
+        }
+        return true;
+
+    }
+
+
+    /**
+     * 处理顾客最后一次进线、最后一次通话
+     * wangzhe
+     * 2021-02-27
+     * @param memeberCard
+     * @param memberLabel
+     * @return
+     */
+    public boolean dealLastCallData(String memeberCard, MemberLabel memberLabel) {
+        //顾客最后一次进线，最后一次通话
+        MemberLastCallInDTO lastCallData = WorkOrderClientAPI.getLastCallManageByMemberCard(memeberCard);
+        if (lastCallData != null) {
+            //最后一次进线时间
+            String lastCallInTime = lastCallData.getLastCallInTime();
+            //最后一次拨打时间
+            String lastDialTime = lastCallData.getLastDialTime();
+
+            //最后一次拨打时间
+            if(StringUtils.isNotEmpty(lastDialTime)){
+                memberLabel.setLastCallTime(MongoDateHelper.getMongoDate(DateUtil.parse(lastDialTime)));
+            }
+            //设置最后一次进线时间
+            if(StringUtils.isNotEmpty(lastCallInTime)){
+                memberLabel.setLastCallInTime(MongoDateHelper.getMongoDate(DateUtil.parse(lastCallInTime)));
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 处理顾客基本信息
+     * wangzhe
+     * 2021-02-27
+     * @param memberLabel
+     * @return
+     */
+    public boolean dealMemberBase(MemberLabel memberLabel){
+        //是否有QQ
+        if (org.springframework.util.StringUtils.hasText(memberLabel.getQq())) {
+            memberLabel.setHasQQ(true);
+        } else {
+            memberLabel.setHasQQ(false);
+        }
+        //是否有邮箱
+        if (org.springframework.util.StringUtils.hasText(memberLabel.getEmail())) {
+            memberLabel.setHasEmail(true);
+        } else {
+            memberLabel.setHasEmail(false);
+        }
+        //是否有微信
+        if (org.springframework.util.StringUtils.hasText(memberLabel.getWechat())) {
+            memberLabel.setHasWechat(true);
+        } else {
+            memberLabel.setHasWechat(false);
+        }
+        //生日月份
+        if (org.springframework.util.StringUtils.hasText(memberLabel.getBirthday())) {
+            memberLabel.setMemberMonth(getMonth(memberLabel.getBirthday()));
+        }
+        //是否有余额
+        if(memberLabel.getTotalMoney()>0){
+            memberLabel.setHasMoney(true);
+        }else{
+            memberLabel.setHasMoney(false);
+        }
+        //处理创建时间，修改时间，首次下单时间，最后一个下单时间
+        if(Objects.nonNull(memberLabel.getCreateTime())){
+            memberLabel.setCreateTime(MongoDateHelper.getMongoDate(memberLabel.getCreateTime()));
+        }
+        if(Objects.nonNull(memberLabel.getLastSignTime())){
+            memberLabel.setLastSignTime(MongoDateHelper.getMongoDate(memberLabel.getLastSignTime()));
+        }
+        if(Objects.nonNull(memberLabel.getUpdateTime())){
+            memberLabel.setUpdateTime(MongoDateHelper.getMongoDate(memberLabel.getUpdateTime()));
+        }
+        if(Objects.nonNull(memberLabel.getFirstOrderTime())){
+            memberLabel.setFirstOrderTime(MongoDateHelper.getMongoDate(memberLabel.getFirstOrderTime()));
+
+        }
+
+        //首次购买商品
+        if(org.springframework.util.StringUtils.hasText(memberLabel.getFirstBuyProductCod())){
+            Set<String> set = org.springframework.util.StringUtils.commaDelimitedListToSet(memberLabel.getFirstBuyProductCod());
+            memberLabel.setFirstBuyProductCodes(new ArrayList<>(set));
+        }
+
+        //最后一次购买商品
+        if(org.springframework.util.StringUtils.hasText(memberLabel.getLastBuyProductCode())){
+            Set<String> set = org.springframework.util.StringUtils.commaDelimitedListToSet(memberLabel.getLastBuyProductCode());
+            memberLabel.setLastBuyProductCodes(new ArrayList<>(set));
+        }
+
+        //设置会员卡号
+//        String _id = mongoMemberLabels.get(memberCard);
+//        if(StringUtils.isNotEmpty(_id)){
+//            memberLabel.set_id(_id);
+//        }
+        return true;
+    }
+
+
+    /**
+     * 处理顾客的服用效果
+     * @param memberLabel
+     * @param products
+     */
+    public void dealMemberProductEffect(MemberLabel memberLabel,List<MemberProduct> products){
+        if(!CollectionUtils.isEmpty(products)){
+            memberLabel.setMemberProductList(products);
+        }
+    }
+
+    /**
+     * 处理顾客的综合行为
+     * wangzhe
+     * 2021-02-27
+     * @param memberLabel
+     * @param actionDicts
+     */
+    public void dealMemberAction(MemberLabel memberLabel,List<ActionDict> actionDicts){
+        if(!CollectionUtils.isEmpty(actionDicts)){
+            Map<Integer,List<ActionDict>> temp=actionDicts.stream().filter(s->s.getType()!=null).collect(Collectors.groupingBy(ActionDict::getType));
+            //方便接电话时间
+            if(!CollectionUtils.isEmpty(temp.get(1))){
+                memberLabel.setPhoneDictList(temp.get(1));
+            }
+            //2性格偏好
+            if(!CollectionUtils.isEmpty(temp.get(2))){
+                memberLabel.setMemberCharacterList(temp.get(2));
+            }
+            //3响应时间
+            if(!CollectionUtils.isEmpty(temp.get(3))){
+                memberLabel.setMemberResponseTimeList(temp.get(3));
+            }
+            //综合行为
+            if(!CollectionUtils.isEmpty(temp.get(5))){
+                memberLabel.setComprehensiveBehaviorList(temp.get(5));
+            }
+            //下单行为
+            if(!CollectionUtils.isEmpty(temp.get(6))){
+                memberLabel.setOrderBehaviorList(temp.get(6));
+            }
+            //活动偏好
+            if(!CollectionUtils.isEmpty(temp.get(7))){
+                memberLabel.setActivityBehaviorList(temp.get(7));
+            }
+        }
+
+    }
+
+    /**
+     * 处理顾客病症
+     * wangzhe
+     * 2021-02-27
+     * @param memberLabel
+     * @param diseaseList
+     */
+    public void dealMemberDisease(MemberLabel memberLabel,List<cn.net.yzl.crm.customer.model.mogo.MemberDisease> diseaseList){
+        if(CollectionUtils.isEmpty(diseaseList)){
+            memberLabel.setMemberDiseaseList(diseaseList);
+        }
+    }
+
+
+
 
 }

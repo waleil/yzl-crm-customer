@@ -180,11 +180,11 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
             haveZeroNumber = PREFIX_ZERO + phoneNumber;
         }
         String memberCard = memberPhoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
-        if (StringUtils.isEmpty(memberCard)) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"没有查询到客户信息!");
+        Member memberEntity = null;
+        if (StringUtils.isNotEmpty(memberCard)) {
+            //根据会员号查询会员信息
+            memberEntity = memberService.selectMemberByCard(memberCard);
         }
-        //根据会员号查询会员信息
-        Member memberEntity = memberService.selectMemberByCard(memberCard);
         return ComResponse.success(memberEntity);
 
     }

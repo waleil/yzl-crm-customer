@@ -5,11 +5,16 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
+import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
+import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
 import cn.net.yzl.activity.model.responseModel.MemberSysParamDetailResponse;
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
+import cn.net.yzl.crm.customer.model.MemberOrderObject;
+import cn.net.yzl.crm.customer.model.PageParam;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +24,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+
+/**
+ * 订单相关接口
+ * wangzhe
+ * 2021-02-26
+ */
 @Component
 @Slf4j
 public class ActivityClientAPI {
@@ -123,5 +132,56 @@ public class ActivityClientAPI {
         List<ActivityDetailResponse> data = getActivityProductByBusNos(Arrays.asList(activityBusNo));
         return CollectionUtil.isEmpty(data) ? null : data.get(0);
     }
+
+    /**
+     * 获取会员级别
+     * wangzhe
+     * 2021-02-26
+     * @return
+     */
+    public static List<MemberLevelPagesResponse> getMemberLevelList(){
+        List<MemberLevelPagesResponse> dmcLevelData = null;
+        PageParam pageParam = new PageParam();
+        pageParam.setPageNo(1);pageParam.setPageSize(20);
+        try {
+            ComResponse<Page<MemberLevelPagesResponse>> dmcLevelResponse = activityClientAPI.activityFien.getMemberLevelPages(pageParam);
+            Page<MemberLevelPagesResponse> data = dmcLevelResponse.getData();
+            if (dmcLevelResponse != null && data != null && CollectionUtil.isNotEmpty(data.getItems())) {
+                dmcLevelData = data.getItems();
+                //等级倒叙排序
+                Collections.sort(dmcLevelData, new Comparator<MemberLevelPagesResponse>() {
+                    public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2) {
+                        return o2.getMemberLevelGrade() - o1.getMemberLevelGrade();
+                    }
+                });
+            }
+            return dmcLevelData;
+        } catch (Exception e) {
+            log.error("activityFienget:MemberLevelPages:" + e.getMessage());
+        }
+        return dmcLevelData;
+    }
+
+    /**
+     * 从DMC获取:是否有积分、红包、优惠券
+     * wangzhe
+     * 2021-02-26
+     * @param memberCard 会员卡号
+     * @return
+     */
+    public static MemberAccountResponse getAccountByMemberCard(String memberCard){
+        MemberAccountResponse data = null;
+        try {
+            ComResponse<MemberAccountResponse> response = activityClientAPI.activityFien.getAccountByMemberCard(memberCard);
+            if (response != null && response.getCode() == 200) {
+                data = response.getData();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+
 
 }
