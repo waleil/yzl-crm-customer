@@ -1880,7 +1880,7 @@ public class MemberServiceImpl implements MemberService {
         //查询MySql数据库中客户的相关信息
         List<MemberLabel> list = memberMapper.queryMemberLabelByCodes(memberCodes);
         if (CollectionUtil.isEmpty(list)) {
-            log.error("本次要同步数据的客户编号都不存在,例如：{}",memberCodes.get(0));
+            log.error("本次要同步数据的客户编号有{}条记录,但数据库都不存在,例如：{}",memberCodes.size(),memberCodes.get(0));
             return true;
         }
 
