@@ -23,4 +23,6 @@ public interface MemberActionRelationService {
     public ComResponse<Integer> deleteRelation(Integer rid);
 
     public ComResponse<Integer> saveUpdateRelation(List<MemberActionRelationDto> memberActionRelationDtoList);
+
+    public ComResponse<Boolean> saveOrUpdateMemberActionRelation(String memberCard,String createNo,List<Integer> memberActionDIdList);
 }

@@ -130,5 +130,18 @@
     inner join member_action_relation b on t.id=b.did and t.del_flag=0
     where t.id= #{type,jdbcType=INTEGER}
   </select>
+    <select id="getActionDictByIds"
+            resultType="cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict">
+      select
+      <include refid="Base_Column_List" />
+      from action_dict
+      where del_flag in (0,2)
+      and id in
+      <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+
+
+    </select>
 
 </mapper>

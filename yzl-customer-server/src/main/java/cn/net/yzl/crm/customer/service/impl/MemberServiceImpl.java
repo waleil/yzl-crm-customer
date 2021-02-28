@@ -36,11 +36,13 @@ import cn.net.yzl.crm.customer.service.MemberAddressService;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.service.impl.phone.MemberPhoneServiceImpl;
+import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
+import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
 import cn.net.yzl.crm.customer.vo.*;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
@@ -120,6 +122,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberPhoneMapper phoneMapper;
+
+    @Autowired
+    MemberActionRelationService memberActionRelationService;
+
 
     @Autowired
     private RabbitTemplate template;
@@ -1626,6 +1632,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public ComResponse<Boolean> memeberWorkOrderSubmit(MemeberWorkOrderSubmitVo vo) {
+        if (StringUtils.isEmpty(vo.getMemberCard())) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数:memberCard不能为空!");
+        }else if (StringUtils.isEmpty(vo.getStaffNo())) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数:staffNo不能为空!");
+        }
         //更新顾客信息
         ComResponse<Boolean> response = updateMember(vo);
         if (response.getCode() != 200) {
@@ -1651,6 +1662,12 @@ public class MemberServiceImpl implements MemberService {
         if (consultation.getCode() != 200) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(顾客咨询商品)记录数据保存失败!");
+        }
+        //更新顾客行为偏好
+        ComResponse<Boolean> response1 = memberActionRelationService.saveOrUpdateMemberActionRelation(vo.getMemberCard(), vo.getStaffNo(), vo.getMemberActionDIdList());
+        if (response1.getCode() != 200) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(response1.getCode(),response1.getMessage());
         }
 
         //设置reids缓存

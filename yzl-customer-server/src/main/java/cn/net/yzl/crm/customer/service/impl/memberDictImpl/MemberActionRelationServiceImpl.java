@@ -15,9 +15,12 @@ import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionDictList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class MemberActionRelationServiceImpl implements MemberActionRelationService {
@@ -183,6 +186,54 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
             }
         }
         return ComResponse.success(num);
+    }
+
+
+
+    @Transactional
+    @Override
+    public ComResponse<Boolean> saveOrUpdateMemberActionRelation(String memberCard,String createNo,List<Integer> memberActionDIdList) {
+        if (CollectionUtil.isEmpty(memberActionDIdList)) {
+            return ComResponse.success(true);
+        }
+        //通过did查询字典
+        List<ActionDict> actionDictByIds = actionDictMapper.getActionDictByIds(memberActionDIdList);
+        if (CollectionUtil.isEmpty(actionDictByIds) || actionDictByIds.size() != memberActionDIdList.size()) {
+            //包含不存在的综合行为
+            //TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(部分行为偏好已经不存在)记录数据保存失败!");
+        }
+
+        Map<Byte,List<ActionDict>> actionDictMap = actionDictByIds.stream()
+                .collect(Collectors.groupingBy(ActionDict::getType));
+        //要删除的类型
+        List<Integer> types = new ArrayList<>();
+        //添加的顾客综合行为偏好
+        List<MemberActionRelationDto> memberActions = new ArrayList<>();
+
+        for (Map.Entry<Byte, List<ActionDict>> entry : actionDictMap.entrySet()) {
+            Integer type = entry.getKey().intValue();
+            types.add(type);
+            List<ActionDict> actionDicts = entry.getValue();
+            for (ActionDict item : actionDicts) {
+                MemberActionRelationDto relationDto = new MemberActionRelationDto();
+                relationDto.setMemberCard(memberCard);
+                relationDto.setDid(item.getId());
+                relationDto.setType(type);
+                relationDto.setCreator(createNo);
+                memberActions.add(relationDto);
+            }
+        }
+        //根据类型删除顾客关联病症
+        int result = memberActionRelationMapper.deleteMemberActionByMemberCardAndTypes(memberCard,types);
+        //批量添加顾客关联病症
+        result = memberActionRelationMapper.insertBatch(memberActions);
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(行为偏好)记录数据保存失败!");
+        }
+        return ComResponse.success(true);
+
     }
 
 

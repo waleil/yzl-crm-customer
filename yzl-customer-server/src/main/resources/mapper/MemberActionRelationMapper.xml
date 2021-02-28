@@ -148,19 +148,28 @@
     where member_card = #{memberCard,jdbcType=VARCHAR} and is_del=0
   </delete>
 
-  <insert id="insert" >
+    <delete id="deleteMemberActionByMemberCardAndTypes">
+        delete from member_action_relation
+        where member_card = #{memberCard,jdbcType=VARCHAR}
+            and `type` in
+            <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    </delete>
+
+    <insert id="insert" >
     insert into member_action_relation (member_card, did, type, creator)
     values (#{memberCard,jdbcType=VARCHAR}, #{did,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR})
   </insert>
 
   <insert id="insertBatch" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
-    insert into member_action_relation (member_card, did, type, creator)
+    insert into member_action_relation (member_card, did, `type`, creator)
     values
-    <foreach collection="list" item="item" open="(" close=")" separator=",">
-    (#{memberCard,jdbcType=VARCHAR}, #{did,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR})
+    <foreach collection="list" item="item" separator=",">
+    (#{item.memberCard,jdbcType=VARCHAR}, #{item.did,jdbcType=INTEGER}, #{item.type,jdbcType=INTEGER}, #{item.creator,jdbcType=VARCHAR})
     </foreach>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
+    <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.dto.member.MemberActionRelationDto">
     update member_action_relation
     <set>
       <if test="memberCard != null">
