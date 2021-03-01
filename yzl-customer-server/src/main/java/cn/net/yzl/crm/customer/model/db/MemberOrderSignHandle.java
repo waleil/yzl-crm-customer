@@ -8,7 +8,7 @@ import java.util.Date;
 
 
 @Data
-public class MemberOrderSignHandleError implements Serializable {
+public class MemberOrderSignHandle implements Serializable {
 
     private Integer id;
 
@@ -18,9 +18,13 @@ public class MemberOrderSignHandleError implements Serializable {
 
     private String orderData;
 
-    private String createNo;
+    private String creatorNo;
 
     private Date createTime;
+
+    private String updatorNo;
+
+    private Date updateTime;
 
     private String ErrorCode;
 

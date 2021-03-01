@@ -1,8 +1,8 @@
 package cn.net.yzl.crm.customer.listener;
 
 import cn.net.yzl.common.entity.ComResponse;
-import cn.net.yzl.crm.customer.model.db.MemberOrderSignHandleError;
-import cn.net.yzl.crm.customer.service.MemberOrderSignHandleErrorService;
+import cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle;
+import cn.net.yzl.crm.customer.service.MemberOrderSignHandleService;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import com.alibaba.fastjson.JSON;
@@ -26,7 +26,7 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 	private MemberService memberService;
 
 	@Autowired
-	private MemberOrderSignHandleErrorService memberOrderSignHandleErrorService;
+	private MemberOrderSignHandleService memberOrderSignHandleService;
 
 
 	/**
@@ -43,17 +43,17 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 		ComResponse<Boolean> response = null;
 		OrderSignInfo4MqVO order = null;//订单签收消息对象
 		boolean successFlag = false;//是否操作成功标识
-		MemberOrderSignHandleError error = null;
+		MemberOrderSignHandle error = null;
 		String exMsg = "";
 		try {
 			//消息换成对象
 			System.out.println(message.getBody());
 			order = this.objectMapper.readValue(message.getBody(), OrderSignInfo4MqVO.class);
-			error = new MemberOrderSignHandleError();
+			error = new MemberOrderSignHandle();
 			error.setMemberCard(order.getMemberCardNo());
 			error.setOrderNo(order.getOrderNo());
 			error.setOrderData(JSON.toJSONString(order));
-			error.setCreateNo("SYSTEM");
+			error.setCreatorNo("SYSTEM");
 			error.setCreateTime(new Date());
 
 			response = memberService.orderSignUpdateMemberData(order);
@@ -83,7 +83,7 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 				}
 			}
 			if (error != null) {
-				ComResponse<Boolean> saveResult = memberOrderSignHandleErrorService.saveDealErrorOrderData(error);
+				ComResponse<Boolean> saveResult = memberOrderSignHandleService.saveDealErrorOrderData(error);
 				if (saveResult.getCode() != 200) {
 					log.error("onMessage:订单签收时处理消息失败且保存失败记录失败!"+order.toString());
 				}
