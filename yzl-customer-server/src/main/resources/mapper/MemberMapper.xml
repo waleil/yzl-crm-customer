@@ -840,7 +840,7 @@
         update member set vip_flag=1,vip_time =
             <choose>
                 <when test="_parameter.containsKey('vipTime') and vipTime != null">
-                    vipTime
+                    #{vipTime}
                 </when>
                 <otherwise>
                     NOW()

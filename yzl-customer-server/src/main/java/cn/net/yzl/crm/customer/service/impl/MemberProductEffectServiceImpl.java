@@ -81,7 +81,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
         //每天用量
         Integer oneNum = null;
-        if (oneToTimes > 0 && oneUseNum > 0) {
+        if (oneToTimes != null && oneUseNum != null && oneToTimes > 0 && oneUseNum > 0) {
             oneNum = oneToTimes*oneUseNum;
         }
         //每天吃多少(计算)
