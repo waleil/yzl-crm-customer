@@ -836,7 +836,7 @@
         )
     </select>
 
-    <update id="setMemberToVip" parameterType="String">
+    <update id="setMemberToVip">
         update member set vip_flag=1,vip_time =
             <choose>
                 <when test="_parameter.containsKey('vipTime') and vipTime != null">
@@ -846,7 +846,7 @@
                     NOW()
                 </otherwise>
             </choose>
-        where member_card=#{member_card}
+        where member_card=#{memberCard}
     </update>
 
     <select id="getMemberProductEffectList" parameterType="String"
