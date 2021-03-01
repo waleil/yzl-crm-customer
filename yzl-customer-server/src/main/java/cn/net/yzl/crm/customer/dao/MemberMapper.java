@@ -37,7 +37,8 @@ public interface MemberMapper {
 
     Member getMemberByPhone(List<String> phoneList);
 
-    void setMemberToVip(String member_card);
+    void setMemberToVip(@Param("memberCard") String memberCard);
+    void setMemberToVip(@Param("memberCard") String memberCard,@Param("vipTime") Date vipTime);
 
     List<MemberProductEffect> getMemberProductEffectList(String member_card);
 

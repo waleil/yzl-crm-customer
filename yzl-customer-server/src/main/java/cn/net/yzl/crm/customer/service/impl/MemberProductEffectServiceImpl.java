@@ -81,7 +81,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
         //每天用量
         Integer oneNum = null;
-        if (oneToTimes > 0 && oneUseNum > 0) {
+        if (oneToTimes != null && oneUseNum != null && oneToTimes > 0 && oneUseNum > 0) {
             oneNum = oneToTimes*oneUseNum;
         }
         //每天吃多少(计算)
@@ -236,17 +236,16 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      */
     @Transactional
     public ComResponse batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> records) {
-        if (CollectionUtil.isEmpty(records)) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空!");
-        }
-        for (MemberProductEffectUpdateVO record : records) {
-            //修改人赋值
-            if (StringUtils.isEmpty(record.getUpdator())) {
-                record.setUpdator(userNo);
-            }
-            int result = this.modify(record);
-            if (result != 1) {
-                return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+        if (CollectionUtil.isNotEmpty(records)) {
+            for (MemberProductEffectUpdateVO record : records) {
+                //修改人赋值
+                if (StringUtils.isEmpty(record.getUpdator())) {
+                    record.setUpdator(userNo);
+                }
+                int result = this.modify(record);
+                if (result != 1) {
+                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"记录数据保存失败!");
+                }
             }
         }
         return ComResponse.success();

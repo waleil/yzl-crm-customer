@@ -37,6 +37,9 @@ public class MemeberWorkOrderSubmitVo {
     @ApiModelProperty(value = "手机号",required = true)
     private String memberPhone;
 
+    @ApiModelProperty(value = "座机号",required = false)
+    private String fixedPhoneNum;
+
     @ApiModelProperty(value = "邮箱")
     private String email;
 
@@ -102,5 +105,8 @@ public class MemeberWorkOrderSubmitVo {
 
     @ApiModelProperty(value = "顾客咨询商品", name = "productConsultationInsertVOList", required = false)
     private List<ProductConsultationInsertVO> productConsultationInsertVOList;
+
+    @ApiModelProperty(value = "顾客综合行为偏好二级id", name = "memberActionDIdList", required = false)
+    private List<Integer> memberActionDIdList;
 
 }

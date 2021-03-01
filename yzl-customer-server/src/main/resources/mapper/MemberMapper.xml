@@ -137,7 +137,7 @@
     qq, wechat, email, source, address, birthday, job_code, first_order_time, last_order_time,
     master_card, first_order_staff_no, first_order_am, order_num, intro_no, intro_name,
     intro_type, media_id, media_name, media_type_code, media_type_name, creator_no, create_time,
-    creator_name, updator_no, updator_name, update_time, source_type, vip_flag, buy_intention,
+    creator_name, updator_no, updator_name, update_time, source_type, vip_flag,vip_time, buy_intention,
     reject_flag,m_grade_id mGradeId,m_grade_name mGradeName
   </sql>
     <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.Member">
@@ -535,7 +535,7 @@
             </if>
             <if test="city_code != null">
                 <choose>
-                    <when test="city_code == -999">
+                    <when test="city_code == -9999">
                         city_code = null,
                     </when>
                     <otherwise>
@@ -548,7 +548,7 @@
             </if>
             <if test="area_code != null">
                 <choose>
-                    <when test="area_code == -999">
+                    <when test="area_code == -9999">
                         area_code = null,
                     </when>
                     <otherwise>
@@ -814,7 +814,7 @@
         select id,member_card,phone_number,phone_place,service_provider,phone_type
         from member_phone
         where enabled=1  and member_card=#{member_card}
-
+        order by update_time desc
     </select>
 
     <!--根据顾客手机号查询顾客基本信息 ，用来判断手机号是否被注册，如果注册，则返回注册顾客的实体-->
@@ -836,8 +836,17 @@
         )
     </select>
 
-    <update id="setMemberToVip" parameterType="String">
-        update member set vip_flag=1 where member_card=#{member_card}
+    <update id="setMemberToVip">
+        update member set vip_flag=1,vip_time =
+            <choose>
+                <when test="_parameter.containsKey('vipTime') and vipTime != null">
+                    #{vipTime}
+                </when>
+                <otherwise>
+                    NOW()
+                </otherwise>
+            </choose>
+        where member_card=#{memberCard}
     </update>
 
     <select id="getMemberProductEffectList" parameterType="String"
@@ -1051,7 +1060,9 @@
     <!--    </update>-->
 
     <select id="getMemberList" resultType="cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel">
-        select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code, mt.`name` as m_grade_name,
+        select m.member_card, member_name, nick_name, age, sex, adver_code, m_grade_code,
+        m.`m_grade_id`,
+        m.`m_grade_name`,
         is_active,
         member_status, activity, region_code,region_name, province_code, city_code, total_amount, qq,id_card,
         wechat, email, source, address, birthday, job_code, m.first_order_time, m.last_order_time,
@@ -1070,8 +1081,7 @@
         day_avg_count,
         year_avg_count,
         return_goods_rate
-        from member m inner join member_order_stat o on m.member_card= o.member_card LEFT JOIN member_type mt on
-        m.m_grade_code=mt.`no`
+        from member m inner join member_order_stat o on m.member_card= o.member_card
         where m.member_card in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}

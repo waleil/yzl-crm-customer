@@ -40,4 +40,7 @@ public interface MemberActionRelationMapper {
     int updateByPrimaryKey(MemberActionRelationDto record);
 
     List<cn.net.yzl.crm.customer.model.mogo.ActionDict> queryByMemberCodes(@Param("list") List<String> codes);
+
+    int deleteMemberActionByMemberCardAndTypes(@Param("memberCard") String memberCard, @Param("list") List<Integer> types);
+
 }

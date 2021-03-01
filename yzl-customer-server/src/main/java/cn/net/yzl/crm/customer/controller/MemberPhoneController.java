@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.controller;
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.service.MemberPhoneService;
 import io.swagger.annotations.Api;
@@ -9,10 +10,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,13 +32,9 @@ public class MemberPhoneController {
         return memberPhoneService.getMemberCardByphoneNumber(phoneNumber);
     }
 
-
-    @ApiOperation(value = "顾客手机号-获取顾客会员", notes = "顾客账户-获取顾客会员")
-    @RequestMapping(value = "/v1/getMemberByphoneNumber", method = RequestMethod.GET)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "phoneNumber", value = "电话号码", required = true, dataType = "string"),
-    })
-    ComResponse<Member> getMemberByphoneNumber(@RequestParam("phoneNumber") String  phoneNumber) {
+    @ApiOperation(value = "顾客手机号-获取顾客会员基本信息")
+    @GetMapping("v1/getMemberByphoneNumber")
+    public ComResponse<Member> getMemberByphoneNumber(@RequestParam("phoneNumber") String  phoneNumber) {
         return memberPhoneService.getMemberByphoneNumber(phoneNumber);
     }
 
