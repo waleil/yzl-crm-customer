@@ -1,7 +1,11 @@
 package cn.net.yzl.crm.customer.listener;
 
+import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle;
+import cn.net.yzl.crm.customer.service.MemberOrderSignHandleService;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +15,8 @@ import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @Slf4j
 public class OrderRabbitListener implements ChannelAwareMessageListener {
@@ -18,6 +24,9 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 	private ObjectMapper objectMapper;
 	@Autowired
 	private MemberService memberService;
+
+	@Autowired
+	private MemberOrderSignHandleService memberOrderSignHandleService;
 
 
 	/**
@@ -31,15 +40,54 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 			concurrency = "1"// 消费者数量
 	)
 	public void onMessage(Message message, Channel channel) throws Exception {
+		ComResponse<Boolean> response = null;
+		OrderSignInfo4MqVO order = null;//订单签收消息对象
+		boolean successFlag = false;//是否操作成功标识
+		MemberOrderSignHandle error = null;
+		String exMsg = "";
 		try {
 			//消息换成对象
 			System.out.println(message.getBody());
-			OrderSignInfo4MqVO order = this.objectMapper.readValue(message.getBody(), OrderSignInfo4MqVO.class);
-			memberService.orderSignUpdateMemberData(order);
+			order = this.objectMapper.readValue(message.getBody(), OrderSignInfo4MqVO.class);
+			error = new MemberOrderSignHandle();
+			error.setMemberCard(order.getMemberCardNo());
+			error.setOrderNo(order.getOrderNo());
+			error.setOrderData(JSON.toJSONString(order));
+			error.setCreatorNo("SYSTEM");
+			error.setCreateTime(new Date());
+
+			response = memberService.orderSignUpdateMemberData(order);
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);// 正常消费后，手动确认消息
+			if (response.getCode() == 200) {
+				successFlag = true;
+			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			exMsg = e.getMessage();
+			log.error("onMessage:订单签收时处理消息失败!" + exMsg);
 			channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);// 消费失败后，手动拒绝消息
+		}finally {
+			//处理成功的消息
+			if (successFlag) {
+				error.setStatus(1);//成功
+			}
+			//处理消息失败
+			else{
+				error.setStatus(2);//失败
+				if (response == null) {
+					error.setErrorMsg("消息未处理!" + exMsg);
+				}else{
+					if (response.getCode() != null) {
+						error.setErrorCode(response.getCode().toString());
+					}
+					error.setErrorMsg(response.getMessage());
+				}
+			}
+			if (error != null) {
+				ComResponse<Boolean> saveResult = memberOrderSignHandleService.saveDealErrorOrderData(error);
+				if (saveResult.getCode() != 200) {
+					log.error("onMessage:订单签收时处理消息失败且保存失败记录失败!"+order.toString());
+				}
+			}
 		}
 	}
 

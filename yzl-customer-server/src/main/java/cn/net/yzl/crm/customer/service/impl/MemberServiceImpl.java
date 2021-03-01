@@ -1791,12 +1791,12 @@ public class MemberServiceImpl implements MemberService {
                     phoneType = 2;
                 }
                 if (phoneType != type.intValue()) {
-                    if (phoneType == 1) {
+                    if (type.intValue() == 1) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号格式不正确!",false);
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号码格式不正确!",false);
                     }else{
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!",false);
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码格式不正确!",false);
                     }
                 }
 

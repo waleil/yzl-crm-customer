@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="cn.net.yzl.crm.customer.dao.OrderSignHandleErrorMapper" >
-  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.db.OrderSignHandleError" >
+<mapper namespace="cn.net.yzl.crm.customer.dao.MemberOrderSignHandleMapper" >
+  <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="memberCardNo" property="membercardno" jdbcType="INTEGER" />
     <result column="orderNo" property="orderno" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="cn.net.yzl.crm.customer.model.db.OrderSignHandleError" extends="BaseResultMap" >
+  <resultMap id="ResultMapWithBLOBs" type="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" extends="BaseResultMap" >
     <result column="order_data" property="orderData" jdbcType="LONGVARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
@@ -22,23 +22,36 @@
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
-    from order_sign_handle_error
+    from member_order_sign_handle
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from order_sign_handle_error
+    delete from member_order_sign_handle
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.OrderSignHandleError" >
-    insert into order_sign_handle_error (id, memberCardNo, orderNo, 
-      status, create_time, order_data
-      )
-    values (#{id,jdbcType=INTEGER}, #{membercardno,jdbcType=INTEGER}, #{orderno,jdbcType=INTEGER}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{orderData,jdbcType=LONGVARCHAR}
+  <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into member_order_sign_handle 	(`member_card`,
+	`order_no`,
+	`order_data`,
+	`creator_no`,
+	`create_time`,
+	`error_code`,
+	`error_msg`,
+	`status`
+	)
+    values (
+            #{memberCard,jdbcType=VARCHAR},
+            #{orderNo,jdbcType=VARCHAR},
+            #{orderData,jdbcType=LONGVARCHAR},
+            #{creatorNo,jdbcType=INTEGER},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{errorCode,jdbcType=VARCHAR},
+            #{errorMsg,jdbcType=LONGVARCHAR},
+            #{status,jdbcType=INTEGER}
       )
   </insert>
-  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.db.OrderSignHandleError" >
-    insert into order_sign_handle_error
+  <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
+    insert into member_order_sign_handle
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
@@ -80,8 +93,8 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.OrderSignHandleError" >
-    update order_sign_handle_error
+  <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
+    update member_order_sign_handle
     <set >
       <if test="membercardno != null" >
         memberCardNo = #{membercardno,jdbcType=INTEGER},
@@ -101,8 +114,8 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="cn.net.yzl.crm.customer.model.db.OrderSignHandleError" >
-    update order_sign_handle_error
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
+    update member_order_sign_handle
     set memberCardNo = #{membercardno,jdbcType=INTEGER},
       orderNo = #{orderno,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
@@ -110,8 +123,8 @@
       order_data = #{orderData,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.db.OrderSignHandleError" >
-    update order_sign_handle_error
+  <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
+    update member_order_sign_handle
     set memberCardNo = #{membercardno,jdbcType=INTEGER},
       orderNo = #{orderno,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
