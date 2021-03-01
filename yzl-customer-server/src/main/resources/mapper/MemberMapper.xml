@@ -839,11 +839,11 @@
     <update id="setMemberToVip" parameterType="String">
         update member set vip_flag=1,vip_time =
             <choose>
-                <when test="vipTime == null">
-                    NOW()
+                <when test="_parameter.containsKey('vipTime') and vipTime != null">
+                    vipTime
                 </when>
                 <otherwise>
-                    vipTime
+                    NOW()
                 </otherwise>
             </choose>
         where member_card=#{member_card}
