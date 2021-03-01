@@ -183,6 +183,7 @@ public class MemberServiceImpl implements MemberService {
             memberPhone.setMember_card(member.getMember_card());
             memberPhone.setCreate_time(now);
             memberPhone.setUpdate_time(now);
+            phoneNumber = memberPhone.getPhone_number();
             //是否以0开头 --> 去掉0
             if (phoneNumber.startsWith("0")){
                 noZeroNumber = phoneNumber.substring(1);
@@ -204,6 +205,18 @@ public class MemberServiceImpl implements MemberService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话:"+memberPhone.getPhone_number()+"格式不正确!");
             }
+            //获取入参的点火类型
+            Integer phone_type = memberPhone.getPhone_type();
+            if (phone_type != null && phoneType != phone_type.intValue()) {
+                if (phone_type.intValue() == 1) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "手机号:"+memberPhone.getPhone_number()+"格式不正确!");
+                }else{
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号:"+memberPhone.getPhone_number()+"格式不正确!");
+                }
+            }
+
             memberPhone.setPhone_type(phoneType);
             if (memberPhone.getEnabled() == null) {
                 memberPhone.setEnabled(1);//默认可用
@@ -1536,7 +1549,14 @@ public class MemberServiceImpl implements MemberService {
             workOrderBeanVO.setCallTimes(0);//坐席已拨打次数：0次
             List<MemberPhone> memberPhoneList = memberVO.getMemberPhoneList();
             if (CollectionUtil.isNotEmpty(memberPhoneList)) {
+                //默认为第一个
                 workOrderBeanVO.setCalledPhone(memberPhoneList.get(0).getPhone_number());//被叫号码
+                for (MemberPhone phone : memberPhoneList) {
+                    if (phone != null && phone.getPhone_type() == 1) {
+                        workOrderBeanVO.setCalledPhone(phone.getPhone_number());//被叫号码
+                        break;
+                    }
+                }
             }
             //workOrderBeanVO.setCallerPhone("400-");//主叫号码
             if (workOrderBeanVO.getCreateTime() == null) {
