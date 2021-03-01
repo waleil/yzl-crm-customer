@@ -1046,7 +1046,8 @@ public class MemberServiceImpl implements MemberService {
                 member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
             }
             if (!member.isVip_flag()) {
-                this.setMemberToVip(memberCard);
+                memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
+
             }
             int ret = memberMapper.updateByMemberGradeByMember(member);
 
