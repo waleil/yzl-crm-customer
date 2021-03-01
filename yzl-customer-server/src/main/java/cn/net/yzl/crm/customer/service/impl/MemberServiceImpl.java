@@ -989,9 +989,7 @@ public class MemberServiceImpl implements MemberService {
             if (CollectionUtil.isNotEmpty(dmcLevelData)) {
                 //获取DMC的会员到期时间
                 String validDate = ActivityClientAPI.getMemberGradeValidDate();
-                if ("-1".equals(validDate)) {
-                    log.error("获取会员级别到期时间异常!");
-                }else{
+                if (StringUtils.isNotEmpty(validDate) && !"-1".equals(validDate)) {
                     Pair<Date, Date> dateScope = getDateScope(validDate);
 
                     //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
@@ -1046,7 +1044,8 @@ public class MemberServiceImpl implements MemberService {
                 member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
             }
             if (!member.isVip_flag()) {
-                this.setMemberToVip(memberCard);
+                memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
+
             }
             int ret = memberMapper.updateByMemberGradeByMember(member);
 
@@ -1185,7 +1184,7 @@ public class MemberServiceImpl implements MemberService {
         //获取DMC的会员到期时间
         String validDate = ActivityClientAPI.getMemberGradeValidDate();
         Pair<Date, Date> dateScope = null;
-        if (!"-1".equals(validDate)) {
+        if (StringUtils.isNotEmpty(validDate) && !"-1".equals(validDate)) {
             dateScope = getDateScope(validDate);
         }
 

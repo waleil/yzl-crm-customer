@@ -137,7 +137,7 @@
     qq, wechat, email, source, address, birthday, job_code, first_order_time, last_order_time,
     master_card, first_order_staff_no, first_order_am, order_num, intro_no, intro_name,
     intro_type, media_id, media_name, media_type_code, media_type_name, creator_no, create_time,
-    creator_name, updator_no, updator_name, update_time, source_type, vip_flag, buy_intention,
+    creator_name, updator_no, updator_name, update_time, source_type, vip_flag,vip_time, buy_intention,
     reject_flag,m_grade_id mGradeId,m_grade_name mGradeName
   </sql>
     <insert id="insertSelective" parameterType="cn.net.yzl.crm.customer.model.Member">
@@ -836,8 +836,17 @@
         )
     </select>
 
-    <update id="setMemberToVip" parameterType="String">
-        update member set vip_flag=1 where member_card=#{member_card}
+    <update id="setMemberToVip">
+        update member set vip_flag=1,vip_time =
+            <choose>
+                <when test="_parameter.containsKey('vipTime') and vipTime != null">
+                    #{vipTime}
+                </when>
+                <otherwise>
+                    NOW()
+                </otherwise>
+            </choose>
+        where member_card=#{memberCard}
     </update>
 
     <select id="getMemberProductEffectList" parameterType="String"
