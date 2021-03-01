@@ -104,7 +104,7 @@ public class Member {
     private boolean vip_flag;
     @ApiModelProperty(value = "成为vip的时间(第一次订单签收的时间)")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
-    private boolean vip_time;
+    private Date vip_time;
     @ApiModelProperty(value = "0表示系统自动创建，1 坐席添加")
     private int source_type;
     @ApiModelProperty(value = "介绍是member_card,如果是员工介绍就是staff_no")
