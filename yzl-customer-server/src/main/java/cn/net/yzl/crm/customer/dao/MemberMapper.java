@@ -163,4 +163,8 @@ public interface MemberMapper {
     int updateByMemberGradeByMember(Member member);
 
     List<Member> scanMemberByPage(MemberSerchConditionDTO dto);
+
+    int updateMemberForOrderCreate(@Param("member") Member member);
 }
+
+

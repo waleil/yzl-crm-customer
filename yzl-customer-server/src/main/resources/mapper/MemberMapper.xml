@@ -1376,6 +1376,20 @@
         where
             member_card = #{memberCard,jdbcType=VARCHAR}
     </update>
+
+    <!--处理下单时：更新顾客 首单下单员工，首单时间，最后下单时间-->
+    <update id="updateMemberForOrderCreate" parameterType="cn.net.yzl.crm.customer.model.Member">
+        update member set
+            <if test="member.first_order_staff_no != null" >
+                first_order_staff_no = #{member.first_order_staff_no},
+            </if>
+            <if test="member.first_order_time != null" >
+                first_order_time = #{member.first_order_time},
+            </if>
+            last_order_time = #{member.last_order_time,jdbcType=TIMESTAMP}
+        where
+            member_card = #{member.member_card,jdbcType=VARCHAR}
+    </update>
     <select id="findPageByConditionCount" resultType="java.lang.Integer" parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
         SELECT
        count(1)

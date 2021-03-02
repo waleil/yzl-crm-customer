@@ -895,11 +895,19 @@ public class MemberServiceImpl implements MemberService {
             }
             //保存
             if (addProductVoList.size() > 0) {
-                memberProductEffectService.batchSaveProductEffect(addProductVoList);
+                ComResponse comResponse = memberProductEffectService.batchSaveProductEffect(addProductVoList);
+                if (comResponse.getCode() != 200) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return ComResponse.fail(comResponse.getCode(), comResponse.getMessage());
+                }
             }
             //更新
             if (updateProductVoList.size() > 0) {
-                memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(),updateProductVoList);
+                ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(), updateProductVoList);
+                if (comResponse.getCode() != 200) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return ComResponse.fail(comResponse.getCode(), comResponse.getMessage());
+                }
             }
         }
 
@@ -907,11 +915,8 @@ public class MemberServiceImpl implements MemberService {
         List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
         cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat;
         if (CollectionUtil.isEmpty(memberOrderStats)) {
-            memberOrderStat = new cn.net.yzl.crm.customer.model.db.MemberOrderStat();
-            memberOrderStat.setMemberCard(memberCard);
-            memberOrderStat.setCreateTime(new Date());
-            memberOrderStatMapper.insertSelective(memberOrderStat);
-            memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "memberOrderStat记录不存在!");
         }
 
         //存在则更新最后下单时间
@@ -943,14 +948,14 @@ public class MemberServiceImpl implements MemberService {
             if (StringUtils.isEmpty(memberOrderStat.getFirstBuyProductCode())) {
                 memberOrderStat.setFirstBuyProductCode(memberOrderStat.getLastBuyProductCode());
             }
-            if (memberOrderStat.getFirstOrderAm() == null) {
-                memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//首单金额
+            if (memberOrderStat.getFirstOrderAm() == null || memberOrderStat.getFirstOrderAm().intValue() == 0) {
+                memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//真正首单金额
             }
             if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getTotalAll()) {
                 memberOrderStat.setOrderHighAm(orderInfo4MqVo.getTotalAll());//订单最高金额
             }
 
-            if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
+            if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm().intValue() == 0 || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
                 memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最低金额
             }
 
@@ -961,7 +966,7 @@ public class MemberServiceImpl implements MemberService {
             memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
             int orgNum = productEffectList == null ? 0 : productEffectList.size();
             memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
-            memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
+            //memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
 
             //总平均购买天数
             if (memberOrderStat.getLastOrderTime() != null && memberOrderStat.getFirstOrderTime() != null) {
@@ -969,98 +974,36 @@ public class MemberServiceImpl implements MemberService {
                 Integer buyDay = Math.round(betweenDay / (float) memberOrderStat.getBuyCount());
                 memberOrderStat.setDayAvgCount(buyDay);
             }
+            //最后一次订单的签收时间
+            memberOrderStat.setLastSignTime(orderInfo4MqVo.getSignTime());
 
             //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
-            memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
-
-            //获取会员等级，判断是否升级
-            List<MemberLevelPagesResponse> dmcLevelData = null;
-            PageParam pageParam = new PageParam();
-            pageParam.setPageNo(1);
-            pageParam.setPageSize(20);
-            ComResponse<Page<MemberLevelPagesResponse>> dmcLevelResponse = null;
-            try {
-                dmcLevelResponse = activityFien.getMemberLevelPages(pageParam);
-                Page<MemberLevelPagesResponse> data = dmcLevelResponse.getData();
-                if (dmcLevelResponse != null && data != null && CollectionUtil.isNotEmpty(data.getItems())) {
-                    dmcLevelData = data.getItems();
-                    //等级倒叙排序
-                    Collections.sort(dmcLevelData, new Comparator<MemberLevelPagesResponse>() {
-                        public int compare(MemberLevelPagesResponse o1, MemberLevelPagesResponse o2) {
-                            return o2.getMemberLevelGrade() - o1.getMemberLevelGrade();
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                log.error("获取DMC会员级别异常");
+            int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+            if (result < 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
             }
 
             //查询顾客表信息
             Member member = memberMapper.selectMemberByCard(memberCard);
 
-            //判断是否升级
-            if (CollectionUtil.isNotEmpty(dmcLevelData)) {
-                //获取DMC的会员到期时间
-                String validDate = ActivityClientAPI.getMemberGradeValidDate();
-                if (StringUtils.isNotEmpty(validDate) && !"-1".equals(validDate)) {
-                    Pair<Date, Date> dateScope = getDateScope(validDate);
-
-                    //从订单:获取 一次性预存款 一次性消费满多少 一年累计消费满
-                    ComResponse<List<MemberTotal>> memberTotalResponse = orderFien.queryMemberTotal(Arrays.asList(memberCard),dateScope.getKey(),dateScope.getValue());
-                    List<MemberTotal> memberTotalData = memberTotalResponse.getData();
-                    if (CollectionUtil.isNotEmpty(memberTotalData)) {
-                        MemberTotal memberTotal = memberTotalData.get(0);//因为接口支持多个会员卡号，这里只用了一个卡号
-                        Integer totalSpend = memberTotal.getTotalSpend() == null ? 0 : memberTotal.getTotalSpend();//累计消费
-                        Integer maxSpend = memberTotal.getMaxSpend() == null ? 0 : memberTotal.getMaxSpend();//最高消费
-                        Integer maxCash1 = memberTotal.getMaxCash1() == null ? 0 : memberTotal.getMaxCash1();//最高预存
-
-                        MemberLevelPagesResponse level = null;
-                        //遍历DMC会员级别信息，判断顾客当前属于那个级别
-                        for (MemberLevelPagesResponse levelData : dmcLevelData) {
-                            if (totalSpend - levelData.getYearTotalSpendMoney() >= 0) {//一年累计消费满
-                                level = levelData;
-                                break;
-                            } else if (maxSpend-levelData.getDisposableSpendMoney() >= 0) {//一次性消费满多少
-                                level = levelData;
-                                break;
-                            } else if (maxCash1-levelData.getDisposableAdvanceMoney() >= 0) {//一次性预存款
-                                level = levelData;
-                                break;
-                            }
-                        }
-                        if (level != null) {
-                            //等级相同不更新
-                            if (member.getMGradeId() == null || member.getMGradeId() < level.getMemberLevelGrade()){
-                                //当前顾客的会员级别信息
-                                MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
-                                memberGradeRecord = new MemberGradeRecordPo();
-                                memberGradeRecord.setMemberCard(memberCard);
-                                memberGradeRecord.setCreateTime(new Date());
-                                memberGradeRecord.setBeforeGradeId(member.getMGradeId());
-                                memberGradeRecord.setBeforeGradeName(member.getMGradeName());
-                                memberGradeRecord.setMGradeId(level.getMemberLevelGrade());
-                                memberGradeRecord.setMGradeName(level.getMemberLevelName());
-                                memberGradeRecordDao.insertSelective(memberGradeRecord);
-                                //更新顾客表的会员信息
-                                member.setMGradeId(memberGradeRecord.getMGradeId());
-                                member.setMGradeName(memberGradeRecord.getMGradeName());
-                            }
-
-                        }
-                    }
-                }
-            }
             //更新客户表订单总金额
             member.setTotal_amount(totalCounsumAmount);//累计消费金额
-            if (StringUtils.isEmpty(member.getFirst_order_staff_no())) {
-                member.setFirst_order_staff_no(orderInfo4MqVo.getStaffNo());
+
+
+            //顾客的首单金额为空或者为0的时候,设置顾客的首单金额
+            if (member.getFirst_order_am() == null || member.getFirst_order_am().intValue() == 0) {
                 member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
             }
+            //顾客的会员标识不是会员的时要设置会员标识
             if (!member.isVip_flag()) {
                 memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
-
             }
-            int ret = memberMapper.updateByMemberGradeByMember(member);
+            result = memberMapper.updateByMemberGradeByMember(member);
+            if (result < 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+            }
 
             //设置缓存
             redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
@@ -1086,29 +1029,65 @@ public class MemberServiceImpl implements MemberService {
      * @param orderCreateInfoVO
      * @return
      */
+    @Transactional
     @Override
     public ComResponse<Boolean> dealOrderCreateUpdateMemberData(OrderCreateInfoVO orderCreateInfoVO) {
+        //通过顾客卡号获取顾客
         String memberCard = orderCreateInfoVO.getMemberCard();
-        memberMapper.updateLastOrderTime(memberCard,orderCreateInfoVO.getCreateTime());
+        Member member = memberMapper.selectMemberByCard(memberCard);
+        if (member == null) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"会员卡号:"+memberCard+"不存在！");
+        }
+        boolean isFirst = false;
         //member_order_stat
         List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
         cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat;
         //存在则更新最后下单时间
         if (CollectionUtil.isNotEmpty(memberOrderStats)) {
             memberOrderStat = memberOrderStats.get(0);
+            if ((StringUtils.isEmpty(memberOrderStat.getFirstOrderNo()) ||  "0".equals(memberOrderStat.getFirstOrderNo()))) {
+                isFirst = true;
+                memberOrderStat.setFirstOrderNo(orderCreateInfoVO.getOrderNo());//首单订单号
+                memberOrderStat.setFirstOrderStaffNo(orderCreateInfoVO.getStaffNo());//首单下单员工
+                memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
+            }
             memberOrderStat.setLastOrderTime(orderCreateInfoVO.getCreateTime());//最后一次下单时间
-            memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+            int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+            if (result < 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"更新顾客信息异常!");
+            }
         }
         //不存在则添加记录
         else {
+            isFirst = true;
             memberOrderStat = new cn.net.yzl.crm.customer.model.db.MemberOrderStat();
             memberOrderStat.setMemberCard(memberCard);//会员卡号
             memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
             memberOrderStat.setLastOrderTime(orderCreateInfoVO.getCreateTime());//最后一次下单时间
             memberOrderStat.setFirstOrderStaffNo(orderCreateInfoVO.getStaffNo());//首单下单员工
             memberOrderStat.setFirstOrderNo(orderCreateInfoVO.getOrderNo());//首单订单编号
-            memberOrderStatMapper.insertSelective(memberOrderStat);
+            int result = memberOrderStatMapper.insertSelective(memberOrderStat);
+            if (result < 1) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"更新顾客信息异常!");
+            }
         }
+        //更新member中的首单信息(根据首单订单号是否为空)
+        if (isFirst) {
+            member.setFirst_order_staff_no(orderCreateInfoVO.getStaffNo());//首单下单员工
+            member.setFirst_order_time(orderCreateInfoVO.getCreateTime());//首单下单时间
+        }
+        //memberMapper.updateLastOrderTime(memberCard,orderCreateInfoVO.getCreateTime());
+        //最后一次订单的下单时间 = 当前订单的创建时间
+        member.setLast_order_time(orderCreateInfoVO.getCreateTime());
+        //下单时更新顾客信息
+        int result = memberMapper.updateMemberForOrderCreate(member);
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"更新顾客基本信息异常!");
+        }
+
         //设置reids缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
         return ComResponse.success(true);
