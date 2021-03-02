@@ -861,8 +861,20 @@
 
     <select id="getProductConsultationList" parameterType="String"
             resultType="cn.net.yzl.crm.customer.model.ProductConsultation">
+        <!--
         select  id,member_card,product_code,product_name
         from product_consultation where member_card=#{member_card}
+        -->
+        SELECT id,member_card,product_code,product_name  from product_consultation c where c.member_card = #{member_card} and c.id in
+        (SELECT
+            max( id )  id
+        FROM
+            product_consultation t
+        WHERE
+            member_card = #{member_card}
+        GROUP BY
+            product_code ) order by consultation_time desc;
+
     </select>
 
     <select id="getMemberDisease" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberDisease">
