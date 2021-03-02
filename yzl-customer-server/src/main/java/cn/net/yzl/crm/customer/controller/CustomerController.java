@@ -385,6 +385,10 @@ public class CustomerController {
     public ComResponse<Boolean> dealOrderCreateUpdateMemberData(@RequestBody OrderCreateInfoVO orderCreateInfoVO) {
         if (orderCreateInfoVO == null) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+        } else if (StringUtils.isEmpty(orderCreateInfoVO.getMemberCard())) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"memberCard不能为空");
+        }else if (StringUtils.isEmpty(orderCreateInfoVO.getOrderNo())) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo不能为空");
         }
         ComResponse<Boolean> response = memberService.dealOrderCreateUpdateMemberData(orderCreateInfoVO);
         return response;

@@ -861,8 +861,20 @@
 
     <select id="getProductConsultationList" parameterType="String"
             resultType="cn.net.yzl.crm.customer.model.ProductConsultation">
+        <!--
         select  id,member_card,product_code,product_name
         from product_consultation where member_card=#{member_card}
+        -->
+        SELECT id,member_card,product_code,product_name  from product_consultation c where c.member_card = #{member_card} and c.id in
+        (SELECT
+            max( id )  id
+        FROM
+            product_consultation t
+        WHERE
+            member_card = #{member_card}
+        GROUP BY
+            product_code ) order by consultation_time desc;
+
     </select>
 
     <select id="getMemberDisease" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberDisease">
@@ -1363,6 +1375,20 @@
             last_order_time = #{now,jdbcType=TIMESTAMP}
         where
             member_card = #{memberCard,jdbcType=VARCHAR}
+    </update>
+
+    <!--处理下单时：更新顾客 首单下单员工，首单时间，最后下单时间-->
+    <update id="updateMemberForOrderCreate" parameterType="cn.net.yzl.crm.customer.model.Member">
+        update member set
+            <if test="member.first_order_staff_no != null" >
+                first_order_staff_no = #{member.first_order_staff_no},
+            </if>
+            <if test="member.first_order_time != null" >
+                first_order_time = #{member.first_order_time},
+            </if>
+            last_order_time = #{member.last_order_time,jdbcType=TIMESTAMP}
+        where
+            member_card = #{member.member_card,jdbcType=VARCHAR}
     </update>
     <select id="findPageByConditionCount" resultType="java.lang.Integer" parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
         SELECT

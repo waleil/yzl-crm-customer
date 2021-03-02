@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -193,9 +194,20 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
     @Transactional
     @Override
     public ComResponse<Boolean> saveOrUpdateMemberActionRelation(String memberCard,String createNo,List<Integer> memberActionDIdList) {
+        //过滤null值
+        if (CollectionUtil.isNotEmpty(memberActionDIdList)) {
+            Iterator<Integer> iterator = memberActionDIdList.iterator();
+            while (iterator.hasNext()) {
+                Integer next = iterator.next();
+                if (next == null) {
+                    iterator.remove();
+                }
+            }
+        }
         if (CollectionUtil.isEmpty(memberActionDIdList)) {
             return ComResponse.success(true);
         }
+
         //通过did查询字典
         List<ActionDict> actionDictByIds = actionDictMapper.getActionDictByIds(memberActionDIdList);
         if (CollectionUtil.isEmpty(actionDictByIds) || actionDictByIds.size() != memberActionDIdList.size()) {

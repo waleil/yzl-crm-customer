@@ -191,10 +191,10 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         List<Criteria> not = new ArrayList<>();
         //判断性别
         if (memberCrowdGroup.getSex() != null) {
-            if (memberCrowdGroup.getSex() == 1) {
-                and.add(Criteria.where("sex").is(1));
+            if (memberCrowdGroup.getSex() == 0 || memberCrowdGroup.getSex() == 1) {
+                and.add(Criteria.where("sex").is(memberCrowdGroup.getSex()));
             } else {
-                and.add(Criteria.where("sex").is(0));
+                and.add(Criteria.where("sex").is(2));
             }
         }
         //邮箱

@@ -60,10 +60,10 @@ public class MemberLabelESDao {
         List<QueryBuilder> mustNots = new ArrayList<>();
         //判断性别
         if (memberCrowdGroup.getSex() != null) {
-            if (memberCrowdGroup.getSex() == 1) {
-                filters.add(QueryBuilders.termQuery("sex", 1));
+            if (memberCrowdGroup.getSex() == 0 || memberCrowdGroup.getSex() == 1) {
+                filters.add(QueryBuilders.termQuery("sex", memberCrowdGroup.getSex()));
             } else {
-                filters.add(QueryBuilders.termQuery("sex", 0));
+                filters.add(QueryBuilders.termQuery("sex", 2));
             }
         }
         //邮箱
