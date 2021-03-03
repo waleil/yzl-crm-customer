@@ -22,6 +22,7 @@ import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -35,9 +36,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 
-@Api(value="顾客信息",tags = {"顾客信息"})
+@Api(value = "顾客信息", tags = {"顾客信息"})
 @RestController
 @RequestMapping("member")
+@Slf4j
 public class CustomerController {
 
     @Autowired
@@ -67,18 +69,16 @@ public class CustomerController {
     @ApiOperation(value = "保存转介绍用户")
     @PostMapping("v1/saveMemberReferral")
     public ComResponse<Boolean> saveMemberReferral(@RequestBody MemberAndAddWorkOrderVO memberReferralVO) {
-        if (memberReferralVO == null || memberReferralVO.getMemberVO() ==null || memberReferralVO.getWorkOrderBeanVO() == null){
+        if (memberReferralVO == null || memberReferralVO.getMemberVO() == null || memberReferralVO.getWorkOrderBeanVO() == null) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         }
         int result = memberService.saveMemberReferral(memberReferralVO);
         if (result == 1) {
             return ComResponse.success(true);
         } else {
-            return ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),"保存客户信息失败!");
+            return ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存客户信息失败!");
         }
     }
-
-
 
 
     @ApiOperation(value = "更新会员基本信息")
@@ -97,39 +97,52 @@ public class CustomerController {
     @ApiOperation(value = "根据顾客号查询顾客基本信息")
     @GetMapping("v1/getMember")
     public GeneralResult<Member> getMember(@RequestParam("memberCard") String memberCard) {
-
+        try {
         Member memberEntity = memberService.selectMemberByCard(memberCard);
         CountDownLatch countDownLatch = new CountDownLatch(3);
         //获取联系方式
-        CompletableFuture.supplyAsync(()->memberService.getMemberPhoneList(memberCard)).thenAccept(memberPhones -> {
-            if(memberPhones!=null && memberPhones.size()>0){
+        CompletableFuture.supplyAsync(() -> memberService.getMemberPhoneList(memberCard)).thenAccept(memberPhones -> {
+            if (memberPhones != null && memberPhones.size() > 0) {
                 memberEntity.setMemberPhoneList(memberPhones);
             }
             countDownLatch.countDown();
+        }).exceptionally(e -> {//执行失败
+            log.error("获取联系方式报错!" + memberCard, e);
+            countDownLatch.countDown();
+            return null;
         });
         //获取收获地址
-       CompletableFuture.supplyAsync(()->memberService.getReveiverAddress(memberCard)).thenAccept(addressList->{
-           if(addressList!=null && addressList.size()>0){
-               memberEntity.setReceive_address_list(addressList);
-           }
-           countDownLatch.countDown();
-       });
+        CompletableFuture.supplyAsync(() -> memberService.getReveiverAddress(memberCard)).thenAccept(addressList -> {
+            if (addressList != null && addressList.size() > 0) {
+                memberEntity.setReceive_address_list(addressList);
+            }
+            countDownLatch.countDown();
+        }).exceptionally(e -> {//执行失败
+            log.error("获取收获地址报错!" + memberCard, e);
+            countDownLatch.countDown();
+            return null;
+        });
         List<String> member_cards = new ArrayList<>();
         member_cards.add(memberCard);
         //获取顾客账户信息
-        CompletableFuture.supplyAsync(()->memberService.getMemberAmount(member_cards))
-                            .thenAccept(memberAmountList->{
-                                if (memberAmountList != null && memberAmountList.size() > 0) {
-                                    memberEntity.setMember_amount((MemberAmount) memberAmountList.get(0));
-                                }
-                                countDownLatch.countDown();
-                            });
-        try {
+        CompletableFuture.supplyAsync(() -> memberService.getMemberAmount(member_cards))
+                .thenAccept(memberAmountList -> {
+                    if (memberAmountList != null && memberAmountList.size() > 0) {
+                        memberEntity.setMember_amount((MemberAmount) memberAmountList.get(0));
+                    }
+                    countDownLatch.countDown();
+                }).exceptionally(e -> {//执行失败
+            log.error("获取顾客账户信息报错!" + memberCard, e);
+            countDownLatch.countDown();
+            return null;
+        });
             countDownLatch.await();
-        } catch (InterruptedException e) {
+            return GeneralResult.success(memberEntity);
+        } catch (Exception e) {
             e.printStackTrace();
+            log.error("根据顾客号查询顾客基本信息报错!" + memberCard, e);
+            return GeneralResult.errorWithMessage(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(),ResponseCodeEnums.BIZ_ERROR_CODE.getMessage());
         }
-        return GeneralResult.success(memberEntity);
     }
 
 
@@ -185,7 +198,6 @@ public class CustomerController {
     }
 
 
-
     @ApiOperation("获取顾客购买商品")
     @GetMapping("v1/getMemberProductEffectList")
     public GeneralResult<List<MemberProductEffect>> getMemberProductEffectList(
@@ -220,7 +232,7 @@ public class CustomerController {
             @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query")
     })
     public ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(@NotBlank String memberCard) {
-        return  memberService.getMemberDisease(memberCard);
+        return memberService.getMemberDisease(memberCard);
 
     }
 
@@ -348,14 +360,14 @@ public class CustomerController {
             @ApiImplicitParam(name = "memberCard", value = "会员卡号", required = true, dataType = "string", paramType = "query")
     })
     public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordList(@NotBlank String memberCard) {
-        return  memberService.getMemberGradeRecordList(memberCard);
+        return memberService.getMemberGradeRecordList(memberCard);
 
     }
 
     @ApiOperation("根据时间范围获取会员级别记录")
     @RequestMapping(value = "v1/getMemberGradeRecordListByTimeRange", method = RequestMethod.POST)
-    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(@RequestBody MemberGrandSelectVo vo){
-        return  memberService.getMemberGradeRecordListByTimeRange(vo);
+    public ComResponse<List<MemberGradeRecordDto>> getMemberGradeRecordListByTimeRange(@RequestBody MemberGrandSelectVo vo) {
+        return memberService.getMemberGradeRecordListByTimeRange(vo);
     }
 
 
@@ -363,16 +375,17 @@ public class CustomerController {
     @PostMapping("/v1/updateMemberDiseaseByDiseaseId")
     public ComResponse<Integer> updateMemberDiseaseByDiseaseId(@RequestBody MemberDiseaseIdUpdateVO memberDiseaseIdUpdateVO) {
         if (memberDiseaseIdUpdateVO == null || memberDiseaseIdUpdateVO.getNewDiseaseId() == null || memberDiseaseIdUpdateVO.getOldDiseaseId() == null) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "参数不能为空");
         }
         Integer integer = memberService.updateMemberDiseaseByDiseaseId(memberDiseaseIdUpdateVO);
-        return  ComResponse.success(integer);
+        return ComResponse.success(integer);
 
     }
 
 
     /**
      * 处理实时进线时，保存顾客信息
+     *
      * @param coilInVo
      * @return
      */
@@ -380,7 +393,7 @@ public class CustomerController {
     @PostMapping("/v1/coilInDealMemberData")
     public ComResponse<MemberGroupCodeDTO> coilInDealMemberData(@RequestBody MemberCoilInVO coilInVo) {
         if (coilInVo == null) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "参数不能为空");
         }
         ComResponse<MemberGroupCodeDTO> response = memberService.coilInDealMemberData(coilInVo);
         return response;
@@ -391,7 +404,7 @@ public class CustomerController {
     @PostMapping("/v1/dealWorkOrderUpdateMemberData")
     public ComResponse<Boolean> dealWorkOrderUpdateMemberData(@RequestBody MemeberWorkOrderSubmitVo workOrderSubmitVo) {
         if (workOrderSubmitVo == null) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空",false);
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "参数不能为空", false);
         }
         ComResponse<Boolean> response = memberService.memeberWorkOrderSubmit(workOrderSubmitVo);
         return response;
@@ -401,10 +414,10 @@ public class CustomerController {
     @PostMapping("/v1/dealOrderCreateUpdateMemberData")
     public ComResponse<Boolean> dealOrderCreateUpdateMemberData(@RequestBody OrderCreateInfoVO orderCreateInfoVO) {
         if (orderCreateInfoVO == null) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "参数不能为空");
         } else if (StringUtils.isEmpty(orderCreateInfoVO.getMemberCard())) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"memberCard不能为空");
-        }else if (StringUtils.isEmpty(orderCreateInfoVO.getOrderNo())) {
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "memberCard不能为空");
+        } else if (StringUtils.isEmpty(orderCreateInfoVO.getOrderNo())) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo不能为空");
         }
         ComResponse<Boolean> response = memberService.dealOrderCreateUpdateMemberData(orderCreateInfoVO);
@@ -416,7 +429,7 @@ public class CustomerController {
     @PostMapping("/v1/orderSignUpdateMemberData")
     public ComResponse<Boolean> orderSignUpdateMemberData(@RequestBody OrderSignInfo4MqVO orderInfo4MqVo) {
         if (orderInfo4MqVo == null) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "参数不能为空");
         }
         ComResponse<Boolean> response = memberService.orderSignUpdateMemberData(orderInfo4MqVo);
         return response;
@@ -435,7 +448,7 @@ public class CustomerController {
     }*/
     @ApiOperation("同步顾客标签数据")
     @PostMapping("/v1/updateMemberLabelTimedTask")
-    public ComResponse<Boolean> updateMemberLabel(){
+    public ComResponse<Boolean> updateMemberLabel() {
         //boolean result = memberService.updateMemberLabel();
         boolean result = memberService.updateMemberLabelForTask();
         return ComResponse.success(result);
@@ -459,8 +472,6 @@ public class CustomerController {
         System.out.println(date);
         return ComResponse.success(true);
     }
-
-
 
 
 }
