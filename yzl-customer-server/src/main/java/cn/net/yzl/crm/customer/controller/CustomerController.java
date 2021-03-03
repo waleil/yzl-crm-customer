@@ -1,6 +1,5 @@
 package cn.net.yzl.crm.customer.controller;
 
-import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
@@ -20,7 +19,6 @@ import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
-import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
 import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.*;
@@ -34,6 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 
 @Api(value="顾客信息",tags = {"顾客信息"})
 @RestController
@@ -97,20 +97,37 @@ public class CustomerController {
     @ApiOperation(value = "根据顾客号查询顾客基本信息")
     @GetMapping("v1/getMember")
     public GeneralResult<Member> getMember(@RequestParam("memberCard") String memberCard) {
+
         Member memberEntity = memberService.selectMemberByCard(memberCard);
-        List<MemberPhone> memberPhoneList = memberService.getMemberPhoneList(memberCard); //获取联系方式
-        List<ReveiverAddress> addressList = memberService.getReveiverAddress(memberCard); //获取收获地址
+        CountDownLatch countDownLatch = new CountDownLatch(3);
+        //获取联系方式
+        CompletableFuture.supplyAsync(()->memberService.getMemberPhoneList(memberCard)).thenAccept(memberPhones -> {
+            if(memberPhones!=null && memberPhones.size()>0){
+                memberEntity.setMemberPhoneList(memberPhones);
+            }
+            countDownLatch.countDown();
+        });
+        //获取收获地址
+       CompletableFuture.supplyAsync(()->memberService.getReveiverAddress(memberCard)).thenAccept(addressList->{
+           if(addressList!=null && addressList.size()>0){
+               memberEntity.setReceive_address_list(addressList);
+           }
+           countDownLatch.countDown();
+       });
         List<String> member_cards = new ArrayList<>();
         member_cards.add(memberCard);
-        List<MemberAmount> memberAmountList = memberService.getMemberAmount(member_cards); //获取顾客账户信息
-        if (memberAmountList != null && memberAmountList.size() > 0) {
-            memberEntity.setMember_amount(memberAmountList.get(0));
-        }
-        if(addressList!=null && addressList.size()>0){
-            memberEntity.setReceive_address_list(addressList);
-        }
-        if(memberPhoneList!=null && memberPhoneList.size()>0){
-            memberEntity.setMemberPhoneList(memberPhoneList);
+        //获取顾客账户信息
+        CompletableFuture.supplyAsync(()->memberService.getMemberAmount(member_cards))
+                            .thenAccept(memberAmountList->{
+                                if (memberAmountList != null && memberAmountList.size() > 0) {
+                                    memberEntity.setMember_amount((MemberAmount) memberAmountList.get(0));
+                                }
+                                countDownLatch.countDown();
+                            });
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return GeneralResult.success(memberEntity);
     }
