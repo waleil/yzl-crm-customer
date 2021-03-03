@@ -323,7 +323,27 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public List<MemberPhone> getMemberPhoneList(String member_card) {
-        return memberMapper.getMemberPhoneList(member_card);
+        List<MemberPhone> memberPhoneList = memberMapper.getMemberPhoneList(member_card);
+        if(CollectionUtils.isEmpty(memberPhoneList)){
+            return Collections.emptyList();
+        }
+        List<MemberPhone> temp=  memberPhoneList.stream().filter(v->v.getEnabled()==1).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(temp)){
+            return Collections.emptyList();
+        }
+        if(temp.size()==1){
+            return temp;
+        }
+        Collections.sort(temp, new Comparator<MemberPhone>() {
+            @Override
+            public int compare(MemberPhone o1, MemberPhone o2) {
+                if(o1.getUpdate_time()==null||o2.getUpdate_time()==null){
+                    return 0;
+                }
+                return (int) ((int) o2.getUpdate_time().getTime()-o1.getUpdate_time().getTime());
+            }
+        });
+        return temp;
     }
 
     /**
