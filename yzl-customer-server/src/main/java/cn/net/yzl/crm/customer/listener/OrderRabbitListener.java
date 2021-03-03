@@ -56,6 +56,7 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 			order = this.objectMapper.readValue(message.getBody(), OrderSignInfo4MqVO.class);
 			error.setMemberCard(order.getMemberCardNo());
 			error.setOrderNo(order.getOrderNo());
+			error.setOrderData(JSON.toJSONString(order));
 
 			response = memberService.orderSignUpdateMemberData(order);
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);// 正常消费后，手动确认消息
