@@ -1,6 +1,8 @@
 package cn.net.yzl.crm.customer.model;
 
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -57,4 +59,7 @@ public class MemberAmount implements Serializable {
     private Integer frozenRedBag;
 
     private static final long serialVersionUID = 1L;
+
+    @ApiModelProperty(value = "可用金额",name = "validAmount")
+    private Integer validAmount;
 }

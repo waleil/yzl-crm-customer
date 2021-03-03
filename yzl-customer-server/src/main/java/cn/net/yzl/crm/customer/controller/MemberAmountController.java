@@ -67,4 +67,14 @@ public class MemberAmountController {
     ComResponse<String> operationConfirm(@RequestParam("obtainType") @Min(1) @Max(2) int obtainType, @RequestParam("orderNo") @NotBlank String orderNo) throws ParseException {
         return memberAmountService.operationConfirm(obtainType,orderNo);
     }
+
+
+    @ApiOperation(value = "顾客账户-取消退回冻结金额", notes = "顾客账户-取消退回冻结金额")
+    @RequestMapping(value = "/operationReurnCancel", method = RequestMethod.POST)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "string", paramType = "query"),
+    })
+    ComResponse<String> operationReurnCancel(@RequestParam("orderNo") @NotBlank String orderNo) throws ParseException {
+        return memberAmountService.operationReurnCancel(orderNo);
+    }
 }

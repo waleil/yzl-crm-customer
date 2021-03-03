@@ -53,7 +53,7 @@ public class MybatisConfiguration {
             sessionFactoryBean.setDataSource(writeDataSource);
             
             // 读取配置 
-            sessionFactoryBean.setTypeAliasesPackage("cn.net.yzl.staff.pojo");
+            //sessionFactoryBean.setTypeAliasesPackage("cn.net.yzl.staff.pojo");
             
             //设置mapper.xml文件所在位置
             for (String mapperLocation : mapperLocations) {
