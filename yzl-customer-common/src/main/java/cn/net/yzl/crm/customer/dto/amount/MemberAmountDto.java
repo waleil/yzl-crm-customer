@@ -21,5 +21,8 @@ public class MemberAmountDto implements Serializable {
     @ApiModelProperty(value = "冻结预存款",name = "frozenAmount")
     private Integer frozenAmount;
 
+    @ApiModelProperty(value = "可用金额",name = "validAmount")
+    private Integer validAmount;
+
 
 }
