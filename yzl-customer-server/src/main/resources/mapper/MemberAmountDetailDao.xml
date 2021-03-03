@@ -32,7 +32,7 @@
             member_card memberCard,
             create_date createDate,
             discount_money discountMoney,
-            obtain_type obtainType,
+            obtain_type obtainType,status
             remark
         FROM
             member_amount_detail
