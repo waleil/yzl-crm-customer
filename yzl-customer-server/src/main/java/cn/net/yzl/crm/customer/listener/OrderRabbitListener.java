@@ -46,15 +46,16 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 		MemberOrderSignHandle error = null;
 		String exMsg = "";
 		try {
-			//消息换成对象
-			System.out.println(message.getBody());
-			order = this.objectMapper.readValue(message.getBody(), OrderSignInfo4MqVO.class);
 			error = new MemberOrderSignHandle();
-			error.setMemberCard(order.getMemberCardNo());
-			error.setOrderNo(order.getOrderNo());
 			error.setOrderData(JSON.toJSONString(order));
 			error.setCreatorNo("SYSTEM");
 			error.setCreateTime(new Date());
+
+			System.out.println(message.getBody());
+			//消息换成对象
+			order = this.objectMapper.readValue(message.getBody(), OrderSignInfo4MqVO.class);
+			error.setMemberCard(order.getMemberCardNo());
+			error.setOrderNo(order.getOrderNo());
 
 			response = memberService.orderSignUpdateMemberData(order);
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);// 正常消费后，手动确认消息
@@ -85,7 +86,7 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 			if (error != null) {
 				ComResponse<Boolean> saveResult = memberOrderSignHandleService.saveDealErrorOrderData(error);
 				if (saveResult.getCode() != 200) {
-					log.error("onMessage:订单签收时处理消息失败且保存失败记录失败!"+order.toString());
+					log.error("onMessage:订单签收时处理消息失败且保存失败记录失败!"+ JSON.toJSONString(order));
 				}
 			}
 		}
