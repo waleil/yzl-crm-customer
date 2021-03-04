@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.service.amount;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
+import cn.net.yzl.crm.customer.model.MemberAmountDetail;
 import cn.net.yzl.crm.customer.vo.MemberAmountDetailVO;
 
 import java.text.ParseException;
@@ -20,4 +21,7 @@ public interface MemberAmountService {
     ComResponse<String> operationConfirm(int obtainType, String orderNo);
 
     public ComResponse<String> operationReurnCancel(String orderNo);
+
+
+    public MemberAmountDetail getFrozenDetailByOrder(String orderNo, Integer obtainType);
 }
