@@ -77,7 +77,7 @@ public class CustomerGroupController {
 
     @ApiOperation("分页获取圈选列表")
     @GetMapping("/v1/getCrowdGroupByPage")
-    public ComResponse getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
+    public ComResponse<Page<member_crowd_group>> getCrowdGroupByPage(CrowdGroupDTO crowdGroupDTO) {
         if (crowdGroupDTO == null) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         Page<member_crowd_group> page = customerGroupService.getCrowdGroupByPage(crowdGroupDTO);
         return ComResponse.success(page);

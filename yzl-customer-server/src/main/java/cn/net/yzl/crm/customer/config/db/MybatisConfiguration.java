@@ -77,9 +77,9 @@ public class MybatisConfiguration {
          //设置mybatis-config.xml配置文件位置
             sessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(configLocation));
 
-            //添加分页插件、打印sql插件
-            Interceptor[] plugins = new Interceptor[]{pageHelper(),new SqlPrintInterceptor()};
-            sessionFactoryBean.setPlugins(plugins);
+//            //添加分页插件、打印sql插件
+//            Interceptor[] plugins = new Interceptor[]{pageHelper(),new SqlPrintInterceptor()};
+//            sessionFactoryBean.setPlugins(plugins);
             
             return sessionFactoryBean.getObject();
         } catch (IOException e) {
