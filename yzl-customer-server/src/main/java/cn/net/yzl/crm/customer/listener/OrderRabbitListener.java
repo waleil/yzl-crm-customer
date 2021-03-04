@@ -6,9 +6,12 @@ import cn.net.yzl.crm.customer.service.MemberOrderSignHandleService;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
+import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
@@ -43,15 +46,16 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 		ComResponse<Boolean> response = null;
 		OrderSignInfo4MqVO order = null;//订单签收消息对象
 		boolean successFlag = false;//是否操作成功标识
-		MemberOrderSignHandle error = null;
+		MemberOrderSignHandle error = new MemberOrderSignHandle();
 		String exMsg = "";
 		try {
-			error = new MemberOrderSignHandle();
-			error.setOrderData(JSON.toJSONString(order));
 			error.setCreatorNo("SYSTEM");
 			error.setCreateTime(new Date());
+			if (message.getBody() != null) {
+				//error.setOrderData(StringEscapeUtils.unescapeJavaScript(new String(message.getBody())));
+				error.setOrderData(JSON.toJSONString(new String(message.getBody())));
+			}
 
-			System.out.println(message.getBody());
 			//消息换成对象
 			order = this.objectMapper.readValue(message.getBody(), OrderSignInfo4MqVO.class);
 			error.setMemberCard(order.getMemberCardNo());
