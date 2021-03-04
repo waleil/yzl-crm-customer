@@ -72,11 +72,11 @@ public class WorkOrderBeanVO implements Serializable {
     private Integer isWorkOrder;
 
     @ApiModelProperty(value = "通话时间 （热线每日更新）")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date callTime;
 
     @ApiModelProperty(value = "预约回访日期yyyy-MM-dd HH-mm-ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date visitDate;
 
     @ApiModelProperty(value = "主叫号码")
@@ -104,11 +104,11 @@ public class WorkOrderBeanVO implements Serializable {
     private String applyUpMemo;
 
     @ApiModelProperty(value = "回拨截止时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date callBackDeadline;
 
     @ApiModelProperty(value = "分配时间 （热线每日更新）")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date allocateTime;
 
     @ApiModelProperty(value = "工单处理状态 1:未处理，2：已处理")
@@ -134,7 +134,7 @@ public class WorkOrderBeanVO implements Serializable {
     private Date lastOrderTime;
 
     @ApiModelProperty(value = "座席最后一次拨打时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastCallTime;
 
     @ApiModelProperty(value = "目标销售商品编码（最后一次进线对应的商品）")
@@ -168,7 +168,7 @@ public class WorkOrderBeanVO implements Serializable {
     private BigDecimal workOrderMoney;
 
     @ApiModelProperty(value = "创建时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "创建人id")
@@ -178,7 +178,7 @@ public class WorkOrderBeanVO implements Serializable {
     private String createName;
 
     @ApiModelProperty(value = "修改时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     @ApiModelProperty(value = "修改人id")
