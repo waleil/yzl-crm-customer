@@ -425,4 +425,21 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         }
         return ComResponse.success();
     }
+
+
+    /**
+     * 查询订单对应的冻结记录
+     * @param orderNo 订单号
+     * @param obtainType 1:退回记录 2:消费记录
+     * @return 对应的余额明细记录
+     */
+    public MemberAmountDetail getFrozenDetailByOrder(String orderNo,Integer obtainType){
+        MemberAmountDetail detail = null;
+        if (obtainType != null && (obtainType ==1 || obtainType == 2)) {
+            Map<Byte, MemberAmountDetail> memberAmountDetailMap = memberAmountDetailDao.getDetailByTypesAndOrder(orderNo, Arrays.asList(1, 2), Arrays.asList(3));
+            detail = memberAmountDetailMap.get(obtainType);
+        }
+        return detail;
+    }
+
 }

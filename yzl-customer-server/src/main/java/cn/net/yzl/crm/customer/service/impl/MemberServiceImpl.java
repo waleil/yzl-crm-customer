@@ -35,6 +35,7 @@ import cn.net.yzl.crm.customer.service.CustomerGroupService;
 import cn.net.yzl.crm.customer.service.MemberAddressService;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.service.MemberService;
+import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.service.impl.phone.MemberPhoneServiceImpl;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -125,6 +126,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberActionRelationService memberActionRelationService;
+
+    @Autowired
+    MemberAmountService memberAmountService;
 
 
     @Autowired
@@ -1033,6 +1037,19 @@ public class MemberServiceImpl implements MemberService {
             if (result < 1) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+            }
+
+            //判断是否存在冻结消费，存在则确认消费
+            MemberAmountDetail frozenDetail = memberAmountService.getFrozenDetailByOrder(orderInfo4MqVo.getOrderNo(), 2);
+            //存在冻结消费，要进行确认
+            if (frozenDetail != null) {
+                ComResponse<String> response = memberAmountService.operationConfirm(2, orderInfo4MqVo.getOrderNo());
+                if (response == null || response.getCode() != 200) {
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"确认扣款失败!");
+                }
+            }else{
+                log.info("订单,{}签收时未找到消费冻结记录",orderInfo4MqVo.getOrderNo());
             }
 
             //设置缓存
