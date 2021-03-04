@@ -50,6 +50,7 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 		String exMsg = "";
 		try {
 			error.setCreatorNo("SYSTEM");
+			error.setUpdatorNo("SYSTEM");
 			error.setCreateTime(new Date());
 			if (message.getBody() != null) {
 				//error.setOrderData(StringEscapeUtils.unescapeJavaScript(new String(message.getBody())));
