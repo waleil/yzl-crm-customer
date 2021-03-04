@@ -125,7 +125,7 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         Pattern p = null;
         Matcher m = null;
         boolean b = false;
-        p = Pattern.compile("^[1][3,4,5,7,8,9][0-9]{9}$"); // 验证手机号
+        p = Pattern.compile("^[1][3,4,5,6,7,8,9][0-9]{9}$"); // 验证手机号
         m = p.matcher(str);
         b = m.matches();
         return b;

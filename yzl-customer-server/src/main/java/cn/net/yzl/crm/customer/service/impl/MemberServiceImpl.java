@@ -166,6 +166,9 @@ public class MemberServiceImpl implements MemberService {
         long maxMemberCard = redisUtil.incr(cacheKey, 1);
         //设置顾客会员卡号
         member.setMember_card(String.valueOf(maxMemberCard));
+        member.setMGradeId(1);
+        member.setMGradeName("无卡");
+        member.setM_grade_code(null);
         //保存数据
         int result = memberMapper.insertSelective(member);
         if (result < 1) {
@@ -889,28 +892,35 @@ public class MemberServiceImpl implements MemberService {
                 if (ProductMainDTO == null) {
                     continue;
                 }
-                String totalUseNum = ProductMainDTO.getTotalUseNum();
+                int productCount = productVO.getProductCount() == null ? 1 : productVO.getProductCount();//购买商品的数量
+                String totalUseNum = ProductMainDTO.getTotalUseNum();//当商品规格 数量
                 if (addVo != null) {
-                    addVo.setProductLastNum(Integer.valueOf(totalUseNum));//商品剩余量
+                    if (StringUtils.isNotEmpty(totalUseNum)) {
+                        addVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount);//商品剩余量
+                    }
+                    addVo.setProductCount(productCount);//购买商品数量
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
-                    addVo.setProductLastNum(productVO.getProductCount());
-                    addVo.setProductCount(productVO.getProductCount());//购买商品数量
 
-                    addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
-                    addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
+                    //默认不保存商品信息里面的用量信息
+                    addVo.setOneToTimes(null);
+                    addVo.setOneUseNum(null);
                 }else if (upVo != null){
-                    upVo.setProductLastNum(Integer.valueOf(totalUseNum) + dto.getProductLastNum());//商品剩余量
+                    if (StringUtils.isNotEmpty(totalUseNum)) {
+                        upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
+                    }
+
                     upVo.setProductName(ProductMainDTO.getName());//商品名称
                     upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
                     upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
 
-                    if (dto.getOneToTimes() == null) {
+                    //默认不保存商品信息里面的用量信息
+                    /*if (dto.getOneToTimes() == null) {
                         upVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     }
                     if (dto.getOneUseNum() == null) {
                         upVo.setOneUseNum(ProductMainDTO.getOneUseNum());
-                    }
+                    }*/
                 }
             }
             //保存
@@ -1546,7 +1556,7 @@ public class MemberServiceImpl implements MemberService {
             workOrderBeanVO.setApplyUpStatus(0);//上交状态：未上交
             workOrderBeanVO.setCallFlag(0);//员工当日拨打状态：未拨打
             workOrderBeanVO.setCallTimes(0);//坐席已拨打次数：0次
-            List<MemberPhone> memberPhoneList = memberVO.getMemberPhoneList();
+            /*List<MemberPhone> memberPhoneList = memberVO.getMemberPhoneList();
             if (CollectionUtil.isNotEmpty(memberPhoneList)) {
                 //默认为第一个
                 workOrderBeanVO.setCalledPhone(memberPhoneList.get(0).getPhone_number());//被叫号码
@@ -1556,7 +1566,7 @@ public class MemberServiceImpl implements MemberService {
                         break;
                     }
                 }
-            }
+            }*/
             //workOrderBeanVO.setCallerPhone("400-");//主叫号码
             if (workOrderBeanVO.getCreateTime() == null) {
                 workOrderBeanVO.setCreateTime(now);//创建时间
@@ -1570,7 +1580,7 @@ public class MemberServiceImpl implements MemberService {
                 workOrderBeanVO.setMemberName(memberVO.getMember_name());//会员名称
             }
             workOrderBeanVO.setMGradeCode("1");
-            workOrderBeanVO.setSouce(3);//工单来源：自有的
+            workOrderBeanVO.setSouce(1);//工单来源：自有的
             workOrderBeanVO.setStatus(1);//工单处理状态：未处理
             workOrderBeanVO.setTradeStatus(2);//工单成交状态：未成交
             workOrderBeanVO.setTransTimes(0);//调整次数：0
