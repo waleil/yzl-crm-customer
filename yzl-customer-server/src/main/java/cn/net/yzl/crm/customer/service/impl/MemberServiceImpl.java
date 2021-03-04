@@ -892,28 +892,35 @@ public class MemberServiceImpl implements MemberService {
                 if (ProductMainDTO == null) {
                     continue;
                 }
-                String totalUseNum = ProductMainDTO.getTotalUseNum();
+                int productCount = productVO.getProductCount() == null ? 1 : productVO.getProductCount();//购买商品的数量
+                String totalUseNum = ProductMainDTO.getTotalUseNum();//当商品规格 数量
                 if (addVo != null) {
-                    addVo.setProductLastNum(Integer.valueOf(totalUseNum));//商品剩余量
+                    if (StringUtils.isNotEmpty(totalUseNum)) {
+                        addVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount);//商品剩余量
+                    }
+                    addVo.setProductCount(productCount);//购买商品数量
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
-                    addVo.setProductLastNum(productVO.getProductCount());
-                    addVo.setProductCount(productVO.getProductCount());//购买商品数量
 
-                    addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
-                    addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
+                    //默认不保存商品信息里面的用量信息
+                    addVo.setOneToTimes(null);
+                    addVo.setOneUseNum(null);
                 }else if (upVo != null){
-                    upVo.setProductLastNum(Integer.valueOf(totalUseNum) + dto.getProductLastNum());//商品剩余量
+                    if (StringUtils.isNotEmpty(totalUseNum)) {
+                        upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
+                    }
+
                     upVo.setProductName(ProductMainDTO.getName());//商品名称
                     upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
                     upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
 
-                    if (dto.getOneToTimes() == null) {
+                    //默认不保存商品信息里面的用量信息
+                    /*if (dto.getOneToTimes() == null) {
                         upVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     }
                     if (dto.getOneUseNum() == null) {
                         upVo.setOneUseNum(ProductMainDTO.getOneUseNum());
-                    }
+                    }*/
                 }
             }
             //保存
