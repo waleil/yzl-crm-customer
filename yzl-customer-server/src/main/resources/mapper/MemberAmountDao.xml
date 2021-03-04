@@ -61,7 +61,7 @@
       frozen_ticket, frozen_integral, frozen_red_bag
       )
     values (#{memberCard,jdbcType=VARCHAR}, #{lastIntegral,jdbcType=INTEGER}, #{lastRedBag,jdbcType=INTEGER}, 
-      #{lastCoupon,jdbcType=INTEGER}, #{totalMoney,jdbcType=INTEGER}, #{validMoney,jdbcType=INTEGER},#{frozenAmount,jdbcType=INTEGER},
+      #{lastCoupon,jdbcType=INTEGER}, #{totalMoney,jdbcType=INTEGER}, #{validAmount,jdbcType=INTEGER},#{frozenAmount,jdbcType=INTEGER},
       #{frozenTicket,jdbcType=INTEGER}, #{frozenIntegral,jdbcType=INTEGER}, #{frozenRedBag,jdbcType=INTEGER}
       )
   </insert>
@@ -83,8 +83,8 @@
       <if test="totalMoney != null">
         total_money,
       </if>
-      <if test="validMoney != null">
-        valid_money,
+      <if test="validAmount != null">
+        valid_amount,
       </if>
       <if test="frozenAmount != null">
         frozen_amount,
@@ -115,8 +115,8 @@
       <if test="totalMoney != null">
         #{totalMoney,jdbcType=INTEGER},
       </if>
-      <if test="validMoney != null">
-        #{validMoney,jdbcType=INTEGER},
+      <if test="validAmount != null">
+        #{validAmount,jdbcType=INTEGER},
       </if>
       <if test="frozenAmount != null">
         #{frozenAmount,jdbcType=INTEGER},
@@ -172,7 +172,7 @@
       last_red_bag = #{lastRedBag,jdbcType=INTEGER},
       last_coupon = #{lastCoupon,jdbcType=INTEGER},
       total_money = #{totalMoney,jdbcType=INTEGER},
-      valid_money = #{validMoney,jdbcType=INTEGER},
+      valid_amount = #{validAmount,jdbcType=INTEGER},
       frozen_amount = #{frozenAmount,jdbcType=INTEGER},
       frozen_ticket = #{frozenTicket,jdbcType=INTEGER},
       frozen_integral = #{frozenIntegral,jdbcType=INTEGER},

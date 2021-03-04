@@ -9,6 +9,7 @@ import cn.net.yzl.crm.customer.dao.MemberAmountDetailDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
+import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberAmount;
 import cn.net.yzl.crm.customer.model.MemberAmountDetail;
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
@@ -42,13 +43,19 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     @Transactional
     public ComResponse<MemberAmountDto> getMemberAmount(String memberCard) {
         MemberAmountDto memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
-        if (memberAmountDto == null) { // 如果不存在 就添加一个账户
+        if (memberAmountDto == null) { // 如果不存在 --> 判断客户是否存在 存在才添加一个账户
+            Member member = memberMapper.selectMemberByCard(memberCard);
+            if (member == null) {
+                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"客户不存在!");
+            }
             MemberAmount memberAmount = new MemberAmount();
             memberAmount.setMemberCard(memberCard);
             int num = memberAmountDao.insertSelective(memberAmount);
             if (num < 0) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
             }
+            //插入成功后，重新查询账户信息
+            memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
         }
         return ComResponse.success(memberAmountDto);
     }
