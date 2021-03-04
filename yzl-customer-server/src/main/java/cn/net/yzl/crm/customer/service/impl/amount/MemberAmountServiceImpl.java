@@ -437,7 +437,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         MemberAmountDetail detail = null;
         if (obtainType != null && (obtainType ==1 || obtainType == 2)) {
             Map<Byte, MemberAmountDetail> memberAmountDetailMap = memberAmountDetailDao.getDetailByTypesAndOrder(orderNo, Arrays.asList(1, 2), Arrays.asList(3));
-            detail = memberAmountDetailMap.get(obtainType);
+            detail = memberAmountDetailMap.get((byte)obtainType.intValue());
         }
         return detail;
     }
