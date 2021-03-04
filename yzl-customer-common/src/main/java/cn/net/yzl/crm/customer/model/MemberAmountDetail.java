@@ -2,6 +2,8 @@ package cn.net.yzl.crm.customer.model;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -81,4 +83,7 @@ public class MemberAmountDetail implements Serializable {
     private String remark;
 
     private static final long serialVersionUID = 1L;
+
+    @ApiModelProperty(value = "操作类型:1:先冻结,需要手动确认  2:一步完成", name = "operateType")
+    private Integer operateType;
 }

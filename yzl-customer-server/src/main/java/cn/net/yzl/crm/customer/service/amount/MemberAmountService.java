@@ -18,4 +18,6 @@ public interface MemberAmountService {
     ComResponse<String> operation(MemberAmountDetailVO memberAmountDetailVO);
 
     ComResponse<String> operationConfirm(int obtainType, String orderNo);
+
+    public ComResponse<String> operationReurnCancel(String orderNo);
 }

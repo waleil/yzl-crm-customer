@@ -32,7 +32,7 @@
             member_card memberCard,
             create_date createDate,
             discount_money discountMoney,
-            obtain_type obtainType,
+            obtain_type obtainType,`status`,
             remark
         FROM
             member_amount_detail
@@ -53,6 +53,22 @@
     from member_amount_detail
     where order_no = #{orderNo} and obtain_type=#{obtainType}
     limit 1
+  </select>
+  <select id="getDetailByTypesAndOrder" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from member_amount_detail
+    where order_no = #{orderNo}
+      and `obtain_type` in
+        <foreach item="item" index="index" collection="obtainTypes" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      and `status` in
+        <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    group by obtain_type
+
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from member_amount_detail
@@ -78,6 +94,9 @@
       </if>
       <if test="discountName != null">
         discount_name,
+      </if>
+      <if test="operateType != null">
+        operate_type,
       </if>
       <if test="discountMoney != null">
         discount_money,
@@ -119,6 +138,9 @@
       </if>
       <if test="discountName != null">
         #{discountName,jdbcType=VARCHAR},
+      </if>
+      <if test="operateType != null">
+        #{operateType,jdbcType=TINYINT},
       </if>
       <if test="discountMoney != null">
         #{discountMoney,jdbcType=INTEGER},
@@ -216,5 +238,10 @@
       `status` = #{status,jdbcType=TINYINT},
       remark = #{remark,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateAmountDetailStatus">
+      UPDATE member_amount_detail SET
+        `status` = #{newStatus}
+      where order_no = #{orderNo} and `status` = #{oldStatus}
   </update>
 </mapper>

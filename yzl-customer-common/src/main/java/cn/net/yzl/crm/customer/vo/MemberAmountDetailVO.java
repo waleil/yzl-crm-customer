@@ -36,4 +36,7 @@ public class MemberAmountDetailVO implements Serializable {
     private String remark;
     @ApiModelProperty(value = "订单号(操作类型为1或者2时,orderNo必传)", name = "orderNo")
     private String orderNo;
+
+    @ApiModelProperty(value = "操作类型:1:先冻结,需要手动确认  2:一步完成", name = "operateType")
+    private Integer operateType;
 }

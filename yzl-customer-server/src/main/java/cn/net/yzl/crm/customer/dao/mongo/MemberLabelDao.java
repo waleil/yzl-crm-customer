@@ -9,6 +9,7 @@ import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
+import cn.net.yzl.crm.customer.utils.date.DealDateUtil;
 import cn.net.yzl.crm.customer.utils.mongo.PageUtil;
 import cn.net.yzl.logger.annotate.SysAccessLog;
 import cn.net.yzl.logger.enums.DefaultDataEnums;
@@ -26,6 +27,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -426,20 +431,10 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 if (days.getDay() > 10000) {
                     throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "首单下单时间不能大于10000");
                 }
-                Date date = getPastDate(days.getDay());
-                String symbol = days.getSymbol();
-                if (">=".equals(symbol)){
-                    and.add(Criteria.where("firstOrderTime").gte(MongoDateHelper.getMongoDate(date)));
-                }else if (">".equals(symbol)){
-                    and.add(Criteria.where("firstOrderTime").gt(MongoDateHelper.getMongoDate(date)));
-                }else if ("=".equals(symbol)){
-                    and.add(Criteria.where("firstOrderTime").is(MongoDateHelper.getMongoDate(date)));
-                }else if ("<=".equals(symbol)){
-                    and.add(Criteria.where("firstOrderTime").lte(MongoDateHelper.getMongoDate(date)));
-                }else if ("<".equals(symbol)){
-                    and.add(Criteria.where("firstOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+                Criteria where = dayParamCondition(days, "firstOrderTime");
+                if (where != null) {
+                    and.add(where);
                 }
-
             }
         }
 
@@ -467,23 +462,15 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //最后一次下单时间>=
         if (memberCrowdGroup.getLast_order_to_days() != null) {
-            DayParam day = memberCrowdGroup.getLast_order_to_days();
-            Integer days = day.getDay();
-            String symbol = day.getSymbol();
-            if (days > 10000) {
-                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
-            }
-            Date date = getPastDate(days);
-            if (">=".equals(symbol)){
-                and.add(Criteria.where("lastOrderTime").gte(MongoDateHelper.getMongoDate(date)));
-            }else if (">".equals(symbol)){
-                and.add(Criteria.where("lastOrderTime").gt(MongoDateHelper.getMongoDate(date)));
-            }else if ("=".equals(symbol)){
-                and.add(Criteria.where("lastOrderTime").is(MongoDateHelper.getMongoDate(date)));
-            }else if ("<=".equals(symbol)){
-                and.add(Criteria.where("lastOrderTime").lte(MongoDateHelper.getMongoDate(date)));
-            }else if ("<".equals(symbol)){
-                and.add(Criteria.where("lastOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+            DayParam days = memberCrowdGroup.getLast_order_to_days();
+            if (days.getDay() != null && StringUtils.isNotEmpty(days.getSymbol())) {
+                if (days.getDay() > 10000) {
+                    throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
+                }
+                Criteria where = dayParamCondition(days, "lastOrderTime");
+                if (where != null) {
+                    and.add(where);
+                }
             }
         }
         //生日月份
@@ -570,23 +557,15 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         //签收时间时间>=
         if (memberCrowdGroup.getSign_date_to_days() != null) {
-            DayParam day = memberCrowdGroup.getSign_date_to_days();
-            Integer days = day.getDay();
-            String symbol = day.getSymbol();
-            if (days > 10000) {
-                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次签收时间不能大于10000");
-            }
-            Date date = getPastDate(days);
-            if (">=".equals(symbol)){
-                and.add(Criteria.where("lastSignTime").gte(MongoDateHelper.getMongoDate(date)));
-            }else if (">".equals(symbol)){
-                and.add(Criteria.where("lastSignTime").gt(MongoDateHelper.getMongoDate(date)));
-            }else if ("=".equals(symbol)){
-                and.add(Criteria.where("lastSignTime").is(MongoDateHelper.getMongoDate(date)));
-            }else if ("<=".equals(symbol)){
-                and.add(Criteria.where("lastSignTime").lte(MongoDateHelper.getMongoDate(date)));
-            }else if ("<".equals(symbol)){
-                and.add(Criteria.where("lastOrderTime").lt(MongoDateHelper.getMongoDate(date)));
+            DayParam days = memberCrowdGroup.getSign_date_to_days();
+            if (days.getDay() != null && StringUtils.isNotEmpty(days.getSymbol())) {
+                if (days.getDay() > 10000) {
+                    throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次签收时间不能大于10000");
+                }
+                Criteria where = dayParamCondition(days, "lastSignTime");
+                if (where != null) {
+                    and.add(where);
+                }
             }
         }
         //方便接电话时间
@@ -1141,20 +1120,10 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 if (days.getDay() > 10000) {
                     throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "最后一次下单时间不能大于10000");
                 }
-                Date date = getPastDate(days.getDay());
-                String symbol = days.getSymbol();
-                if (">=".equals(symbol)){
-                    and.add(Criteria.where("lastCallInTime").gte(MongoDateHelper.getMongoDate(date)));
-                }else if (">".equals(symbol)){
-                    and.add(Criteria.where("lastCallInTime").gt(MongoDateHelper.getMongoDate(date)));
-                }else if ("=".equals(symbol)){
-                    and.add(Criteria.where("lastCallInTime").is(MongoDateHelper.getMongoDate(date)));
-                }else if ("<=".equals(symbol)){
-                    and.add(Criteria.where("lastCallInTime").lte(MongoDateHelper.getMongoDate(date)));
-                }else if ("<".equals(symbol)){
-                    and.add(Criteria.where("lastCallInTime").lt(MongoDateHelper.getMongoDate(date)));
+                Criteria where = dayParamCondition(days, "lastCallInTime");
+                if (where != null) {
+                    and.add(where);
                 }
-
             }
         }
         //购买的商品
@@ -1243,5 +1212,29 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
 
         return Collections.EMPTY_MAP;
+    }
+
+
+    public Criteria dayParamCondition(DayParam dayParam,String attr){
+        String symbol = dayParam.getSymbol();
+        Integer days = dayParam.getDay();
+        Date date = getPastDate(days);
+
+        Date start = DealDateUtil.getStart(date);//开始时间
+        Date end = DealDateUtil.getEnd(date);//结束时间
+
+        Criteria where = null;
+        if (">=".equals(symbol)){
+            where = Criteria.where(attr).lte(MongoDateHelper.getMongoDate(end));
+        }else if (">".equals(symbol)){
+            where = Criteria.where(attr).lt(MongoDateHelper.getMongoDate(start));
+        }else if ("=".equals(symbol)){
+            where = Criteria.where(attr).gte(MongoDateHelper.getMongoDate(start)).lt(MongoDateHelper.getMongoDate(end));
+        }else if ("<=".equals(symbol)){
+            where = Criteria.where(attr).gte(MongoDateHelper.getMongoDate(start));
+        }else if ("<".equals(symbol)){
+            where = Criteria.where(attr).gt(MongoDateHelper.getMongoDate(end));
+        }
+        return where;
     }
 }

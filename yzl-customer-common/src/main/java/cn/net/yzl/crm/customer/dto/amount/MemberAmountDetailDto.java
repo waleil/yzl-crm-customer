@@ -27,6 +27,10 @@ public class MemberAmountDetailDto implements Serializable {
     private Integer discountMoney;
     @ApiModelProperty(value = "1 退回 2 消费,3:充值",name = "obtainType")
     private Byte obtainType;
+    @ApiModelProperty(value = "1正常(完成),2:无效(失败),3:进行中(待确认),4:退回完成,5:冻结时退回",name = "status")
+    private Integer status;
+
+
     @ApiModelProperty(value = "备注",name = "remark")
     private String remark;
 }

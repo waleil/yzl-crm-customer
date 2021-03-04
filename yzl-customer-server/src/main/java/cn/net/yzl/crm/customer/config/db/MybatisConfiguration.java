@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration
 @AutoConfigureAfter(cn.net.yzl.crm.customer.config.db.DataSourceConfiguration.class)
-@MapperScan(basePackages="cn.net.yzl.staff.mapper")
+@MapperScan(basePackages="cn.net.yzl.crm.customer.dao")
 public class MybatisConfiguration {
 
 	private static Logger log = LoggerFactory.getLogger(MybatisConfiguration.class);
@@ -66,7 +66,7 @@ public class MybatisConfiguration {
             sessionFactoryBean.setDataSource(roundRobinDataSouceProxy());
             
             // 读取配置 
-            sessionFactoryBean.setTypeAliasesPackage("cn.net.yzl.staff.pojo");
+            //sessionFactoryBean.setTypeAliasesPackage("cn.net.yzl.staff.pojo");
             
             //设置mapper.xml文件所在位置
             for (String mapperLocation : mapperLocations) {
