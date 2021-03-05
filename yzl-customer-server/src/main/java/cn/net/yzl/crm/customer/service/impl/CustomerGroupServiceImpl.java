@@ -235,8 +235,17 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     public Boolean memberGroupTimedTask() {
         List<member_crowd_group> list =memberCrowdGroupDao.query4Task();
         //多线程执行
-        for(member_crowd_group memberCrowdGroup:list){
-            threadPoolExecutor.execute(()->{ memberCrowdGroupRun(memberCrowdGroup);});
+        String groupId = "";
+        String groupName = "";
+        try {
+            for (member_crowd_group memberCrowdGroup : list) {
+                groupId = memberCrowdGroup.get_id();
+                groupName = memberCrowdGroup.getCrowd_name();
+                //threadPoolExecutor.execute(()->{ memberCrowdGroupRun(memberCrowdGroup);});
+                memberCrowdGroupRun(memberCrowdGroup);
+            }
+        } catch (Exception e) {
+            log.error("/v1/memberGroupTimedTask:定时任务圈选异常!,当前处理的群组id为:{},名称为:{}",groupId,groupName);
         }
         return true;
     }
