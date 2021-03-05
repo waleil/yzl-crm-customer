@@ -173,6 +173,12 @@
             <if test="adver_name != null">
                 adver_name,
             </if>
+            <if test="mGradeId != null">
+                m_grade_id,
+            </if>
+            <if test="mGradeName != null">
+                m_grade_name,
+            </if>
             <if test="m_grade_code != null">
                 m_grade_code,
             </if>
@@ -326,6 +332,12 @@
             <if test="adver_name != null">
                 #{adver_name,jdbcType=VARCHAR},
             </if>
+            <if test="mGradeId != null">
+                #{mGradeId,jdbcType=INTEGER},
+            </if>
+            <if test="mGradeName != null">
+                #{mGradeName,jdbcType=VARCHAR},
+            </if>
             <if test="m_grade_code != null">
                 #{m_grade_code,jdbcType=VARCHAR},
             </if>
@@ -452,6 +464,7 @@
     <insert id="insert" parameterType="cn.net.yzl.crm.customer.model.Member">
     insert into member ( member_card, member_name,
                         nick_name, age, sex, adver_code,
+                         m_grade_id,m_grade_name,
                         m_grade_code, is_active, member_status,
                         activity, region_code, province_code,
                         city_code, total_amount, qq,
@@ -464,6 +477,7 @@
     )
     values ( #{member_card,jdbcType=VARCHAR}, #{member_name,jdbcType=VARCHAR},
             #{nick_name,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{sex}, #{adver_code,jdbcType=INTEGER},
+             #{mGradeId,jdbcType=INTEGER}, #{mGradeName,jdbcType=VARCHAR},
             #{m_grade_code,jdbcType=VARCHAR}, #{is_active,jdbcType=SMALLINT}, #{member_status,jdbcType=TINYINT},
             #{activity,jdbcType=BIT}, #{region_code,jdbcType=INTEGER}, #{province_code,jdbcType=INTEGER},
             #{city_code,jdbcType=INTEGER}, #{total_amount,jdbcType=INTEGER}, #{qq,jdbcType=VARCHAR},
