@@ -18,11 +18,11 @@ import java.util.List;
 public class MemberProductEffectSelectVO implements Serializable {
 
     @ApiModelProperty(value = "顾客卡号",name = "memberCard",required = true)
-    @NotBlank
+//    @NotBlank
     private String memberCard;
 
     @ApiModelProperty(value = "订单号",name = "orderNo")
-    @NotBlank
+//    @NotBlank
     private String orderNo;
 
 
