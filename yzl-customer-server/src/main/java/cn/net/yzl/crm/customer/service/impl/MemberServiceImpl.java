@@ -1568,7 +1568,7 @@ public class MemberServiceImpl implements MemberService {
             String memberCard = memberVO.getMember_card();
             workOrderBeanVO.setMemberCard(memberCard);
             workOrderBeanVO.setAcceptStatus(2);//工单接收状态：已接收
-            //workOrderBeanVO.setActivity(3);
+
             workOrderBeanVO.setAllocateTime(now);//分配时间
             workOrderBeanVO.setApplyUpStatus(0);//上交状态：未上交
             workOrderBeanVO.setCallFlag(0);//员工当日拨打状态：未拨打
@@ -1589,6 +1589,10 @@ public class MemberServiceImpl implements MemberService {
                 workOrderBeanVO.setCreateTime(now);//创建时间
             }
 
+            workOrderBeanVO.setAllocateStatus(1);
+            workOrderBeanVO.setActivity(3);
+            workOrderBeanVO.setProductTypeCnt(0);
+            workOrderBeanVO.setProductLastNum(0);
 
             workOrderBeanVO.setHistoryFlag(0);//非历史数据
             workOrderBeanVO.setIsVisiable(1);//可见
