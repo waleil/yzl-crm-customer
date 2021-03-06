@@ -57,13 +57,13 @@ public interface CustomerGroupService {
 
     Page<MemberLabelDto>  groupTrialPullData(member_crowd_group memberCrowdGroup);
 
-    int memberCrowdGroupRun(member_crowd_group memberCrowdGroup);
+    int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) throws InterruptedException;
 
     int memberCrowdGroupTrialById(MemberCrowdGroupOpVO crowdGroupOpVO);
 
     Page<MemberLabelDto>  groupTrialByIdPullData(MemberCrowdGroupOpVO crowdGroupOpVO);
 
-    int memberCrowdGroupRunById(MemberCrowdGroupOpVO crowdGroupOpVO);
+    int memberCrowdGroupRunById(MemberCrowdGroupOpVO crowdGroupOpVO) throws InterruptedException;
     /**
      * @Author: lichanghong
      * @Description: 根据顾客编号查询顾客所属圈选群
@@ -87,7 +87,7 @@ public interface CustomerGroupService {
      * @param
      * @Return: java.lang.Boolean
      */
-    Boolean memberGroupTimedTask();
+    Boolean memberGroupTimedTask() throws InterruptedException;
 
 
     boolean isCrowdGroupIncludeMemberCard(member_crowd_group memberCrowdGroup, String memberCard);

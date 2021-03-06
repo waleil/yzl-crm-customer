@@ -53,11 +53,20 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
      */
     @SysAccessLog(source = DefaultDataEnums.Source.MEMORY_CACHE,action = DefaultDataEnums.Action.QUERY)
     public List<member_crowd_group> query4Task(){
+
+        return query4Task(false);
+    }
+    public List<member_crowd_group> query4Task(boolean all){
         Query query = new Query();
-        query.addCriteria(Criteria.where("enable").is(1).and("del").is(false));
+        Criteria criteria = new Criteria();
+        if (all) {
+            criteria = Criteria.where("enable").is(1);
+        }
+        criteria.and("del").is(false);
+        query.addCriteria(criteria);
         //圈选规则按优先级排序,更新时间降序
         query.with(Sort.by(Sort.Direction.ASC, "seq"));
-        query.with(Sort.by(Sort.Direction.DESC,"update_time"));
+        query.with(Sort.by(Sort.Direction.DESC,"create_time"));
 
         return mongoTemplate.find(query,member_crowd_group.class);
     }
