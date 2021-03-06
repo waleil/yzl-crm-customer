@@ -954,107 +954,123 @@ public class MemberServiceImpl implements MemberService {
         }
 
         //存在则更新最后下单时间
-        if (CollectionUtil.isNotEmpty(memberOrderStats)) {
-            memberOrderStat = memberOrderStats.get(0);
-            //累计消费金额
-            Integer totalCounsumAmount = memberOrderStat.getTotalCounsumAmount() == null ? 0 : memberOrderStat.getTotalCounsumAmount();
-            totalCounsumAmount += orderInfo4MqVo.getSpend();
-            memberOrderStat.setTotalCounsumAmount(totalCounsumAmount);
+        memberOrderStat = memberOrderStats.get(0);
+        //累计消费金额
+        Integer totalCounsumAmount = memberOrderStat.getTotalCounsumAmount() == null ? 0 : memberOrderStat.getTotalCounsumAmount();
+        totalCounsumAmount += orderInfo4MqVo.getSpend();
+        memberOrderStat.setTotalCounsumAmount(totalCounsumAmount);
 
-            //累计充值金额
-            Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
-            totalInvestAmount += orderInfo4MqVo.getCash1();
-            memberOrderStat.setTotalInvestAmount(totalInvestAmount);
+//        //累计充值金额
+//        Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
+//        totalInvestAmount += orderInfo4MqVo.getCash1();
+//        memberOrderStat.setTotalInvestAmount(totalInvestAmount);
 
-            //累计订单总金额
-            Integer totalOrderAmount = memberOrderStat.getTotalOrderAmount() == null ? 0 : memberOrderStat.getTotalOrderAmount();
-            totalOrderAmount += orderInfo4MqVo.getTotalAll();
-            memberOrderStat.setTotalOrderAmount(totalOrderAmount);
+        //累计订单总金额
+        Integer totalOrderAmount = memberOrderStat.getTotalOrderAmount() == null ? 0 : memberOrderStat.getTotalOrderAmount();
+        totalOrderAmount += orderInfo4MqVo.getTotalAll();
+        memberOrderStat.setTotalOrderAmount(totalOrderAmount);
 
-            //累计订单应收总金额
-            Integer orderRecAmount = memberOrderStat.getOrderRecAmount() == null ? 0 : memberOrderStat.getOrderRecAmount();
-            orderRecAmount += orderInfo4MqVo.getCash();
-            memberOrderStat.setOrderRecAmount(orderRecAmount);
-
-
-            memberOrderStat.setLastBuyProductCode(codes);//最后一次购买商品
-            //首次购买商品
-            if (StringUtils.isEmpty(memberOrderStat.getFirstBuyProductCode())) {
-                memberOrderStat.setFirstBuyProductCode(memberOrderStat.getLastBuyProductCode());
-            }
-            if (memberOrderStat.getFirstOrderAm() == null || memberOrderStat.getFirstOrderAm().intValue() == 0) {
-                memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//真正首单金额
-            }
-            if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getTotalAll()) {
-                memberOrderStat.setOrderHighAm(orderInfo4MqVo.getTotalAll());//订单最高金额
-            }
-
-            if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm().intValue() == 0 || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
-                memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最低金额
-            }
-
-            if (memberOrderStat.getBuyCount() == null) {
-                memberOrderStat.setBuyCount(0);
-            }
-            memberOrderStat.setBuyCount(memberOrderStat.getBuyCount() + 1);//累计购买次数
-            memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
-            int orgNum = productEffectList == null ? 0 : productEffectList.size();
-            memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
-            //memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
-
-            //总平均购买天数
-            if (memberOrderStat.getLastOrderTime() != null && memberOrderStat.getFirstOrderTime() != null) {
-                long betweenDay = DateUtil.between(memberOrderStat.getFirstOrderTime(), memberOrderStat.getLastOrderTime(), DateUnit.DAY);
-                Integer buyDay = Math.round(betweenDay / (float) memberOrderStat.getBuyCount());
-                memberOrderStat.setDayAvgCount(buyDay);
-            }
-            //最后一次订单的签收时间
-            memberOrderStat.setLastSignTime(orderInfo4MqVo.getSignTime());
-
-            //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
-            int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
-            }
-
-            //查询顾客表信息
-            Member member = memberMapper.selectMemberByCard(memberCard);
-
-            //更新客户表订单总金额
-            member.setTotal_amount(totalCounsumAmount);//累计消费金额
+        //累计订单应收总金额
+        Integer orderRecAmount = memberOrderStat.getOrderRecAmount() == null ? 0 : memberOrderStat.getOrderRecAmount();
+        orderRecAmount += orderInfo4MqVo.getCash();
+        memberOrderStat.setOrderRecAmount(orderRecAmount);
 
 
-            //顾客的首单金额为空或者为0的时候,设置顾客的首单金额
-            if (member.getFirst_order_am() == null || member.getFirst_order_am().intValue() == 0) {
-                member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
-            }
-            //顾客的会员标识不是会员的时要设置会员标识
-            if (!member.isVip_flag()) {
-                memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
-            }
-            result = memberMapper.updateByMemberGradeByMember(member);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
-            }
-
-            //判断是否存在冻结消费，存在则确认消费
-            MemberAmountDetail frozenDetail = memberAmountService.getFrozenDetailByOrder(orderInfo4MqVo.getOrderNo(), 2);
-            //存在冻结消费，要进行确认
-            if (frozenDetail != null) {
-                ComResponse<String> response = memberAmountService.operationConfirm(2, orderInfo4MqVo.getOrderNo());
-                if (response == null || response.getCode() != 200) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"确认扣款失败!");
-                }
-            }else{
-                log.info("订单,{}签收时未找到消费冻结记录",orderInfo4MqVo.getOrderNo());
-            }
-
-            //设置缓存
-            redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
+        memberOrderStat.setLastBuyProductCode(codes);//最后一次购买商品
+        //首次购买商品
+        if (StringUtils.isEmpty(memberOrderStat.getFirstBuyProductCode())) {
+            memberOrderStat.setFirstBuyProductCode(memberOrderStat.getLastBuyProductCode());
         }
+        if (memberOrderStat.getFirstOrderAm() == null || memberOrderStat.getFirstOrderAm().intValue() == 0) {
+            memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//真正首单金额
+        }
+        if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getTotalAll()) {
+            memberOrderStat.setOrderHighAm(orderInfo4MqVo.getTotalAll());//订单最高金额
+        }
+
+        if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm().intValue() == 0 || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
+            memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最低金额
+        }
+
+        if (memberOrderStat.getBuyCount() == null) {
+            memberOrderStat.setBuyCount(0);
+        }
+        memberOrderStat.setBuyCount(memberOrderStat.getBuyCount() + 1);//累计购买次数
+        memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
+        int orgNum = productEffectList == null ? 0 : productEffectList.size();
+        memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
+        //memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
+
+        //总平均购买天数
+        if (memberOrderStat.getLastOrderTime() != null && memberOrderStat.getFirstOrderTime() != null) {
+            long betweenDay = DateUtil.between(memberOrderStat.getFirstOrderTime(), memberOrderStat.getLastOrderTime(), DateUnit.DAY);
+            Integer buyDay = Math.round(betweenDay / (float) memberOrderStat.getBuyCount());
+            memberOrderStat.setDayAvgCount(buyDay);
+        }
+        //最后一次订单的签收时间
+        memberOrderStat.setLastSignTime(orderInfo4MqVo.getSignTime());
+
+        //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
+        int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+        }
+
+        //查询顾客表信息
+        Member member = memberMapper.selectMemberByCard(memberCard);
+
+        //更新客户表订单总金额
+        member.setTotal_amount(totalCounsumAmount);//累计消费金额
+
+
+        //顾客的首单金额为空或者为0的时候,设置顾客的首单金额
+        if (member.getFirst_order_am() == null || member.getFirst_order_am().intValue() == 0) {
+            member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
+        }
+        //顾客的会员标识不是会员的时要设置会员标识
+        if (!member.isVip_flag()) {
+            memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
+        }
+        result = memberMapper.updateByMemberGradeByMember(member);
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+        }
+
+        //判断是否存在冻结消费，存在则确认消费
+        MemberAmountDetail frozenDetail = memberAmountService.getFrozenDetailByOrder(orderInfo4MqVo.getOrderNo(), 2);
+        //存在冻结消费，要进行确认
+        if (frozenDetail != null) {
+            ComResponse<String> response = memberAmountService.operationConfirm(2, orderInfo4MqVo.getOrderNo());
+            if (response == null || response.getCode() != 200) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"确认扣款失败!");
+            }
+        }else{
+            log.info("订单,{}签收时未找到消费冻结记录",orderInfo4MqVo.getOrderNo());
+        }
+
+        //判断是否是活到付款，活货到付款要进行充值
+        Integer payType = orderInfo4MqVo.getPayType();
+        Integer cash1 = orderInfo4MqVo.getCash1();
+        if (payType != null && payType == 1 && cash1 != null && cash1 > 0){
+            MemberAmountDetailVO vo = new MemberAmountDetailVO();
+            vo.setOrderNo(orderInfo4MqVo.getOrderNo());
+            vo.setMemberCard(memberCard);
+            vo.setDiscountMoney(orderInfo4MqVo.getCash1());//预存金额 分为单位
+            vo.setObtainType(3);
+            vo.setRemark("订单签收时,预存金额");
+            ComResponse<String> response = memberAmountService.operation(vo);
+            if (response == null || response.getCode() != 200) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"确认扣款失败!");
+            }
+
+        }
+
+        //设置缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
         return ComResponse.success(true);
     }
 

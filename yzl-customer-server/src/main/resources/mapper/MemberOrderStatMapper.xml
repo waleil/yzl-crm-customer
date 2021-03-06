@@ -47,6 +47,15 @@
 </foreach>
 
 </select>
+  <select id="queryByMemberCode" resultType="cn.net.yzl.crm.customer.model.db.MemberOrderStat">
+    select
+    member_card, total_counsum_amount, total_invest_amount, total_order_amount, order_rec_amount,
+    first_order_time, last_order_time, last_buy_product_code, first_order_staff_no, first_order_no,
+    first_buy_product_code, first_order_am, order_high_am, order_low_am, order_avg_am,
+    product_type_cnt, buy_count, day_avg_count, year_avg_count, return_goods_rate,last_sign_time
+    from member_order_stat
+    where member_card  =  #{memberCard,jdbcType=VARCHAR}
+  </select>
 
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderStat" useGeneratedKeys="true">
     insert into member_order_stat
