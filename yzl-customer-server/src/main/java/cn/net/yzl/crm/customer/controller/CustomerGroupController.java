@@ -132,7 +132,7 @@ public class CustomerGroupController {
 
     @ApiOperation("圈选")
     @PostMapping("/v1/groupRun")
-    public ComResponse<Integer> memberCrowdGroupRun(@RequestBody member_crowd_group memberCrowdGroup) {
+    public ComResponse<Integer> memberCrowdGroupRun(@RequestBody member_crowd_group memberCrowdGroup) throws InterruptedException {
         if (memberCrowdGroup == null || StringUtils.isEmpty(memberCrowdGroup.get_id()))
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupRun(memberCrowdGroup);
@@ -165,7 +165,7 @@ public class CustomerGroupController {
 
     @ApiOperation("通过群组Id圈选")
     @PostMapping("/v1/groupRunById")
-    public ComResponse<Integer> memberCrowdGroupRunById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO) {
+    public ComResponse<Integer> memberCrowdGroupRunById(@RequestBody MemberCrowdGroupOpVO crowdGroupOpVO) throws InterruptedException {
         if (crowdGroupOpVO == null || StringUtils.isEmpty(crowdGroupOpVO.get_id()))
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         int count = customerGroupService.memberCrowdGroupRunById(crowdGroupOpVO);
@@ -209,7 +209,7 @@ public class CustomerGroupController {
      */
     @ApiOperation("顾客人群圈选定时任务")
     @PostMapping("/v1/memberGroupTimedTask")
-    public ComResponse<Boolean> memberGroupTimedTask() {
+    public ComResponse<Boolean> memberGroupTimedTask() throws InterruptedException {
 
         customerGroupService.memberGroupTimedTask();
         return ComResponse.success(true);

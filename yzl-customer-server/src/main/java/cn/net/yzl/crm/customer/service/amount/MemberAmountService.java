@@ -20,8 +20,5 @@ public interface MemberAmountService {
 
     ComResponse<String> operationConfirm(int obtainType, String orderNo);
 
-    public ComResponse<String> operationReurnCancel(String orderNo);
-
-
     public MemberAmountDetail getFrozenDetailByOrder(String orderNo, Integer obtainType);
 }

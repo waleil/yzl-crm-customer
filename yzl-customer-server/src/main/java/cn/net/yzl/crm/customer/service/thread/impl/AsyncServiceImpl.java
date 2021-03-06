@@ -21,12 +21,21 @@ public class AsyncServiceImpl implements IAsyncService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        try{
-            Thread.sleep(1000);
-        }catch(Exception e){
+        log.info("end executeAsync");
+    }
+
+    @Override
+    @Async("asyncServiceExecutor")
+    public Future<String> executeAsync2(ExecutorFunctional target) {
+        log.info("start executeAsync");
+        try {
+            target.execute();
+        } catch (Exception e) {
             e.printStackTrace();
+            return new AsyncResult<String>("error");
         }
         log.info("end executeAsync");
+        return new AsyncResult<String>("success");
     }
 
     @Override

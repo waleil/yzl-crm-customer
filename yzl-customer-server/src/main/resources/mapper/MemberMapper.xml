@@ -1223,7 +1223,10 @@
 
     <select id="getMemberAmount" resultType="cn.net.yzl.crm.customer.model.MemberAmount">
         select
-        member_card,last_integral,last_red_bag,last_coupon,total_money,frozen_amount,frozen_ticket,frozen_red_bag,frozen_integral
+        member_card memberCard,last_integral lastIntegral,last_red_bag lastRedBag,last_coupon lastCoupon,
+               total_money totalMoney,frozen_amount frozenAmount,frozen_ticket frozenTicket,
+               frozen_red_bag frozenIntegral,frozen_integral frozenRedBag,
+               total_money - frozen_amount validAmount <!-- 总金额- 冻结 -->
         from member_amount
         where member_card in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
