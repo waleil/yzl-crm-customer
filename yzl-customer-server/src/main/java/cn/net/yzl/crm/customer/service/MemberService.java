@@ -124,7 +124,7 @@ public interface MemberService {
 
     void delCrowdGroupById(int id);
 
-    List getMemberAmount(List<String> member_cards);
+    List<MemberAmount> getMemberAmount(List<String> member_cards);
 
     List<member_wide> selectFullMemberByPage(int currentPage, int pageSize);
 

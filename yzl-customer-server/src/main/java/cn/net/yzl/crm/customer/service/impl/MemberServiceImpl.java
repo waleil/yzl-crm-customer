@@ -533,7 +533,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public List getMemberAmount(List<String> member_cards) {
+    public List<MemberAmount> getMemberAmount(List<String> member_cards) {
         return memberMapper.getMemberAmount(member_cards);
     }
 
