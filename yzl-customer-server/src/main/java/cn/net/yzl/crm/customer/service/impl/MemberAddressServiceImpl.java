@@ -69,6 +69,12 @@ public class MemberAddressServiceImpl implements MemberAddressService {
             if (num1 < 1) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "更新默认收货地址失败!");
             }
+        }else{
+            //查询顾客当前的收货地址，当没有一条默认记录时，更新当前添加的记录的default_flag = 1
+            int count = reveiverAddressMapper.selectDefaultCountByMemberCard(memberCard);
+            if (count < 1) {
+                reveiverAddressInsertVO.setDefaultFlag(1);
+            }
         }
         ReveiverAddress reveiverAddress = new ReveiverAddress();
         BeanUtil.copyProperties(reveiverAddressInsertVO, reveiverAddress);
@@ -108,6 +114,12 @@ public class MemberAddressServiceImpl implements MemberAddressService {
             num =  reveiverAddressRecordDao.updateDefaultFlagByMemberCard(reveiverAddress1.getMemberCard(),1,0);
             if (num < 0) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "更新默认收货地址失败!");
+            }
+        }else{
+            //查询顾客当前的收货地址，当没有一条默认记录时，更新当前添加的记录的default_flag = 1
+            int count = reveiverAddressMapper.selectDefaultCountByMemberCard(reveiverAddress1.getMemberCard());
+            if (count < 1) {
+                reveiverAddressUpdateVO.setDefaultFlag(1);
             }
         }
 

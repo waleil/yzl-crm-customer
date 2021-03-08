@@ -63,4 +63,6 @@ public interface ReveiverAddressMapper {
 
     List<ReveiverAddressDto> getReveiverAddressByPage(MemberReveiverAddressSerchDTO serchDTO);
 
+    int selectDefaultCountByMemberCard(@Param("memberCard") String memberCard);
+
 }
