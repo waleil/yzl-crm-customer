@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface MemberOrderStatMapper {
      * @Return: java.util.List<cn.net.yzl.crm.customer.model.db.MemberOrderStat>
      */
     List<MemberOrderStat> queryByMemberCodes(List<String> codes);
+
+    MemberOrderStat queryByMemberCode(@Param("memberCard") String memberCard);
 }

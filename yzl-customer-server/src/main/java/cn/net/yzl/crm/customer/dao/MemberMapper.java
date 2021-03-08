@@ -33,8 +33,6 @@ public interface MemberMapper {
 
     Member selectMemberByCard(String memberCard);
 
-    List<MemberPhone> getMemberPhoneList(String member_card);
-
     Member getMemberByPhone(List<String> phoneList);
 
     void setMemberToVip(@Param("memberCard") String memberCard);
@@ -127,7 +125,7 @@ public interface MemberMapper {
      * 获取顾客行为偏好字典数据
      * @return
      */
-    List<MemberBaseAttr> getmemberActions();
+//    List<MemberBaseAttr> getmemberActions();
 
     void updateCrowdGroup(CrowdGroup crowdGroup);
 

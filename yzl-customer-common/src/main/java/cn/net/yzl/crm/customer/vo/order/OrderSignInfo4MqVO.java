@@ -42,6 +42,9 @@ public class OrderSignInfo4MqVO {
     @ApiModelProperty(value = "商品列表")
     private List<OrderProductVO> productList;
 
+    @ApiModelProperty(value = "支付方式:0=货到付款,1=款到发货")
+    private Integer payType;
+
 
 //    @ApiModelProperty(value = "下单时间")
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

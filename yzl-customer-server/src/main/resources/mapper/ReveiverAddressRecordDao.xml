@@ -95,4 +95,10 @@
       modify_no = #{modifyNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+    <update id="updateDefaultFlagByMemberCard">
+        update reveiver_address set
+            default_flag = #{newFlag,jdbcType=INTEGER}
+        where member_card = #{memberCard,jdbcType=VARCHAR}
+        and default_flag = #{oldFlag,jdbcType=INTEGER}
+    </update>
 </mapper>

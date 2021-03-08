@@ -85,6 +85,7 @@
         <id column="memberStreetNo" property="streetNo" jdbcType="INTEGER"/>
         <id column="memberStreetName" property="streetName" jdbcType="VARCHAR"/>
         <id column="memberAddress" property="detailedReceivingAddress" jdbcType="VARCHAR"/>
+        <id column="defaultFlg" property="defaultFlg" jdbcType="INTEGER"/>
     </resultMap>
     <resultMap id="phoneNumberListMap" type="java.lang.String">
         <id column="phoneNumber" javaType="String"/>
@@ -102,7 +103,8 @@
         address.member_county_name memberCountyName,
         member_street_no memberStreetNo,
         member_street_name memberStreetName,
-        address.member_address memberAddress
+        address.member_address memberAddress,
+        address.default_flag defaultFlag
     </sql>
 
     <sql id="phoneNumberList_Column_List">
@@ -823,12 +825,6 @@
     <select id="getMemberGrad" resultType="cn.net.yzl.crm.customer.model.MemberGrad">
         select id,no,name from member_type
     </select>
-    <!--根据顾客号查询顾客手机号信息 -->
-    <select id="getMemberPhoneList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberPhone">
-        select id,member_card,phone_number,phone_place,service_provider,phone_type,enabled
-        from member_phone
-        where  member_card=#{member_card} order by update_time  desc;
-    </select>
 
     <!--根据顾客手机号查询顾客基本信息 ，用来判断手机号是否被注册，如果注册，则返回注册顾客的实体-->
     <select id="getMemberByPhone" resultType="cn.net.yzl.crm.customer.model.Member">
@@ -960,7 +956,8 @@
                     member_city_no,member_city_name,
                     member_county_no,member_county_name,
                     member_street_no,member_street_name,
-                    member_address,create_code,update_code
+                    member_address,create_code,update_code,
+                    default_flag defaultFlag
 
             from reveiver_address where member_card=#{member_card} order by status desc,update_time desc
     </select>
@@ -1213,9 +1210,11 @@
         </foreach>
     </select>
 
+    <!--
     <select id="getmemberActions" resultType="cn.net.yzl.crm.customer.model.MemberBaseAttr">
         select id,name,ltype from member_base_attr
     </select>
+    -->
 
     <update id="delCrowdGroupById">
         update crowd_group set del=1 where id=#{id}

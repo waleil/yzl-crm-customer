@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sun.corba.se.impl.resolver.SplitLocalResolverImpl;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -31,12 +32,14 @@ public class MemberPhone {
     private String creator_no;
 
     @ApiModelProperty("创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date create_time;
 
     @ApiModelProperty("创建人no")
     private String updator_no;
 
     @ApiModelProperty("修改时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date update_time;
 
     @ApiModelProperty("是否可用，1 是 0 否")

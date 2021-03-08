@@ -30,8 +30,6 @@ public interface MemberService {
 
     Member selectMemberByCard(String memberCard);
 
-    List<MemberPhone> getMemberPhoneList(String member_card);
-
     Member getMemberByPhone(String phone);
 
     void setMemberToVip(String member_card);
@@ -43,9 +41,9 @@ public interface MemberService {
 
     ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(String member_card);
 
-    void saveReveiverAddress(ReveiverAddress reveiverAddress);
+//    void saveReveiverAddress(ReveiverAddress reveiverAddress);
 
-    void updateReveiverAddress(ReveiverAddress reveiverAddress);
+//    void updateReveiverAddress(ReveiverAddress reveiverAddress);
 
     List<ReveiverAddress> getReveiverAddress(String member_card);
 
@@ -97,7 +95,7 @@ public interface MemberService {
      *
      * @return
      */
-    List<MemberBaseAttr> getmemberActions();
+//    List<MemberBaseAttr> getmemberActions();
 
     /**
      * 删除圈选

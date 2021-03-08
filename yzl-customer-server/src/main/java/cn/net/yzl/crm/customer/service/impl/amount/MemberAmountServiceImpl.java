@@ -1,17 +1,21 @@
 package cn.net.yzl.crm.customer.service.impl.amount;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.MemberAmountDao;
 import cn.net.yzl.crm.customer.dao.MemberAmountDetailDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
+import cn.net.yzl.crm.customer.dao.MemberOrderStatMapper;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberAmount;
 import cn.net.yzl.crm.customer.model.MemberAmountDetail;
+import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
+import cn.net.yzl.crm.customer.service.MemberOrderStatService;
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.DateCustomerUtils;
@@ -39,6 +43,14 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     private MemberAmountDetailDao memberAmountDetailDao;
     @Autowired
     private MemberMapper memberMapper;
+    @Autowired
+    MemberOrderStatMapper memberOrderStatMapper;
+
+    @Autowired
+    MemberOrderStatService memberOrderStatService;
+
+
+
     @Override
     @Transactional
     public ComResponse<MemberAmountDto> getMemberAmount(String memberCard) {
@@ -219,6 +231,29 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                     isAdd = true;
                     memberAmountDetail.setStatus((byte) 1);//直接完成
                     memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + discountMoney);
+
+                    //计算累计充值金额
+                    //更新member_order_stat
+                    MemberOrderStat memberOrderStat = memberOrderStatService.queryByMemberCode(memberCard);
+                    if (memberOrderStat == null) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "memberOrderStat记录不存在!");
+                    }
+
+                    //累计充值金额
+                    Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
+                    totalInvestAmount += discountMoney;
+
+                    MemberOrderStat update = new MemberOrderStat();
+                    update.setTotalInvestAmount(totalInvestAmount);
+                    update.setMemberCard(memberOrderStat.getMemberCard());
+
+                    int result = memberOrderStatMapper.updateByPrimaryKeySelective(update);
+                    if (result < 1) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+                    }
+
                 }
                 // 修改账户信息
                 int num = memberAmountDao.updateByPrimaryKeySelective(memberAmount);
