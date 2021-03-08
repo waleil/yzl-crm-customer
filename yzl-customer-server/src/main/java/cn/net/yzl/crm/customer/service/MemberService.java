@@ -30,8 +30,6 @@ public interface MemberService {
 
     Member selectMemberByCard(String memberCard);
 
-    List<MemberPhone> getMemberPhoneList(String member_card);
-
     Member getMemberByPhone(String phone);
 
     void setMemberToVip(String member_card);

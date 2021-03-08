@@ -180,4 +180,14 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <!--根据顾客号查询顾客手机号信息 -->
+  <select id="getMemberPhoneList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberPhone">
+    select id,member_card,phone_number,phone_place,service_provider,phone_type,update_time,enabled
+    from member_phone
+    where  member_card=#{member_card} <!-- order by update_time  desc 使用本地排序-->;
+  </select>
+
+
 </mapper>

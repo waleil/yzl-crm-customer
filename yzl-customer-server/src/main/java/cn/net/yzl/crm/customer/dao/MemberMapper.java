@@ -33,8 +33,6 @@ public interface MemberMapper {
 
     Member selectMemberByCard(String memberCard);
 
-    List<MemberPhone> getMemberPhoneList(String member_card);
-
     Member getMemberByPhone(List<String> phoneList);
 
     void setMemberToVip(@Param("memberCard") String memberCard);

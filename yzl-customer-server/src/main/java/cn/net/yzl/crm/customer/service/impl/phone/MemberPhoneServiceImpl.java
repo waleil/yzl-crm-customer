@@ -12,11 +12,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -190,5 +191,37 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         }
         return ComResponse.success(memberEntity);
 
+    }
+
+
+    /**
+     * 获取顾客联系方式信息，包括手机号，座机号
+     *
+     * @param member_card
+     * @return
+     */
+    @Override
+    public List<MemberPhone> getMemberPhoneList(String member_card) {
+        List<MemberPhone> memberPhoneList = memberPhoneMapper.getMemberPhoneList(member_card);
+        if(CollectionUtils.isEmpty(memberPhoneList)){
+            return Collections.emptyList();
+        }
+        List<MemberPhone> temp=  memberPhoneList.stream().filter(v->v.getEnabled()==1).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(temp)){
+            return Collections.emptyList();
+        }
+        if(temp.size()==1){
+            return temp;
+        }
+        Collections.sort(temp, new Comparator<MemberPhone>() {
+            @Override
+            public int compare(MemberPhone o1, MemberPhone o2) {
+                if(o1.getUpdate_time()==null||o2.getUpdate_time()==null){
+                    return 0;
+                }
+                return (int) ((int) o2.getUpdate_time().getTime()-o1.getUpdate_time().getTime());
+            }
+        });
+        return temp;
     }
 }
