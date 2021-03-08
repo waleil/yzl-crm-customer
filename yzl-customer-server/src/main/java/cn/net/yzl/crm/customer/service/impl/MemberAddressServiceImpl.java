@@ -56,18 +56,29 @@ public class MemberAddressServiceImpl implements MemberAddressService {
 
         // 判断顾客编号是否存在
         String memberCard = reveiverAddressInsertVO.getMemberCard();
+        //获取顾客对象
         Member member = memberMapper.selectMemberByCard(memberCard);
         if (member == null) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "会员不存在");
         }
+
+        int num1 = 0;
+        //更新当前顾客其他的收货地址为非默认收货地址
+        if (reveiverAddressInsertVO.getDefaultFlag() != null && reveiverAddressInsertVO.getDefaultFlag() == 1) {
+            num1 =  reveiverAddressRecordDao.updateDefaultFlagByMemberCard(memberCard,1,0);
+            if (num1 < 1) {
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "更新默认收货地址失败!");
+            }
+        }
         ReveiverAddress reveiverAddress = new ReveiverAddress();
         BeanUtil.copyProperties(reveiverAddressInsertVO, reveiverAddress);
+        //保存新的收货地址
         int num = reveiverAddressMapper.insertSelective(reveiverAddress);
         if (num < 1) {
             throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "数据保存失败");
         }
         reveiverAddress.setReveiverAddressCode(reveiverAddress.getId());
-        //更新code
+        //更新code为id
         num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
         if (num < 1) {
             throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "数据保存失败");
@@ -78,7 +89,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         reveiverAddressRecordPo.setAfterData(JSONUtil.toJsonStr(reveiverAddress));
         reveiverAddressRecordPo.setId(null);
         reveiverAddressRecordPo.setReveiverAddressId(reveiverAddress.getId());
-       int num1 =  reveiverAddressRecordDao.insertSelective(reveiverAddressRecordPo);
+       num1 =  reveiverAddressRecordDao.insertSelective(reveiverAddressRecordPo);
         if (num1 < 1) {
             throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "记录数据保存失败");
         }
@@ -90,10 +101,19 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     public ComResponse<String> updateReveiverAddress(ReveiverAddressUpdateVO reveiverAddressUpdateVO) {
         // 获取数据
         ReveiverAddress reveiverAddress1 = reveiverAddressMapper.selectByPrimaryKey(reveiverAddressUpdateVO.getId());
+        int num = 0;
+
+        //更新当前顾客其他的收货地址为非默认收货地址
+        if (reveiverAddressUpdateVO.getDefaultFlag() != null && reveiverAddressUpdateVO.getDefaultFlag() == 1) {
+            num =  reveiverAddressRecordDao.updateDefaultFlagByMemberCard(reveiverAddress1.getMemberCard(),1,0);
+            if (num < 0) {
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "更新默认收货地址失败!");
+            }
+        }
 
         ReveiverAddress reveiverAddress = new ReveiverAddress();
         BeanUtil.copyProperties(reveiverAddressUpdateVO, reveiverAddress);
-        int num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
+        num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
         if (num < 1) {
             throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "数据更新失败");
         }

@@ -41,9 +41,9 @@ public interface MemberService {
 
     ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(String member_card);
 
-    void saveReveiverAddress(ReveiverAddress reveiverAddress);
+//    void saveReveiverAddress(ReveiverAddress reveiverAddress);
 
-    void updateReveiverAddress(ReveiverAddress reveiverAddress);
+//    void updateReveiverAddress(ReveiverAddress reveiverAddress);
 
     List<ReveiverAddress> getReveiverAddress(String member_card);
 

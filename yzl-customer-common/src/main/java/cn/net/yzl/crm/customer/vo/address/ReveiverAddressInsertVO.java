@@ -48,4 +48,7 @@ public class ReveiverAddressInsertVO implements Serializable {
     @ApiModelProperty(value = "修改人",name = "updateCode",hidden = true)
     private String updateCode;
 
+    @ApiModelProperty(value = "是否是默认收货地址:0=不是,1=是",name = "defaultFlag",required = false)
+    private Integer defaultFlag;
+
 }

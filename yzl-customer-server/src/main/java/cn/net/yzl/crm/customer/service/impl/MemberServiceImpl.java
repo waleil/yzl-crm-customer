@@ -379,15 +379,15 @@ public class MemberServiceImpl implements MemberService {
         return ComResponse.success(list);
     }
 
-    @Override
-    public void saveReveiverAddress(ReveiverAddress reveiverAddress) {
-        memberMapper.saveReveiverAddress(reveiverAddress);
-    }
+//    @Override
+//    public void saveReveiverAddress(ReveiverAddress reveiverAddress) {
+//        memberMapper.saveReveiverAddress(reveiverAddress);
+//    }
 
-    @Override
-    public void updateReveiverAddress(ReveiverAddress reveiverAddress) {
-        memberMapper.updateReveiverAddress(reveiverAddress);
-    }
+//    @Override
+//    public void updateReveiverAddress(ReveiverAddress reveiverAddress) {
+//        memberMapper.updateReveiverAddress(reveiverAddress);
+//    }
 
     @Override
     public List<ReveiverAddress> getReveiverAddress(String member_card) {
