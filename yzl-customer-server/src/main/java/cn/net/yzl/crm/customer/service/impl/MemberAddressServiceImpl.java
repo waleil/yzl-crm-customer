@@ -4,12 +4,15 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
+import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.common.util.JsonUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ReveiverAddressMapper;
 import cn.net.yzl.crm.customer.dao.ReveiverAddressRecordDao;
 import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
+import cn.net.yzl.crm.customer.dto.member.MemberReveiverAddressSerchDTO;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddress;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddressRecordPo;
@@ -17,6 +20,7 @@ import cn.net.yzl.crm.customer.service.MemberAddressService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressUpdateVO;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,5 +113,18 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         }
 
         return ComResponse.success();
+    }
+
+    @Override
+    public ComResponse<Page<ReveiverAddressDto>> getReveiverAddressByPage(MemberReveiverAddressSerchDTO serchDTO) {
+        PageHelper.startPage(serchDTO.getCurrentPage(), serchDTO.getPageSize());
+        List<ReveiverAddressDto> list = reveiverAddressMapper.getReveiverAddressByPage(serchDTO);
+
+        if(list==null || list.size()<0){
+            return ComResponse.nodata();
+        }
+        Page<ReveiverAddressDto> page = AssemblerResultUtil.resultAssembler(list);
+
+        return ComResponse.success(page);
     }
 }

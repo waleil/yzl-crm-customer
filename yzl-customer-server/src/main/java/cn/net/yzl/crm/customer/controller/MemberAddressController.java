@@ -1,7 +1,9 @@
 package cn.net.yzl.crm.customer.controller;
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
+import cn.net.yzl.crm.customer.dto.member.MemberReveiverAddressSerchDTO;
 import cn.net.yzl.crm.customer.service.MemberAddressService;
 import cn.net.yzl.crm.customer.utils.BeanUtil;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
@@ -56,5 +58,11 @@ public class MemberAddressController {
     })
     public ComResponse<List<ReveiverAddressDto>> getReveiverAddress(String memberCard) {
         return memberAddressService.getReveiverAddress(memberCard);
+    }
+
+    @ApiOperation(value = "顾客收货地址-分页获取顾客收货地址", notes = "顾客收货地址-分页获取顾客收货地址")
+    @RequestMapping(value = "v1/getReveiverAddressByPage", method = RequestMethod.POST)
+    public ComResponse<Page<ReveiverAddressDto>> getReveiverAddressByPage(@RequestBody MemberReveiverAddressSerchDTO serchDTO) {
+        return memberAddressService.getReveiverAddressByPage(serchDTO);
     }
 }
