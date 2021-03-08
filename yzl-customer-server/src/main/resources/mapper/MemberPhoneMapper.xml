@@ -188,6 +188,12 @@
     from member_phone
     where  member_card=#{member_card} <!-- order by update_time  desc 使用本地排序-->;
   </select>
+  <select id="getMemberCardByPhoneNumbers" resultType="java.lang.String">
+    select member_card memberCard from member_phone where phone_number in
+    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
 
 
 </mapper>

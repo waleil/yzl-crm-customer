@@ -1,7 +1,6 @@
 package cn.net.yzl.crm.customer.controller;
 
 import cn.net.yzl.common.entity.ComResponse;
-import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.service.MemberPhoneService;
 import io.swagger.annotations.Api;
@@ -36,6 +35,13 @@ public class MemberPhoneController {
     @GetMapping("v1/getMemberByphoneNumber")
     public ComResponse<Member> getMemberByphoneNumber(@RequestParam("phoneNumber") String  phoneNumber) {
         return memberPhoneService.getMemberByphoneNumber(phoneNumber);
+    }
+
+    @ApiOperation(value = "顾客手机号-根据多个电话号获取顾客会员卡号集合")
+    @GetMapping("v1/getMemberCardByphoneNumbers")
+    public ComResponse<List<String>> getMemberCardByphoneNumbers(@RequestParam("phoneNumbers") List<String>  phoneNumbers) {
+        List<String> memCards = memberPhoneService.getMemberCardByphoneNumbers(phoneNumbers);
+        return ComResponse.success(memCards);
     }
 
 }

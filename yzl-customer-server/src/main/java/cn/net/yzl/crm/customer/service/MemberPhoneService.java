@@ -21,4 +21,7 @@ public interface MemberPhoneService {
     ComResponse<Member> getMemberByphoneNumber(String phoneNumber);
 
     List<MemberPhone> getMemberPhoneList(String member_card);
+
+    List<String> getMemberCardByphoneNumbers(List<String> phoneNumbers);
+
 }

@@ -224,4 +224,40 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         });
         return temp;
     }
+
+    @Override
+    public List<String> getMemberCardByphoneNumbers(List<String> phoneNumbers) {
+
+        List<String> list = formatPhoneNumber(phoneNumbers);
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        List<String> memberCards = memberPhoneMapper.getMemberCardByPhoneNumbers(list);
+        return memberCards;
+    }
+
+
+
+    private List<String> formatPhoneNumber(List<String> phoneNumbers) {
+        List<String> list = new ArrayList<>();
+        if (CollectionUtils.isEmpty(phoneNumbers)) {
+            return list;
+        }
+        String noZeroNumber = "";
+        String haveZeroNumber = "";
+        for (String phoneNumber : phoneNumbers) {
+            phoneNumber = phoneNumber.trim();
+            //是否以0开头 --> 去掉0
+            if (phoneNumber.startsWith(PREFIX_ZERO)){
+                noZeroNumber = phoneNumber.substring(1);
+                haveZeroNumber = phoneNumber;
+            }else{
+                noZeroNumber = phoneNumber;
+                haveZeroNumber = PREFIX_ZERO + phoneNumber;
+            }
+            list.add(noZeroNumber);
+            list.add(haveZeroNumber);
+        }
+        return list;
+    }
 }
