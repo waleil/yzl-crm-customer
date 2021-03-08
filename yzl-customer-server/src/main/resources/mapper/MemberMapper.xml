@@ -825,9 +825,9 @@
     </select>
     <!--根据顾客号查询顾客手机号信息 -->
     <select id="getMemberPhoneList" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberPhone">
-        select id,member_card,phone_number,phone_place,service_provider,phone_type,enabled
+        select id,member_card,phone_number,phone_place,service_provider,phone_type,update_time,enabled
         from member_phone
-        where  member_card=#{member_card} order by update_time  desc;
+        where  member_card=#{member_card} <!-- order by update_time  desc 使用本地排序-->;
     </select>
 
     <!--根据顾客手机号查询顾客基本信息 ，用来判断手机号是否被注册，如果注册，则返回注册顾客的实体-->
@@ -1213,9 +1213,11 @@
         </foreach>
     </select>
 
+    <!--
     <select id="getmemberActions" resultType="cn.net.yzl.crm.customer.model.MemberBaseAttr">
         select id,name,ltype from member_base_attr
     </select>
+    -->
 
     <update id="delCrowdGroupById">
         update crowd_group set del=1 where id=#{id}
