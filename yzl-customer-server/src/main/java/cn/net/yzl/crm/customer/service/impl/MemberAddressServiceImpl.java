@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
@@ -14,6 +15,7 @@ import cn.net.yzl.crm.customer.dao.ReveiverAddressRecordDao;
 import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
 import cn.net.yzl.crm.customer.dto.member.MemberReveiverAddressSerchDTO;
 import cn.net.yzl.crm.customer.model.Member;
+import cn.net.yzl.crm.customer.model.MemberPhone;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddress;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddressRecordPo;
 import cn.net.yzl.crm.customer.service.MemberAddressService;
@@ -25,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -42,8 +46,19 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     public ComResponse<List<ReveiverAddressDto>> getReveiverAddress(String memberCard) {
 
         List<ReveiverAddressDto> list = reveiverAddressMapper.getReveiverAddressByMemberCard(memberCard);
-        if (list == null || list.size() < 1) {
+        if (CollectionUtil.isEmpty(list)) {
             return ComResponse.nodata();
+        }
+        if(list.size() > 1){
+            Collections.sort(list, new Comparator<ReveiverAddressDto>() {
+                @Override
+                public int compare(ReveiverAddressDto o1, ReveiverAddressDto o2) {
+                    if(o1.getUpdateTime()==null||o2.getUpdateTime()==null){
+                        return 0;
+                    }
+                    return (int) ((int) o2.getUpdateTime().getTime()-o1.getUpdateTime().getTime());
+                }
+            });
         }
         return ComResponse.success(list);
     }
