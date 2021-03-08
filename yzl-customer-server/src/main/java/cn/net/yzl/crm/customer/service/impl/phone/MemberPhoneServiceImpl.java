@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.service.impl.phone;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.MemberPhoneMapper;
@@ -227,12 +228,11 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
 
     @Override
     public List<String> getMemberCardByphoneNumbers(List<String> phoneNumbers) {
-
+        List<String> memberCards = new ArrayList<>();
         List<String> list = formatPhoneNumber(phoneNumbers);
-        if (CollectionUtils.isEmpty(list)) {
-            return null;
+        if (CollectionUtil.isNotEmpty(list)) {
+            memberCards = memberPhoneMapper.getMemberCardByPhoneNumbers(list);
         }
-        List<String> memberCards = memberPhoneMapper.getMemberCardByPhoneNumbers(list);
         return memberCards;
     }
 
@@ -246,6 +246,9 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         String noZeroNumber = "";
         String haveZeroNumber = "";
         for (String phoneNumber : phoneNumbers) {
+            if (StringUtils.isEmpty(phoneNumber.trim())) {
+                continue;
+            }
             phoneNumber = phoneNumber.trim();
             //是否以0开头 --> 去掉0
             if (phoneNumber.startsWith(PREFIX_ZERO)){
