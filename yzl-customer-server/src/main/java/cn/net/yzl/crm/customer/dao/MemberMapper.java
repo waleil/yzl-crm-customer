@@ -127,7 +127,7 @@ public interface MemberMapper {
      * 获取顾客行为偏好字典数据
      * @return
      */
-    List<MemberBaseAttr> getmemberActions();
+//    List<MemberBaseAttr> getmemberActions();
 
     void updateCrowdGroup(CrowdGroup crowdGroup);
 

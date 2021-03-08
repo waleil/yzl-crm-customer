@@ -97,7 +97,7 @@ public interface MemberService {
      *
      * @return
      */
-    List<MemberBaseAttr> getmemberActions();
+//    List<MemberBaseAttr> getmemberActions();
 
     /**
      * 删除圈选

@@ -290,12 +290,12 @@ public class CustomerController {
     }
 
 
-    @ApiOperation("获取顾客行为偏好字典数据")
-    @GetMapping("/v1/getMemberActions")
-    public ComResponse getMemberActions() {
-        List<MemberBaseAttr> list = memberService.getmemberActions();
-        return ComResponse.success(list);
-    }
+//    @ApiOperation("获取顾客行为偏好字典数据")
+//    @GetMapping("/v1/getMemberActions")
+//    public ComResponse getMemberActions() {
+//        List<MemberBaseAttr> list = memberService.getmemberActions();
+//        return ComResponse.success(list);
+//    }
 
     @ApiOperation("删除顾客圈选")
     @GetMapping("/v1/delMemberCrowdGroup")

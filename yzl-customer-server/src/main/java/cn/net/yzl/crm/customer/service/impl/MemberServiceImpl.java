@@ -479,10 +479,10 @@ public class MemberServiceImpl implements MemberService {
      *
      * @return
      */
-    @Override
+/*    @Override
     public List<MemberBaseAttr> getmemberActions() {
         return memberMapper.getmemberActions();
-    }
+    }*/
 
     /**
      * 根据crowdId 删除顾客圈选
