@@ -59,7 +59,7 @@
     member_province_name memberProvinceName, member_city_no memberCityNo,
     member_city_name memberCityName, member_county_no memberCountyNo, member_county_name memberCountyName,
     member_street_no memberStreetNo, member_street_name memberStreetName, member_address memberAddress,
-    default_flag defaultFlag
+    default_flag defaultFlag,update_time updateTime
     from reveiver_address
     where member_card = #{memberCard}
     and status=0
