@@ -58,7 +58,7 @@ public class MemberAmountController {
         return memberAmountService.operation(memberAmountDetailVO);
     }
 
-    @ApiOperation(value = "顾客账户-冻结金额确认(消费/退回)", notes = "顾客账户-冻结金额确认(消费/退回)")
+    @ApiOperation(value = "顾客账户-消费冻结金额确认", notes = "顾客账户-消费冻结金额确认")
     @RequestMapping(value = "/operationConfirm", method = RequestMethod.POST)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "string", paramType = "query"),
@@ -68,13 +68,4 @@ public class MemberAmountController {
         return memberAmountService.operationConfirm(obtainType,orderNo);
     }
 
-
-    @ApiOperation(value = "顾客账户-取消退回冻结金额", notes = "顾客账户-取消退回冻结金额")
-    @RequestMapping(value = "/operationReurnCancel", method = RequestMethod.POST)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "string", paramType = "query"),
-    })
-    ComResponse<String> operationReurnCancel(@RequestParam("orderNo") @NotBlank String orderNo) throws ParseException {
-        return memberAmountService.operationReurnCancel(orderNo);
-    }
 }

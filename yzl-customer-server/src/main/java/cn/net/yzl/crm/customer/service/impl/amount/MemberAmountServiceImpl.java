@@ -1,16 +1,21 @@
 package cn.net.yzl.crm.customer.service.impl.amount;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.MemberAmountDao;
 import cn.net.yzl.crm.customer.dao.MemberAmountDetailDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
+import cn.net.yzl.crm.customer.dao.MemberOrderStatMapper;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
+import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberAmount;
 import cn.net.yzl.crm.customer.model.MemberAmountDetail;
+import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
+import cn.net.yzl.crm.customer.service.MemberOrderStatService;
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.DateCustomerUtils;
@@ -38,17 +43,31 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     private MemberAmountDetailDao memberAmountDetailDao;
     @Autowired
     private MemberMapper memberMapper;
+    @Autowired
+    MemberOrderStatMapper memberOrderStatMapper;
+
+    @Autowired
+    MemberOrderStatService memberOrderStatService;
+
+
+
     @Override
     @Transactional
     public ComResponse<MemberAmountDto> getMemberAmount(String memberCard) {
         MemberAmountDto memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
-        if (memberAmountDto == null) { // 如果不存在 就添加一个账户
+        if (memberAmountDto == null) { // 如果不存在 --> 判断客户是否存在 存在才添加一个账户
+            Member member = memberMapper.selectMemberByCard(memberCard);
+            if (member == null) {
+                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"客户不存在!");
+            }
             MemberAmount memberAmount = new MemberAmount();
             memberAmount.setMemberCard(memberCard);
             int num = memberAmountDao.insertSelective(memberAmount);
             if (num < 0) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE);
             }
+            //插入成功后，重新查询账户信息
+            memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
         }
         return ComResponse.success(memberAmountDto);
     }
@@ -74,13 +93,14 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     @Autowired
     private RedissonClient redisson;
 
+    /**
+     * 冻结扣款 退回 充值
+     * @param memberAmountDetailVO
+     * @return
+     */
     @Override
     @Transactional
     public ComResponse<String> operation(MemberAmountDetailVO memberAmountDetailVO) {
-
-        //当类型为2的时候，直接完成扣减
-        Integer operateType = memberAmountDetailVO.getOperateType() == null || memberAmountDetailVO.getOperateType() != 2 ? 1 : 2;
-        boolean isComplete = operateType == 2;
 
         String memberCard = memberAmountDetailVO.getMemberCard();
         // 用会员号 做锁
@@ -105,8 +125,8 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                 //操作订单号
                 String orderNo = memberAmountDetailVO.getOrderNo();
 
-                MemberAmountDetail consumeDetail = null;//消费记录
-                MemberAmountDetail returnDetail = null;//退回记录
+                MemberAmountDetail returnDetail = null;//消费记录
+                MemberAmountDetail consumeDetail = null;//退回记录
 
                 // 校验 参数 如果是 退回或者消费的时候 订单号必传
                 if (obtainType == 1 || obtainType == 2) {
@@ -115,33 +135,39 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                         throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "订单号必传");
                     }
                     // 判断相应的操作订单 记录 是否存在
-                    //MemberAmountDetail memberAmountDetail = memberAmountDetailDao.getByTypeAndOrder(obtainType, orderNo);
-                    //查询状态为1,3的
-                    Map<Byte,MemberAmountDetail> memberAmountDetailMap = memberAmountDetailDao.getDetailByTypesAndOrder(orderNo,Arrays.asList(1,2),Arrays.asList(1,3));
-                    if (memberAmountDetailMap.get((byte)obtainType) != null) {
-                        throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ", obtainType:" + obtainType + ",已经操作过,不可重复操作!");
-                    }
-
-                    consumeDetail = memberAmountDetailMap.get((byte)2);//消费记录
-                    returnDetail = memberAmountDetailMap.get((byte)1);//退回记录
-
-                    //退回的时候，必须要有消费记录
+                    returnDetail = memberAmountDetailDao.getByTypeAndOrder(obtainType, orderNo);//消费记录
+                    consumeDetail = memberAmountDetailDao.getByTypeAndOrder(2, orderNo);//退回记录
+                    //退回
                     if (obtainType == 1) {
                         if (consumeDetail == null) {
                             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ", obtainType:" + obtainType + ",没有找消费记录,不可退回操作!");
+                        } else if (consumeDetail.getStatus() == 2) {
+                            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ", obtainType:" + obtainType + ",没有找消费有效消费记录,不可退回操作!");
                         }
-                        //金额要和消费金额完全一致
-                        else if (!discountMoney.equals(consumeDetail.getDiscountMoney())) {
-                            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "退回金额不正确!应退金额为:"+consumeDetail.getDiscountMoney());
+                        //消费记录未确认
+                        if (consumeDetail.getStatus() != 1) {
+                            if (returnDetail !=null){
+                                //不用操作(判定为重复操作)
+                                return ComResponse.success();
+                            }else{
+                                //可以操作（但是金额要和冻结金额一致）
+                                if (!discountMoney.equals(consumeDetail.getDiscountMoney())) {
+                                    throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "退回金额不正确!应退金额为:" + consumeDetail.getDiscountMoney());
+                                }
+                            }
+                        }else{
+                            //消费已经确认的情况下，当前订单可以无限次退回操作，但是后台无操作
                         }
                     }
-                    //消费的时候
-                    else if (obtainType == 2) {
+                    //消费扣款
+                    else{
                         //要判断可用余额是否充足
-                        if (memberAmountDto.getValidAmount() < discountMoney) {
+                        if (consumeDetail != null) {
+                            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ", obtainType:" + obtainType + ",已经存在扣货款记录,不可重复操作!");
+                        }
+                        else if (memberAmountDto.getValidAmount() < discountMoney) {
                             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "账户余额不足!");
                         }
-
                     }
                 }
 
@@ -156,84 +182,94 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                 memberAmountDetail.setCreateDate(new Date());
                 memberAmountDetail.setObtainType((byte)obtainType);
                 memberAmountDetail.setOrderNo(orderNo);
-                memberAmountDetail.setDiscountMoney(memberAmountDetailVO.getDiscountMoney());
-                //操作类型
-                memberAmountDetail.setOperateType(operateType);
+                memberAmountDetail.setDiscountMoney(memberAmountDetailVO.getDiscountMoney());//金额
+
+                //是否为添加操作
+                boolean isAdd = false;
+
                 //退回
                 if (obtainType == 1) {
-                    //消费未确认时：不管是否一步退回，都将状态改为5
+                    //消费未确认时：直接作废
                     if (consumeDetail.getStatus() != 1) {
-                        memberAmountDetail.setStatus((byte)5);//未完成退回
-                        consumeDetail.setStatus((byte)5);//未完成取消
+                        isAdd = false;
+                        consumeDetail.setStatus((byte)2);//作废
+
+                        String remark = consumeDetail.getRemark();
+                        if (StringUtil.isEmpty(remark)) {
+                            remark = "";
+                        }
+                        if (StringUtil.isNotEmpty(memberAmountDetailVO.getRemark())){
+                            remark = remark + ",退回原因:" + memberAmountDetailVO.getRemark();
+                        }
+                        consumeDetail.setRemark(remark);
                         //将消费的冻结金额直接减去消费金额
                         memberAmount.setFrozenAmount(memberAmountDto.getFrozenAmount() - discountMoney);
-                        //增加可用余额
-                        memberAmount.setValidAmount(memberAmountDto.getValidAmount() + discountMoney);
+                        //更新消费记录的状态
+                        int result = memberAmountDao.updateConsumeDetailStatus(consumeDetail);
+                        if (result < 1) {
+                            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                            throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "账户信息修改错误!");
+                        }
                     }
-                    //当消费记录的状态为待完成时
+                    //当消费记录已经确认时
                     else{
-                        //一步退回时
-                        if (isComplete) {
-                            memberAmountDetail.setStatus((byte)4);//退回
-                            consumeDetail.setStatus((byte)4);//已完成退回
-                            //直接增加账户余额
-                            memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + discountMoney);
-                            //直接增加可用余额
-                            memberAmount.setValidAmount(memberAmountDto.getValidAmount() + discountMoney);
-                        }
-                        //退回冻结时
-                        else{
-                            memberAmountDetail.setStatus((byte)3);//未完成退回
-                            memberAmount.setFrozenAmount(memberAmountDto.getFrozenAmount() + discountMoney);
-                        }
-                    }
-
-                    //更新消费记录的状态
-                    int result = memberAmountDao.updateConsumeDetailStatus(consumeDetail);
-                    if (result < 1) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "账户信息修改错误!");
+                        isAdd = true;
+                        memberAmountDetail.setStatus((byte) 1);
+                        //直接增加账户余额
+                        memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + discountMoney);
                     }
                 }
-                //消费
+                //冻结消费
                 else if (obtainType == 2) {
-                    //直接扣减
-                    if (isComplete) {
-                        memberAmountDetail.setStatus((byte) 1);
-                        //总金额直接扣减
-                        memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() - discountMoney);
-                        //可用余额直接扣减
-                        memberAmount.setValidAmount(memberAmountDto.getValidAmount() - discountMoney);
-                    }
-                    //冻结消费
-                    else{
-                        memberAmountDetail.setStatus((byte) 3);
-                        //冻结扣减金额
-                        memberAmount.setFrozenAmount(memberAmountDto.getFrozenAmount() + discountMoney);
-                        //减少可用余额
-                        memberAmount.setValidAmount(memberAmountDto.getValidAmount() - discountMoney);
-                    }
+                    isAdd = true;
+                    memberAmountDetail.setStatus((byte) 3);
+                    //冻结扣减金额
+                    memberAmount.setFrozenAmount(memberAmountDto.getFrozenAmount() + discountMoney);
                 }
                 //充值:直接增加账户余额
                 else if (obtainType == 3) {
-                    memberAmountDetail.setStatus((byte) 1);
-                    memberAmountDetail.setOperateType(2);
+                    isAdd = true;
+                    memberAmountDetail.setStatus((byte) 1);//直接完成
                     memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + discountMoney);
-                    memberAmount.setValidAmount(memberAmountDto.getValidAmount() + discountMoney);
+
+                    //计算累计充值金额
+                    //更新member_order_stat
+                    MemberOrderStat memberOrderStat = memberOrderStatService.queryByMemberCode(memberCard);
+                    if (memberOrderStat == null) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "memberOrderStat记录不存在!");
+                    }
+
+                    //累计充值金额
+                    Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
+                    totalInvestAmount += discountMoney;
+
+                    MemberOrderStat update = new MemberOrderStat();
+                    update.setTotalInvestAmount(totalInvestAmount);
+                    update.setMemberCard(memberOrderStat.getMemberCard());
+
+                    int result = memberOrderStatMapper.updateByPrimaryKeySelective(update);
+                    if (result < 1) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+                    }
+
                 }
                 // 修改账户信息
                 int num = memberAmountDao.updateByPrimaryKeySelective(memberAmount);
-
                 if (num < 1) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "账户信息修改错误!");
                 }
                 // 生成新的记录信息
-                int num1 = memberAmountDetailDao.insertSelective(memberAmountDetail);
-                if (num1 < 1) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "账户信息记录保存错误!");
+                if (isAdd) {
+                    num = memberAmountDetailDao.insertSelective(memberAmountDetail);
+                    if (num < 1) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "账户信息记录保存错误!");
+                    }
                 }
+
             }else{
                 throw new BizException(ResponseCodeEnums.REPEAT_ERROR_CODE.getCode(), "当前账户正在下单操作，请勿重复下单!");
             }
@@ -257,7 +293,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     @Override
     @Transactional
     public ComResponse<String> operationConfirm(int obtainType, String orderNo) {
-        if (obtainType != 1 && obtainType != 2) {
+        if (obtainType != 2) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "参数obtainType不正确!");
         }
         RLock lock = redisson.getLock("operationConfirm"+orderNo);
@@ -267,24 +303,20 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             logger.info("MemberAmountServiceImpl  operationConfirm () : obtainType : {},orderNO:{}", obtainType, orderNo);
             // 目前的操作 只支持 消费和退款的 确认 obtainType 为 1(退回) 2:(消费)
 
-            // 获取 操作记录
-            //MemberAmountDetail memberAmountDetail = memberAmountDetailDao.getByTypeAndOrder(obtainType, orderNo);
-            Map<Byte, MemberAmountDetail> memberAmountDetailMap = memberAmountDetailDao.getDetailByTypesAndOrder(orderNo,Arrays.asList(1, 2),Arrays.asList(1,3));
-            //获取消费冬冻结记录
-            MemberAmountDetail frozenDetail = memberAmountDetailMap.get((byte) obtainType);
-            if (frozenDetail == null) {
+            // 获取消费操作记录
+            MemberAmountDetail consumeDetail = memberAmountDetailDao.getByTypeAndOrder(obtainType, orderNo);
+            if (consumeDetail == null) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ", obtainType: " + obtainType + ",未找到冻结记录!");
-            } else if (frozenDetail.getStatus() == 1) {
+            } else if (consumeDetail.getStatus() == 1) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ", obtainType: " + obtainType + ",已经确认过,不可重复操作!");
+            } else if (consumeDetail.getStatus() != 3) {
+                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ", obtainType: " + obtainType + ",冻结已经退回,不可确认操作!");
             }
 
-            MemberAmountDetail consumeDetail = memberAmountDetailMap.get((byte)2);//消费记录
-            MemberAmountDetail returnDetail = memberAmountDetailMap.get((byte)1);//退回记录
-
-            Integer frozen = frozenDetail.getDiscountMoney();//要减去的冻结金额(本次确认金额)
+            Integer frozen = consumeDetail.getDiscountMoney();//要减去的冻结金额(本次确认金额)
 
             // 判断顾客账户是否存在
-            String memberCard = frozenDetail.getMemberCard();
+            String memberCard = consumeDetail.getMemberCard();
             MemberAmountDto memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
             if (memberAmountDto == null) {
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "账户不存在!");
@@ -293,31 +325,18 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             //确认金额  > 总的冻结金额
             if (frozen > memberAmountDto.getFrozenAmount()) {
                 logger.info("MemberAmountServiceImpl  operationConfirm () : orderNO:{},顾客:{} 账户异常!总金额:{}，冻结金额:{},本次需要扣减金额:{}",
-                        orderNo,frozenDetail.getMemberCard(),memberAmountDto.getTotalMoney(),memberAmountDto.getFrozenAmount(),frozen);
+                        orderNo,consumeDetail.getMemberCard(),memberAmountDto.getTotalMoney(),memberAmountDto.getFrozenAmount(),frozen);
                 throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "顾客账户异常!");
             }
 
             MemberAmount memberAmount = new MemberAmount();
             memberAmount.setMemberCard(memberCard);
 
-            // 判断 是消费 的时候 总金额是否满足扣除
-            if (obtainType == 2) { // 2:(消费确认)
-                if (frozen > memberAmountDto.getTotalMoney()){
-                    throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "消费确认时,总额度不够消费!");
-                }
-                //扣减余额
-                memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() - frozen);
-                consumeDetail.setStatus((byte)1);
+            if (frozen > memberAmountDto.getTotalMoney()){
+                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "消费确认时,总额度不够消费!");
             }
-            //退回的确认的时候把消费确认的状态改为4
-            else if (obtainType == 1) {//退回确认
-                //增加总余额
-                memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + frozen);
-                //增加可用余额
-                memberAmount.setValidAmount(memberAmountDto.getValidAmount() + frozen);
-                returnDetail.setStatus((byte)4);
-                consumeDetail.setStatus((byte)4);
-            }
+            //扣减余额
+            memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() - frozen);
             //剩余冻结金额 = 总冻结金额 - 本次确认的金额
             memberAmount.setFrozenAmount(memberAmountDto.getFrozenAmount() - frozen);
 
@@ -327,19 +346,13 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "顾客账户信息修改异常!");
             }
+
+            consumeDetail.setStatus((byte)1);
             result = memberAmountDao.updateConsumeDetailStatus(consumeDetail);
             if (result < 1) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "顾客账户信息修改异常!");
             }
-            if (returnDetail != null) {
-                result = memberAmountDao.updateConsumeDetailStatus(returnDetail);
-                if (result < 1) {
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "顾客账户信息修改异常!");
-                }
-            }
-
         }catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -349,73 +362,20 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     }
 
     /**
-     * 取消退回
-     * wangzhe
-     * 2021-03-03
+     * 查询订单对应的冻结记录
      * @param orderNo 订单号
-     * @return
+     * @param obtainType 1:退回记录 2:消费记录
+     * @return 对应的余额明细记录
      */
-    @Override
-    @Transactional
-    public ComResponse<String> operationReurnCancel(String orderNo) {
-        if (StringUtil.isEmpty(orderNo)) {
-            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "参数orderNo不能为空!");
+    public MemberAmountDetail getFrozenDetailByOrder(String orderNo,Integer obtainType){
+        MemberAmountDetail detail = null;
+        if (obtainType != null && (obtainType ==1 || obtainType == 2)) {
+            detail = memberAmountDetailDao.getByTypeAndOrder(obtainType,orderNo);
+            if (detail != null && detail.getStatus() != 3) {
+                detail = null;
+            }
         }
-        RLock lock = redisson.getLock("operationConfirm"+orderNo);
-
-        try {
-            lock.tryLock(3, TimeUnit.SECONDS);
-            logger.info("MemberAmountServiceImpl  operationConfirm ():orderNO:{}", orderNo);
-            // 目前的操作 只支持 消费和退款的 确认 obtainType 为 1(退回) 2:(消费)
-
-            // 获取 操作记录
-           // MemberAmountDetail memberAmountDetail = memberAmountDetailDao.getByTypeAndOrder(1, orderNo);
-            Map<Byte, MemberAmountDetail> memberAmountDetailMap = memberAmountDetailDao.getDetailByTypesAndOrder(orderNo,Arrays.asList(1),Arrays.asList(3));
-            //获取消费冬冻结记录
-            MemberAmountDetail frozenDetail = memberAmountDetailMap.get((byte)1);
-            if (frozenDetail == null) {
-                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "orderNo:" + orderNo + ",未找到冻结记录!");
-            }
-            Integer frozen = frozenDetail.getDiscountMoney();//要减去的冻结金额(本次确认金额)
-
-            // 判断顾客账户是否存在
-            String memberCard = frozenDetail.getMemberCard();
-            MemberAmountDto memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
-            if (memberAmountDto == null) {
-                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "账户不存在!");
-            }
-
-            //确认金额  > 总的冻结金额
-            if (frozen > memberAmountDto.getFrozenAmount()) {
-                logger.info("MemberAmountServiceImpl  operationConfirm () : orderNO:{},顾客:{} 账户异常!总金额:{}，冻结金额:{},本次需要取消冻结金额:{}",
-                        orderNo,frozenDetail.getMemberCard(),memberAmountDto.getTotalMoney(),memberAmountDto.getFrozenAmount(),frozen);
-                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "顾客账户异常!");
-            }
-            //设置余额明细记录的状态为2作废
-            frozenDetail.setStatus((byte)2);
-
-            MemberAmount memberAmount = new MemberAmount();
-            memberAmount.setMemberCard(memberCard);
-            //剩余冻结金额 = 总冻结金额 - 本次确认的金额
-            memberAmount.setFrozenAmount(memberAmountDto.getFrozenAmount() - frozen);
-
-            // 修改账户信息
-            int result = memberAmountDao.updateByPrimaryKeySelective(memberAmount);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "顾客账户信息修改异常!");
-            }
-            result = memberAmountDao.updateConsumeDetailStatus(frozenDetail);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "顾客账户信息修改异常!");
-            }
-
-        }catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            lock.unlock();
-        }
-        return ComResponse.success();
+        return detail;
     }
+
 }

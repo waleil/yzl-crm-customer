@@ -8,6 +8,7 @@ import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
+import cn.net.yzl.crm.customer.service.MemberPhoneService;
 import cn.net.yzl.crm.customer.service.MemberService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.BeanUtil;
@@ -44,6 +45,8 @@ public class CustomerController {
 
     @Autowired
     MemberService memberService;
+    @Autowired
+    MemberPhoneService memberPhoneService;
 
     @ApiOperation("顾客列表-查询")
     @PostMapping("v1/getMemberListByPage")
@@ -101,7 +104,7 @@ public class CustomerController {
         Member memberEntity = memberService.selectMemberByCard(memberCard);
         CountDownLatch countDownLatch = new CountDownLatch(3);
         //获取联系方式
-        CompletableFuture.supplyAsync(() -> memberService.getMemberPhoneList(memberCard)).thenAccept(memberPhones -> {
+        CompletableFuture.supplyAsync(() -> memberPhoneService.getMemberPhoneList(memberCard)).thenAccept(memberPhones -> {
             if (memberPhones != null && memberPhones.size() > 0) {
                 memberEntity.setMemberPhoneList(memberPhones);
             }
@@ -153,7 +156,7 @@ public class CustomerController {
             @NotBlank(message = "member_card不能为空")
             @ApiParam(name = "member_card", value = "会员卡号", required = true)
                     String member_card) {
-        List<MemberPhone> memberPhoneList = memberService.getMemberPhoneList(member_card);
+        List<MemberPhone> memberPhoneList = memberPhoneService.getMemberPhoneList(member_card);
         return GeneralResult.success(memberPhoneList);
     }
 
@@ -246,7 +249,7 @@ public class CustomerController {
 
     @ApiOperation("获取顾客购买能力")
     @GetMapping("/v1/getMemberOrderStat")
-    public GeneralResult getMemberOrderStat(
+    public GeneralResult<MemberOrderStat> getMemberOrderStat(
             @RequestParam("member_card")
             @NotBlank(message = "member_card不能为空")
             @ApiParam(name = "member_card", value = "会员卡号", required = true)
@@ -290,12 +293,12 @@ public class CustomerController {
     }
 
 
-    @ApiOperation("获取顾客行为偏好字典数据")
-    @GetMapping("/v1/getMemberActions")
-    public ComResponse getMemberActions() {
-        List<MemberBaseAttr> list = memberService.getmemberActions();
-        return ComResponse.success(list);
-    }
+//    @ApiOperation("获取顾客行为偏好字典数据")
+//    @GetMapping("/v1/getMemberActions")
+//    public ComResponse getMemberActions() {
+//        List<MemberBaseAttr> list = memberService.getmemberActions();
+//        return ComResponse.success(list);
+//    }
 
     @ApiOperation("删除顾客圈选")
     @GetMapping("/v1/delMemberCrowdGroup")

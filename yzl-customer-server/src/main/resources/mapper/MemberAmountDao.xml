@@ -8,7 +8,7 @@
     <result column="last_red_bag" jdbcType="INTEGER" property="lastRedBag" />
     <result column="last_coupon" jdbcType="INTEGER" property="lastCoupon" />
     <result column="total_money" jdbcType="INTEGER" property="totalMoney" />
-    <result column="valid_amount" jdbcType="INTEGER" property="validAmount" />
+    <result column="validAmount" jdbcType="INTEGER" property="validAmount" />
     <result column="frozen_amount" jdbcType="INTEGER" property="frozenAmount" />
     <result column="frozen_ticket" jdbcType="INTEGER" property="frozenTicket" />
     <result column="frozen_integral" jdbcType="INTEGER" property="frozenIntegral" />
@@ -29,7 +29,7 @@
                   member_card memberCard,
                   frozen_amount frozenAmount,
                   total_money totalMoney,
-                  valid_amount validAmount
+                  total_money - frozen_amount validAmount <!-- 总金额- 冻结 -->
               FROM
                   member_amount
               WHERE
@@ -42,7 +42,8 @@
     SELECT
     member_card memberCard,
     frozen_amount frozenAmount,
-    total_money totalMoney
+    total_money totalMoney,
+    total_money - frozen_amount validAmount <!-- 总金额- 冻结 -->
     FROM
     member_amount
     where member_card in
@@ -57,11 +58,11 @@
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.net.yzl.crm.customer.model.MemberAmount" useGeneratedKeys="true">
     insert into member_amount (member_card, last_integral, last_red_bag, 
-      last_coupon, total_money,valid_amount, frozen_amount,
+      last_coupon, total_money, frozen_amount,
       frozen_ticket, frozen_integral, frozen_red_bag
       )
     values (#{memberCard,jdbcType=VARCHAR}, #{lastIntegral,jdbcType=INTEGER}, #{lastRedBag,jdbcType=INTEGER}, 
-      #{lastCoupon,jdbcType=INTEGER}, #{totalMoney,jdbcType=INTEGER}, #{validMoney,jdbcType=INTEGER},#{frozenAmount,jdbcType=INTEGER},
+      #{lastCoupon,jdbcType=INTEGER}, #{totalMoney,jdbcType=INTEGER},#{frozenAmount,jdbcType=INTEGER},
       #{frozenTicket,jdbcType=INTEGER}, #{frozenIntegral,jdbcType=INTEGER}, #{frozenRedBag,jdbcType=INTEGER}
       )
   </insert>
@@ -82,9 +83,6 @@
       </if>
       <if test="totalMoney != null">
         total_money,
-      </if>
-      <if test="validMoney != null">
-        valid_money,
       </if>
       <if test="frozenAmount != null">
         frozen_amount,
@@ -114,9 +112,6 @@
       </if>
       <if test="totalMoney != null">
         #{totalMoney,jdbcType=INTEGER},
-      </if>
-      <if test="validMoney != null">
-        #{validMoney,jdbcType=INTEGER},
       </if>
       <if test="frozenAmount != null">
         #{frozenAmount,jdbcType=INTEGER},
@@ -159,9 +154,6 @@
       <if test="frozenRedBag != null">
         frozen_red_bag = #{frozenRedBag,jdbcType=INTEGER},
       </if>
-      <if test="validAmount != null">
-        valid_amount = #{validAmount,jdbcType=INTEGER},
-      </if>
     </set>
     where member_card = #{memberCard}
   </update>
@@ -172,7 +164,6 @@
       last_red_bag = #{lastRedBag,jdbcType=INTEGER},
       last_coupon = #{lastCoupon,jdbcType=INTEGER},
       total_money = #{totalMoney,jdbcType=INTEGER},
-      valid_money = #{validMoney,jdbcType=INTEGER},
       frozen_amount = #{frozenAmount,jdbcType=INTEGER},
       frozen_ticket = #{frozenTicket,jdbcType=INTEGER},
       frozen_integral = #{frozenIntegral,jdbcType=INTEGER},
@@ -181,7 +172,8 @@
   </update>
   <update id="updateConsumeDetailStatus" parameterType="cn.net.yzl.crm.customer.model.MemberAmountDetail">
     UPDATE `member_amount_detail` SET
-      `status` = #{consumeDetail.status}
+      `status` = #{consumeDetail.status},
+      `remark` = #{consumeDetail.remark}
     where `id` =#{consumeDetail.id}
   </update>
 </mapper>

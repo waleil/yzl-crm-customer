@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.controller;
 
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
@@ -11,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +76,9 @@ public class MemberProductEffectController {
             @ApiImplicitParam(name = "productEffect", value = "商品服用效果vo", required = true),
     })
     public ComResponse<List<MemberProductEffectDTO>> getProductEffects(@RequestBody MemberProductEffectSelectVO productEffect) {
-
+        if (StringUtils.isEmpty(productEffect.getMemberCard()) && StringUtils.isEmpty(productEffect.getOrderNo())){
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "memberCard和orderNo不能同时为空!");
+        }
         ComResponse result = memberProductEffectService.getProductEffects(productEffect);
 
         return result;

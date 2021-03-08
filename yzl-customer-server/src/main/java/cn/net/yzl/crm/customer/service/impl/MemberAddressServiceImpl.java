@@ -1,26 +1,34 @@
 package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.GeneralResult;
+import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.common.util.JsonUtil;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.ReveiverAddressMapper;
 import cn.net.yzl.crm.customer.dao.ReveiverAddressRecordDao;
 import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
+import cn.net.yzl.crm.customer.dto.member.MemberReveiverAddressSerchDTO;
 import cn.net.yzl.crm.customer.model.Member;
+import cn.net.yzl.crm.customer.model.MemberPhone;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddress;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddressRecordPo;
 import cn.net.yzl.crm.customer.service.MemberAddressService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressUpdateVO;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -38,8 +46,19 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     public ComResponse<List<ReveiverAddressDto>> getReveiverAddress(String memberCard) {
 
         List<ReveiverAddressDto> list = reveiverAddressMapper.getReveiverAddressByMemberCard(memberCard);
-        if (list == null || list.size() < 1) {
+        if (CollectionUtil.isEmpty(list)) {
             return ComResponse.nodata();
+        }
+        if(list.size() > 1){
+            Collections.sort(list, new Comparator<ReveiverAddressDto>() {
+                @Override
+                public int compare(ReveiverAddressDto o1, ReveiverAddressDto o2) {
+                    if(o1.getUpdateTime()==null||o2.getUpdateTime()==null){
+                        return 0;
+                    }
+                    return (int) ((int) o2.getUpdateTime().getTime()-o1.getUpdateTime().getTime());
+                }
+            });
         }
         return ComResponse.success(list);
     }
@@ -52,18 +71,35 @@ public class MemberAddressServiceImpl implements MemberAddressService {
 
         // 判断顾客编号是否存在
         String memberCard = reveiverAddressInsertVO.getMemberCard();
+        //获取顾客对象
         Member member = memberMapper.selectMemberByCard(memberCard);
         if (member == null) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "会员不存在");
         }
+
+        int num1 = 0;
+        //更新当前顾客其他的收货地址为非默认收货地址
+        if (reveiverAddressInsertVO.getDefaultFlag() != null && reveiverAddressInsertVO.getDefaultFlag() == 1) {
+            num1 =  reveiverAddressRecordDao.updateDefaultFlagByMemberCard(memberCard,1,0);
+            if (num1 < 1) {
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "更新默认收货地址失败!");
+            }
+        }else{
+            //查询顾客当前的收货地址，当没有一条默认记录时，更新当前添加的记录的default_flag = 1
+            int count = reveiverAddressMapper.selectDefaultCountByMemberCard(memberCard);
+            if (count < 1) {
+                reveiverAddressInsertVO.setDefaultFlag(1);
+            }
+        }
         ReveiverAddress reveiverAddress = new ReveiverAddress();
         BeanUtil.copyProperties(reveiverAddressInsertVO, reveiverAddress);
+        //保存新的收货地址
         int num = reveiverAddressMapper.insertSelective(reveiverAddress);
         if (num < 1) {
             throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "数据保存失败");
         }
         reveiverAddress.setReveiverAddressCode(reveiverAddress.getId());
-        //更新code
+        //更新code为id
         num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
         if (num < 1) {
             throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "数据保存失败");
@@ -74,7 +110,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         reveiverAddressRecordPo.setAfterData(JSONUtil.toJsonStr(reveiverAddress));
         reveiverAddressRecordPo.setId(null);
         reveiverAddressRecordPo.setReveiverAddressId(reveiverAddress.getId());
-       int num1 =  reveiverAddressRecordDao.insertSelective(reveiverAddressRecordPo);
+       num1 =  reveiverAddressRecordDao.insertSelective(reveiverAddressRecordPo);
         if (num1 < 1) {
             throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "记录数据保存失败");
         }
@@ -86,10 +122,25 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     public ComResponse<String> updateReveiverAddress(ReveiverAddressUpdateVO reveiverAddressUpdateVO) {
         // 获取数据
         ReveiverAddress reveiverAddress1 = reveiverAddressMapper.selectByPrimaryKey(reveiverAddressUpdateVO.getId());
+        int num = 0;
+
+        //更新当前顾客其他的收货地址为非默认收货地址
+        if (reveiverAddressUpdateVO.getDefaultFlag() != null && reveiverAddressUpdateVO.getDefaultFlag() == 1) {
+            num =  reveiverAddressRecordDao.updateDefaultFlagByMemberCard(reveiverAddress1.getMemberCard(),1,0);
+            if (num < 0) {
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "更新默认收货地址失败!");
+            }
+        }else{
+            //查询顾客当前的收货地址，当没有一条默认记录时，更新当前添加的记录的default_flag = 1
+            int count = reveiverAddressMapper.selectDefaultCountByMemberCard(reveiverAddress1.getMemberCard());
+            if (count < 1) {
+                reveiverAddressUpdateVO.setDefaultFlag(1);
+            }
+        }
 
         ReveiverAddress reveiverAddress = new ReveiverAddress();
         BeanUtil.copyProperties(reveiverAddressUpdateVO, reveiverAddress);
-        int num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
+        num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
         if (num < 1) {
             throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "数据更新失败");
         }
@@ -109,5 +160,18 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         }
 
         return ComResponse.success();
+    }
+
+    @Override
+    public ComResponse<Page<ReveiverAddressDto>> getReveiverAddressByPage(MemberReveiverAddressSerchDTO serchDTO) {
+        PageHelper.startPage(serchDTO.getCurrentPage(), serchDTO.getPageSize());
+        List<ReveiverAddressDto> list = reveiverAddressMapper.getReveiverAddressByPage(serchDTO);
+
+        if(list==null || list.size()<0){
+            return ComResponse.nodata();
+        }
+        Page<ReveiverAddressDto> page = AssemblerResultUtil.resultAssembler(list);
+
+        return ComResponse.success(page);
     }
 }

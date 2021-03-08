@@ -26,6 +26,7 @@
     <result column="create_code" property="createCode" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="update_code" property="updateCode" jdbcType="VARCHAR" />
+    <result column="default_flag" property="defaultFlag" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     <!--
@@ -36,7 +37,7 @@
     id, reveiver_address_code, member_card, member_name, member_mobile, member_province_no, 
     member_province_name, member_city_no, member_city_name, member_county_no, member_county_name, 
     member_street_no, member_street_name, member_address, status, create_time, create_code, 
-    update_time, update_code
+    update_time, update_code,default_flag
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     <!--
@@ -57,13 +58,34 @@
     member_province_no memberProvinceNo,
     member_province_name memberProvinceName, member_city_no memberCityNo,
     member_city_name memberCityName, member_county_no memberCountyNo, member_county_name memberCountyName,
-    member_street_no memberStreetNo, member_street_name memberStreetName, member_address memberAddress
+    member_street_no memberStreetNo, member_street_name memberStreetName, member_address memberAddress,
+    default_flag defaultFlag,update_time updateTime
     from reveiver_address
     where member_card = #{memberCard}
     and status=0
 
 
 
+  </select>
+    <select id="getReveiverAddressByPage" resultType="cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto">
+      select
+        id,  member_card memberCard, member_name memberName, member_mobile memberMobile,
+        member_province_no memberProvinceNo,
+        member_province_name memberProvinceName, member_city_no memberCityNo,
+        member_city_name memberCityName, member_county_no memberCountyNo, member_county_name memberCountyName,
+        member_street_no memberStreetNo, member_street_name memberStreetName, member_address memberAddress
+      from reveiver_address
+      where status=0
+      <if test="memberCard != null" >
+        and member_card = #{memberCard}
+      </if>
+      <if test="defaultFLag != null" >
+        and default_fLag = #{defaultFLag}
+      </if>
+
+    </select>
+  <select id="selectDefaultCountByMemberCard" resultType="java.lang.Integer">
+    SELECT count(1) from reveiver_address where member_card =#{memberCard,jdbcType=VARCHAR} and default_flag = 1;
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     <!--
@@ -86,14 +108,14 @@
       member_county_no, member_county_name, member_street_no, 
       member_street_name, member_address, status, 
       create_time, create_code, update_time, 
-      update_code)
+      update_code,default_flag)
     values (#{id,jdbcType=INTEGER}, #{reveiverAddressCode,jdbcType=INTEGER}, #{memberCard,jdbcType=VARCHAR}, 
       #{memberName,jdbcType=VARCHAR}, #{memberMobile,jdbcType=VARCHAR}, #{memberProvinceNo,jdbcType=INTEGER}, 
       #{memberProvinceName,jdbcType=VARCHAR}, #{memberCityNo,jdbcType=INTEGER}, #{memberCityName,jdbcType=VARCHAR}, 
       #{memberCountyNo,jdbcType=INTEGER}, #{memberCountyName,jdbcType=VARCHAR}, #{memberStreetNo,jdbcType=INTEGER}, 
       #{memberStreetName,jdbcType=VARCHAR}, #{memberAddress,jdbcType=VARCHAR}, #{status,jdbcType=BIT}, 
       #{createTime,jdbcType=TIMESTAMP}, #{createCode,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{updateCode,jdbcType=VARCHAR})
+      #{updateCode,jdbcType=VARCHAR},#{defaultFlag,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective"  keyColumn="id" keyProperty="id" useGeneratedKeys="true" parameterType="cn.net.yzl.crm.customer.model.db.ReveiverAddress" >
     <!--
@@ -160,6 +182,9 @@
       <if test="updateCode != null" >
         update_code,
       </if>
+      <if test="defaultFlag != null" >
+        default_flag,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -218,6 +243,9 @@
       </if>
       <if test="updateCode != null" >
         #{updateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="defaultFlag != null" >
+        #{defaultFlag,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -283,6 +311,9 @@
       <if test="updateCode != null" >
         update_code = #{updateCode,jdbcType=VARCHAR},
       </if>
+      <if test="defaultFlag != null" >
+        default_flag = #{defaultFlag,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -310,7 +341,8 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       create_code = #{createCode,jdbcType=VARCHAR},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      update_code = #{updateCode,jdbcType=VARCHAR}
+      update_code = #{updateCode,jdbcType=VARCHAR},
+      default_flag = #{defaultFlag,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

@@ -31,10 +31,8 @@ import cn.net.yzl.crm.customer.model.mogo.MemberOrder;
 import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
-import cn.net.yzl.crm.customer.service.CustomerGroupService;
-import cn.net.yzl.crm.customer.service.MemberAddressService;
-import cn.net.yzl.crm.customer.service.MemberProductEffectService;
-import cn.net.yzl.crm.customer.service.MemberService;
+import cn.net.yzl.crm.customer.service.*;
+import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.service.impl.phone.MemberPhoneServiceImpl;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.sys.BizException;
@@ -112,6 +110,9 @@ public class MemberServiceImpl implements MemberService {
     MemberAmountRedbagIntegralMapper memberAmountRedbagIntegralMapper;
 
     @Autowired
+    MemberOrderStatService memberOrderStatService;
+
+    @Autowired
     ProductFien productFien;
     @Autowired
     OrderFien orderFien;
@@ -125,6 +126,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberActionRelationService memberActionRelationService;
+
+    @Autowired
+    MemberAmountService memberAmountService;
 
 
     @Autowired
@@ -166,6 +170,9 @@ public class MemberServiceImpl implements MemberService {
         long maxMemberCard = redisUtil.incr(cacheKey, 1);
         //设置顾客会员卡号
         member.setMember_card(String.valueOf(maxMemberCard));
+        member.setMGradeId(1);
+        member.setMGradeName("无卡");
+        member.setM_grade_code(null);
         //保存数据
         int result = memberMapper.insertSelective(member);
         if (result < 1) {
@@ -315,36 +322,6 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.selectMemberByCard(memberCard);
     }
 
-    /**
-     * 获取顾客联系方式信息，包括手机号，座机号
-     *
-     * @param member_card
-     * @return
-     */
-    @Override
-    public List<MemberPhone> getMemberPhoneList(String member_card) {
-        List<MemberPhone> memberPhoneList = memberMapper.getMemberPhoneList(member_card);
-        if(CollectionUtils.isEmpty(memberPhoneList)){
-            return Collections.emptyList();
-        }
-        List<MemberPhone> temp=  memberPhoneList.stream().filter(v->v.getEnabled()==1).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(temp)){
-            return Collections.emptyList();
-        }
-        if(temp.size()==1){
-            return temp;
-        }
-        Collections.sort(temp, new Comparator<MemberPhone>() {
-            @Override
-            public int compare(MemberPhone o1, MemberPhone o2) {
-                if(o1.getUpdate_time()==null||o2.getUpdate_time()==null){
-                    return 0;
-                }
-                return (int) ((int) o2.getUpdate_time().getTime()-o1.getUpdate_time().getTime());
-            }
-        });
-        return temp;
-    }
 
     /**
      * 根据手机号获取顾客信息（可用来判断手机号是否被注册，如果被注册则返回注册顾客实体）
@@ -402,15 +379,15 @@ public class MemberServiceImpl implements MemberService {
         return ComResponse.success(list);
     }
 
-    @Override
-    public void saveReveiverAddress(ReveiverAddress reveiverAddress) {
-        memberMapper.saveReveiverAddress(reveiverAddress);
-    }
+//    @Override
+//    public void saveReveiverAddress(ReveiverAddress reveiverAddress) {
+//        memberMapper.saveReveiverAddress(reveiverAddress);
+//    }
 
-    @Override
-    public void updateReveiverAddress(ReveiverAddress reveiverAddress) {
-        memberMapper.updateReveiverAddress(reveiverAddress);
-    }
+//    @Override
+//    public void updateReveiverAddress(ReveiverAddress reveiverAddress) {
+//        memberMapper.updateReveiverAddress(reveiverAddress);
+//    }
 
     @Override
     public List<ReveiverAddress> getReveiverAddress(String member_card) {
@@ -419,7 +396,30 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberOrderStat getMemberOrderStat(String member_card) {
-        return memberMapper.getMemberOrderStat(member_card);
+        MemberOrderStat stat = memberMapper.getMemberOrderStat(member_card);
+        if (stat != null) {
+            BigDecimal dBD100 = new BigDecimal("100");
+            if (stat.getTotal_counsum_amount() != null) {
+                stat.setTotalCounsumAmountD((new BigDecimal(stat.getTotal_counsum_amount()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
+            }
+            if (stat.getTotal_invest_amount() != null) {
+                stat.setTotalInvestAmountD((new BigDecimal(stat.getTotal_invest_amount()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
+            }
+            if (stat.getFirst_order_am() != null) {
+                stat.setFirstOrderAmD((new BigDecimal(stat.getFirst_order_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
+            }
+            if (stat.getOrder_high_am() != null) {
+                stat.setOrderHighAmD((new BigDecimal(stat.getOrder_high_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
+            }
+            if (stat.getOrder_low_am() != null) {
+                stat.setOrderLowAmD((new BigDecimal(stat.getOrder_low_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
+            }
+            if (stat.getOrder_avg_am() != null) {
+                stat.setOrderAvgAmD((new BigDecimal(stat.getOrder_avg_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
+            }
+        }
+
+        return stat;
     }
 
     /**
@@ -472,10 +472,10 @@ public class MemberServiceImpl implements MemberService {
      *
      * @return
      */
-    @Override
+/*    @Override
     public List<MemberBaseAttr> getmemberActions() {
         return memberMapper.getmemberActions();
-    }
+    }*/
 
     /**
      * 根据crowdId 删除顾客圈选
@@ -526,7 +526,7 @@ public class MemberServiceImpl implements MemberService {
      * @return
      */
     @Override
-    public List getMemberAmount(List<String> member_cards) {
+    public List<MemberAmount> getMemberAmount(List<String> member_cards) {
         return memberMapper.getMemberAmount(member_cards);
     }
 
@@ -889,28 +889,35 @@ public class MemberServiceImpl implements MemberService {
                 if (ProductMainDTO == null) {
                     continue;
                 }
-                String totalUseNum = ProductMainDTO.getTotalUseNum();
+                int productCount = productVO.getProductCount() == null ? 1 : productVO.getProductCount();//购买商品的数量
+                String totalUseNum = ProductMainDTO.getTotalUseNum();//当商品规格 数量
                 if (addVo != null) {
-                    addVo.setProductLastNum(Integer.valueOf(totalUseNum));//商品剩余量
+                    if (StringUtils.isNotEmpty(totalUseNum)) {
+                        addVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount);//商品剩余量
+                    }
+                    addVo.setProductCount(productCount);//购买商品数量
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
-                    addVo.setProductLastNum(productVO.getProductCount());
-                    addVo.setProductCount(productVO.getProductCount());//购买商品数量
 
-                    addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
-                    addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
+                    //默认不保存商品信息里面的用量信息
+                    addVo.setOneToTimes(null);
+                    addVo.setOneUseNum(null);
                 }else if (upVo != null){
-                    upVo.setProductLastNum(Integer.valueOf(totalUseNum) + dto.getProductLastNum());//商品剩余量
+                    if (StringUtils.isNotEmpty(totalUseNum)) {
+                        upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
+                    }
+
                     upVo.setProductName(ProductMainDTO.getName());//商品名称
                     upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
                     upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
 
-                    if (dto.getOneToTimes() == null) {
+                    //默认不保存商品信息里面的用量信息
+                    /*if (dto.getOneToTimes() == null) {
                         upVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     }
                     if (dto.getOneUseNum() == null) {
                         upVo.setOneUseNum(ProductMainDTO.getOneUseNum());
-                    }
+                    }*/
                 }
             }
             //保存
@@ -932,102 +939,128 @@ public class MemberServiceImpl implements MemberService {
         }
 
         //更新member_order_stat
-        List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
-        cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat;
-        if (CollectionUtil.isEmpty(memberOrderStats)) {
+        cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat = memberOrderStatService.queryByMemberCode(memberCard);
+        if (memberOrderStat == null) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "memberOrderStat记录不存在!");
         }
 
-        //存在则更新最后下单时间
-        if (CollectionUtil.isNotEmpty(memberOrderStats)) {
-            memberOrderStat = memberOrderStats.get(0);
-            //累计消费金额
-            Integer totalCounsumAmount = memberOrderStat.getTotalCounsumAmount() == null ? 0 : memberOrderStat.getTotalCounsumAmount();
-            totalCounsumAmount += orderInfo4MqVo.getSpend();
-            memberOrderStat.setTotalCounsumAmount(totalCounsumAmount);
+        //累计消费金额
+        Integer totalCounsumAmount = memberOrderStat.getTotalCounsumAmount() == null ? 0 : memberOrderStat.getTotalCounsumAmount();
+        totalCounsumAmount += orderInfo4MqVo.getSpend();
+        memberOrderStat.setTotalCounsumAmount(totalCounsumAmount);
 
-            //累计充值金额
-            Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
-            totalInvestAmount += orderInfo4MqVo.getCash1();
-            memberOrderStat.setTotalInvestAmount(totalInvestAmount);
+//        //累计充值金额
+//        Integer totalInvestAmount = memberOrderStat.getTotalInvestAmount() == null ? 0 : memberOrderStat.getTotalInvestAmount();
+//        totalInvestAmount += orderInfo4MqVo.getCash1();
+//        memberOrderStat.setTotalInvestAmount(totalInvestAmount);
 
-            //累计订单总金额
-            Integer totalOrderAmount = memberOrderStat.getTotalOrderAmount() == null ? 0 : memberOrderStat.getTotalOrderAmount();
-            totalOrderAmount += orderInfo4MqVo.getTotalAll();
-            memberOrderStat.setTotalOrderAmount(totalOrderAmount);
+        //累计订单总金额
+        Integer totalOrderAmount = memberOrderStat.getTotalOrderAmount() == null ? 0 : memberOrderStat.getTotalOrderAmount();
+        totalOrderAmount += orderInfo4MqVo.getTotalAll();
+        memberOrderStat.setTotalOrderAmount(totalOrderAmount);
 
-            //累计订单应收总金额
-            Integer orderRecAmount = memberOrderStat.getOrderRecAmount() == null ? 0 : memberOrderStat.getOrderRecAmount();
-            orderRecAmount += orderInfo4MqVo.getCash();
-            memberOrderStat.setOrderRecAmount(orderRecAmount);
+        //累计订单应收总金额
+        Integer orderRecAmount = memberOrderStat.getOrderRecAmount() == null ? 0 : memberOrderStat.getOrderRecAmount();
+        orderRecAmount += orderInfo4MqVo.getCash();
+        memberOrderStat.setOrderRecAmount(orderRecAmount);
 
 
-            memberOrderStat.setLastBuyProductCode(codes);//最后一次购买商品
-            //首次购买商品
-            if (StringUtils.isEmpty(memberOrderStat.getFirstBuyProductCode())) {
-                memberOrderStat.setFirstBuyProductCode(memberOrderStat.getLastBuyProductCode());
-            }
-            if (memberOrderStat.getFirstOrderAm() == null || memberOrderStat.getFirstOrderAm().intValue() == 0) {
-                memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//真正首单金额
-            }
-            if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getTotalAll()) {
-                memberOrderStat.setOrderHighAm(orderInfo4MqVo.getTotalAll());//订单最高金额
-            }
-
-            if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm().intValue() == 0 || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
-                memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最低金额
-            }
-
-            if (memberOrderStat.getBuyCount() == null) {
-                memberOrderStat.setBuyCount(0);
-            }
-            memberOrderStat.setBuyCount(memberOrderStat.getBuyCount() + 1);//累计购买次数
-            memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
-            int orgNum = productEffectList == null ? 0 : productEffectList.size();
-            memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
-            //memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
-
-            //总平均购买天数
-            if (memberOrderStat.getLastOrderTime() != null && memberOrderStat.getFirstOrderTime() != null) {
-                long betweenDay = DateUtil.between(memberOrderStat.getFirstOrderTime(), memberOrderStat.getLastOrderTime(), DateUnit.DAY);
-                Integer buyDay = Math.round(betweenDay / (float) memberOrderStat.getBuyCount());
-                memberOrderStat.setDayAvgCount(buyDay);
-            }
-            //最后一次订单的签收时间
-            memberOrderStat.setLastSignTime(orderInfo4MqVo.getSignTime());
-
-            //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
-            int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
-            }
-
-            //查询顾客表信息
-            Member member = memberMapper.selectMemberByCard(memberCard);
-
-            //更新客户表订单总金额
-            member.setTotal_amount(totalCounsumAmount);//累计消费金额
-
-
-            //顾客的首单金额为空或者为0的时候,设置顾客的首单金额
-            if (member.getFirst_order_am() == null || member.getFirst_order_am().intValue() == 0) {
-                member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
-            }
-            //顾客的会员标识不是会员的时要设置会员标识
-            if (!member.isVip_flag()) {
-                memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
-            }
-            result = memberMapper.updateByMemberGradeByMember(member);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
-            }
-
-            //设置缓存
-            redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
+        memberOrderStat.setLastBuyProductCode(codes);//最后一次购买商品
+        //首次购买商品
+        if (StringUtils.isEmpty(memberOrderStat.getFirstBuyProductCode())) {
+            memberOrderStat.setFirstBuyProductCode(memberOrderStat.getLastBuyProductCode());
         }
+        if (memberOrderStat.getFirstOrderAm() == null || memberOrderStat.getFirstOrderAm().intValue() == 0) {
+            memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//真正首单金额
+        }
+        if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getTotalAll()) {
+            memberOrderStat.setOrderHighAm(orderInfo4MqVo.getTotalAll());//订单最高金额
+        }
+
+        if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm().intValue() == 0 || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
+            memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最低金额
+        }
+
+        if (memberOrderStat.getBuyCount() == null) {
+            memberOrderStat.setBuyCount(0);
+        }
+        memberOrderStat.setBuyCount(memberOrderStat.getBuyCount() + 1);//累计购买次数
+        memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
+        int orgNum = productEffectList == null ? 0 : productEffectList.size();
+        memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
+        //memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
+
+        //总平均购买天数
+        if (memberOrderStat.getLastOrderTime() != null && memberOrderStat.getFirstOrderTime() != null) {
+            long betweenDay = DateUtil.between(memberOrderStat.getFirstOrderTime(), memberOrderStat.getLastOrderTime(), DateUnit.DAY);
+            Integer buyDay = Math.round(betweenDay / (float) memberOrderStat.getBuyCount());
+            memberOrderStat.setDayAvgCount(buyDay);
+        }
+        //最后一次订单的签收时间
+        memberOrderStat.setLastSignTime(orderInfo4MqVo.getSignTime());
+
+        //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
+        int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+        }
+
+        //查询顾客表信息
+        Member member = memberMapper.selectMemberByCard(memberCard);
+
+        //更新客户表订单总金额
+        member.setTotal_amount(totalCounsumAmount);//累计消费金额
+
+
+        //顾客的首单金额为空或者为0的时候,设置顾客的首单金额
+        if (member.getFirst_order_am() == null || member.getFirst_order_am().intValue() == 0) {
+            member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
+        }
+        //顾客的会员标识不是会员的时要设置会员标识
+        if (!member.isVip_flag()) {
+            memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
+        }
+        result = memberMapper.updateByMemberGradeByMember(member);
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
+        }
+
+        //判断是否存在冻结消费，存在则确认消费
+        MemberAmountDetail frozenDetail = memberAmountService.getFrozenDetailByOrder(orderInfo4MqVo.getOrderNo(), 2);
+        //存在冻结消费，要进行确认
+        if (frozenDetail != null) {
+            ComResponse<String> response = memberAmountService.operationConfirm(2, orderInfo4MqVo.getOrderNo());
+            if (response == null || response.getCode() != 200) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"确认扣款失败!");
+            }
+        }else{
+            log.info("订单,{}签收时未找到消费冻结记录",orderInfo4MqVo.getOrderNo());
+        }
+
+        //判断是否是货到付款，货到付款要进行充值
+        Integer payType = orderInfo4MqVo.getPayType();
+        Integer cash1 = orderInfo4MqVo.getCash1();
+        if (payType != null && payType == 1 && cash1 != null && cash1 > 0){
+            MemberAmountDetailVO vo = new MemberAmountDetailVO();
+            vo.setOrderNo(orderInfo4MqVo.getOrderNo());
+            vo.setMemberCard(memberCard);
+            vo.setDiscountMoney(orderInfo4MqVo.getCash1());//预存金额 分为单位
+            vo.setObtainType(3);
+            vo.setRemark("订单签收时,预存金额");
+            ComResponse<String> response = memberAmountService.operation(vo);
+            if (response == null || response.getCode() != 200) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return ComResponse.fail(response.getCode(),response.getMessage());
+            }
+
+        }
+
+        //设置缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
         return ComResponse.success(true);
     }
 
@@ -1060,39 +1093,25 @@ public class MemberServiceImpl implements MemberService {
         }
         boolean isFirst = false;
         //member_order_stat
-        List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> memberOrderStats = memberOrderStatMapper.queryByMemberCodes(Arrays.asList(memberCard));
-        cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat;
-        //存在则更新最后下单时间
-        if (CollectionUtil.isNotEmpty(memberOrderStats)) {
-            memberOrderStat = memberOrderStats.get(0);
-            if ((StringUtils.isEmpty(memberOrderStat.getFirstOrderNo()) ||  "0".equals(memberOrderStat.getFirstOrderNo()))) {
-                isFirst = true;
-                memberOrderStat.setFirstOrderNo(orderCreateInfoVO.getOrderNo());//首单订单号
-                memberOrderStat.setFirstOrderStaffNo(orderCreateInfoVO.getStaffNo());//首单下单员工
-                memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
-            }
-            memberOrderStat.setLastOrderTime(orderCreateInfoVO.getCreateTime());//最后一次下单时间
-            int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"更新顾客信息异常!");
-            }
+        cn.net.yzl.crm.customer.model.db.MemberOrderStat memberOrderStat = memberOrderStatService.queryByMemberCode(memberCard);
+        if (memberOrderStat == null) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "memberOrderStat记录不存在!");
         }
-        //不存在则添加记录
-        else {
+
+        if ((StringUtils.isEmpty(memberOrderStat.getFirstOrderNo()) ||  "0".equals(memberOrderStat.getFirstOrderNo()))) {
             isFirst = true;
-            memberOrderStat = new cn.net.yzl.crm.customer.model.db.MemberOrderStat();
-            memberOrderStat.setMemberCard(memberCard);//会员卡号
-            memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
-            memberOrderStat.setLastOrderTime(orderCreateInfoVO.getCreateTime());//最后一次下单时间
+            memberOrderStat.setFirstOrderNo(orderCreateInfoVO.getOrderNo());//首单订单号
             memberOrderStat.setFirstOrderStaffNo(orderCreateInfoVO.getStaffNo());//首单下单员工
-            memberOrderStat.setFirstOrderNo(orderCreateInfoVO.getOrderNo());//首单订单编号
-            int result = memberOrderStatMapper.insertSelective(memberOrderStat);
-            if (result < 1) {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"更新顾客信息异常!");
-            }
+            memberOrderStat.setFirstOrderTime(orderCreateInfoVO.getCreateTime());//首单下单时间
         }
+        memberOrderStat.setLastOrderTime(orderCreateInfoVO.getCreateTime());//最后一次下单时间
+        int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+        if (result < 1) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"更新顾客信息异常!");
+        }
+
         //更新member中的首单信息(根据首单订单号是否为空)
         if (isFirst) {
             member.setFirst_order_staff_no(orderCreateInfoVO.getStaffNo());//首单下单员工
@@ -1102,7 +1121,7 @@ public class MemberServiceImpl implements MemberService {
         //最后一次订单的下单时间 = 当前订单的创建时间
         member.setLast_order_time(orderCreateInfoVO.getCreateTime());
         //下单时更新顾客信息
-        int result = memberMapper.updateMemberForOrderCreate(member);
+        result = memberMapper.updateMemberForOrderCreate(member);
         if (result < 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"更新顾客基本信息异常!");
@@ -1541,12 +1560,12 @@ public class MemberServiceImpl implements MemberService {
             String memberCard = memberVO.getMember_card();
             workOrderBeanVO.setMemberCard(memberCard);
             workOrderBeanVO.setAcceptStatus(2);//工单接收状态：已接收
-            //workOrderBeanVO.setActivity(3);
+
             workOrderBeanVO.setAllocateTime(now);//分配时间
             workOrderBeanVO.setApplyUpStatus(0);//上交状态：未上交
             workOrderBeanVO.setCallFlag(0);//员工当日拨打状态：未拨打
             workOrderBeanVO.setCallTimes(0);//坐席已拨打次数：0次
-            List<MemberPhone> memberPhoneList = memberVO.getMemberPhoneList();
+            /*List<MemberPhone> memberPhoneList = memberVO.getMemberPhoneList();
             if (CollectionUtil.isNotEmpty(memberPhoneList)) {
                 //默认为第一个
                 workOrderBeanVO.setCalledPhone(memberPhoneList.get(0).getPhone_number());//被叫号码
@@ -1556,12 +1575,16 @@ public class MemberServiceImpl implements MemberService {
                         break;
                     }
                 }
-            }
+            }*/
             //workOrderBeanVO.setCallerPhone("400-");//主叫号码
             if (workOrderBeanVO.getCreateTime() == null) {
                 workOrderBeanVO.setCreateTime(now);//创建时间
             }
 
+            workOrderBeanVO.setAllocateStatus(1);
+            workOrderBeanVO.setActivity(3);
+            workOrderBeanVO.setProductTypeCnt(0);
+            workOrderBeanVO.setProductLastNum(0);
 
             workOrderBeanVO.setHistoryFlag(0);//非历史数据
             workOrderBeanVO.setIsVisiable(1);//可见
@@ -1570,7 +1593,7 @@ public class MemberServiceImpl implements MemberService {
                 workOrderBeanVO.setMemberName(memberVO.getMember_name());//会员名称
             }
             workOrderBeanVO.setMGradeCode("1");
-            workOrderBeanVO.setSouce(3);//工单来源：自有的
+            workOrderBeanVO.setSouce(1);//工单来源：自有的
             workOrderBeanVO.setStatus(1);//工单处理状态：未处理
             workOrderBeanVO.setTradeStatus(2);//工单成交状态：未成交
             workOrderBeanVO.setTransTimes(0);//调整次数：0

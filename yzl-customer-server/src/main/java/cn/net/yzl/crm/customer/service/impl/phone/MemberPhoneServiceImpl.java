@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.service.impl.phone;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.MemberPhoneMapper;
@@ -12,11 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -125,7 +127,7 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         Pattern p = null;
         Matcher m = null;
         boolean b = false;
-        p = Pattern.compile("^[1][3,4,5,7,8,9][0-9]{9}$"); // 验证手机号
+        p = Pattern.compile("^[1][3,4,5,6,7,8,9][0-9]{9}$"); // 验证手机号
         m = p.matcher(str);
         b = m.matches();
         return b;
@@ -190,5 +192,75 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
         }
         return ComResponse.success(memberEntity);
 
+    }
+
+
+    /**
+     * 获取顾客联系方式信息，包括手机号，座机号
+     *
+     * @param member_card
+     * @return
+     */
+    @Override
+    public List<MemberPhone> getMemberPhoneList(String member_card) {
+        List<MemberPhone> memberPhoneList = memberPhoneMapper.getMemberPhoneList(member_card);
+        if(CollectionUtils.isEmpty(memberPhoneList)){
+            return Collections.emptyList();
+        }
+        List<MemberPhone> temp=  memberPhoneList.stream().filter(v->v.getEnabled()==1).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(temp)){
+            return Collections.emptyList();
+        }
+        if(temp.size()==1){
+            return temp;
+        }
+        Collections.sort(temp, new Comparator<MemberPhone>() {
+            @Override
+            public int compare(MemberPhone o1, MemberPhone o2) {
+                if(o1.getUpdate_time()==null||o2.getUpdate_time()==null){
+                    return 0;
+                }
+                return (int) ((int) o2.getUpdate_time().getTime()-o1.getUpdate_time().getTime());
+            }
+        });
+        return temp;
+    }
+
+    @Override
+    public List<String> getMemberCardByphoneNumbers(List<String> phoneNumbers) {
+        List<String> memberCards = new ArrayList<>();
+        List<String> list = formatPhoneNumber(phoneNumbers);
+        if (CollectionUtil.isNotEmpty(list)) {
+            memberCards = memberPhoneMapper.getMemberCardByPhoneNumbers(list);
+        }
+        return memberCards;
+    }
+
+
+
+    private List<String> formatPhoneNumber(List<String> phoneNumbers) {
+        List<String> list = new ArrayList<>();
+        if (CollectionUtils.isEmpty(phoneNumbers)) {
+            return list;
+        }
+        String noZeroNumber = "";
+        String haveZeroNumber = "";
+        for (String phoneNumber : phoneNumbers) {
+            if (StringUtils.isEmpty(phoneNumber.trim())) {
+                continue;
+            }
+            phoneNumber = phoneNumber.trim();
+            //是否以0开头 --> 去掉0
+            if (phoneNumber.startsWith(PREFIX_ZERO)){
+                noZeroNumber = phoneNumber.substring(1);
+                haveZeroNumber = phoneNumber;
+            }else{
+                noZeroNumber = phoneNumber;
+                haveZeroNumber = PREFIX_ZERO + phoneNumber;
+            }
+            list.add(noZeroNumber);
+            list.add(haveZeroNumber);
+        }
+        return list;
     }
 }

@@ -17,6 +17,7 @@ import cn.net.yzl.crm.customer.mongomodel.crowd.CustomerCrowdGroupVO;
 import cn.net.yzl.crm.customer.mongomodel.crowd.UpdateCrowdStatusVO;
 import cn.net.yzl.crm.customer.mongomodel.member_crowd_group;
 import cn.net.yzl.crm.customer.service.CustomerGroupService;
+import cn.net.yzl.crm.customer.service.thread.IAsyncService;
 import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.CacheUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
@@ -38,6 +39,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author lichanghong
@@ -56,6 +59,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    IAsyncService executeAsync;
 
     private final static Integer SAVE_LINE = 15_000;
 
@@ -114,6 +120,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         Date date = new Date();
         member_crowd_group.setCreate_time(MongoDateHelper.getMongoDate(date));
         member_crowd_group.setCreateTimeLong(date.getTime());
+        member_crowd_group.setUpdate_time(member_crowd_group.getCreate_time());
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
         return ComResponse.success();
     }
@@ -235,8 +242,17 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     public Boolean memberGroupTimedTask() {
         List<member_crowd_group> list =memberCrowdGroupDao.query4Task();
         //多线程执行
-        for(member_crowd_group memberCrowdGroup:list){
-            threadPoolExecutor.execute(()->{ memberCrowdGroupRun(memberCrowdGroup);});
+        String groupId = "";
+        String groupName = "";
+        try {
+            for (member_crowd_group memberCrowdGroup : list) {
+                groupId = memberCrowdGroup.get_id();
+                groupName = memberCrowdGroup.getCrowd_name();
+                //threadPoolExecutor.execute(()->{ memberCrowdGroupRun(memberCrowdGroup);});
+                memberCrowdGroupRun(memberCrowdGroup);
+            }
+        } catch (Exception e) {
+            log.error("/v1/memberGroupTimedTask:定时任务圈选异常!,当前处理的群组id为:{},名称为:{}",groupId,groupName);
         }
         return true;
     }
@@ -248,39 +264,62 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     @Override
     @Transactional(value = "mongoTransactionManager",rollbackFor = Throwable.class)
-    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) {
-        long groupRunStartTime = System.currentTimeMillis();
+    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) throws InterruptedException {
         //生成数据的版本号
         Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMdd"));
         String groupId = memberCrowdGroup.get_id();
-        Integer pageNo = 1;
-        Integer pageSize = SAVE_LINE;
-        Query query = memberLabelDao.initQuery(memberCrowdGroup);
-        List<MemberLabel> labels = null;
-        Page<MemberLabel> memberLabelPage;
-        //获取记录的总条数
-        boolean hasNext = true;
-        int matchCount = 0;
-        query.with(Sort.by(Sort.Order.asc("_id")));
-        query.fields().include("memberCard").include("memberName").exclude("_id");
-        while (hasNext) {
-            //分页查询
-            memberLabelPage = memberLabelDao.memberCrowdGroupRunUsePage(pageNo, pageSize, query);
-            labels = memberLabelPage.getItems();
-            if(!CollectionUtils.isEmpty(labels)){
-            PageParam pageParam = memberLabelPage.getPageParam();
-            log.info("memberCrowdGroupRun-page query:groupId:{},本次分页,pageNo:{},圈选出{}条记录,版本号为:{}",groupId,pageParam.getPageNo(),labels.size(),version);
-            //处理数据
-            matchCount += doMemberCrowdGroupRun(groupId, labels,version);
-            labels.clear();
-            //判断是否有下一页
-            if (pageParam.getNextPage() == 0) {
-                hasNext = false;
+        AtomicInteger matchCount = new AtomicInteger(0);
+        long groupRunStartTime = System.currentTimeMillis();
+
+        if (memberCrowdGroup.getEnable() != null && memberCrowdGroup.getEnable() == 1){
+            Integer pageNo = 1;
+            Integer pageSize = SAVE_LINE;
+            Query query = memberLabelDao.initQuery(memberCrowdGroup);
+
+            //获取记录的总条数
+            boolean hasNext = true;
+            query.with(Sort.by(Sort.Order.asc("_id")));
+            query.fields().include("memberCard").include("memberName").exclude("_id");
+
+            List<Future<String>> futures = new ArrayList<>();
+            while (hasNext) {
+                Page<MemberLabel> memberLabelPage = memberLabelDao.memberCrowdGroupRunUsePage(pageNo, pageSize, query);
+                PageParam pageParam = memberLabelPage.getPageParam();
+                //分页查询
+                List<MemberLabel> labels = memberLabelPage.getItems();
+                if(!CollectionUtils.isEmpty(labels)) {
+                    Future<String> future = executeAsync.executeAsync2(() -> {
+                        log.info("memberCrowdGroupRun-page query:groupId:{},本次分页,pageNo:{},圈选出{}条记录,版本号为:{}", groupId, pageParam.getPageNo(), labels.size(), version);
+                        //处理数据
+                        int result = doMemberCrowdGroupRun(groupId, labels, version);
+                        matchCount.addAndGet(result);
+                        labels.clear();
+                    });
+                    futures.add(future);
+                    if (pageParam.getNextPage() == 0) {
+                        hasNext = false;
+                    }
+                    pageNo = pageParam.getNextPage();
+                }
+                //判断是否有下一页
+                else{
+                    break;
+                }
             }
-            pageNo = pageParam.getNextPage();
-            }else{
-                break;
+
+            a:while (true) {
+                Iterator<Future<String>> iterator = futures.iterator();
+                while (iterator.hasNext()) {
+                    if (iterator.next().isDone()) {
+                        iterator.remove();
+                    }
+                }
+                if (futures.size() == 0) {
+                    break a;
+                }
+                Thread.sleep(3000);
             }
+            log.info("群组:{}程执行完毕",groupId);
         }
 
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
@@ -298,8 +337,8 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         update.set("person_count",count);
         memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
         long groupRunEndTime = System.currentTimeMillis();
-        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount,version,count,(groupRunEndTime-groupRunStartTime));
-        return matchCount;
+        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount.get(),version,count,(groupRunEndTime-groupRunStartTime));
+        return matchCount.get();
     }
 
 
@@ -494,7 +533,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @return
      */
     @Override
-    public int memberCrowdGroupRunById(MemberCrowdGroupOpVO crowdGroupOpVO) {
+    public int memberCrowdGroupRunById(MemberCrowdGroupOpVO crowdGroupOpVO) throws InterruptedException {
         //查询规则
         member_crowd_group memberCrowdGroup = memberCrowdGroupDao.getMemberCrowdGroup(crowdGroupOpVO.get_id());
         if (memberCrowdGroup == null) {

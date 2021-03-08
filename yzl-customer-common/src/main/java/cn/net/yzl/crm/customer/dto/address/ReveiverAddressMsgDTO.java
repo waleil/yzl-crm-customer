@@ -42,4 +42,7 @@ public class ReveiverAddressMsgDTO implements Serializable {
     @ApiModelProperty(value = "详细地址，街道门牌号",name = "detailedReceivingAddress")
     private String detailedReceivingAddress;
 
+    @ApiModelProperty(value = "是否是默认收货地址:0=不是,1=是",name = "defaultFlag",required = false)
+    private Integer defaultFlag;
+
 }

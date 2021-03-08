@@ -57,6 +57,9 @@ public class ReveiverAddress {
     @ApiModelProperty("修改人编号")
     private String update_code;
 
+    @ApiModelProperty(value = "是否是默认收货地址:0=不是,1=是",name = "defaultFlag",required = false)
+    private Integer defaultFlag;
+
 
 
 }

@@ -37,4 +37,8 @@ public interface MemberPhoneMapper {
 
     List<MemberPhone> getMemberPhoneByMemberCard(@Param("memberCard") String memberCard);
 
+
+    List<MemberPhone> getMemberPhoneList(String member_card);
+
+    List<String> getMemberCardByPhoneNumbers(@Param("list") List<String> list);
 }

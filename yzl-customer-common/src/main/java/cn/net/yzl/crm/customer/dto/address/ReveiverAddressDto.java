@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.dto.address;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -41,5 +42,12 @@ public class ReveiverAddressDto implements Serializable {
     private String memberStreetName;
     @ApiModelProperty(value = "详细地址，街道门牌号",name = "memberAddress")
     private String memberAddress;
+
+    @ApiModelProperty(value = "是否是默认收货地址:0=不是,1=是",name = "defaultFlag",required = false)
+    private Integer defaultFlag;
+
+    @ApiModelProperty(value = "修改时间",name = "updateTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTime;
 
 }

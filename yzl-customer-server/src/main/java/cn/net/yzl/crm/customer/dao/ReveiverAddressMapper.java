@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
+import cn.net.yzl.crm.customer.dto.member.MemberReveiverAddressSerchDTO;
 import cn.net.yzl.crm.customer.model.db.ReveiverAddress;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -59,4 +60,9 @@ public interface ReveiverAddressMapper {
 
 
     List<ReveiverAddressDto> getReveiverAddressByMemberCard(@Param("memberCard") String memberCard);
+
+    List<ReveiverAddressDto> getReveiverAddressByPage(MemberReveiverAddressSerchDTO serchDTO);
+
+    int selectDefaultCountByMemberCard(@Param("memberCard") String memberCard);
+
 }
