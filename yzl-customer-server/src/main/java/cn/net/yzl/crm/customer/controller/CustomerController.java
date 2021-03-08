@@ -249,7 +249,7 @@ public class CustomerController {
 
     @ApiOperation("获取顾客购买能力")
     @GetMapping("/v1/getMemberOrderStat")
-    public GeneralResult getMemberOrderStat(
+    public GeneralResult<MemberOrderStat> getMemberOrderStat(
             @RequestParam("member_card")
             @NotBlank(message = "member_card不能为空")
             @ApiParam(name = "member_card", value = "会员卡号", required = true)
