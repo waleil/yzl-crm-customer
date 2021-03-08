@@ -15,6 +15,7 @@ import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberAmount;
 import cn.net.yzl.crm.customer.model.MemberAmountDetail;
 import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
+import cn.net.yzl.crm.customer.service.MemberOrderStatService;
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.DateCustomerUtils;
@@ -44,6 +45,9 @@ public class MemberAmountServiceImpl implements MemberAmountService {
     private MemberMapper memberMapper;
     @Autowired
     MemberOrderStatMapper memberOrderStatMapper;
+
+    @Autowired
+    MemberOrderStatService memberOrderStatService;
 
 
 
@@ -230,7 +234,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
 
                     //计算累计充值金额
                     //更新member_order_stat
-                    MemberOrderStat memberOrderStat = memberOrderStatMapper.queryByMemberCode(memberCard);
+                    MemberOrderStat memberOrderStat = memberOrderStatService.queryByMemberCode(memberCard);
                     if (memberOrderStat == null) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "memberOrderStat记录不存在!");
@@ -242,9 +246,9 @@ public class MemberAmountServiceImpl implements MemberAmountService {
 
                     MemberOrderStat update = new MemberOrderStat();
                     update.setTotalInvestAmount(totalInvestAmount);
-                    update.setId(memberOrderStat.getId());
+                    update.setMemberCard(memberOrderStat.getMemberCard());
 
-                    int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
+                    int result = memberOrderStatMapper.updateByPrimaryKeySelective(update);
                     if (result < 1) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
