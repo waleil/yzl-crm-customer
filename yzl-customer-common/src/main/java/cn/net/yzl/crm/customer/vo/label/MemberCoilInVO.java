@@ -36,7 +36,7 @@ public class MemberCoilInVO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date callInTime;
 
-    @ApiModelProperty(value = "获客来源渠道(媒介类型) -1：其他，0:电视媒体, 1:广播电台媒体，2：社区媒体，3：户外媒体，4：印刷媒体，5：互联网媒体，6：电商站内流量媒体 99:转介绍客户",name="source")
+    @ApiModelProperty(value = "获客来源渠道(媒介类型) -1：其他，0:电视媒体, 1:广播电台媒体，2：社区媒体，3：户外媒体，4：印刷媒体，5：互联网媒体，6：电商站内流量媒体",name="source")
     private Integer mediaType;
 
 

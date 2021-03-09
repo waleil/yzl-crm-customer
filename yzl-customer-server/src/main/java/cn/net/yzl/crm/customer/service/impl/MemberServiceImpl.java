@@ -1550,8 +1550,14 @@ public class MemberServiceImpl implements MemberService {
     public int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO) {
         Member memberVO = memberReferralVO.getMemberVO();
         WorkOrderBeanVO workOrderBeanVO = memberReferralVO.getWorkOrderBeanVO();
-        //99:转介绍客户"
-        memberVO.setSource(99);
+        //转介绍客户的获客渠道取自介绍客户
+        if (2 == memberVO.getIntro_type() && StringUtils.isNotEmpty(memberVO.getIntro_no())){
+            Member member = this.selectMemberByCard(memberVO.getIntro_no());
+            if (member != null) {
+                memberVO.setSource(member.getSource());
+            }
+        }
+
         //保存用户信息
         int result = this.insert(memberVO);
         if (result > 0) {
