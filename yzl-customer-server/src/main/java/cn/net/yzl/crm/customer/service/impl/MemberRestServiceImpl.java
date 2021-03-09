@@ -1,5 +1,7 @@
 package cn.net.yzl.crm.customer.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -22,5 +24,10 @@ public class MemberRestServiceImpl implements MemberRestService {
 	@Override
 	public Integer selectMemberCount(MemberQuery memberQuery) {
 		return this.memberRestMapper.selectMemberCount(memberQuery);
+	}
+
+	@Override
+	public List<String> selectMemberCards(String memberName) {
+		return this.memberRestMapper.selectMemberCards(memberName);
 	}
 }
