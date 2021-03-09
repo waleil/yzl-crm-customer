@@ -34,4 +34,13 @@ public class MemberRestControllerTests {
 			e.printStackTrace();
 		}
 	}
+
+	@Test
+	public void testQueryMemberCards() {
+		try {
+			System.err.println(this.controller.queryMemberCards("张三"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

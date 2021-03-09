@@ -1,5 +1,7 @@
 package cn.net.yzl.crm.customer.service;
 
+import java.util.List;
+
 import cn.net.yzl.crm.customer.dto.MemberQuery;
 
 /**
@@ -20,4 +22,14 @@ public interface MemberRestService {
 	 * @date 2021年2月5日,下午8:59:00
 	 */
 	Integer selectMemberCount(MemberQuery memberQuery);
+
+	/**
+	 * 按顾客姓名查询顾客卡号列表
+	 * 
+	 * @param memberName 顾客姓名
+	 * @return 顾客卡号列表
+	 * @author zhangweiwei
+	 * @date 2021年3月9日,下午1:26:16
+	 */
+	List<String> selectMemberCards(String memberName);
 }
