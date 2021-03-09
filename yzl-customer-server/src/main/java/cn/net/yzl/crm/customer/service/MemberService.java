@@ -205,4 +205,8 @@ public interface MemberService {
 
 
     public Integer updateMemberDisease(String memberCard,String createNo, List<MemberWorkOrderDiseaseVo> memberDiseaseList);
+
+    boolean addredis(String memberCard);
+
+
 }

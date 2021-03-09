@@ -74,11 +74,15 @@ public class ActivityClientAPI {
                 break;
             }
         }
-        if (response == null ||  response.getData() == null || 200 != response.getCode()) {
+        if (200 != response.getCode()) {
             log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
             throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"activityFien:getMemberGradeValidDate:获取DMC会员级别管理接口异常!");
         }
         MemberSysParamDetailResponse data = response.getData();
+        if (data == null) {
+            log.info("getMemberSysParamByType:DMC返回数据为空！");
+            return "";
+        }
 
         if (data.getValidityType() == null || data.getValidityType() == 0) {
             log.info("getMemberSysParamByType:会员有效期类型为长期有效！");
