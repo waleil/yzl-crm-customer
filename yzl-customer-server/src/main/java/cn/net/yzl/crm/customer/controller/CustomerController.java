@@ -468,11 +468,14 @@ public class CustomerController {
     @Deprecated
     @ApiOperation("测试静态方法")
     @PostMapping("/v1/testStaticMethod")
-    public ComResponse<Boolean> testStaticMethod() throws IOException {
+    public ComResponse<Boolean> testStaticMethod(String memberCard) throws IOException {
+
+
+        boolean b = memberService.addredis(memberCard);
 
         //ActivityDetailResponse activityProductByBusNo = ActivityClientAPI.getActivityProductByBusNo(1);
-        String date = ActivityClientAPI.getMemberGradeValidDate();
-        System.out.println(date);
+//        String date = ActivityClientAPI.getMemberGradeValidDate();
+//        System.out.println(date);
         return ComResponse.success(true);
     }
 

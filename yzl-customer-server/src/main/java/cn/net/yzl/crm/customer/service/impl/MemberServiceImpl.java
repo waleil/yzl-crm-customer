@@ -1790,6 +1790,13 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
+    @Override
+    public boolean addredis(String memberCard) {
+        //设置缓存
+        redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
+        return true;
+    }
+
     /**
      *
      * @param vo
@@ -2012,7 +2019,12 @@ public class MemberServiceImpl implements MemberService {
             //会员升级[已经按级别倒叙排序](DMC)
             levelList = ActivityClientAPI.getMemberLevelList();
             //获取DMC的会员到期时间
-            String validDate = ActivityClientAPI.getMemberGradeValidDate();
+            String validDate = "";
+            try {
+                validDate = ActivityClientAPI.getMemberGradeValidDate();
+            } catch (Exception e) {
+                log.error("syncMemberLabel：获取DMC会员到期时间异常，{}",e);
+            }
             if (StringUtils.isNotEmpty(validDate) && !"-1".equals(validDate)) {
                 dateScope = getDateScope(validDate);
             }
