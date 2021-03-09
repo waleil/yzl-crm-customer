@@ -1,7 +1,6 @@
 package cn.net.yzl.crm.customer.dao.elasticsearch.impl;
 
-import cn.net.yzl.crm.customer.config.ESConfig;
-import cn.net.yzl.crm.customer.config.RestHighLevelClientConfig;
+import cn.net.yzl.crm.customer.config.es.RestHighLevelClientConfig;
 import cn.net.yzl.crm.customer.dao.elasticsearch.ElasticsearchDao;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
