@@ -28,6 +28,9 @@ public class MemberProductEffect {
     @ApiModelProperty("每天吃多少")
     private int eating_perday;
 
+    @ApiModelProperty("每天吃几次")
+    private int one_to_times;
+
     @ApiModelProperty("每次吃多少")
     private int one_use_num;
 
