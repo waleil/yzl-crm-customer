@@ -67,4 +67,35 @@ public class WorkOrderClientAPI {
     }
 
 
+    /**
+     * 查询出距离商品服用完日期不足多少天
+     * @return
+     */
+    public static Integer queryReturnVisitRules(){
+        //查询配置规则
+        ComResponse<Integer> rules = null;
+        try {
+            rules = workOrderClientAPI.workOrderClient.queryReturnVisitRules();
+        } catch (Exception e) {
+            log.error("update member product last num:查询配置规则异常：{}",e);
+        }
+        Integer configDay = rules == null || rules.getData() == null ? Integer.MIN_VALUE : rules.getData();
+        return configDay;
+    }
+
+    public static boolean productDosage(List<String> memberCardList){
+        try {
+            ComResponse<Boolean> response = workOrderClientAPI.workOrderClient.productDosage(memberCardList);
+            if (response.getCode() == 200) {
+                return true;
+            }else{
+                log.error("创建工单失败：错误码:{},错误信息:{}",response.getCode(),response.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("创建工单异常：异常信息:{}",e);
+        }
+        return false;
+    }
+
+
 }
