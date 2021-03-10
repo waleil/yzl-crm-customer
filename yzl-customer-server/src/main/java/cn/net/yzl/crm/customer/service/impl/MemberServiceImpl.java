@@ -782,10 +782,11 @@ public class MemberServiceImpl implements MemberService {
             Map<String,String> mongoMemberLabels = memberLabelDao.queryByCodes(memberCards);
             //没有member_label的顾客要新建
             if (CollectionUtil.isEmpty(mongoMemberLabels)) {
+                //根据顾客基本资料，新建顾客标签
                 boolean result = syncMemberLabel(memberCards, 2, null);
                 if (!result) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "收货地址保存失败!");
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存顾客标签信息失败!");
                 }
             }
 
