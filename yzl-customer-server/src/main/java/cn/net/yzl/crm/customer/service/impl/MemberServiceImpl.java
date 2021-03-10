@@ -727,7 +727,11 @@ public class MemberServiceImpl implements MemberService {
         //判断当前号码是否已经使用
         ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(coilInVo.getCallerPhone());
         if (response.getCode() != 200) {
-            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
+            String msg = response.getMessage();
+            if (StringUtils.isEmpty(msg)) {
+                msg = "保存会员信息失败!";
+            }
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), msg);
         }
         Member member = response.getData();
         String memberCard = "";//会员卡号
@@ -739,7 +743,7 @@ public class MemberServiceImpl implements MemberService {
             ComResponse<String> addMemberResult = memberPhoneService.getMemberCardByphoneNumber(coilInVo.getCallerPhone());
             if (addMemberResult.getCode() != 200) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
+                throw new BizException(addMemberResult.getCode(), addMemberResult.getMessage());
             }
             //新添加的会员卡号
             memberCard = addMemberResult.getData();
