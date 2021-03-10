@@ -312,7 +312,8 @@
         FROM
             member_product_effect
         WHERE
-            product_last_num > 0
+            product_last_num > 0 <!-- 商品剩余量>0的 -->
+            and taking_state in (1,2)  <!-- 服用状态: 1 正常，2 非常好 -->
         ORDER BY id DESC
     </select>
 
