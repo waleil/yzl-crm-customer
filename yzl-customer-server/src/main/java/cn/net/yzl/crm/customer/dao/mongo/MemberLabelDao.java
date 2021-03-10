@@ -370,7 +370,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
              //   Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("mGradeId").is(Integer.parseInt(c.getId())));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("mGradeId").is(Integer.parseInt(c.getId())));
+                    }
                 }
             }
         }
