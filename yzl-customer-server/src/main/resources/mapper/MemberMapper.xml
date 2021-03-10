@@ -753,9 +753,7 @@
         m.activity ,
         m.m_grade_code ,
         m.is_active ,
-        m.region_code ,
         m.total_amount ,
-        m.last_order_time,
         m.address,
         m.job_code,
         m.first_order_time,
@@ -782,7 +780,6 @@
         FROM
         member m
         <where>
-            1=1
             <if test="memberName != null">
                 and (m.member_card = #{memberName} or m.member_name = #{memberName})
             </if>

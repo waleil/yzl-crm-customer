@@ -300,11 +300,11 @@ public class MemberServiceImpl implements MemberService {
 
 
         PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
-        List<Member> list = memberMapper.findPageByCondition(dto);
-        if(list==null || list.size()<0){
+        List<Member> memberList = memberMapper.findPageByCondition(dto);
+        if(CollectionUtil.isEmpty(memberList)){
             return ComResponse.nodata();
         }
-        Page<Member> page = AssemblerResultUtil.resultAssembler(list);
+        Page<Member> page = AssemblerResultUtil.resultAssembler(memberList);
 
         return ComResponse.success(page);
     }
