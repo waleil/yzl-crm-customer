@@ -68,6 +68,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -278,36 +280,28 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public ComResponse<Page<Member>> findPageByCondition(MemberSerchConditionDTO dto) {
+    public ComResponse<Page<Member>> findPageByCondition(MemberSerchConditionDTO dto)  {
+        //Page<Member> page = AssemblerResultUtil.resultAssembler(memberList);
 
-        // 获取数量
-//
-//       int num =  memberMapper.findPageByConditionCount(dto);
-//       if(num<1){
-//           return ComResponse.nodata();
-//       }
-//        Page<Member> page = new Page<>();
-//        PageParam pageParam = new PageParam();
-//        pageParam.setTotalCount(num);
-//        pageParam.setPageSize(dto.getPageSize());
-//        pageParam.setPageNo(dto.getCurrentPage());
-//        pageParam.setNextPage((int)Math.ceil(num/dto.getPageSize()));
-//
-//        page.setPageParam(pageParam);
-//        dto.setFromLine((dto.getCurrentPage()-1)*dto.getPageSize());
-//        List<Member> list = memberMapper.findPageByCondition(dto);
-//        page.setItems(list);
-
-
-        PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
-        List<Member> list = memberMapper.findPageByCondition(dto);
-        if(list==null || list.size()<0){
-            return ComResponse.nodata();
+        CompletableFuture<Integer> cfCount=CompletableFuture.supplyAsync(()->this.memberMapper.findCountByCondition(dto));
+        CompletableFuture<List<Member>> cfList=CompletableFuture.supplyAsync(()->this.memberMapper.findPageByCondition(dto));
+        CompletableFuture.allOf(cfCount,cfList);
+        List<Member> memberList =Collections.emptyList();
+        try {
+             memberList = cfList.get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getLocalizedMessage(),e);
         }
-        Page<Member> page = AssemblerResultUtil.resultAssembler(list);
+        Integer totalCount =0;
+        try {
+             totalCount = cfCount.get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getLocalizedMessage(),e);
+        }
 
-        return ComResponse.success(page);
+        return ComResponse.success(dto.toPage(memberList,totalCount));
     }
+
     @Override
     public List<MemberProductEffect> getMemberProductEffectList(String member_card) {
         return memberMapper.getMemberProductEffectList(member_card);
