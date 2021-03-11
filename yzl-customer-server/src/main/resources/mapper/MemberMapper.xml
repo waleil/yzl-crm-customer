@@ -741,76 +741,79 @@
     <select id="findPageByCondition" resultType="cn.net.yzl.crm.customer.model.Member"
             parameterType="cn.net.yzl.crm.customer.dto.member.MemberSerchConditionDTO">
         SELECT
-        m.id,
-        m.member_card ,
-        m.member_name ,
-        m.adver_code,
-        m.adver_name,
-        m.sex ,
-        m.media_name ,
-        m.media_type_name ,
-        m.member_status ,
-        m.activity ,
-        m.m_grade_code ,
-        m.is_active ,
-        m.total_amount ,
-        m.address,
-        m.job_code,
-        m.first_order_time,
-        m.last_order_time,
-        m.master_card,
-        m.first_order_staff_no,
-        m.intro_no,
-        m.intro_name,
-        m.intro_type,
-        m.media_id,
-        m.media_type_code,
-        m.region_code,
-        m.region_name,
-        m.province_code,
-        m.city_code,
-        m.qq,
-        m.wechat,
-        m.email,
-        m.vip_flag,
-        m.source_type,
-        m.m_grade_id mGradeId,
-        m.m_grade_name mGradeName
-
+            m.id,
+            m.member_card ,
+            m.member_name ,
+            m.adver_code,
+            m.adver_name,
+            m.sex ,
+            m.media_name ,
+            m.media_type_name ,
+            m.member_status ,
+            m.activity ,
+            m.m_grade_code ,
+            m.is_active ,
+            m.total_amount ,
+            m.address,
+            m.job_code,
+            m.first_order_time,
+            m.last_order_time,
+            m.master_card,
+            m.first_order_staff_no,
+            m.intro_no,
+            m.intro_name,
+            m.intro_type,
+            m.media_id,
+            m.media_type_code,
+            m.region_code,
+            m.region_name,
+            m.province_code,
+            m.city_code,
+            m.qq,
+            m.wechat,
+            m.email,
+            m.vip_flag,
+            m.source_type,
+            m.m_grade_id mGradeId,
+            m.m_grade_name mGradeName
         FROM
-        member m
-        <where>
-            <if test="memberName != null">
-                and (m.member_card = #{memberName} or m.member_name = #{memberName})
-            </if>
-            <if test="mediaId != null">
-                and m.media_id = #{mediaId}
-            </if>
-            <if test="adverCode != null">
-                and m.adver_code = #{adverCode}
-            </if>
-            <if test="memberStatus != null">
-                and m.member_status = #{memberStatus}
-            </if>
-            <if test="mGradeId != null">
-                and m.m_grade_id = #{mGradeId}
-            </if>
-            <if test="lastOrderTimeStart != null">
-                and m.last_order_time <![CDATA[ >= ]]> #{lastOrderTimeStart}
-            </if>
-            <if test="lastOrderTimeEnd != null">
-                and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeEnd}
-            </if>
-            <!--            <if test="diseaseId != null and diseaseId != '' ">-->
-            <!--                and d.disease_id = #{diseaseId}-->
-            <!--            </if>-->
-            <!--            <if test="diseasePid != null and diseasePid != '' and (diseaseId == null or diseaseId == '' )">-->
-            <!--                and d.disease_id = #{diseasePid}-->
-            <!--            </if>-->
-        </where>
-        order by last_order_time desc
+            member m
+        JOIN
+        (
+            SELECT
+                m.id
+            FROM
+                member m
+            <where>
+                <if test="memberName != null">
+                    and (m.member_card = #{memberName} or m.member_name = #{memberName})
+                </if>
+                <if test="mediaId != null">
+                    and m.media_id = #{mediaId}
+                </if>
+                <if test="adverCode != null">
+                    and m.adver_code = #{adverCode}
+                </if>
+                <if test="memberStatus != null">
+                    and m.member_status = #{memberStatus}
+                </if>
+                <if test="mGradeId != null">
+                    and m.m_grade_id = #{mGradeId}
+                </if>
+                <if test="lastOrderTimeStart != null">
+                    and m.last_order_time <![CDATA[ >= ]]> #{lastOrderTimeStart}
+                </if>
+                <if test="lastOrderTimeEnd != null">
+                    and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeEnd}
+                </if>
 
-<!--         limit #{fromLine},#{pageSize} -->
+            </where>
+            order by last_order_time desc
+
+            limit #{fromLine},#{pageSize}
+
+        ) filterm on m.id =filterm.id
+
     </select>
     <!--根据顾客号查询顾客基本信息 -->
     <select id="selectMemberByCard" parameterType="java.lang.String" resultType="cn.net.yzl.crm.customer.model.Member">
@@ -1555,5 +1558,35 @@
 
         order by create_time asc
 
+    </select>
+    <select id="findCountByCondition" resultType="java.lang.Integer">
+        SELECT
+        COUNT(m.id)
+        FROM
+        member m
+        <where>
+            <if test="memberName != null">
+                and (m.member_card = #{memberName} or m.member_name = #{memberName})
+            </if>
+            <if test="mediaId != null">
+                and m.media_id = #{mediaId}
+            </if>
+            <if test="adverCode != null">
+                and m.adver_code = #{adverCode}
+            </if>
+            <if test="memberStatus != null">
+                and m.member_status = #{memberStatus}
+            </if>
+            <if test="mGradeId != null">
+                and m.m_grade_id = #{mGradeId}
+            </if>
+            <if test="lastOrderTimeStart != null">
+                and m.last_order_time <![CDATA[ >= ]]> #{lastOrderTimeStart}
+            </if>
+            <if test="lastOrderTimeEnd != null">
+                and m.last_order_time <![CDATA[ <= ]]> #{lastOrderTimeEnd}
+            </if>
+
+        </where>
     </select>
 </mapper>
