@@ -1,7 +1,7 @@
 package cn.net.yzl.crm.customer.model;
 
 import lombok.Data;
-
+@Deprecated
 @Data
 public class Label {
     private Integer id;
