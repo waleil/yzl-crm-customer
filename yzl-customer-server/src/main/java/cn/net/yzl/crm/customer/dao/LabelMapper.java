@@ -12,13 +12,15 @@ import java.util.List;
 @Mapper
 public interface LabelMapper {
 
-     List<LabelGroup> getLabelGroups();
-
-     @Select("SELECT id, pid, `name`, field_name fieldName, `code`, value1, value2, label_type labelType,limit_dn limitDn, limit_up limitUp,\n" +
-             "  sort, url, check_box checkBox, group_id groupId, route from  label")
-     List<Label> getCustomerLabels();
-
-     @Select("SELECT id,`name` as labelName from  label_type_base")
-     List<LabelType> selectAllLabelTypes();
+//     List<LabelGroup> getLabelGroups();
+//
+//     @Deprecated
+//     @Select("SELECT id, pid, `name`, field_name fieldName, `code`, value1, value2, label_type labelType,limit_dn limitDn, limit_up limitUp,\n" +
+//             "  sort, url, check_box checkBox, group_id groupId, route from  label")
+//     List<Label> getCustomerLabels();
+//
+//     @Deprecated
+//     @Select("SELECT id,`name` as labelName from  label_type_base")
+//     List<LabelType> selectAllLabelTypes();
 
 }
