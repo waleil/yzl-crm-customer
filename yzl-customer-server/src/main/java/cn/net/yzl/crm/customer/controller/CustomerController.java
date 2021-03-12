@@ -457,6 +457,13 @@ public class CustomerController {
         return ComResponse.success(result);
     }
 
+    @ApiOperation("同步顾客订单指标数据数据")
+    @PostMapping("/v1/updateMemberOrderQuotaTask")
+    public ComResponse<Boolean> updateMemberOrderQuotaTask() {
+        boolean result = memberService.updateMemberOrderQuotaTask();
+        return ComResponse.success(result);
+    }
+
     @ApiOperation("根据DMC规则初始化会员级别")
     @PostMapping("/v1/updateMemberGrandValidityInitTimedTask")
     public ComResponse<Boolean> updateMemberGrandValidityInit() throws IOException {

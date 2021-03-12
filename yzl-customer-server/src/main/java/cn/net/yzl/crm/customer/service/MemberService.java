@@ -188,7 +188,7 @@ public interface MemberService {
 
 //    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
 
-    boolean updateMemberLabel();
+//    boolean updateMemberLabel();
     boolean updateMemberLabelForTask();
 
     int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO);
@@ -207,5 +207,7 @@ public interface MemberService {
 
     boolean addredis(String memberCard);
 
+
+    boolean updateMemberOrderQuotaTask();
 
 }

@@ -203,7 +203,7 @@ public class MemberLabel extends BaseObject {
     private Integer yearAvgCount;
 
     @ApiModelProperty("退货率")
-    private Integer returnGoodsRate;
+    private Double returnGoodsRate;
 
 
     @ApiModelProperty("累计订单总金额")
