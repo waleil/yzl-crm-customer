@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+@Deprecated
 @ApiModel(value="顾客标签实体",description="入参" )
 @Data
 public class LabelDto {

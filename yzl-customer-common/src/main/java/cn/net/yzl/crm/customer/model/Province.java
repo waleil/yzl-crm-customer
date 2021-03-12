@@ -7,6 +7,7 @@ import lombok.Data;
  * @date : 2020/12/8 19:01
  * @description:
  */
+@Deprecated
 @Data
 public class Province {
     private int id;
