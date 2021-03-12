@@ -5,7 +5,6 @@ import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.*;
-import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberPhoneService;
@@ -454,13 +453,6 @@ public class CustomerController {
     public ComResponse<Boolean> updateMemberLabel() {
         //boolean result = memberService.updateMemberLabel();
         boolean result = memberService.updateMemberLabelForTask();
-        return ComResponse.success(result);
-    }
-
-    @ApiOperation("同步顾客订单指标数据数据")
-    @PostMapping("/v1/updateMemberOrderQuotaTask")
-    public ComResponse<Boolean> updateMemberOrderQuotaTask() {
-        boolean result = memberService.updateMemberOrderQuotaTask();
         return ComResponse.success(result);
     }
 

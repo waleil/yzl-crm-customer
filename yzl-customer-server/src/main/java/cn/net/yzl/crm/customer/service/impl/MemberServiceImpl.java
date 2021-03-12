@@ -11,7 +11,6 @@ import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
-import cn.net.yzl.common.util.AssemblerResultUtil;
 import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
@@ -41,11 +40,11 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
-import cn.net.yzl.crm.customer.viewmodel.memberActionModel.MemberActionRelation;
 import cn.net.yzl.crm.customer.vo.*;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
+import cn.net.yzl.crm.customer.vo.member.MemberOrderStatUpdateVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
@@ -53,24 +52,16 @@ import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderDiseaseVo;
 import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 import cn.net.yzl.crm.customer.vo.work.WorkOrderBeanVO;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
-import cn.net.yzl.order.model.vo.order.OrderTotal4MemberDTO;
 import cn.net.yzl.product.model.vo.product.dto.ProductMainDTO;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.language.bm.Rule;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.cursor.Cursor;
-import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -2044,67 +2035,6 @@ public class MemberServiceImpl implements MemberService {
             memberLabel.setMemberDiseaseList(diseaseList);
         }
     }
-
-
-    /**
-     * 通过顾客订单指标数据
-     * @return
-     */
-    //@Transactional
-    @Override
-    public boolean updateMemberOrderQuotaTask() {
-        long start = System.currentTimeMillis();
-        log.info("updateMemberOrderQuotaTask:定时器开始执行!,执行时间为:{}",start);
-        int pageNo = 0, pageSize = 1000, fromIndex;
-        String memberCard = "";
-        int totalUpdate = 0;
-        while (true) {
-            pageNo++;
-            fromIndex = (pageNo - 1) * pageSize;
-            List<cn.net.yzl.crm.customer.model.db.MemberOrderStat> statList = memberOrderStatMapper.scanByPage(pageSize, fromIndex);
-            if (CollectionUtil.isEmpty(statList)) {
-                log.info("updateMemberOrderQuotaTask:当前是第{}页，一共查询:{}条数据!", pageNo,0);
-                break;
-            }
-            log.info("updateMemberOrderQuotaTask:当前是第{}页，一共查询:{}条数据!", pageNo,statList.size());
-
-            Iterator<cn.net.yzl.crm.customer.model.db.MemberOrderStat> iterator = statList.iterator();
-            while (iterator.hasNext()) {
-                cn.net.yzl.crm.customer.model.db.MemberOrderStat stat = iterator.next();
-                memberCard = stat.getMemberCard();
-                //查询订单接口，获取年度签收订单总数
-                //获取总退货订单数 获取总订单数
-                OrderTotal4MemberDTO orderTotal4MemberDTO = OrderClientAPI.selectOrderTotal4Member(memberCard);
-                if (orderTotal4MemberDTO == null) {
-                    log.info("updateMemberOrderQuotaTask:没有获取到顾客:{}的数据", memberCard);
-                    iterator.remove();
-                }
-                int returnOrderNum = orderTotal4MemberDTO.getRefundCnt();//退货数量
-                int totalOrderNum = orderTotal4MemberDTO.getTotalOrderCnt();//总订单数量，不包含取消订单和审批未通过
-                Integer signCnt4TYear = orderTotal4MemberDTO.getTotalSignCnt4TYear();//总签收数量，从当年一月一日开始按照签收日期确定
-                if (totalOrderNum > 0) {
-                    BigDecimal returnRate = new BigDecimal(returnOrderNum * 100).divide(new BigDecimal(totalOrderNum),2, BigDecimal.ROUND_HALF_UP);
-                    stat.setReturnGoodsRate(returnRate.doubleValue());//退货率
-                }
-
-                if (signCnt4TYear != null && signCnt4TYear > 0) {
-                    stat.setYearAvgCount(365 / signCnt4TYear);//年度平均购买天数
-                }
-            }
-            //更新数据
-            int result = memberOrderStatMapper.updateOrderStatQuota(statList);
-            log.info("updateMemberOrderQuotaTask:当前是第{}页，一共更新:{}条数据", pageNo,totalUpdate);
-            totalUpdate += result;
-            if (statList.size() < pageSize) {
-                break;
-            }
-        }
-        long end = System.currentTimeMillis();
-        log.info("updateMemberOrderQuotaTask:数据更新完成，查询{}页，每页:{}条数据，一共更新:{}条数据,执行时长能够为:{}", pageNo,pageSize,totalUpdate,(end-start));
-        return true;
-    }
-
-
 
 
 }

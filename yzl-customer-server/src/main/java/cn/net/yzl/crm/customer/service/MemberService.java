@@ -11,6 +11,7 @@ import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
+import cn.net.yzl.crm.customer.vo.member.MemberOrderStatUpdateVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderDiseaseVo;
@@ -206,8 +207,5 @@ public interface MemberService {
     public Integer updateMemberDisease(String memberCard,String createNo, List<MemberWorkOrderDiseaseVo> memberDiseaseList);
 
     boolean addredis(String memberCard);
-
-
-    boolean updateMemberOrderQuotaTask();
 
 }
