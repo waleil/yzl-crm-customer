@@ -8,6 +8,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
 import cn.net.yzl.crm.customer.model.MemberOrderObject;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
+import cn.net.yzl.order.model.vo.order.OrderTotal4MemberDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -120,6 +121,24 @@ public class OrderClientAPI {
             return data.get(0);
         }
         return null;
+    }
+
+    /**
+     * 根据顾客卡号查询退单/签收信息
+     * @param memberCard
+     * @return
+     */
+    public static OrderTotal4MemberDTO selectOrderTotal4Member(String memberCard){
+        OrderTotal4MemberDTO data = null;
+        try {
+            ComResponse<OrderTotal4MemberDTO> response = orderClientAPI.orderFien.selectOrderTotal4Member(memberCard);
+            if (response != null && response.getCode() == 200) {
+                data = response.getData();
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        return data;
     }
 
 

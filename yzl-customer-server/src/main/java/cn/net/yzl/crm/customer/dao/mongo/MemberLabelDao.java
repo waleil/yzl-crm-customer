@@ -370,7 +370,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
              //   Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("mGradeId").is(Integer.parseInt(c.getId())));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("mGradeId").is(Integer.parseInt(c.getId())));
+                    }
                 }
             }
         }
@@ -484,7 +486,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = in.get(i);
-                    and.add(Criteria.where("memberMonth").is(Integer.parseInt(c.getId())));
+                    if (c.getId() != null) {
+                        and.add(Criteria.where("memberMonth").is(Integer.parseInt(c.getId())));
+                    }
                 }
                // criteria.andOperator(andArray);
             }
@@ -494,7 +498,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 //Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("memberMonth").is(Integer.parseInt(c.getId())));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("memberMonth").is(Integer.parseInt(c.getId())));
+                    }
                 }
                // criteria.norOperator(exArray);
             }
@@ -753,7 +759,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("payMode").is(Integer.parseInt(c.getId()))));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("payMode").is(Integer.parseInt(c.getId()))));
+                    }
                 }
               //  criteria.norOperator(exArray);
             }
@@ -769,7 +777,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
              //   Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = in.get(i);
-                    and.add(Criteria.where("memberOrders").elemMatch(Criteria.where("payType").is(Integer.parseInt(c.getId()))));
+                    if (c.getId() != null) {
+                        and.add(Criteria.where("memberOrders").elemMatch(Criteria.where("payType").is(Integer.parseInt(c.getId()))));
+                    }
 
                 }
                // criteria.andOperator(andArray);
@@ -780,7 +790,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
               //  Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("payType").is(Integer.parseInt(c.getId()))));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("payType").is(Integer.parseInt(c.getId()))));
+                    }
                 }
                 //criteria.norOperator(exArray);
             }
@@ -796,7 +808,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                 //Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = in.get(i);
-                    and.add(Criteria.where("memberOrders").elemMatch(Criteria.where("status").is(Integer.parseInt(c.getId()))));
+                    if (c.getId() != null) {
+                        and.add(Criteria.where("memberOrders").elemMatch(Criteria.where("status").is(Integer.parseInt(c.getId()))));
+                    }
 
                 }
                // criteria.andOperator(andArray);
@@ -807,7 +821,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("status").is(Integer.parseInt(c.getId()))));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("status").is(Integer.parseInt(c.getId()))));
+                    }
                 }
                // criteria.norOperator(exArray);
             }
@@ -947,7 +963,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
               //  Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = in.get(i);
-                    and.add( Criteria.where("memberOrders").elemMatch(Criteria.where("logisticsStatus").is(Integer.parseInt(c.getId()))));
+                    if (c.getId() != null) {
+                        and.add(Criteria.where("memberOrders").elemMatch(Criteria.where("logisticsStatus").is(Integer.parseInt(c.getId()))));
+                    }
 
                 }
                // criteria.andOperator(andArray);
@@ -957,7 +975,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("logisticsStatus").is(Integer.parseInt(c.getId()))));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("logisticsStatus").is(Integer.parseInt(c.getId()))));
+                    }
                 }
                // criteria.norOperator(exArray);
             }
@@ -973,7 +993,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
               //  Criteria[] andArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = in.get(i);
-                    and.add( Criteria.where("memberOrders").elemMatch(Criteria.where("companyCode").is(c.getId())));
+                    if (c.getId() != null) {
+                        and.add(Criteria.where("memberOrders").elemMatch(Criteria.where("companyCode").is(c.getId())));
+                    }
 
                 }
                // criteria.andOperator(andArray);
@@ -983,7 +1005,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
                // Criteria[] exArray = new Criteria[size];
                 for (int i = 0; i < size; i++) {
                     crowd_base_value c = ex.get(i);
-                    not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("companyCode").is(c.getId())));
+                    if (c.getId() != null) {
+                        not.add(Criteria.where("memberOrders").elemMatch(Criteria.where("companyCode").is(c.getId())));
+                    }
                 }
                // criteria.norOperator(exArray);
             }

@@ -17,7 +17,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Api(value="ActionDictController",tags = {"客户综合行为"})
+@Api(value="ActionDictController",tags = {"顾客综合行为字典"})
 @RestController
 @RequestMapping("/member/memberAction")
 public class ActionDictController {

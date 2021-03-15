@@ -2,6 +2,8 @@ package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.cursor.Cursor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,4 +29,10 @@ public interface MemberOrderStatMapper {
     List<MemberOrderStat> queryByMemberCodes(List<String> codes);
 
     MemberOrderStat queryByMemberCode(@Param("memberCard") String memberCard);
+
+    //List<MemberOrderStat> scanByPage(@Param("limit") int limit,@Param("pageSize") int pageSize);
+
+    List<MemberOrderStat> scanByPage(@Param("pageSize") Integer pageSize,@Param("fromIndex") Integer fromIndex);
+
+    int updateOrderStatQuota(@Param("list") List<MemberOrderStat> statList);
 }

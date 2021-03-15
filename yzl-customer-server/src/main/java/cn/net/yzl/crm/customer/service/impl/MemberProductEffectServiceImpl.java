@@ -11,6 +11,7 @@ import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.MemberProductEffectMapper;
 import cn.net.yzl.crm.customer.dao.MemberProductEffectRecordMapper;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
+import cn.net.yzl.crm.customer.feign.api.WorkOrderClientAPI;
 import cn.net.yzl.crm.customer.feign.client.workorder.WorkOrderClient;
 import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.db.MemberProductEffect;
@@ -277,14 +278,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
     public ComResponse<Boolean> updateMemberProductLastNumAndCreateWorkOrder() {
         log.info("update member product last num: start,当前时间{}",new Date());
         //查询配置规则
-        ComResponse<Integer> rules = null;
-        try {
-            rules = workOrderClient.queryReturnVisitRules();
-        } catch (Exception e) {
-            log.error("update member product last num:查询配置规则异常：{}",e);
-        }
-        Integer configDay = rules == null || rules.getData() == null ? Integer.MIN_VALUE : rules.getData();
-
+        Integer configDay = WorkOrderClientAPI.queryReturnVisitRules();
         log.info("update member product last num:查询配置规则,当前配置为：{}",configDay);
         Integer pageNo = 1, pageSize = 2_000;
         boolean hasNext = true;
@@ -311,10 +305,8 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
                 betweenDay = DateUtil.between(currentDateStart, item.getDueDate(), DateUnit.DAY,false);
                 if (betweenDay < configDay){
                     //判断缓存是否存在(防止重复回访)
-                    if (item.getProductLastNum() < configDay){
-                        if (!CacheForProductEffectUtil.getAndSetNx(item.getMemberCard())) {
-                            memberCardList.add(item.getMemberCard());
-                        }
+                    if (!CacheForProductEffectUtil.getAndSetNx(item.getMemberCard())) {
+                        memberCardList.add(item.getMemberCard());
                     }
                 }
             }
@@ -325,8 +317,10 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
             }
             //次日回访
             if (CollectionUtil.isNotEmpty(memberCardList)){
-                ComResponse<Boolean> response = workOrderClient.productDosage(memberCardList);
-                log.info("update member product last num:进行次日回访:状态{},状态码{},message{}",response.getStatus(),response.getCode(),response.getMessage());
+                boolean result = WorkOrderClientAPI.productDosage(memberCardList);
+                if (!result) {
+                    log.info("update member product last num:创建次日回访工单失败!");
+                }
                 memberCardList.clear();
             }
         }

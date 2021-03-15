@@ -3,7 +3,9 @@ package cn.net.yzl.crm.customer.feign.api;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Pair;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
 import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
@@ -13,10 +15,13 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
+import cn.net.yzl.crm.customer.feign.model.MemberGradeValidDate;
 import cn.net.yzl.crm.customer.model.MemberOrderObject;
 import cn.net.yzl.crm.customer.model.PageParam;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -74,11 +80,15 @@ public class ActivityClientAPI {
                 break;
             }
         }
-        if (response == null ||  response.getData() == null || 200 != response.getCode()) {
+        if (200 != response.getCode()) {
             log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
             throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"activityFien:getMemberGradeValidDate:获取DMC会员级别管理接口异常!");
         }
         MemberSysParamDetailResponse data = response.getData();
+        if (data == null) {
+            log.info("getMemberSysParamByType:DMC返回数据为空！");
+            return "";
+        }
 
         if (data.getValidityType() == null || data.getValidityType() == 0) {
             log.info("getMemberSysParamByType:会员有效期类型为长期有效！");
@@ -99,6 +109,82 @@ public class ActivityClientAPI {
         }
         String valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
         return valid;
+    }
+    public static MemberGradeValidDate getMemberGradeValidDateObj(){
+        String valid = "";
+        MemberGradeValidDate validDateObj = new MemberGradeValidDate();
+        validDateObj.setIsAlways(null);
+        try {
+            ComResponse<MemberSysParamDetailResponse> response = null;
+            for (int i = 0; i < 3; i++) {
+                response = activityClientAPI.activityFien.getMemberSysParamByType(0);//会员
+                if (200 != response.getCode()) {
+                    log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
+                } else {
+                    break;
+                }
+            }
+            if (200 != response.getCode()) {
+                log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
+            }
+            MemberSysParamDetailResponse data = response.getData();
+            if (data == null) {
+                log.info("getMemberSysParamByType:DMC返回数据为空！");
+                validDateObj.setIsAlways(true);//请求成功，返回数据为空，则为长期有效
+                return validDateObj;
+            }
+
+            if (data.getValidityType() == null || data.getValidityType() == 0) {
+                log.info("getMemberSysParamByType:会员有效期类型为长期有效！");
+                validDateObj.setIsAlways(true);
+                return validDateObj;
+            }
+
+            if (StringUtils.isEmpty(data.getValidityMonth()) || StringUtils.isEmpty(data.getValidityDay())) {
+                log.error("getMemberSysParamByType:接口参数日期为空:{}-{}", data.getValidityMonth(), data.getValidityDay());
+            } else {
+                //获取会员到期的年月日，格式：yyyy-MM-dd
+                if (data.getValidityMonth().length() == 1) {
+                    data.setValidityMonth("0" + data.getValidityMonth());
+                }
+                if (data.getValidityDay().length() == 1) {
+                    data.setValidityDay("0" + data.getValidityDay());
+                }
+                valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
+                validDateObj.setIsAlways(false);
+
+
+                Date startDate = null;
+                Date endDate = null;
+                //格式化会员到期时间
+                Date validDate = DateUtil.parse(valid, "yyyy-MM-dd");
+
+                //当前日期字符串，格式：yyyy-MM-dd
+                String today= DateUtil.today();
+                Date todayDate = DateUtil.parse(today);
+                long between = DateUtil.between(todayDate, validDate, DateUnit.DAY, false);
+                if (between <= 0) {
+                    startDate = DateUtil.offsetDay(validDate, 1);
+                    endDate = DateUtil.endOfDay(DateUtil.date());//一天的结束，结果：2017-03-01 23:59:59
+                }else {
+                    //没过:到期时间一年前 到今天
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(validDate);
+                    c.add(Calendar.YEAR, -1);
+                    c.add(Calendar.DATE,1);
+                    startDate = DateUtil.beginOfDay(c.getTime());//一年前 + 1天
+                    //今天的结束，结果：2017-03-01 23:59:59
+                    endDate = DateUtil.endOfDay(DateUtil.date());//今天
+                }
+                validDateObj.setCurrentYearValidDate(validDate);
+                validDateObj.setStartDate(startDate);
+                validDateObj.setEndDate(endDate);
+            }
+        } catch (Exception e) {
+            log.error("getMemberSysParamByType:DMC获取会员有效期接口异常",e);
+        }
+        return validDateObj;
     }
 
     /**

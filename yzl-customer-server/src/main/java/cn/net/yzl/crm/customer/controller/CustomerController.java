@@ -5,7 +5,6 @@ import cn.net.yzl.common.entity.GeneralResult;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.*;
-import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.model.*;
 import cn.net.yzl.crm.customer.mongomodel.member_wide;
 import cn.net.yzl.crm.customer.service.MemberPhoneService;
@@ -468,11 +467,14 @@ public class CustomerController {
     @Deprecated
     @ApiOperation("测试静态方法")
     @PostMapping("/v1/testStaticMethod")
-    public ComResponse<Boolean> testStaticMethod() throws IOException {
+    public ComResponse<Boolean> testStaticMethod(String memberCard) throws IOException {
+
+
+        boolean b = memberService.addredis(memberCard);
 
         //ActivityDetailResponse activityProductByBusNo = ActivityClientAPI.getActivityProductByBusNo(1);
-        String date = ActivityClientAPI.getMemberGradeValidDate();
-        System.out.println(date);
+//        String date = ActivityClientAPI.getMemberGradeValidDate();
+//        System.out.println(date);
         return ComResponse.success(true);
     }
 

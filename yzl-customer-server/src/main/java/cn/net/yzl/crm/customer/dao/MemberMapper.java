@@ -163,6 +163,8 @@ public interface MemberMapper {
     List<Member> scanMemberByPage(MemberSerchConditionDTO dto);
 
     int updateMemberForOrderCreate(@Param("member") Member member);
+
+    int findCountByCondition(MemberSerchConditionDTO dto);
 }
 
 

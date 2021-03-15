@@ -11,10 +11,10 @@ import cn.net.yzl.crm.customer.vo.MemberDiseaseIdUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
+import cn.net.yzl.crm.customer.vo.member.MemberOrderStatUpdateVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
 import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderDiseaseVo;
-import cn.net.yzl.crm.customer.vo.work.MemberWorkOrderInfoVO;
 import cn.net.yzl.crm.customer.vo.work.MemeberWorkOrderSubmitVo;
 
 import java.io.IOException;
@@ -189,7 +189,7 @@ public interface MemberService {
 
 //    ComResponse<Boolean> hangUpUpdateMemberData(MemberHangUpVO memberHangUpVO);
 
-    boolean updateMemberLabel();
+//    boolean updateMemberLabel();
     boolean updateMemberLabelForTask();
 
     int saveMemberReferral(MemberAndAddWorkOrderVO memberReferralVO);
@@ -205,4 +205,7 @@ public interface MemberService {
 
 
     public Integer updateMemberDisease(String memberCard,String createNo, List<MemberWorkOrderDiseaseVo> memberDiseaseList);
+
+    boolean addredis(String memberCard);
+
 }

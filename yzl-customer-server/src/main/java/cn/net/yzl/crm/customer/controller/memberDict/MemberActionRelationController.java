@@ -19,7 +19,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Api(value="MemberActionRelationController",tags = {"客户综合行为"})
+@Api(value="MemberActionRelationController",tags = {"顾客综合行为"})
 @RestController
 @RequestMapping("/member/memberAction")
 public class MemberActionRelationController {

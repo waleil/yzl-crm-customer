@@ -1,4 +1,4 @@
-package cn.net.yzl.crm.customer.config;
+package cn.net.yzl.crm.customer.config.es;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
