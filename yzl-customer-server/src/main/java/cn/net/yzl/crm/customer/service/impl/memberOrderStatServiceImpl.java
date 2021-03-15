@@ -69,8 +69,8 @@ public class memberOrderStatServiceImpl implements MemberOrderStatService {
             int totalOrderNum = vo.get(0).getTotalOrderCnt();//总订单数量，不包含取消订单和审批未通过
             Integer signCnt4TYear = vo.get(0).getTotalSignCnt4TYear();//总签收数量，从当年一月一日开始按照签收日期确定
             if (totalOrderNum > 0) {
-                BigDecimal returnRate = new BigDecimal(returnOrderNum * 100).divide(new BigDecimal(totalOrderNum),2, BigDecimal.ROUND_HALF_UP);
-                stat.setReturnGoodsRate(returnRate.doubleValue());//退货率
+                BigDecimal returnRate = new BigDecimal(returnOrderNum).divide(new BigDecimal(totalOrderNum),4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(10000));
+                stat.setReturnGoodsRate(returnRate.intValue());//退货率
             }
 
             if (signCnt4TYear != null && signCnt4TYear > 0) {

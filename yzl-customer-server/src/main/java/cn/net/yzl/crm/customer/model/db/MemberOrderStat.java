@@ -43,7 +43,7 @@ public class MemberOrderStat {
 
     private Integer yearAvgCount;
 
-    private Double returnGoodsRate;
+    private Integer returnGoodsRate;
 
     private Date createTime;
     private Date lastSignTime;
@@ -216,11 +216,11 @@ public class MemberOrderStat {
         this.yearAvgCount = yearAvgCount;
     }
 
-    public Double getReturnGoodsRate() {
+    public Integer getReturnGoodsRate() {
         return returnGoodsRate;
     }
 
-    public void setReturnGoodsRate(Double returnGoodsRate) {
+    public void setReturnGoodsRate(Integer returnGoodsRate) {
         this.returnGoodsRate = returnGoodsRate ;
     }
 
