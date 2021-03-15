@@ -19,6 +19,7 @@ import cn.net.yzl.crm.customer.model.db.MemberProductEffectRecord;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.CacheForProductEffectUtil;
+import cn.net.yzl.crm.customer.utils.date.DealDateUtil;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectUpdateVO;
@@ -50,9 +51,6 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
     MemberProductEffectRecordMapper memberProductEffectRecordMapper;
     @Autowired
     MemberMapper memberMapper;
-
-    //客户编号
-    List<String> memberCardList = new ArrayList<>();
 
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -282,11 +280,15 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         log.info("update member product last num:查询配置规则,当前配置为：{}",configDay);
         Integer pageNo = 1, pageSize = 2_000;
         boolean hasNext = true;
+        //临时记录要更新余量的商品服用效果的id
         List<Integer> idList = new ArrayList<>();
+
+        //客户编号
+        List<String> memberCardList = new ArrayList<>();
         //计算商品服用完日期和当前时间的天数差
         long betweenDay;
         //获取系统当前时间
-        Date currentDateStart = cn.net.yzl.crm.customer.utils.date.DateUtil.getCurrentDateStart();
+        Date currentDateStart = DealDateUtil.getStart(new Date());
         while (hasNext) {
             //分页查询顾客的商品服用效果
             PageHelper.startPage(pageNo, pageSize);
@@ -303,7 +305,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
                 }
                 //小于最小服用天数
                 betweenDay = DateUtil.between(currentDateStart, item.getDueDate(), DateUnit.DAY,false);
-                if (betweenDay < configDay){
+                if (betweenDay >= 0 && betweenDay < configDay){
                     //判断缓存是否存在(防止重复回访)
                     if (!CacheForProductEffectUtil.getAndSetNx(item.getMemberCard())) {
                         memberCardList.add(item.getMemberCard());

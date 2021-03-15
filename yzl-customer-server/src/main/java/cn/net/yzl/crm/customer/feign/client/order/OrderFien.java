@@ -4,6 +4,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.crm.customer.model.MemberOrderObject;
 import cn.net.yzl.order.model.vo.member.MemberTotal;
 import cn.net.yzl.order.model.vo.order.OrderInfoResDTO;
+import cn.net.yzl.order.model.vo.order.OrderTotal4MemberDTO;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -28,5 +29,9 @@ public interface OrderFien {
                                                            @RequestParam(required = false, value = "startDate")Date startDate,
                                                            @RequestParam(required = false, value = "endDate")Date endDate);
 
+
+    @ApiOperation(value = "根据顾客卡号查询退单/签收信息")
+    @GetMapping("/orderSearch/v1/selectOrderTotal4Member")
+    public ComResponse<OrderTotal4MemberDTO> selectOrderTotal4Member(@RequestParam("memberCard") String memberCard);
 }
 
