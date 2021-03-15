@@ -62,18 +62,25 @@ public class memberOrderStatServiceImpl implements MemberOrderStatService {
         if (CollectionUtil.isEmpty(memberOrderStats)) {
             return true;
         }
+        Integer returnOrderNum = null;
+        Integer totalOrderNum = null;
+        Integer signCnt4TYear = null;
+
         for (cn.net.yzl.crm.customer.model.db.MemberOrderStat stat : memberOrderStats) {
             List<MemberOrderStatUpdateVo> vo = statStatisticsVosMap.get(stat.getMemberCard());
 
-            int returnOrderNum = vo.get(0).getRefundCnt();//退货数量
-            int totalOrderNum = vo.get(0).getTotalOrderCnt();//总订单数量，不包含取消订单和审批未通过
-            Integer signCnt4TYear = vo.get(0).getTotalSignCnt4TYear();//总签收数量，从当年一月一日开始按照签收日期确定
-            if (totalOrderNum > 0) {
+            returnOrderNum = vo.get(0).getRefundCnt();//退货数量
+            totalOrderNum = vo.get(0).getTotalOrderCnt();//总订单数量，不包含取消订单和审批未通过
+            signCnt4TYear = vo.get(0).getTotalSignCnt4TYear();//总签收数量，从当年一月一日开始按照签收日期确定
+            if (returnOrderNum == null || totalOrderNum == null || returnOrderNum == 0 || totalOrderNum == 0){
+                stat.setReturnGoodsRate(0);//退货率
+            }else {
                 BigDecimal returnRate = new BigDecimal(returnOrderNum).divide(new BigDecimal(totalOrderNum),4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(10000));
                 stat.setReturnGoodsRate(returnRate.intValue());//退货率
             }
-
-            if (signCnt4TYear != null && signCnt4TYear > 0) {
+            if (signCnt4TYear == null || signCnt4TYear == 0) {
+                stat.setYearAvgCount(0);//年度平均购买天数
+            }else {
                 BigDecimal yearAvgCount = new BigDecimal(365).divide(new BigDecimal(signCnt4TYear),0, BigDecimal.ROUND_HALF_UP);
                 stat.setYearAvgCount(yearAvgCount.intValue());//年度平均购买天数
             }
