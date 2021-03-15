@@ -37,6 +37,7 @@ import cn.net.yzl.crm.customer.service.impl.phone.MemberPhoneServiceImpl;
 import cn.net.yzl.crm.customer.service.memberDict.MemberActionRelationService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
+import cn.net.yzl.crm.customer.utils.CentYuanConvertUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -395,25 +396,12 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderStat getMemberOrderStat(String member_card) {
         MemberOrderStat stat = memberMapper.getMemberOrderStat(member_card);
         if (stat != null) {
-            BigDecimal dBD100 = new BigDecimal("100");
-            if (stat.getTotal_counsum_amount() != null) {
-                stat.setTotalCounsumAmountD((new BigDecimal(stat.getTotal_counsum_amount()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
-            }
-            if (stat.getTotal_invest_amount() != null) {
-                stat.setTotalInvestAmountD((new BigDecimal(stat.getTotal_invest_amount()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
-            }
-            if (stat.getFirst_order_am() != null) {
-                stat.setFirstOrderAmD((new BigDecimal(stat.getFirst_order_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
-            }
-            if (stat.getOrder_high_am() != null) {
-                stat.setOrderHighAmD((new BigDecimal(stat.getOrder_high_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
-            }
-            if (stat.getOrder_low_am() != null) {
-                stat.setOrderLowAmD((new BigDecimal(stat.getOrder_low_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
-            }
-            if (stat.getOrder_avg_am() != null) {
-                stat.setOrderAvgAmD((new BigDecimal(stat.getOrder_avg_am()).divide(dBD100).setScale(2,BigDecimal.ROUND_DOWN)));
-            }
+            stat.setTotalCounsumAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_counsum_amount()));//累计消费金额(元)
+            stat.setTotalInvestAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_invest_amount()));//累计充值金额(元)
+            stat.setFirstOrderAmD(CentYuanConvertUtil.cent2Yuan(stat.getFirst_order_am()));//首单金额(元)
+            stat.setOrderHighAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_high_am()));//订单最高金额(元)
+            stat.setOrderLowAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_low_am()));//订单最低金额(元)")
+            stat.setOrderAvgAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_avg_am()));//订单平均金额(元)
         }
 
         return stat;

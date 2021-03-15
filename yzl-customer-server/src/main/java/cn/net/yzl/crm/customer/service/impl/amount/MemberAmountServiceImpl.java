@@ -18,6 +18,7 @@ import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
 import cn.net.yzl.crm.customer.service.MemberOrderStatService;
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.sys.BizException;
+import cn.net.yzl.crm.customer.utils.CentYuanConvertUtil;
 import cn.net.yzl.crm.customer.utils.DateCustomerUtils;
 import cn.net.yzl.crm.customer.vo.MemberAmountDetailVO;
 import jodd.util.StringUtil;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -69,6 +71,13 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             //插入成功后，重新查询账户信息
             memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
         }
+
+        if (memberAmountDto != null) {
+            memberAmountDto.setTotalMoneyD(CentYuanConvertUtil.cent2Yuan(memberAmountDto.getTotalMoney()));//总余额(包含冻结金额)
+            memberAmountDto.setFrozenAmountD(CentYuanConvertUtil.cent2Yuan(memberAmountDto.getFrozenAmount()));//冻结金额
+            memberAmountDto.setValidAmountD(CentYuanConvertUtil.cent2Yuan(memberAmountDto.getValidAmount()));//可用余额(元)
+        }
+
         return ComResponse.success(memberAmountDto);
     }
 
