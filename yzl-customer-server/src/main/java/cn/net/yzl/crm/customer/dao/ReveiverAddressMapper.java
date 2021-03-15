@@ -65,4 +65,5 @@ public interface ReveiverAddressMapper {
 
     int selectDefaultCountByMemberCard(@Param("memberCard") String memberCard);
 
+    Integer updateDefaultFlagById(@Param("id") Integer id);
 }

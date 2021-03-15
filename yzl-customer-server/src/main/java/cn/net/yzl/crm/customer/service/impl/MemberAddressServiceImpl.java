@@ -46,10 +46,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     public ComResponse<List<ReveiverAddressDto>> getReveiverAddress(String memberCard) {
 
         List<ReveiverAddressDto> list = reveiverAddressMapper.getReveiverAddressByMemberCard(memberCard);
-        if (CollectionUtil.isEmpty(list)) {
-            return ComResponse.nodata();
-        }
-        if(list.size() > 1){
+        if(CollectionUtil.isNotEmpty(list) && list.size() > 1){
             Collections.sort(list, new Comparator<ReveiverAddressDto>() {
                 @Override
                 public int compare(ReveiverAddressDto o1, ReveiverAddressDto o2) {
@@ -81,7 +78,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         //更新当前顾客其他的收货地址为非默认收货地址
         if (reveiverAddressInsertVO.getDefaultFlag() != null && reveiverAddressInsertVO.getDefaultFlag() == 1) {
             num1 =  reveiverAddressRecordDao.updateDefaultFlagByMemberCard(memberCard,1,0);
-            if (num1 < 1) {
+            if (num1 < 0) {
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "更新默认收货地址失败!");
             }
         }else{
@@ -122,6 +119,9 @@ public class MemberAddressServiceImpl implements MemberAddressService {
     public ComResponse<String> updateReveiverAddress(ReveiverAddressUpdateVO reveiverAddressUpdateVO) {
         // 获取数据
         ReveiverAddress reveiverAddress1 = reveiverAddressMapper.selectByPrimaryKey(reveiverAddressUpdateVO.getId());
+        if (reveiverAddress1 == null) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "记录不存在!");
+        }
         int num = 0;
 
         //更新当前顾客其他的收货地址为非默认收货地址
@@ -142,7 +142,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         BeanUtil.copyProperties(reveiverAddressUpdateVO, reveiverAddress);
         num = reveiverAddressMapper.updateByPrimaryKeySelective(reveiverAddress);
         if (num < 1) {
-            throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "数据更新失败");
+            throw new BizException(ResponseCodeEnums.UPDATE_DATA_ERROR_CODE.getCode(), "数据更新失败!");
         }
 
         //添加记录
@@ -156,7 +156,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         reveiverAddressRecordPo.setReveiverAddressId(reveiverAddress.getId());
         int num1 =  reveiverAddressRecordDao.insertSelective(reveiverAddressRecordPo);
         if (num1 < 1) {
-            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "记录数据保存失败");
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "记录数据保存失败!");
         }
 
         return ComResponse.success();
@@ -173,5 +173,46 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         Page<ReveiverAddressDto> page = AssemblerResultUtil.resultAssembler(list);
 
         return ComResponse.success(page);
+    }
+
+
+    /**
+     * 删除收货地址(删除地址的时候判断当前记录是不是默认收货地址，如果是默认的则将剩余记录中的最新的一条设置为默认收货地址)
+     * wanghze
+     * 2021-03-15
+     * @param id
+     * @return
+     */
+    @Transactional
+    @Override
+    public Integer deleteAddressById(Integer id) {
+        //通过id获取当前收货地址记录
+        ReveiverAddress reveiverAddress = reveiverAddressMapper.selectByPrimaryKey(id);
+        //判断记录是否存在
+        if (reveiverAddress == null) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "记录不存在!");
+        }
+        //删除当前记录
+        int result = reveiverAddressMapper.deleteByPrimaryKey(id);
+        if (result < 1) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "删除记录失败!");
+        }
+
+        //判断记录是否为默认收货地址
+        if (1 == reveiverAddress.getDefaultFlag()) {
+            //当要删除的地址为默认的收货地址的时候，要将数据苦衷最新的一条设置为默认收货地址
+            ComResponse<List<ReveiverAddressDto>> response = this.getReveiverAddress(reveiverAddress.getMemberCard());
+            if (response.getCode() != 200) {
+                throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "获取数据失败!");
+            }
+            List<ReveiverAddressDto> addressDtoList = response.getData();
+            if (CollectionUtil.isNotEmpty(addressDtoList)) {
+                result = reveiverAddressMapper.updateDefaultFlagById(addressDtoList.get(0).getId());
+                if (result < 1) {
+                    throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "操作失败!");
+                }
+            }
+        }
+        return result;
     }
 }

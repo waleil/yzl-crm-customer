@@ -19,4 +19,10 @@ public interface MemberAddressService {
 
     ComResponse<Page<ReveiverAddressDto>> getReveiverAddressByPage(MemberReveiverAddressSerchDTO serchDTO);
 
+    /**
+     * 根据主键id删除收货地址记录
+     * @param id
+     * @return
+     */
+    Integer deleteAddressById(Integer id);
 }
