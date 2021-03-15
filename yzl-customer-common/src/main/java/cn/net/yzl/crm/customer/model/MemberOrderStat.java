@@ -53,6 +53,9 @@ public class MemberOrderStat {
     @ApiModelProperty("退货率")
     private Integer return_goods_rate;
 
+    @ApiModelProperty("退货率(保留两位小数)")
+    private BigDecimal returnGoodsRateD;
+
 
     @ApiModelProperty("累计消费金额(分)")
     private Integer total_counsum_amount;

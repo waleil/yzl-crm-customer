@@ -402,6 +402,7 @@ public class MemberServiceImpl implements MemberService {
             stat.setOrderHighAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_high_am()));//订单最高金额(元)
             stat.setOrderLowAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_low_am()));//订单最低金额(元)")
             stat.setOrderAvgAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_avg_am()));//订单平均金额(元)
+            stat.setReturnGoodsRateD(CentYuanConvertUtil.cent2Yuan(stat.getReturn_goods_rate()));//退货率
         }
 
         return stat;
