@@ -18,7 +18,7 @@ public class CacheForProductEffectUtil {
 
     private final static Integer INITIAL_CAPACITY = 1000;
     private final static Integer MAXIMUM_SIZE = 200_000;
-    private final static Integer DURATION = 1;
+    private final static Integer DURATION = 2;
 
     /**
      * 声明一个静态的内存块

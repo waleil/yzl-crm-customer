@@ -1741,13 +1741,14 @@ public class MemberServiceImpl implements MemberService {
                 MemberLevelPagesResponse level = null;
                 //遍历DMC会员级别信息，判断顾客当前属于那个级别
                 for (MemberLevelPagesResponse levelData : levelList) {
-                    if (levelData.getYearTotalSpendMoney() != null && levelData.getYearTotalSpendMoney() > 0 && totalSpend-levelData.getYearTotalSpendMoney() >= 0) {//一年累计消费满
+                    //注:DMC返回的数据的单位是元
+                    if (levelData.getYearTotalSpendMoney() != null && levelData.getYearTotalSpendMoney().compareTo(BigDecimal.ZERO) > 0 && totalSpend -levelData.getYearTotalSpendMoney().multiply(new BigDecimal(100)).intValue() >= 0) {//一年累计消费满
                         level = levelData;
                         break;
-                    } else if (levelData.getDisposableSpendMoney() != null && levelData.getDisposableSpendMoney() > 0 && maxSpend-levelData.getDisposableSpendMoney() >= 0) {//一次性消费满多少
+                    } else if (levelData.getDisposableSpendMoney() != null && levelData.getDisposableSpendMoney().compareTo(BigDecimal.ZERO) > 0 && maxSpend-levelData.getDisposableSpendMoney().multiply(new BigDecimal(100)).intValue() >= 0) {//一次性消费满多少
                         level = levelData;
                         break;
-                    } else if (levelData.getDisposableAdvanceMoney() != null && levelData.getDisposableAdvanceMoney() > 0 && maxCash1-levelData.getDisposableAdvanceMoney() >= 0) {//一次性预存款
+                    } else if (levelData.getDisposableAdvanceMoney() != null && levelData.getDisposableAdvanceMoney().compareTo(BigDecimal.ZERO) > 0 && maxCash1-levelData.getDisposableAdvanceMoney().multiply(new BigDecimal(100)).intValue() >= 0) {//一次性预存款
                         level = levelData;
                         break;
                     }
