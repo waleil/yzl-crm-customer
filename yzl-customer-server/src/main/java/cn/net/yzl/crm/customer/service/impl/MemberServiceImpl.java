@@ -165,7 +165,7 @@ public class MemberServiceImpl implements MemberService {
                 ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(memberPhone.getPhone_number());
                 if (response.getCode() != 200 || response.getData() != null) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号:" + memberPhone.getPhone_number() + "已经被使用!");
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号码:" + memberPhone.getPhone_number() + "已经被使用!");
                 }
             }
         }
@@ -1137,7 +1137,17 @@ public class MemberServiceImpl implements MemberService {
         }
 
         //保存用户信息
-        int result = this.insert(memberVO);
+        int result = 0;
+        try {
+            result = this.insert(memberVO);
+        } catch (Exception e) {
+            if (StringUtils.isNotEmpty(e.getMessage()) && e.getMessage().endsWith("已经被使用!")){
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "用户已经存在!");
+            }else{
+                throw e;
+            }
+        }
+
         if (result > 0) {
             Date now = new Date();
             //保存工单
@@ -1190,7 +1200,7 @@ public class MemberServiceImpl implements MemberService {
             ComResponse<Void> response = workOrderClient.addWorkOrder(workOrderBeanVO);
             if (response.getCode() != 200) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存工单失败!");
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "创建工单失败!");
             }
 
             //设置缓存(2小时后同步)
@@ -1429,14 +1439,14 @@ public class MemberServiceImpl implements MemberService {
                         return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号码格式不正确!",false);
                     }else{
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码格式不正确!",false);
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"座机号码格式不正确!",false);
                     }
                 }
 
                 String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
                 if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!",false);
+                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码已经被使用!",false);
                 }
                 MemberPhone memberPhone = new MemberPhone();
                 if (CollectionUtil.isNotEmpty(memberPhoneList)) {
