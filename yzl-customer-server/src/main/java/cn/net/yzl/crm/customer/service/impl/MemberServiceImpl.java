@@ -179,6 +179,10 @@ public class MemberServiceImpl implements MemberService {
         member.setMGradeId(1);
         member.setMGradeName("无卡");
         member.setM_grade_code(null);
+        //设置媒体类型信息
+        member.setMedia_type_code(member.getSource());
+        member.setMedia_type_name(convertMediaTypeCode2Name(member.getSource()));
+
         //保存数据
         int result = memberMapper.insertSelective(member);
         if (result < 1) {
@@ -744,6 +748,8 @@ public class MemberServiceImpl implements MemberService {
             member.setAdver_code(coilInVo.getAdvId());
             member.setAdver_name(coilInVo.getAdvName());
             member.setSource(coilInVo.getMediaType());//获客来源
+            member.setMedia_type_code(coilInVo.getMediaType());
+            member.setMedia_type_name(convertMediaTypeCode2Name(coilInVo.getMediaType()));
 
             //更新会员信息
             int update = updateByMemberCardSelective(member);
@@ -775,7 +781,7 @@ public class MemberServiceImpl implements MemberService {
             /**
              * 匹配是否有对应的圈选规则；（只匹配第一个符合的群组，同时将顾客编号和群组编号插入关系表中group_ref_member）
              */
-            //查询出生效的规则，根据股则id圈选，选中的则跳出循环
+            //查询出生效的规则，根据规则id圈选，选中的则跳出循环
             List<member_crowd_group> ruleList =memberCrowdGroupDao.query4Task();
 
             if (CollectionUtil.isNotEmpty(ruleList)) {
@@ -800,6 +806,48 @@ public class MemberServiceImpl implements MemberService {
         dto.setMemberGroupCode(groupId);
 
         return ComResponse.success(dto);
+    }
+
+    /**
+     * 将媒体类型code转换成媒体类型名称
+     * wangzhe
+     * 2021-03-16
+     * @param code 媒体类型code
+     * @return
+     */
+    private String convertMediaTypeCode2Name(Integer code){
+        //"获客来源渠道(媒介类型) -1：其他，0:电视媒体, 1:广播电台媒体，2：社区媒体，3：户外媒体，4：印刷媒体，5：互联网媒体，6：电商站内流量媒体"
+        String name = null;
+        if (code == null) {
+            return name;
+        }
+        switch (code) {
+            case -1 :
+                name = "其他";
+                break;
+            case 0 :
+                name = "电视媒体";
+                break;
+            case 1 :
+                name = "广播电台媒体";
+                break;
+            case 2 :
+                name = "社区媒体";
+                break;
+            case 3 :
+                name = "户外媒体";
+                break;
+            case 4 :
+                name = "印刷媒体";
+                break;
+            case 5 :
+                name = "互联网媒体";
+                break;
+            case 6 :
+                name = "电商站内流量媒体";
+                break;
+        }
+        return name;
     }
 
     /**
