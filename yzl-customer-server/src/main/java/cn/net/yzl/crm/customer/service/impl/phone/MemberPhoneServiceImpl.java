@@ -35,12 +35,12 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
     @Transactional
     public ComResponse<String> getMemberCardByphoneNumber(String phoneNumber) {
         if (StringUtils.isEmpty(phoneNumber)) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号不能为空!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码不能为空!");
         }
         phoneNumber = phoneNumber.trim();
         //电话号码最少10位
         if (phoneNumber.length() < 10) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码格式不正确!");
         }
 
         String noZeroNumber = "";

@@ -92,7 +92,7 @@ public interface CustomerGroupService {
 
     boolean isCrowdGroupIncludeMemberCard(member_crowd_group memberCrowdGroup, String memberCard);
 
-    public int memberCrowdGroupRunByLabels(String groupId, List<MemberLabel> labels);
+    public Boolean memberCrowdGroupRunByLabels(String groupId, List<MemberLabel> labels);
 
     Query convertMongoCondition(member_crowd_group memberCrowdGroup);
 

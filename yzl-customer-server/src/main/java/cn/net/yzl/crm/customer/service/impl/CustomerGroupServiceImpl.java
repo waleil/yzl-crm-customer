@@ -352,15 +352,26 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @param labels
      * @return
      */
-    public int memberCrowdGroupRunByLabels(String groupId,List<MemberLabel> labels) {
+    public Boolean memberCrowdGroupRunByLabels(String groupId,List<MemberLabel> labels) {
         long groupRunStartTime = System.currentTimeMillis();
         //生成数据的版本号
-        Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMdd"));
-        int matchCount = doMemberCrowdGroupRun(groupId, labels,version);
-        labels.clear();
+        Long version = Long.parseLong(DateUtil.format(new Date(),DATE_FORMAT_YYYYMMDD));
+        //int matchCount = doMemberCrowdGroupRun(groupId, labels,version);
+        List<GroupRefMember> list = new ArrayList<>(labels.size());
 
-        //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
-        boolean result = deleteMongoGroupRefMemberByGroupId(groupId, version);
+        for (MemberLabel label : labels) {
+            GroupRefMember member = new GroupRefMember();//新建
+            member.setGroupId(groupId);
+            member.setMemberCard(label.getMemberCard());
+            member.setMemberName(label.getMemberName());
+            member.setVersion(version);
+            list.add(member);
+        }
+        //保存集合
+        memberLabelDao.insertAll(list,COLLECTION_NAME_GROUP_REF_MEMBER);
+        log.info("memberCrowdGroupRun-save:groupId:{},本次保存:{}条记录,版本号为:{}",groupId,list.size(),version);
+        list.clear();
+        //labels.clear();
         //查询group_ref_member中，当前群组的顾客数量
         Query getMemberCount = new Query();
         getMemberCount.addCriteria(Criteria.where("groupId").is(groupId));
@@ -373,8 +384,8 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         update.set("person_count",count);
         memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
         long groupRunEndTime = System.currentTimeMillis();
-        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount,version,count,(groupRunEndTime-groupRunStartTime));
-        return matchCount;
+        log.info("memberCrowdGroupRun-end:groupId:{},本次版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,version,count,(groupRunEndTime-groupRunStartTime));
+        return Boolean.TRUE;
     }
 
     @Override
