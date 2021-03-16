@@ -180,8 +180,10 @@ public class MemberServiceImpl implements MemberService {
         member.setMGradeName("无卡");
         member.setM_grade_code(null);
         //设置媒体类型信息
-        member.setMedia_type_code(member.getSource());
-        member.setMedia_type_name(convertMediaTypeCode2Name(member.getSource()));
+        if (member.getSource() != null) {
+            member.setMedia_type_code(member.getSource());
+            member.setMedia_type_name(convertMediaTypeCode2Name(member.getSource()));
+        }
 
         //保存数据
         int result = memberMapper.insertSelective(member);
