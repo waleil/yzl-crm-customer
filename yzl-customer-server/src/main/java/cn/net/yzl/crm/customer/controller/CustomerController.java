@@ -387,7 +387,8 @@ public class CustomerController {
 
     /**
      * 处理实时进线时，保存顾客信息
-     *
+     * wangzhe
+     * 2021-02-28
      * @param coilInVo
      * @return
      */
