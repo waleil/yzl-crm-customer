@@ -890,9 +890,9 @@ public class MemberServiceImpl implements MemberService {
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
 
-                    //默认不保存商品信息里面的用量信息
-                    addVo.setOneToTimes(null);
-                    addVo.setOneUseNum(null);
+                    //默认保存商品信息里面的用量信息
+                    addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
+                    addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
                 }else if (upVo != null){
                     if (StringUtils.isNotEmpty(totalUseNum)) {
                         upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
@@ -902,7 +902,7 @@ public class MemberServiceImpl implements MemberService {
                     upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
                     upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
 
-                    //默认不保存商品信息里面的用量信息
+                    //默认保存商品信息里面的用量信息
                     /*if (dto.getOneToTimes() == null) {
                         upVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     }
