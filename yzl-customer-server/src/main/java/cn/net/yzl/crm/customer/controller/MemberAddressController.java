@@ -65,7 +65,7 @@ public class MemberAddressController {
     }
 
     @ApiOperation(value = "顾客收货地址-删除顾客收货地址", notes = "顾客收货地址-删除顾客收货地址")
-    @RequestMapping(value = "v1/deleteAddressById", method = RequestMethod.POST)
+    @RequestMapping(value = "v1/deleteAddressById", method = RequestMethod.GET)
     public ComResponse<Boolean> deleteAddressById(@RequestParam("id") Integer id) {
         Integer result = memberAddressService.deleteAddressById(id);
         if (result < 0) {
