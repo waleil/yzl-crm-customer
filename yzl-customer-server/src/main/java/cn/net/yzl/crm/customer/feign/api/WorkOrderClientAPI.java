@@ -77,9 +77,9 @@ public class WorkOrderClientAPI {
         try {
             rules = workOrderClientAPI.workOrderClient.queryReturnVisitRules();
         } catch (Exception e) {
-            log.error("update member product last num:查询配置规则异常：{}",e);
+            log.error("queryReturnVisitRules:查询配置规则异常：{}",e);
         }
-        Integer configDay = rules == null || rules.getData() == null ? Integer.MIN_VALUE : rules.getData();
+        Integer configDay = (rules == null || rules.getData() == null || rules.getData() == 0) ? Integer.MIN_VALUE : rules.getData();
         return configDay;
     }
 

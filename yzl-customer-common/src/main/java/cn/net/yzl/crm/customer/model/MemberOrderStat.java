@@ -51,7 +51,10 @@ public class MemberOrderStat {
     @ApiModelProperty("年度平均购买天数")
     private int year_avg_count;
     @ApiModelProperty("退货率")
-    private Double return_goods_rate;
+    private Integer return_goods_rate;
+
+    @ApiModelProperty("退货率(保留两位小数)")
+    private BigDecimal returnGoodsRateD;
 
 
     @ApiModelProperty("累计消费金额(分)")

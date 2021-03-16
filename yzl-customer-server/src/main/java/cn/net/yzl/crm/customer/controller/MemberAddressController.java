@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.controller;
 
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.address.ReveiverAddressDto;
 import cn.net.yzl.crm.customer.dto.member.MemberReveiverAddressSerchDTO;
 import cn.net.yzl.crm.customer.service.MemberAddressService;
@@ -15,10 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -64,5 +62,15 @@ public class MemberAddressController {
     @RequestMapping(value = "v1/getReveiverAddressByPage", method = RequestMethod.POST)
     public ComResponse<Page<ReveiverAddressDto>> getReveiverAddressByPage(@RequestBody MemberReveiverAddressSerchDTO serchDTO) {
         return memberAddressService.getReveiverAddressByPage(serchDTO);
+    }
+
+    @ApiOperation(value = "顾客收货地址-删除顾客收货地址", notes = "顾客收货地址-删除顾客收货地址")
+    @RequestMapping(value = "v1/deleteAddressById", method = RequestMethod.GET)
+    public ComResponse<Boolean> deleteAddressById(@RequestParam("id") Integer id) {
+        Integer result = memberAddressService.deleteAddressById(id);
+        if (result < 0) {
+            ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "操作失败!");
+        }
+        return ComResponse.success(Boolean.TRUE);
     }
 }

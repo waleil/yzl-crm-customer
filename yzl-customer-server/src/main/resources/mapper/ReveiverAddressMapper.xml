@@ -345,4 +345,10 @@
       default_flag = #{defaultFlag,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <update id="updateDefaultFlagById" parameterType="java.lang.Integer" >
+    update reveiver_address
+    set `default_flag` = 1
+    where id = #{id,jdbcType=INTEGER};
+  </update>
 </mapper>

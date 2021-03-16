@@ -165,7 +165,7 @@ public class MemberServiceImpl implements MemberService {
                 ComResponse<Member> response = memberPhoneService.getMemberByphoneNumber(memberPhone.getPhone_number());
                 if (response.getCode() != 200 || response.getData() != null) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号:" + memberPhone.getPhone_number() + "已经被使用!");
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号码:" + memberPhone.getPhone_number() + "已经被使用!");
                 }
             }
         }
@@ -402,6 +402,7 @@ public class MemberServiceImpl implements MemberService {
             stat.setOrderHighAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_high_am()));//订单最高金额(元)
             stat.setOrderLowAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_low_am()));//订单最低金额(元)")
             stat.setOrderAvgAmD(CentYuanConvertUtil.cent2Yuan(stat.getOrder_avg_am()));//订单平均金额(元)
+            stat.setReturnGoodsRateD(CentYuanConvertUtil.cent2Yuan(stat.getReturn_goods_rate()));//退货率
         }
 
         return stat;
@@ -889,9 +890,9 @@ public class MemberServiceImpl implements MemberService {
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
 
-                    //默认不保存商品信息里面的用量信息
-                    addVo.setOneToTimes(null);
-                    addVo.setOneUseNum(null);
+                    //默认保存商品信息里面的用量信息
+                    addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
+                    addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
                 }else if (upVo != null){
                     if (StringUtils.isNotEmpty(totalUseNum)) {
                         upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
@@ -901,7 +902,7 @@ public class MemberServiceImpl implements MemberService {
                     upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
                     upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
 
-                    //默认不保存商品信息里面的用量信息
+                    //默认保存商品信息里面的用量信息
                     /*if (dto.getOneToTimes() == null) {
                         upVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     }
@@ -1136,7 +1137,17 @@ public class MemberServiceImpl implements MemberService {
         }
 
         //保存用户信息
-        int result = this.insert(memberVO);
+        int result = 0;
+        try {
+            result = this.insert(memberVO);
+        } catch (Exception e) {
+            if (StringUtils.isNotEmpty(e.getMessage()) && e.getMessage().endsWith("已经被使用!")){
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "用户已经存在!");
+            }else{
+                throw e;
+            }
+        }
+
         if (result > 0) {
             Date now = new Date();
             //保存工单
@@ -1189,7 +1200,7 @@ public class MemberServiceImpl implements MemberService {
             ComResponse<Void> response = workOrderClient.addWorkOrder(workOrderBeanVO);
             if (response.getCode() != 200) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存工单失败!");
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "创建工单失败!");
             }
 
             //设置缓存(2小时后同步)
@@ -1428,14 +1439,14 @@ public class MemberServiceImpl implements MemberService {
                         return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号码格式不正确!",false);
                     }else{
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码格式不正确!",false);
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"座机号码格式不正确!",false);
                     }
                 }
 
                 String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
                 if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号已经被使用!",false);
+                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码已经被使用!",false);
                 }
                 MemberPhone memberPhone = new MemberPhone();
                 if (CollectionUtil.isNotEmpty(memberPhoneList)) {
@@ -1741,13 +1752,14 @@ public class MemberServiceImpl implements MemberService {
                 MemberLevelPagesResponse level = null;
                 //遍历DMC会员级别信息，判断顾客当前属于那个级别
                 for (MemberLevelPagesResponse levelData : levelList) {
-                    if (levelData.getYearTotalSpendMoney() != null && levelData.getYearTotalSpendMoney() > 0 && totalSpend-levelData.getYearTotalSpendMoney() >= 0) {//一年累计消费满
+                    //注:DMC返回的数据的单位是元
+                    if (levelData.getYearTotalSpendMoney() != null && levelData.getYearTotalSpendMoney().compareTo(BigDecimal.ZERO) > 0 && totalSpend -levelData.getYearTotalSpendMoney().multiply(new BigDecimal(100)).intValue() >= 0) {//一年累计消费满
                         level = levelData;
                         break;
-                    } else if (levelData.getDisposableSpendMoney() != null && levelData.getDisposableSpendMoney() > 0 && maxSpend-levelData.getDisposableSpendMoney() >= 0) {//一次性消费满多少
+                    } else if (levelData.getDisposableSpendMoney() != null && levelData.getDisposableSpendMoney().compareTo(BigDecimal.ZERO) > 0 && maxSpend-levelData.getDisposableSpendMoney().multiply(new BigDecimal(100)).intValue() >= 0) {//一次性消费满多少
                         level = levelData;
                         break;
-                    } else if (levelData.getDisposableAdvanceMoney() != null && levelData.getDisposableAdvanceMoney() > 0 && maxCash1-levelData.getDisposableAdvanceMoney() >= 0) {//一次性预存款
+                    } else if (levelData.getDisposableAdvanceMoney() != null && levelData.getDisposableAdvanceMoney().compareTo(BigDecimal.ZERO) > 0 && maxCash1-levelData.getDisposableAdvanceMoney().multiply(new BigDecimal(100)).intValue() >= 0) {//一次性预存款
                         level = levelData;
                         break;
                     }
