@@ -751,14 +751,6 @@ public class MemberServiceImpl implements MemberService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员信息失败!");
             }
-
-//            //将顾客信息插入顾客标签库：顾客编号、进线时间、咨询的商品、首次进线广告、媒体等；
-//            label.setMemberCard(member.getMember_card());
-//            label.setMediaId(coilInVo.getMediaId());
-//            label.setMediaName(coilInVo.getMediaName());
-//            label.setAdverCode(coilInVo.getAdvId());
-//            label.setAdverName(coilInVo.getAdvName());
-//            memberLabelDao.save(label);
         }
         //会员已经存在的情景 ->判断顾客是否已经被圈选
         else{
@@ -772,7 +764,7 @@ public class MemberServiceImpl implements MemberService {
             Map<String,String> mongoMemberLabels = memberLabelDao.queryByCodes(memberCards);
             //没有member_label的顾客要新建
             if (CollectionUtil.isEmpty(mongoMemberLabels)) {
-                //根据顾客基本资料，新建顾客标签
+                //根据顾客基本资料，新建顾客标签(type=2.只同步顾客的基本资料(本服务数据))
                 boolean result = syncMemberLabel(memberCards, 2, null);
                 if (!result) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -783,11 +775,12 @@ public class MemberServiceImpl implements MemberService {
             /**
              * 匹配是否有对应的圈选规则；（只匹配第一个符合的群组，同时将顾客编号和群组编号插入关系表中group_ref_member）
              */
-            //查询出所有的规则，根据股则id圈选，选中的则跳出循环
+            //查询出生效的规则，根据股则id圈选，选中的则跳出循环
             List<member_crowd_group> ruleList =memberCrowdGroupDao.query4Task();
 
             if (CollectionUtil.isNotEmpty(ruleList)) {
                 for (member_crowd_group group : ruleList) {
+                    //判断当前客户是否属于给定圈选规则
                     if (customerGroupService.isCrowdGroupIncludeMemberCard(group, member.getMember_card())) {
                         groupId = group.get_id();
                         break;
@@ -795,11 +788,9 @@ public class MemberServiceImpl implements MemberService {
                 }
                 //根据规则插入客户信息
                 if (StringUtils.isNotEmpty(groupId)) {
-                    List<MemberLabel> labels = new ArrayList<>();
                     MemberLabel label = new MemberLabel();
                     label.setMemberCard(memberCard);
-                    labels.add(label);
-                    customerGroupService.memberCrowdGroupRunByLabels(groupId,labels);
+                    customerGroupService.memberCrowdGroupRunByLabels(groupId,Arrays.asList(label));
                 }
             }
         }
@@ -1560,7 +1551,7 @@ public class MemberServiceImpl implements MemberService {
      * wangzhe
      * 2021-02-26
      * @param memberCodes
-     * @param type : type = 1 同步所有的数 2.只同步顾客的基本资料  3.去其他模块拉去数据
+     * @param type : type = 1 同步所有的数 2.只同步顾客的基本资料(本服务数据)  3.去其他模块拉去数据
      *
      * @return
      */

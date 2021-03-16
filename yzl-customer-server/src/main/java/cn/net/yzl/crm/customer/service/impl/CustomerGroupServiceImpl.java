@@ -70,6 +70,8 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
     private final static String COLLECTION_NAME_MEMBER_LABEL = "member_label";
     private final static String COLLECTION_NAME_GROUP_REF_MEMBER= "group_ref_member";
+    //日期格式化成年月日
+    private final static String DATE_FORMAT_YYYYMMDD= "yyyyMMdd";
 
     //缓存圈选群组id，顾客编号
     private static Map<String, HashSet<String>> cacheMap = new ConcurrentHashMap<>();
@@ -196,12 +198,12 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     }
 
     /**
-     * ，判断当前客户是否属于给定圈选规则
-     * @param memberCrowdGroup
+     * 判断当前客户是否属于给定圈选规则
      * wangzhe
      * 2020-02-07
+     * @param memberCrowdGroup 群组对象
      * @param memberCard 会员卡号
-     * @return
+     * @return 该会员卡好是否数据当前群组
      */
     @Override
     public boolean isCrowdGroupIncludeMemberCard(member_crowd_group memberCrowdGroup,String memberCard) {
@@ -240,7 +242,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
 
     @Override
     public Boolean memberGroupTimedTask() {
-        List<member_crowd_group> list =memberCrowdGroupDao.query4Task();
+        List<member_crowd_group> list =memberCrowdGroupDao.query4Task(Boolean.TRUE);
         //多线程执行
         String groupId = "";
         String groupName = "";
@@ -266,7 +268,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Transactional(value = "mongoTransactionManager",rollbackFor = Throwable.class)
     public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) throws InterruptedException {
         //生成数据的版本号
-        Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMdd"));
+        Long version = Long.parseLong(DateUtil.format(new Date(),DATE_FORMAT_YYYYMMDD));
         String groupId = memberCrowdGroup.get_id();
         AtomicInteger matchCount = new AtomicInteger(0);
         long groupRunStartTime = System.currentTimeMillis();
@@ -418,11 +420,6 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
             member.setMemberName(label.getMemberName());
             member.setVersion(version);
             list.add(member);
-            /*if (isSaveLine(i)) {
-                memberLabelDao.insertAll(list,COLLECTION_NAME_MEMBER_LABEL);
-                log.info("memberCrowdGroupRun-save:groupId:{},本次保存{}条记录,因重复圈选当前过滤:{}条记录,版本号为:{}",groupId,length,list.size(),repeatFilterCount,version);
-                list.clear();
-            }*/
         }
         //保存集合
         if (CollectionUtil.isNotEmpty(list)) {

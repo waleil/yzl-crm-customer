@@ -56,17 +56,23 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
 
         return query4Task(false);
     }
+
+    /**
+     * 查询圈选规则
+     * @param all 为true时则包含已经禁用的
+     * @return
+     */
     public List<member_crowd_group> query4Task(boolean all){
         Query query = new Query();
         Criteria criteria = new Criteria();
-        if (all) {
-            criteria = Criteria.where("enable").is(1);
+        if (!all) {
+            criteria = Criteria.where("enable").is(1);//启用的
         }
-        criteria.and("del").is(false);
+        criteria.and("del").is(false);//没有被删除的
         query.addCriteria(criteria);
         //圈选规则按优先级排序,更新时间降序
         query.with(Sort.by(Sort.Direction.ASC, "seq"));
-        query.with(Sort.by(Sort.Direction.DESC,"create_time"));
+        query.with(Sort.by(Sort.Direction.DESC,"update_time"));
 
         return mongoTemplate.find(query,member_crowd_group.class);
     }
