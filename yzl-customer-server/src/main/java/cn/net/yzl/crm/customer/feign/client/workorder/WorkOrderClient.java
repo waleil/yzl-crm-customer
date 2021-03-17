@@ -17,7 +17,8 @@ import java.util.List;
 /**
  * 智能工单
  */
-@FeignClient(name = "yzl-workorder-server")
+//@FeignClient(name = "yzl-workorder-server")
+@FeignClient(name="work-order-api", url = "${api.gateway.url}/workorderServer")
 public interface WorkOrderClient {
 
     @GetMapping("workOrder/v1/queryReturnVisitRules")

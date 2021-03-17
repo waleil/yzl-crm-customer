@@ -218,7 +218,7 @@
   </update>
 
 
-  <update id="updateMemberProductLastNumByMemberCards">
+  <update id="updateMemberProductLastNumByPrimaryKeys">
     update member_product_effect
     set
         product_last_num = (CASE when (product_last_num - eating_time) > 0 THEN (product_last_num - eating_time) else 0 end),
@@ -228,6 +228,20 @@
     <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
       #{item}
     </foreach>
+  </update>
+
+  <!-- 更新已经停服的商品的服用完日期 -->
+  <update id="updateMemberProductDueDateByPrimaryKeys">
+    update member_product_effect
+    set
+    due_date = DATE_FORMAT(DATE_ADD(NOW(),INTERVAL ceil(product_last_num / eating_time) DAY),'%Y-%m-%d 00:00:00'),
+    updator='SYSTEM'
+    where
+    id in
+    <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    and eating_time > 0;
   </update>
   <select id="queryByMemberCodes" parameterType="list" resultType="cn.net.yzl.crm.customer.model.mogo.MemberProduct" >
     select
@@ -313,7 +327,7 @@
             member_product_effect
         WHERE
             product_last_num > 0 <!-- 商品剩余量>0的 -->
-            and taking_state in (1,2)  <!-- 服用状态: 1 正常，2 非常好 -->
+      <!--  and taking_state in (1,2)  服用状态: 1 正常，2 非常好 -->
         ORDER BY id
     </select>
 
