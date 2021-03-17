@@ -17,6 +17,7 @@ import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.feign.api.OrderClientAPI;
+import cn.net.yzl.crm.customer.feign.api.ProductClientAPI;
 import cn.net.yzl.crm.customer.feign.api.WorkOrderClientAPI;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
@@ -45,7 +46,6 @@ import cn.net.yzl.crm.customer.vo.*;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
-import cn.net.yzl.crm.customer.vo.member.MemberOrderStatUpdateVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
@@ -115,12 +115,12 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     MemberOrderStatService memberOrderStatService;
 
-    @Autowired
-    ProductFien productFien;
-    @Autowired
-    OrderFien orderFien;
-    @Autowired
-    ActivityFien activityFien;
+//    @Autowired
+//    ProductFien productFien;
+//    @Autowired
+//    OrderFien orderFien;
+//    @Autowired
+//    ActivityFien activityFien;
     @Autowired
     WorkOrderClient workOrderClient;
 
@@ -881,9 +881,8 @@ public class MemberServiceImpl implements MemberService {
             Map<String, ProductMainDTO> productMap = new HashMap<>();
 
             //通过商品编号，获取商品信息
-            ComResponse<List<ProductMainDTO>> response = productFien.queryByProductCodes(codes.split(","));
-            if (response != null && CollectionUtil.isNotEmpty(response.getData())) {
-                List<ProductMainDTO> productList = response.getData();
+            List<ProductMainDTO> productList = ProductClientAPI.queryByProductCodes(codes.split(","));
+            if (CollectionUtil.isNotEmpty(productList)) {
                 for (ProductMainDTO mainDTO : productList) {
                     productMap.put(mainDTO.getProductCode(), mainDTO);
                 }
