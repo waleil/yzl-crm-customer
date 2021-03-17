@@ -61,5 +61,8 @@ public interface MemberProductEffectMapper {
 
     List<MemberProductEffect> selectMemberProductEffectByPage();
 
-    Integer updateMemberProductLastNumByMemberCards(@Param("ids") List<Integer> memberCardList);
+    Integer updateMemberProductLastNumByPrimaryKeys(@Param("ids") List<Integer> memberCardList);
+
+    Integer updateMemberProductDueDateByPrimaryKeys(@Param("ids") List<Integer> stoptakingIdList);
+
 }
