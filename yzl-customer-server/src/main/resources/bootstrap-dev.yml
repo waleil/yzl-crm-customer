@@ -2,7 +2,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: 192.168.32.33:8848,192.168.32.34:8848,192.168.32.35:8848  #.169:8848
+        server-addr: http://nacosdev.staff.yuzhilin.net.cn
         username: apigateway
         password: apigateway
         namespace: a97dae2d-5fcd-4dc3-bfa1-5f7b9b1dfd5a

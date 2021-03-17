@@ -59,6 +59,8 @@ public interface CustomerGroupService {
 
     int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) throws InterruptedException;
 
+    int memberCrowdGroupRun(member_crowd_group memberCrowdGroup,Long version) throws InterruptedException;
+
     int memberCrowdGroupTrialById(MemberCrowdGroupOpVO crowdGroupOpVO);
 
     Page<MemberLabelDto>  groupTrialByIdPullData(MemberCrowdGroupOpVO crowdGroupOpVO);

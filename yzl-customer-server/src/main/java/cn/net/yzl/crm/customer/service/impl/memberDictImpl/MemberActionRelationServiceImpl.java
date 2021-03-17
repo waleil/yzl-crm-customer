@@ -103,6 +103,8 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
                 actionDict.setName(memberActionRelationDto.getDname());
                 actionDict.setType(memberActionRelationDto.getType());
                 actionDict.setDelFlag(2);
+                actionDict.setValue(memberActionRelationDto.getValue());
+                actionDict.setValue2(memberActionRelationDto.getValue2());
                 actionDictMapper.insertSelective(actionDict);
                 actionId = actionDict.getId();
             }else{
