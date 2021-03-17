@@ -8,6 +8,7 @@ import cn.net.yzl.crm.customer.dto.label.MemberLabelDto;
 import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.*;
 import cn.net.yzl.crm.customer.sys.BizException;
+import cn.net.yzl.crm.customer.utils.CollectionsHelper;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.date.DealDateUtil;
 import cn.net.yzl.crm.customer.utils.mongo.PageUtil;
@@ -80,7 +81,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         query.skip(0);
         query.limit(0);
-
+        //为null则设置为空集合
+        CollectionsHelper.nullSetEmptyList(memberLabels);
+        //返回分页查询结果
         return PageUtil.resultAssembler(memberLabels, pageNo, pageSize, totalCount.intValue());
     }
     public Page<MemberLabelDto> memberCrowdGroupRunUsePage(Integer pageNo , Integer pageSize, Query query, Long totalCount) {
@@ -97,7 +100,9 @@ public class MemberLabelDao extends MongoBaseDao<MemberLabel> {
         }
         query.skip(0);
         query.limit(0);
-
+        //为null则设置为空集合
+        CollectionsHelper.nullSetEmptyList(memberLabels);
+        //返回分页查询结果
         return PageUtil.resultAssembler(memberLabels, pageNo, pageSize, totalCount.intValue());
     }
 
