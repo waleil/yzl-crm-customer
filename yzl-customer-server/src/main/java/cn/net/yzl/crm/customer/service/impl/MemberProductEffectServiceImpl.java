@@ -305,7 +305,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
                     continue;
                 }
                 //已经停服的要重新计算商品的服用完日期
-                if (3 == item.getTakingState()){
+                if (item.getTakingState() != null && item.getTakingState() == 3){
                     //有日用量的，则进行更新
                     if (item.getEatingTime() != null && item.getEatingTime() > 0){
                         stoptakingIdList.add(item.getId());
