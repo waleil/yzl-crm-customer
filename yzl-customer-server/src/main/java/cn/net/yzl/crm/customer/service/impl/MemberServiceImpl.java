@@ -323,7 +323,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member selectMemberByCard(String memberCard) {
-        return memberMapper.selectMemberByCard(memberCard);
+        Member member = memberMapper.selectMemberByCard(memberCard);
+        if (member != null) {
+            if (member.getAge() != null && member.getAge() == 0) {
+                member.setAge(null);
+            }
+        }
+        return member;
     }
 
 
