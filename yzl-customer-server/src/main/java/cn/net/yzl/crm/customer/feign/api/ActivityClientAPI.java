@@ -69,18 +69,19 @@ public class ActivityClientAPI {
      * 2021-02-26
      * @return
      */
-    public static String getMemberGradeValidDate(){
+    /*public static String getMemberGradeValidDate(){
         ComResponse<MemberSysParamDetailResponse> response = null;
         for (int i = 0; i < 3; i++) {
-            response = activityClientAPI.activityFien.getMemberSysParamByType(0);//会员
-            if (200 != response.getCode()) {
-                log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-                throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"activityFien:getMemberGradeValidDate:获取DMC会员级别管理接口异常!");
-            }else{
-                break;
+            try {
+                response = activityClientAPI.activityFien.getMemberSysParamByType(0);//会员
+                if (response.getCode() == 200) {
+                    break;
+                }
+            } catch (Exception e) {
+                log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!",e);
             }
         }
-        if (200 != response.getCode()) {
+        if (response == null || response.getCode() != 200) {
             log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
             throw new BizException(ResponseCodeEnums.API_ERROR_CODE.getCode(),"activityFien:getMemberGradeValidDate:获取DMC会员级别管理接口异常!");
         }
@@ -109,7 +110,14 @@ public class ActivityClientAPI {
         }
         String valid = DateUtil.year(DateUtil.date()) + "-" + data.getValidityMonth() + "-" + data.getValidityDay();
         return valid;
-    }
+    }*/
+
+    /**
+     * 获取DMC会员有效期配置
+     * wangzhe
+     * 2021-03-12
+     * @return
+     */
     public static MemberGradeValidDate getMemberGradeValidDateObj(){
         String valid = "";
         MemberGradeValidDate validDateObj = new MemberGradeValidDate();
@@ -117,14 +125,16 @@ public class ActivityClientAPI {
         try {
             ComResponse<MemberSysParamDetailResponse> response = null;
             for (int i = 0; i < 3; i++) {
-                response = activityClientAPI.activityFien.getMemberSysParamByType(0);//会员
-                if (200 != response.getCode()) {
-                    log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
-                } else {
-                    break;
+                try {
+                    response = activityClientAPI.activityFien.getMemberSysParamByType(0);//会员
+                    if (response.getCode() == 200) {
+                        break;
+                    }
+                } catch (Exception e) {
+                    log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!",e);
                 }
             }
-            if (200 != response.getCode()) {
+            if (response == null || response.getCode() != 200) {
                 log.error("getMemberSysParamByType:获取DMC会员级别管理接口异常!");
             }
             MemberSysParamDetailResponse data = response.getData();
@@ -168,7 +178,6 @@ public class ActivityClientAPI {
                     endDate = DateUtil.endOfDay(DateUtil.date());//一天的结束，结果：2017-03-01 23:59:59
                 }else {
                     //没过:到期时间一年前 到今天
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Calendar c = Calendar.getInstance();
                     c.setTime(validDate);
                     c.add(Calendar.YEAR, -1);

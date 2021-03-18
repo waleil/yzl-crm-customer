@@ -11,12 +11,14 @@ import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.common.util.DateHelper;
 import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
 import cn.net.yzl.crm.customer.dto.member.*;
 import cn.net.yzl.crm.customer.feign.api.ActivityClientAPI;
 import cn.net.yzl.crm.customer.feign.api.OrderClientAPI;
+import cn.net.yzl.crm.customer.feign.api.ProductClientAPI;
 import cn.net.yzl.crm.customer.feign.api.WorkOrderClientAPI;
 import cn.net.yzl.crm.customer.feign.client.Activity.ActivityFien;
 import cn.net.yzl.crm.customer.feign.client.order.OrderFien;
@@ -40,12 +42,12 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.CentYuanConvertUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
+import cn.net.yzl.crm.customer.utils.date.DealDateUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.*;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
 import cn.net.yzl.crm.customer.vo.label.MemberCoilInVO;
 import cn.net.yzl.crm.customer.vo.member.MemberGrandSelectVo;
-import cn.net.yzl.crm.customer.vo.member.MemberOrderStatUpdateVo;
 import cn.net.yzl.crm.customer.vo.order.OrderCreateInfoVO;
 import cn.net.yzl.crm.customer.vo.order.OrderProductVO;
 import cn.net.yzl.crm.customer.vo.order.OrderSignInfo4MqVO;
@@ -115,12 +117,12 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     MemberOrderStatService memberOrderStatService;
 
-    @Autowired
-    ProductFien productFien;
-    @Autowired
-    OrderFien orderFien;
-    @Autowired
-    ActivityFien activityFien;
+//    @Autowired
+//    ProductFien productFien;
+//    @Autowired
+//    OrderFien orderFien;
+//    @Autowired
+//    ActivityFien activityFien;
     @Autowired
     WorkOrderClient workOrderClient;
 
@@ -179,6 +181,12 @@ public class MemberServiceImpl implements MemberService {
         member.setMGradeId(1);
         member.setMGradeName("无卡");
         member.setM_grade_code(null);
+        //设置媒体类型信息
+        if (member.getSource() != null) {
+            member.setMedia_type_code(member.getSource());
+            member.setMedia_type_name(convertMediaTypeCode2Name(member.getSource()));
+        }
+
         //保存数据
         int result = memberMapper.insertSelective(member);
         if (result < 1) {
@@ -317,7 +325,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member selectMemberByCard(String memberCard) {
-        return memberMapper.selectMemberByCard(memberCard);
+        Member member = memberMapper.selectMemberByCard(memberCard);
+        if (member != null) {
+            if (member.getAge() != null && member.getAge() == 0) {
+                member.setAge(null);
+            }
+        }
+        return member;
     }
 
 
@@ -744,6 +758,8 @@ public class MemberServiceImpl implements MemberService {
             member.setAdver_code(coilInVo.getAdvId());
             member.setAdver_name(coilInVo.getAdvName());
             member.setSource(coilInVo.getMediaType());//获客来源
+            member.setMedia_type_code(coilInVo.getMediaType());
+            member.setMedia_type_name(convertMediaTypeCode2Name(coilInVo.getMediaType()));
 
             //更新会员信息
             int update = updateByMemberCardSelective(member);
@@ -775,7 +791,7 @@ public class MemberServiceImpl implements MemberService {
             /**
              * 匹配是否有对应的圈选规则；（只匹配第一个符合的群组，同时将顾客编号和群组编号插入关系表中group_ref_member）
              */
-            //查询出生效的规则，根据股则id圈选，选中的则跳出循环
+            //查询出生效的规则，根据规则id圈选，选中的则跳出循环
             List<member_crowd_group> ruleList =memberCrowdGroupDao.query4Task();
 
             if (CollectionUtil.isNotEmpty(ruleList)) {
@@ -800,6 +816,48 @@ public class MemberServiceImpl implements MemberService {
         dto.setMemberGroupCode(groupId);
 
         return ComResponse.success(dto);
+    }
+
+    /**
+     * 将媒体类型code转换成媒体类型名称
+     * wangzhe
+     * 2021-03-16
+     * @param code 媒体类型code
+     * @return
+     */
+    private String convertMediaTypeCode2Name(Integer code){
+        //"获客来源渠道(媒介类型) -1：其他，0:电视媒体, 1:广播电台媒体，2：社区媒体，3：户外媒体，4：印刷媒体，5：互联网媒体，6：电商站内流量媒体"
+        String name = null;
+        if (code == null) {
+            return name;
+        }
+        switch (code) {
+            case -1 :
+                name = "其他";
+                break;
+            case 0 :
+                name = "电视媒体";
+                break;
+            case 1 :
+                name = "广播电台媒体";
+                break;
+            case 2 :
+                name = "社区媒体";
+                break;
+            case 3 :
+                name = "户外媒体";
+                break;
+            case 4 :
+                name = "印刷媒体";
+                break;
+            case 5 :
+                name = "互联网媒体";
+                break;
+            case 6 :
+                name = "电商站内流量媒体";
+                break;
+        }
+        return name;
     }
 
     /**
@@ -831,9 +889,8 @@ public class MemberServiceImpl implements MemberService {
             Map<String, ProductMainDTO> productMap = new HashMap<>();
 
             //通过商品编号，获取商品信息
-            ComResponse<List<ProductMainDTO>> response = productFien.queryByProductCodes(codes.split(","));
-            if (response != null && CollectionUtil.isNotEmpty(response.getData())) {
-                List<ProductMainDTO> productList = response.getData();
+            List<ProductMainDTO> productList = ProductClientAPI.queryByProductCodes(codes.split(","));
+            if (CollectionUtil.isNotEmpty(productList)) {
                 for (ProductMainDTO mainDTO : productList) {
                     productMap.put(mainDTO.getProductCode(), mainDTO);
                 }
@@ -1204,14 +1261,18 @@ public class MemberServiceImpl implements MemberService {
     //@Transactional
     public boolean updateMemberGrandValidityInit() throws IOException {//MemberSysParamDetailResponse
         //获取DMC的会员到期时间
-        String validDate = ActivityClientAPI.getMemberGradeValidDate();
-        if ("0".equals(validDate)) {
+        //String validDate = ActivityClientAPI.getMemberGradeValidDate();
+        MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
+        if (validDateObj.getIsAlways() == null || validDateObj.getIsAlways()) {
             log.info("updateMemberGrandValidityInit:会员有效期类型为长期有效！");
             return true;
         }
-        String today= DateUtil.today();
-        if (!today.equals(validDate)) {
-            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",today,validDate);
+        Date todayStart = DealDateUtil.getStart(new Date());
+
+        Date yearValidDate = validDateObj.getCurrentYearValidDate();
+        long between = DateUtil.between(todayStart,yearValidDate, DateUnit.DAY, false);
+        if (between != 0) {
+            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",todayStart,yearValidDate);
             return true;
         }
 

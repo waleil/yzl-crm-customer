@@ -282,6 +282,8 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         boolean hasNext = true;
         //临时记录要更新余量的商品服用效果的id
         List<Integer> idList = new ArrayList<>();
+        //停止服用商品效果记录的id
+        List<Integer> stoptakingIdList = new ArrayList<>();
 
         //客户编号
         List<String> memberCardList = new ArrayList<>();
@@ -299,10 +301,18 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
             pageNo++;
             //更新数据
             for (MemberProductEffect item : list) {
-                idList.add(item.getId());//用户更新商品的数量
                 if (item.getDueDate() == null) {
                     continue;
                 }
+                //已经停服的要重新计算商品的服用完日期
+                if (item.getTakingState() != null && item.getTakingState() == 3){
+                    //有日用量的，则进行更新
+                    if (item.getEatingTime() != null && item.getEatingTime() > 0){
+                        stoptakingIdList.add(item.getId());
+                    }
+                    continue;
+                }
+                idList.add(item.getId());//用户更新商品的数量
                 //小于最小服用天数
                 betweenDay = DateUtil.between(currentDateStart, item.getDueDate(), DateUnit.DAY,false);
                 if (betweenDay >= 0 && betweenDay < configDay){
@@ -312,10 +322,17 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
                     }
                 }
             }
+            //更新已经停复的商品的服用完日期
+            if (CollectionUtil.isNotEmpty(stoptakingIdList)) {
+                Integer count = memberProductEffectMapper.updateMemberProductDueDateByPrimaryKeys(stoptakingIdList);
+                log.info("update member product stop taking due date: record count:{}",count);
+                stoptakingIdList.clear();
+            }
             //更新商品剩余量
             if (CollectionUtil.isNotEmpty(idList)) {
-                Integer count = memberProductEffectMapper.updateMemberProductLastNumByMemberCards(idList);
+                Integer count = memberProductEffectMapper.updateMemberProductLastNumByPrimaryKeys(idList);
                 log.info("update member product last num: record count:{}",count);
+                idList.clear();
             }
             //次日回访
             if (CollectionUtil.isNotEmpty(memberCardList)){

@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Date;
 import java.util.List;
 
-@FeignClient(name = "yzl-order-server")
+//@FeignClient(name = "yzl-order-server")
+@FeignClient(name = "orderFien", url = "${api.gateway.url}/orderService")
 public interface OrderFien {
 
 //    @GetMapping("/orderSearch/v1/selectOrderInfo")

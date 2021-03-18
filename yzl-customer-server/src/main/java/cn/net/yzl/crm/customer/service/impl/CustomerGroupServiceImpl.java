@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
@@ -246,12 +247,14 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         //多线程执行
         String groupId = "";
         String groupName = "";
+
+        Long version = Long.parseLong(DateUtil.format(DateUtil.tomorrow(),DATE_FORMAT_YYYYMMDD));
         try {
             for (member_crowd_group memberCrowdGroup : list) {
                 groupId = memberCrowdGroup.get_id();
                 groupName = memberCrowdGroup.getCrowd_name();
                 //threadPoolExecutor.execute(()->{ memberCrowdGroupRun(memberCrowdGroup);});
-                memberCrowdGroupRun(memberCrowdGroup);
+                memberCrowdGroupRun(memberCrowdGroup,version);
             }
         } catch (Exception e) {
             log.error("/v1/memberGroupTimedTask:定时任务圈选异常!,当前处理的群组id为:{},名称为:{}",groupId,groupName);
@@ -259,6 +262,11 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         return true;
     }
 
+    @Override
+    @Transactional(value = "mongoTransactionManager",rollbackFor = Throwable.class)
+    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) throws InterruptedException {
+        return memberCrowdGroupRun(memberCrowdGroup, null);
+    }
     /**
      * 匹配全选规则，生成新的数据
      * @param memberCrowdGroup
@@ -266,9 +274,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      */
     @Override
     @Transactional(value = "mongoTransactionManager",rollbackFor = Throwable.class)
-    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) throws InterruptedException {
+    public int memberCrowdGroupRun(member_crowd_group memberCrowdGroup,Long version) throws InterruptedException {
         //生成数据的版本号
-        Long version = Long.parseLong(DateUtil.format(new Date(),DATE_FORMAT_YYYYMMDD));
+        Long ver = version == null ? Long.parseLong(DateUtil.format(new Date(), DATE_FORMAT_YYYYMMDD)) : version;
         String groupId = memberCrowdGroup.get_id();
         AtomicInteger matchCount = new AtomicInteger(0);
         long groupRunStartTime = System.currentTimeMillis();
@@ -291,9 +299,9 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
                 List<MemberLabel> labels = memberLabelPage.getItems();
                 if(!CollectionUtils.isEmpty(labels)) {
                     Future<String> future = executeAsync.executeAsync2(() -> {
-                        log.info("memberCrowdGroupRun-page query:groupId:{},本次分页,pageNo:{},圈选出{}条记录,版本号为:{}", groupId, pageParam.getPageNo(), labels.size(), version);
+                        log.info("memberCrowdGroupRun-page query:groupId:{},本次分页,pageNo:{},圈选出{}条记录,版本号为:{}", groupId, pageParam.getPageNo(), labels.size(), ver);
                         //处理数据
-                        int result = doMemberCrowdGroupRun(groupId, labels, version);
+                        int result = doMemberCrowdGroupRun(groupId, labels, ver);
                         matchCount.addAndGet(result);
                         labels.clear();
                     });
@@ -325,7 +333,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         }
 
         //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
-        deleteMongoGroupRefMemberByGroupId(groupId,version);
+        deleteMongoGroupRefMemberByGroupId(groupId,ver);
 
         //查询group_ref_member中，当前群组的顾客数量
         Query getMemberCount = new Query();
@@ -339,7 +347,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         update.set("person_count",count);
         memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
         long groupRunEndTime = System.currentTimeMillis();
-        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount.get(),version,count,(groupRunEndTime-groupRunStartTime));
+        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount.get(),ver,count,(groupRunEndTime-groupRunStartTime));
         return matchCount.get();
     }
 
@@ -352,15 +360,26 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
      * @param labels
      * @return
      */
-    public int memberCrowdGroupRunByLabels(String groupId,List<MemberLabel> labels) {
+    public Boolean memberCrowdGroupRunByLabels(String groupId,List<MemberLabel> labels) {
         long groupRunStartTime = System.currentTimeMillis();
         //生成数据的版本号
-        Long version = Long.parseLong(DateUtil.format(new Date(),"yyyyMMdd"));
-        int matchCount = doMemberCrowdGroupRun(groupId, labels,version);
-        labels.clear();
+        Long version = Long.parseLong(DateUtil.format(new Date(),DATE_FORMAT_YYYYMMDD));
+        //int matchCount = doMemberCrowdGroupRun(groupId, labels,version);
+        List<GroupRefMember> list = new ArrayList<>(labels.size());
 
-        //删除mongo里面的当前groupId对应的历史数据(删除非当前版本的数据)
-        boolean result = deleteMongoGroupRefMemberByGroupId(groupId, version);
+        for (MemberLabel label : labels) {
+            GroupRefMember member = new GroupRefMember();//新建
+            member.setGroupId(groupId);
+            member.setMemberCard(label.getMemberCard());
+            member.setMemberName(label.getMemberName());
+            member.setVersion(version);
+            list.add(member);
+        }
+        //保存集合
+        memberLabelDao.insertAll(list,COLLECTION_NAME_GROUP_REF_MEMBER);
+        log.info("memberCrowdGroupRun-save:groupId:{},本次保存:{}条记录,版本号为:{}",groupId,list.size(),version);
+        list.clear();
+        //labels.clear();
         //查询group_ref_member中，当前群组的顾客数量
         Query getMemberCount = new Query();
         getMemberCount.addCriteria(Criteria.where("groupId").is(groupId));
@@ -373,8 +392,8 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         update.set("person_count",count);
         memberLabelDao.updateFirst(updateCondition, update,member_crowd_group.class);
         long groupRunEndTime = System.currentTimeMillis();
-        log.info("memberCrowdGroupRun-end:groupId:{},本次圈选出{}条记录,版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,matchCount,version,count,(groupRunEndTime-groupRunStartTime));
-        return matchCount;
+        log.info("memberCrowdGroupRun-end:groupId:{},本次版本号为:{} member_crowd_group 已更新,更新后为:{},本次圈选总耗时:{}",groupId,version,count,(groupRunEndTime-groupRunStartTime));
+        return Boolean.TRUE;
     }
 
     @Override
@@ -559,6 +578,17 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
                 fields.exclude("_id");
             }
         }
+    }
+
+    public static void main(String[] args) {
+
+
+        List<Object> objects = Collections.emptyList();
+
+        objects.clear();
+
+        objects.add("ssss");
+        System.out.println(objects);
     }
 
 }

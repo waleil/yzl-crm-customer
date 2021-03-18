@@ -59,6 +59,8 @@ public interface CustomerGroupService {
 
     int memberCrowdGroupRun(member_crowd_group memberCrowdGroup) throws InterruptedException;
 
+    int memberCrowdGroupRun(member_crowd_group memberCrowdGroup,Long version) throws InterruptedException;
+
     int memberCrowdGroupTrialById(MemberCrowdGroupOpVO crowdGroupOpVO);
 
     Page<MemberLabelDto>  groupTrialByIdPullData(MemberCrowdGroupOpVO crowdGroupOpVO);
@@ -92,7 +94,7 @@ public interface CustomerGroupService {
 
     boolean isCrowdGroupIncludeMemberCard(member_crowd_group memberCrowdGroup, String memberCard);
 
-    public int memberCrowdGroupRunByLabels(String groupId, List<MemberLabel> labels);
+    public Boolean memberCrowdGroupRunByLabels(String groupId, List<MemberLabel> labels);
 
     Query convertMongoCondition(member_crowd_group memberCrowdGroup);
 

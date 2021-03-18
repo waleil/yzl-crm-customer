@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "yzl-activity-db")
+//@FeignClient(name = "yzl-activity-db")
+@FeignClient(name = "activityFien", url = "${api.gateway.url}/activityDB")
 public interface ActivityFien {
 
     @ApiOperation(value = "通过活动编号查询活动商品信息")
