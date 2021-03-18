@@ -15,8 +15,10 @@ import cn.net.yzl.crm.customer.model.Member;
 import cn.net.yzl.crm.customer.model.MemberAmount;
 import cn.net.yzl.crm.customer.model.MemberAmountDetail;
 import cn.net.yzl.crm.customer.model.db.MemberOrderStat;
+import cn.net.yzl.crm.customer.model.db.MemberRecharge;
 import cn.net.yzl.crm.customer.service.MemberOrderStatService;
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
+import cn.net.yzl.crm.customer.service.amount.MemberRechargeService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.CentYuanConvertUtil;
 import cn.net.yzl.crm.customer.utils.DateCustomerUtils;
@@ -50,6 +52,9 @@ public class MemberAmountServiceImpl implements MemberAmountService {
 
     @Autowired
     MemberOrderStatService memberOrderStatService;
+
+    @Autowired
+    MemberRechargeService memberRechargeService;
 
 
 
@@ -119,7 +124,11 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             //尝试加锁300ms
             if(lock.tryLock(300, TimeUnit.MILLISECONDS)){
                 // 判断账户是否存在
-                MemberAmountDto memberAmountDto = memberAmountDao.getMemberAmount(memberCard);
+                ComResponse<MemberAmountDto> response = this.getMemberAmount(memberCard);
+                if (response.getCode() != 200) {
+                    throw new BizException(response.getCode(), response.getMessage());
+                }
+                MemberAmountDto memberAmountDto = response.getData();
                 if (memberAmountDto == null) {
                     throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "账户不存在!");
                 }
@@ -262,7 +271,16 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                         return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"记录数据保存失败!");
                     }
-
+                    //新增客户充值记录
+                    MemberRecharge recharge = new MemberRecharge();
+                    recharge.setMemberCard(memberCard);
+                    recharge.setCreateDate(new Date());
+                    recharge.setInMoney(discountMoney);
+                    result = memberRechargeService.addRecharge(recharge);
+                    if (result < 1) {
+                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        return ComResponse.fail(ResponseCodeEnums.SERVICE_ERROR_CODE.getCode(),"充值记录保存失败!");
+                    }
                 }
                 // 修改账户信息
                 int num = memberAmountDao.updateByPrimaryKeySelective(memberAmount);
