@@ -3,16 +3,22 @@
 <mapper namespace="cn.net.yzl.crm.customer.dao.MemberOrderSignHandleMapper" >
   <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="memberCardNo" property="membercardno" jdbcType="INTEGER" />
-    <result column="orderNo" property="orderno" jdbcType="INTEGER" />
-    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="member_card" property="memberCard" jdbcType="VARCHAR" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="order_data" property="orderData" jdbcType="VARCHAR" />
+    <result column="creator_no" property="creatorNo" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="updator_no" property="updatorNo" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="error_code" property="errorCode" jdbcType="VARCHAR" />
+    <result column="error_msg" property="errorMsg" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" extends="BaseResultMap" >
     <result column="order_data" property="orderData" jdbcType="LONGVARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, memberCardNo, orderNo, status, create_time
+    id, member_card,order_no, order_data, creator_no,create_time,updator_no,update_time,error_code,error_msg,status
   </sql>
   <sql id="Blob_Column_List" >
     order_data
@@ -25,6 +31,7 @@
     from member_order_sign_handle
     where id = #{id,jdbcType=INTEGER}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from member_order_sign_handle
     where id = #{id,jdbcType=INTEGER}
@@ -131,4 +138,30 @@
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <update id="updateSuccessStatusByPrimaryKey" parameterType="java.lang.Integer">
+    update member_order_sign_handle
+    <set>
+        `status` = 1,
+        `updator_no`='SYSTEM',
+        `update_time` = NOW(),
+        `error_code` = null,
+        `error_msg` = null,
+    </set>
+    where id = #{primaryKey,jdbcType=INTEGER}
+  </update>
+
+  <!-- -->
+  <select id="getFailRecordListCount" resultType="java.lang.Integer">
+    SELECT count(1) FROM `member_order_sign_handle` where `status` = 2
+  </select>
+
+  <select id="getFailRecordList" resultMap="BaseResultMap">
+    select
+        <include refid="Base_Column_List" />
+    from `member_order_sign_handle`
+    where `status` = 2
+    limit #{fromLine},#{pageSize}
+  </select>
+
+
 </mapper>
