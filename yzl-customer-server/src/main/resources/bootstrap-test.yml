@@ -1,14 +1,13 @@
 spring:
   cloud:
     nacos:
+      server-addr: http://nacostest.staff.yuzhilin.net.cn  #.169:8848
       discovery:
-        server-addr: http://nacostest.staff.yuzhilin.net.cn  #.169:8848
         username: apigateway
         password: apigateway
         namespace: a97dae2d-5fcd-4dc3-bfa1-5f7b9b1dfd5a
 #        register-enabled: false
       config:
-        server-addr: http://nacostest.staff.yuzhilin.net.cn
         username: crm
         password: crm123456!
         namespace: ca2511dc-ae29-40f0-b1d9-8daca30a7e9c

@@ -3,28 +3,33 @@
 <mapper namespace="cn.net.yzl.crm.customer.dao.MemberOrderSignHandleMapper" >
   <resultMap id="BaseResultMap" type="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="memberCardNo" property="membercardno" jdbcType="INTEGER" />
-    <result column="orderNo" property="orderno" jdbcType="INTEGER" />
-    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="member_card" property="memberCard" jdbcType="VARCHAR" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="creator_no" property="creatorNo" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="updator_no" property="updatorNo" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="error_code" property="errorCode" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" extends="BaseResultMap" >
     <result column="order_data" property="orderData" jdbcType="LONGVARCHAR" />
+    <result column="error_msg" property="errorMsg" jdbcType="LONGVARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, memberCardNo, orderNo, status, create_time
+    id, member_card,order_no, creator_no,create_time,updator_no,update_time,error_code,status
   </sql>
   <sql id="Blob_Column_List" >
-    order_data
+    order_data, error_msg
   </sql>
   <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
     select 
-    <include refid="Base_Column_List" />
-    ,
+    <include refid="Base_Column_List" />,
     <include refid="Blob_Column_List" />
     from member_order_sign_handle
     where id = #{id,jdbcType=INTEGER}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from member_order_sign_handle
     where id = #{id,jdbcType=INTEGER}
@@ -56,79 +61,166 @@
       <if test="id != null" >
         id,
       </if>
-      <if test="membercardno != null" >
-        memberCardNo,
+      <if test="memberCard != null" >
+        member_card,
       </if>
-      <if test="orderno != null" >
-        orderNo,
+      <if test="orderNo != null" >
+        order_no,
       </if>
-      <if test="status != null" >
-        status,
+      <if test="creatorNo != null" >
+        creator_no,
       </if>
       <if test="createTime != null" >
         create_time,
       </if>
+      <if test="updatorNo != null" >
+        updator_no,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="errorCode != null" >
+        error_code,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
       <if test="orderData != null" >
         order_data,
+      </if>
+      <if test="errorMsg != null" >
+        error_msg,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="membercardno != null" >
-        #{membercardno,jdbcType=INTEGER},
+      <if test="memberCard != null" >
+        #{memberCard,jdbcType=VARCHAR},
       </if>
-      <if test="orderno != null" >
-        #{orderno,jdbcType=INTEGER},
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
-        #{status,jdbcType=INTEGER},
+      <if test="creatorNo != null" >
+        #{creatorNo,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="updatorNo != null" >
+        #{updatorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="errorCode != null" >
+        #{errorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
       <if test="orderData != null" >
         #{orderData,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="errorMsg != null" >
+        #{errorMsg,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
     update member_order_sign_handle
     <set >
-      <if test="membercardno != null" >
-        memberCardNo = #{membercardno,jdbcType=INTEGER},
+      <if test="memberCard != null" >
+        member_card = #{memberCard,jdbcType=VARCHAR},
       </if>
-      <if test="orderno != null" >
-        orderNo = #{orderno,jdbcType=INTEGER},
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
-        status = #{status,jdbcType=INTEGER},
+      <if test="creatorNo != null" >
+        creator_no = #{creatorNo,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="updatorNo != null" >
+        updator_no = #{updatorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="errorCode != null" >
+        error_code = #{errorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
       <if test="orderData != null" >
         order_data = #{orderData,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="errorMsg != null" >
+        error_msg = #{errorMsg,jdbcType=LONGVARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
     update member_order_sign_handle
-    set memberCardNo = #{membercardno,jdbcType=INTEGER},
-      orderNo = #{orderno,jdbcType=INTEGER},
-      status = #{status,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      order_data = #{orderData,jdbcType=LONGVARCHAR}
+    set member_card = #{memberCard,jdbcType=VARCHAR},
+        order_no = #{orderNo,jdbcType=VARCHAR},
+        creator_no = #{creatorNo,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        updator_no = #{updatorNo,jdbcType=VARCHAR},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        error_code = #{errorCode,jdbcType=VARCHAR},
+        status = #{status,jdbcType=INTEGER},
+        order_data = #{orderData,jdbcType=LONGVARCHAR},
+        error_msg = #{errorMsg,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle" >
     update member_order_sign_handle
-    set memberCardNo = #{membercardno,jdbcType=INTEGER},
-      orderNo = #{orderno,jdbcType=INTEGER},
-      status = #{status,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+    set member_card = #{memberCard,jdbcType=VARCHAR},
+        order_no = #{orderNo,jdbcType=VARCHAR},
+        creator_no = #{creatorNo,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        updator_no = #{updatorNo,jdbcType=VARCHAR},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        error_code = #{errorCode,jdbcType=VARCHAR},
+        status = #{status,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <update id="updateSuccessStatusByPrimaryKey" parameterType="cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle">
+    update member_order_sign_handle
+    <set>
+        `status` = #{status,jdbcType=INTEGER},
+        `updator_no`='SYSTEM',
+        `update_time` = NOW(),
+        `error_code` = null,
+        `error_msg` = null,
+        <if test="memberCard != null" >
+          member_card = #{memberCard,jdbcType=VARCHAR},
+        </if>
+        <if test="orderNo != null" >
+          order_no = #{orderNo,jdbcType=VARCHAR},
+        </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- -->
+  <select id="getFailRecordListCount" resultType="java.lang.Integer">
+    SELECT count(1) FROM `member_order_sign_handle` where `status` = 2
+  </select>
+
+  <select id="getFailRecordList" resultMap="ResultMapWithBLOBs">
+    select
+        <include refid="Base_Column_List" />,
+        <include refid="Blob_Column_List" />
+    from `member_order_sign_handle`
+    where `status` = 2
+    limit #{fromLine},#{pageSize}
+  </select>
+
+
 </mapper>

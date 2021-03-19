@@ -124,7 +124,8 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
         if(insert<1){
             return  ComResponse.fail(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(),ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getMessage());
         }
-        return ComResponse.success(insert);
+        //成功时，返回综合行为的id
+        return ComResponse.success(memberActionRelationDto.getDid());
     }
 
 

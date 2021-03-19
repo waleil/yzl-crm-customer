@@ -1,13 +1,12 @@
 spring:
   cloud:
     nacos:
+      server-addr: 192.168.32.33:8848,192.168.32.34:8848,192.168.32.35:8848  #.169:8848
       discovery:
-        server-addr: 192.168.32.33:8848,192.168.32.34:8848,192.168.32.35:8848  #.169:8848
         username: apigateway
         password: apigateway
         namespace: a97dae2d-5fcd-4dc3-bfa1-5f7b9b1dfd5a
       config:
-        server-addr: 192.168.32.33:8848,192.168.32.34:8848,192.168.32.35:8848
         username: crm
         password: crm123456!
         namespace: a73b51f6-bde9-4226-9a36-dc07ec1a2a30

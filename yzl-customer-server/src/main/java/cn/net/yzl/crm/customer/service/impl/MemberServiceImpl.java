@@ -11,6 +11,7 @@ import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.common.util.DateHelper;
 import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
@@ -41,6 +42,7 @@ import cn.net.yzl.crm.customer.utils.CacheKeyUtil;
 import cn.net.yzl.crm.customer.utils.CentYuanConvertUtil;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.crm.customer.utils.RedisUtil;
+import cn.net.yzl.crm.customer.utils.date.DealDateUtil;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import cn.net.yzl.crm.customer.vo.*;
 import cn.net.yzl.crm.customer.vo.address.ReveiverAddressInsertVO;
@@ -932,6 +934,8 @@ public class MemberServiceImpl implements MemberService {
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
 
+                    addVo.setUnit(ProductMainDTO.getUnit());//商品的计量单位
+
                     //默认保存商品信息里面的用量信息
                     addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
@@ -943,6 +947,11 @@ public class MemberServiceImpl implements MemberService {
                     upVo.setProductName(ProductMainDTO.getName());//商品名称
                     upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
                     upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
+
+                    //当商品的计量单位为空的时候，重新设置
+                    if (StringUtils.isEmpty(upVo.getUnit())) {
+                        upVo.setUnit(ProductMainDTO.getUnit());//商品的计量单位
+                    }
 
                     //默认保存商品信息里面的用量信息
                     /*if (dto.getOneToTimes() == null) {
@@ -1255,14 +1264,18 @@ public class MemberServiceImpl implements MemberService {
     //@Transactional
     public boolean updateMemberGrandValidityInit() throws IOException {//MemberSysParamDetailResponse
         //获取DMC的会员到期时间
-        String validDate = ActivityClientAPI.getMemberGradeValidDate();
-        if ("0".equals(validDate)) {
+        //String validDate = ActivityClientAPI.getMemberGradeValidDate();
+        MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
+        if (validDateObj.getIsAlways() == null || validDateObj.getIsAlways()) {
             log.info("updateMemberGrandValidityInit:会员有效期类型为长期有效！");
             return true;
         }
-        String today= DateUtil.today();
-        if (!today.equals(validDate)) {
-            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",today,validDate);
+        Date todayStart = DealDateUtil.getStart(new Date());
+
+        Date yearValidDate = validDateObj.getCurrentYearValidDate();
+        long between = DateUtil.between(todayStart,yearValidDate, DateUnit.DAY, false);
+        if (between != 0) {
+            log.info("updateMemberGrandValidityInit:会员未到期!当前时间为：{}，DMC会员到期时间为：{}！",todayStart,yearValidDate);
             return true;
         }
 

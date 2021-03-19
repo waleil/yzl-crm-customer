@@ -1,7 +1,11 @@
 package cn.net.yzl.crm.customer.dao;
 
 
+import cn.net.yzl.crm.customer.dto.PageDTO;
 import cn.net.yzl.crm.customer.model.db.MemberOrderSignHandle;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface MemberOrderSignHandleMapper {
     int deleteByPrimaryKey(Integer id);
@@ -17,4 +21,18 @@ public interface MemberOrderSignHandleMapper {
     int updateByPrimaryKeyWithBLOBs(MemberOrderSignHandle record);
 
     int updateByPrimaryKey(MemberOrderSignHandle record);
+
+    /**
+     * 更新处理成功的消息
+     * wangzhe
+     * 2021-03-18
+     * @param record
+     * @return
+     */
+    Integer updateSuccessStatusByPrimaryKey(MemberOrderSignHandle record);
+
+    Integer getFailRecordListCount();
+
+
+    List<MemberOrderSignHandle> getFailRecordList(PageDTO page);
 }

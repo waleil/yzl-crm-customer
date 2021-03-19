@@ -58,6 +58,9 @@ public class MemberProductEffectUpdateVO implements Serializable {
     @ApiModelProperty(value = "购买商品数量",name="productCount",required = false,hidden = true)
     private Integer productCount;
 
+    @ApiModelProperty(value = "计量单位",name="unit",required = false)
+    private String unit;
+
 
 
 
