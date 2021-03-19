@@ -26,10 +26,10 @@ public interface MemberOrderSignHandleMapper {
      * 更新处理成功的消息
      * wangzhe
      * 2021-03-18
-     * @param primaryKey
+     * @param record
      * @return
      */
-    Integer updateSuccessStatusByPrimaryKey(@Param("primaryKey") Integer primaryKey);
+    Integer updateSuccessStatusByPrimaryKey(MemberOrderSignHandle record);
 
     Integer getFailRecordListCount();
 
