@@ -90,4 +90,26 @@ public class MemberOrderSignHandleServiceImpl implements MemberOrderSignHandleSe
 
         return page.toPage(list,totalCount);
     }
+
+
+
+    @Override
+    public Integer updateByPrimaryKeySelective(MemberOrderSignHandle signHandle) {
+        if (signHandle == null) {
+            throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "主键不能为空!");
+        }
+        //通过id查询记录，判断记录是否存在
+        MemberOrderSignHandle memberOrderSignHandle = memberOrderSignHandleMapper.selectByPrimaryKey(signHandle.getId());
+        if (memberOrderSignHandle == null) {
+            throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "记录不存在!");
+        }
+        /*if (memberOrderSignHandle.getStatus() == 1) {
+            throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "记录已经处理成功,不允许修改!");
+        }*/
+        int result = memberOrderSignHandleMapper.updateByPrimaryKeySelective(signHandle);
+        if (result < 0) {
+            throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "记录修改失败!");
+        }
+        return result;
+    }
 }

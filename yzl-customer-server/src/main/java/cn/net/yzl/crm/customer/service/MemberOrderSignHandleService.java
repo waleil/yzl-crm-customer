@@ -28,4 +28,13 @@ public interface MemberOrderSignHandleService {
      */
 
     Page<MemberOrderSignHandle> getFailRecordList(PageDTO page);
+
+    /**
+     * 根据记录主键更细数据
+     * wangzhe
+     * 2021-03-19
+     * @param signHandle
+     * @return
+     */
+    public Integer updateByPrimaryKeySelective(MemberOrderSignHandle signHandle);
 }

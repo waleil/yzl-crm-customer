@@ -10,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/member/memberAddress")
@@ -43,6 +40,13 @@ public class MemberOrderSignHandleController {
         }
         Page<MemberOrderSignHandle> pageList = memberOrderSignHandleService.getFailRecordList(page);
         return ComResponse.success(pageList);
+    }
+
+    @ApiOperation(value = "订单签收后推送消息-修改订单签收失败消息记录", notes = "订单签收后推送消息-获取处理失败的消息列表")
+    @RequestMapping(value = "v1/updateSignHandleRecord", method = RequestMethod.POST)
+    public ComResponse<Boolean>  updateByPrimaryKeySelective(@RequestBody  MemberOrderSignHandle signHandle) throws IllegalAccessException {
+        memberOrderSignHandleService.updateByPrimaryKeySelective(signHandle);
+        return ComResponse.success(Boolean.TRUE);
     }
 
 
