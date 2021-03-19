@@ -132,6 +132,9 @@ public class MemberProductEffect {
 
 
 
+    @ApiModelProperty(value = "计量单位",name="unit",required = false)
+    private String unit;
+
 
 
 
@@ -461,5 +464,13 @@ public class MemberProductEffect {
 
     public void setUpateTime(Date upateTime) {
         this.upateTime = upateTime;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }
