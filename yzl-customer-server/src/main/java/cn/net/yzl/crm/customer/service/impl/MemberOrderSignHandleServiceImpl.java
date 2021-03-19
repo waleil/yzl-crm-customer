@@ -142,9 +142,9 @@ public class MemberOrderSignHandleServiceImpl implements MemberOrderSignHandleSe
         if (memberOrderSignHandle == null) {
             throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "记录不存在!");
         }
-        /*if (memberOrderSignHandle.getStatus() == 1) {
+        if (memberOrderSignHandle.getStatus() == 1) {
             throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "记录已经处理成功,不允许修改!");
-        }*/
+        }
         int result = memberOrderSignHandleMapper.updateByPrimaryKeyWithBLOBs(signHandle);
         if (result < 0) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
