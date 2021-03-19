@@ -938,6 +938,8 @@ public class MemberServiceImpl implements MemberService {
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
 
+                    addVo.setUnit(ProductMainDTO.getUnit());//商品的计量单位
+
                     //默认保存商品信息里面的用量信息
                     addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
@@ -949,6 +951,11 @@ public class MemberServiceImpl implements MemberService {
                     upVo.setProductName(ProductMainDTO.getName());//商品名称
                     upVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
                     upVo.setProductCount(dto.getProductCount() + productVO.getProductCount());//购买商品数量
+
+                    //当商品的计量单位为空的时候，重新设置
+                    if (StringUtils.isEmpty(upVo.getUnit())) {
+                        upVo.setUnit(ProductMainDTO.getUnit());//商品的计量单位
+                    }
 
                     //默认保存商品信息里面的用量信息
                     /*if (dto.getOneToTimes() == null) {

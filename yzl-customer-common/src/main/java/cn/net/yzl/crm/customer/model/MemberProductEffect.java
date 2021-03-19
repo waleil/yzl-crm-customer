@@ -51,6 +51,9 @@ public class MemberProductEffect {
     @ApiModelProperty("购买商品数量")
     private Integer product_count;
 
+    @ApiModelProperty(value = "计量单位",name="unit",required = false)
+    private String unit;
+
 
 
 }

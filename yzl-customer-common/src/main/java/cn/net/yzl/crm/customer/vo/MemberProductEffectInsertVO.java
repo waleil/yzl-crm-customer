@@ -55,6 +55,9 @@ public class MemberProductEffectInsertVO implements Serializable {
     @ApiModelProperty(value = "商品关联的最后一次签收订单编号",name="orderNo",required = true)
     private String orderNo;
 
+    @ApiModelProperty(value = "计量单位",name="unit",required = false)
+    private String unit;
+
 
 
 
