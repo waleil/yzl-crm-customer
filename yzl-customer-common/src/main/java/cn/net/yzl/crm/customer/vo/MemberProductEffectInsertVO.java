@@ -25,7 +25,7 @@ public class MemberProductEffectInsertVO implements Serializable {
     @ApiModelProperty(value = "服用效果",name="takingEffect",required = true)
     private Integer takingEffect;
 
-    @ApiModelProperty(value = "服用状态",name="takingState",required = true)
+    @ApiModelProperty(value = "服用状态: 1 正常，2 非常好，3已停服",name="takingState",required = true)
     private Integer takingState;
 
     @ApiModelProperty(value = "每天吃几次",name="oneToTimes",required = true)
