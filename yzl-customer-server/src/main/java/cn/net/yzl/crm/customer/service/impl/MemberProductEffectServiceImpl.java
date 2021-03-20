@@ -322,7 +322,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
                     }
                 }
             }
-            //更新已经停复的商品的服用完日期
+            //更新已经停服的商品的服用完日期
             if (CollectionUtil.isNotEmpty(stoptakingIdList)) {
                 Integer count = memberProductEffectMapper.updateMemberProductDueDateByPrimaryKeys(stoptakingIdList);
                 log.info("update member product stop taking due date: record count:{}",count);

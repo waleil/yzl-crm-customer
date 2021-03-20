@@ -870,6 +870,8 @@ public class MemberServiceImpl implements MemberService {
         List<OrderProductVO> buyProductList = orderInfo4MqVo.getProductList();//订单购买的商品
         StringBuilder buyProductCodes = new StringBuilder();
         String codes = "";
+        //去重后的商品编号
+        Set<String> codeSet = new HashSet<>();
         //之前没有购买过的商品
         List<MemberProductEffectInsertVO> addProductVoList = new ArrayList<>();
         List<MemberProductEffectUpdateVO> updateProductVoList = new ArrayList<>();
@@ -877,6 +879,7 @@ public class MemberServiceImpl implements MemberService {
         if (CollectionUtil.isNotEmpty(buyProductList)) {
             for (OrderProductVO productVO : buyProductList) {
                 buyProductCodes.append(productVO.getProductCode()).append(",");
+                codeSet.add(productVO.getProductCode());
             }
             if (buyProductCodes.length() > 0) {
                 codes = buyProductCodes.substring(0, buyProductCodes.length() - 1);
@@ -886,6 +889,9 @@ public class MemberServiceImpl implements MemberService {
 
             //通过商品编号，获取商品信息
             List<ProductMainDTO> productList = ProductClientAPI.queryByProductCodes(codes.split(","));
+            if (codeSet.size() != productList.size()) {
+                return ComResponse.fail(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "包含不存在的商品!");
+            }
             if (CollectionUtil.isNotEmpty(productList)) {
                 for (ProductMainDTO mainDTO : productList) {
                     productMap.put(mainDTO.getProductCode(), mainDTO);
@@ -935,11 +941,18 @@ public class MemberServiceImpl implements MemberService {
                     addVo.setOrderNo(orderInfo4MqVo.getOrderNo());//商品关联的最后一次签收订单编号
 
                     addVo.setUnit(ProductMainDTO.getUnit());//商品的计量单位
+                    //首次添加的商品的默认的商品的服用状态为正常服用 by wangzhe 20210320
+                    addVo.setTakingState(1);
 
                     //默认保存商品信息里面的用量信息
                     addVo.setOneToTimes(ProductMainDTO.getOneToTimes());
                     addVo.setOneUseNum(ProductMainDTO.getOneUseNum());
                 }else if (upVo != null){
+                    //已经存在的记录，如果服用状态为空或商品的剩余量为0，则需要更新商品的服用状态为正常服用 by wangzhe 20210320
+                    if (dto.getTakingState() == null || dto.getProductLastNum() == 0) {
+                        dto.setTakingState(1);
+                    }
+
                     if (StringUtils.isNotEmpty(totalUseNum)) {
                         upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
                     }
@@ -1042,7 +1055,7 @@ public class MemberServiceImpl implements MemberService {
         //最后一次订单的签收时间
         memberOrderStat.setLastSignTime(orderInfo4MqVo.getSignTime());
 
-        //memberOrderStat.setYearAvgCount();//年度平均购买天数 TODO 暂时不处理
+        //memberOrderStat.setYearAvgCount();//年度平均购买天数 由订单的定时器对每天有更新操作的订单进行T+1扫描，不在这里处理
         int result = memberOrderStatMapper.updateByPrimaryKeySelective(memberOrderStat);
         if (result < 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -1060,7 +1073,7 @@ public class MemberServiceImpl implements MemberService {
         if (member.getFirst_order_am() == null || member.getFirst_order_am().intValue() == 0) {
             member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
         }
-        //顾客的会员标识不是会员的时要设置会员标识
+        //顾客的会员标识不是会员的时要设置会员标识(这个标识在第一次订单签收的时候更新为1，之后不会再改变，即有第一次订单签收操作就更新为1)
         if (!member.isVip_flag()) {
             memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
         }
@@ -1091,14 +1104,18 @@ public class MemberServiceImpl implements MemberService {
             vo.setOrderNo(orderInfo4MqVo.getOrderNo());
             vo.setMemberCard(memberCard);
             vo.setDiscountMoney(orderInfo4MqVo.getCash1());//预存金额 分为单位
-            vo.setObtainType(3);
+            vo.setObtainType(3);//3:充值
             vo.setRemark("订单签收时,预存金额");
-            ComResponse<String> response = memberAmountService.operation(vo);
+            ComResponse<String> response = null;
+            try {
+                response = memberAmountService.operation(vo);
+            } catch (Exception e) {
+                log.error("订单:{}签收时,预存金额操作异常,",orderInfo4MqVo.getOrderNo(),e);
+            }
             if (response == null || response.getCode() != 200) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ComResponse.fail(response.getCode(),response.getMessage());
             }
-
         }
 
         //设置缓存
