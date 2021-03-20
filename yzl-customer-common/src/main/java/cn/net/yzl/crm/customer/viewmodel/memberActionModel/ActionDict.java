@@ -31,5 +31,8 @@ public class ActionDict implements Serializable {
     @ApiModelProperty("值2")
     private String value2;
 
+    @ApiModelProperty(value = "删除标识",hidden = true)
+    private Integer delFlag;
+
 
 }
