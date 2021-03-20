@@ -109,7 +109,8 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
                 actionId = actionDict.getId();
             }else{
                 //有着直接使用
-                actionId = actionDicts.get(0).getId();
+                //actionId = actionDicts.get(0).getId();
+                return  ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"行为字典已经存在,不能重复添加!");
             }
             memberActionRelationDto.setDid(actionId);
         }
