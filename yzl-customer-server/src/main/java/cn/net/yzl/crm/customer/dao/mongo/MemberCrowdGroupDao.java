@@ -70,9 +70,9 @@ public class MemberCrowdGroupDao extends MongoBaseDao<member_crowd_group> {
         }
         criteria.and("del").is(false);//没有被删除的
         query.addCriteria(criteria);
-        //圈选规则按优先级排序,更新时间降序
+        //圈选规则按优先级排序,创建时间升序
         query.with(Sort.by(Sort.Direction.ASC, "seq"));
-        query.with(Sort.by(Sort.Direction.DESC,"update_time"));
+        query.with(Sort.by(Sort.Direction.DESC,"create_time"));
 
         return mongoTemplate.find(query,member_crowd_group.class);
     }

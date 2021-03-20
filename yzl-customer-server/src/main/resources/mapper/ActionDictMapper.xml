@@ -8,6 +8,12 @@
     <result column="value" jdbcType="VARCHAR" property="value" />
     <result column="value2" jdbcType="VARCHAR" property="value2" />
   </resultMap>
+
+  <resultMap id="BaseResultMapWithDelFlag" type="cn.net.yzl.crm.customer.viewmodel.memberActionModel.ActionDict" extends="BaseResultMap" >
+    <result column="del_flag" property="delFlag" jdbcType="INTEGER" />
+  </resultMap>
+
+
   <sql id="Base_Column_List">
     id, `name`, `type`, `value`, value2
   </sql>
@@ -26,11 +32,12 @@
         where type = #{type,jdbcType=INTEGER}  and del_flag=0
   </select>
 
-  <select id="selectByTypeAndName"  resultMap="BaseResultMap">
+  <select id="selectByTypeAndName"  resultMap="BaseResultMapWithDelFlag">
     select
-    <include refid="Base_Column_List" />
+      <include refid="Base_Column_List" />,
+      del_flag
     from action_dict
-    where type = #{type,jdbcType=INTEGER} and name=#{name,jdbcType=VARCHAR}  and del_flag=0
+    where type = #{type,jdbcType=INTEGER} and name=#{name,jdbcType=VARCHAR}  and del_flag in (0,2)
   </select>
 
   <update id="deleteByPrimaryKey" >

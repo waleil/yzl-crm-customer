@@ -108,9 +108,13 @@ public class MemberActionRelationServiceImpl implements MemberActionRelationServ
                 actionDictMapper.insertSelective(actionDict);
                 actionId = actionDict.getId();
             }else{
-                //有着直接使用
-                //actionId = actionDicts.get(0).getId();
-                return  ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"行为字典已经存在,不能重复添加!");
+                ActionDict actionDict = actionDicts.get(0);
+                Integer delFlag = actionDict.getDelFlag();
+                if (delFlag != null && delFlag == 0) {
+                    return  ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"行为字典已经存在,不能重复添加!");
+                }
+                //待同步的行为字典，直接使用
+                actionId = actionDict.getId();
             }
             memberActionRelationDto.setDid(actionId);
         }
