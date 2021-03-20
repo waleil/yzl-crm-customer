@@ -950,7 +950,7 @@ public class MemberServiceImpl implements MemberService {
                 }else if (upVo != null){
                     //已经存在的记录，如果服用状态为空或商品的剩余量为0，则需要更新商品的服用状态为正常服用 by wangzhe 20210320
                     if (dto.getTakingState() == null || dto.getProductLastNum() == 0) {
-                        dto.setTakingState(1);
+                        upVo.setTakingState(1);
                     }
 
                     if (StringUtils.isNotEmpty(totalUseNum)) {

@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.vo.work;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
@@ -17,7 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 工单表
  */
 @Data
-@Document(collection = "work_order")
+@ApiModel(value = "WorkOrderBeanVO",description = "保存转介绍用户的工单对象")
 public class WorkOrderBeanVO implements Serializable {
 
     @Id
