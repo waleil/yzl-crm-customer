@@ -14,6 +14,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -47,8 +48,9 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 		String exMsg = "";
 		try {
 			error.setCreatorNo("SYSTEM");
-			error.setUpdatorNo("SYSTEM");
+			//error.setUpdatorNo("SYSTEM");
 			error.setCreateTime(new Date());
+
 			if (message.getBody() != null) {
 				//error.setOrderData(StringEscapeUtils.unescapeJavaScript(new String(message.getBody())));
 				error.setOrderData(JSON.toJSONString(new String(message.getBody())));
@@ -60,6 +62,15 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 			error.setOrderNo(order.getOrderNo());
 			error.setOrderData(JSON.toJSONString(order));
 
+			try {
+				//先保存记录，后面操作成功后更新状态为1，处理失败更新状态为2
+				error.setStatus(0);
+				ComResponse<Boolean> res = memberOrderSignHandleService.saveDealErrorOrderData(error);
+			} catch (Exception e) {
+				log.error("处理消息,保存记录失败,订单号为:{}",order.getOrderNo());
+			}
+
+			//处理订单签收后的消息
 			response = memberService.orderSignUpdateMemberData(order);
 			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);// 正常消费后，手动确认消息
 			if (response.getCode() == 200) {
@@ -86,10 +97,10 @@ public class OrderRabbitListener implements ChannelAwareMessageListener {
 					error.setErrorMsg(response.getMessage());
 				}
 			}
-			if (error != null) {
-				ComResponse<Boolean> saveResult = memberOrderSignHandleService.saveDealErrorOrderData(error);
-				if (saveResult.getCode() != 200) {
-					log.error("onMessage:订单签收时处理消息失败且保存失败记录失败!"+ JSON.toJSONString(order));
+			if (error != null && error.getId() != null) {
+				Integer result = memberOrderSignHandleService.updateUnCheckByPrimaryKeySelective(error);
+				if (result < 1) {
+					log.error("onMessage:订单签收时更新消息记录失败!"+ JSON.toJSONString(order));
 				}
 			}
 		}

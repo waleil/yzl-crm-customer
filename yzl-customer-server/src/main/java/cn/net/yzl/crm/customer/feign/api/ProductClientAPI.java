@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -54,11 +55,17 @@ public class ProductClientAPI {
         List<ProductMainDTO> data = null;
         try {
             ComResponse<List<ProductMainDTO> > response = productClientAPI.productFien.queryByProductCodes(codes);
-            if (response != null && response.getCode() == 200) {
+            if (response.getCode() == 503) {
+                log.error("商品服务不可用:queryByProductCodes");
+            }
+            else if (response.getCode() != null && response.getCode() == 200) {
                 data = response.getData();
             }
         }catch (Exception e){
             log.error(e.getMessage(),e);
+        }
+        if (CollectionUtil.isEmpty(data)) {
+            data = Collections.emptyList();
         }
         return data;
     }
