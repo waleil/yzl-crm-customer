@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @ApiModel("顾客订单统计")
 @Data
@@ -19,12 +20,12 @@ public class MemberOrderStat {
 
 
     @ApiModelProperty("首单下单时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private String first_order_time;
+   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date first_order_time;
 
     @ApiModelProperty("最后一次下单时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private String last_order_time;
+    private Date last_order_time;
 
     @ApiModelProperty("最后一次购买商品")
     private String last_buy_product_code;
