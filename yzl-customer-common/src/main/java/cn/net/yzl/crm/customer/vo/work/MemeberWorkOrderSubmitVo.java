@@ -3,12 +3,14 @@ package cn.net.yzl.crm.customer.vo.work;
 import cn.net.yzl.crm.customer.model.MemberDisease;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectUpdateVO;
 import cn.net.yzl.crm.customer.vo.ProductConsultationInsertVO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -32,6 +34,10 @@ public class MemeberWorkOrderSubmitVo {
     @NotNull(message = "年龄不能为空")
     @ApiModelProperty(value = "年龄",required = true)
     private Integer age;
+
+    @ApiModelProperty(value = "会员生日")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date birthday;
 
     @NotBlank(message = "手机号不能为空")
     @ApiModelProperty(value = "手机号",required = true)

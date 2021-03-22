@@ -1567,6 +1567,7 @@ public class MemberServiceImpl implements MemberService {
         member.setMember_name(vo.getMemberName());//会员名称
         member.setSex(vo.getSex());//性别
         member.setAge(vo.getAge());//年龄
+        member.setBirthday(vo.getBirthday());
 
         member.setEmail(vo.getEmail());
         member.setQq(vo.getQq());
