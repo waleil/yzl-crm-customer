@@ -152,4 +152,24 @@ public class MemberOrderSignHandleServiceImpl implements MemberOrderSignHandleSe
         }
         return result;
     }
+
+    /**
+     * 更新消息记录
+     * wangzhe
+     * 202-03-19
+     * @param signHandle
+     * @return
+     */
+    @Override
+    public Integer updateUnCheckByPrimaryKeySelective(MemberOrderSignHandle signHandle) {
+        if (signHandle == null) {
+            throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "主键不能为空!");
+        }
+        int result = memberOrderSignHandleMapper.updateByPrimaryKeyWithBLOBs(signHandle);
+        if (result < 0) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BizException(ResponseCodeEnums.BIZ_ERROR_CODE.getCode(), "记录修改失败!");
+        }
+        return result;
+    }
 }

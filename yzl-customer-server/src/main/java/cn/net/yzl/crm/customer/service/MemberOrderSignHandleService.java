@@ -37,4 +37,13 @@ public interface MemberOrderSignHandleService {
      * @return
      */
     public Integer updateByPrimaryKeySelective(MemberOrderSignHandle signHandle);
+
+    /**
+     * 根据记录主键更细数据(不校验记录是否存在和状态)
+     * wangzhe
+     * 2021-03-19
+     * @param signHandle
+     * @return
+     */
+    public Integer updateUnCheckByPrimaryKeySelective(MemberOrderSignHandle signHandle);
 }

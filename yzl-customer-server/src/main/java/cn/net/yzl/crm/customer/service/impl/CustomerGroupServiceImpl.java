@@ -248,6 +248,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
         String groupId = "";
         String groupName = "";
 
+        //明天的yyyyMMdd
         Long version = Long.parseLong(DateUtil.format(DateUtil.tomorrow(),DATE_FORMAT_YYYYMMDD));
         try {
             for (member_crowd_group memberCrowdGroup : list) {
