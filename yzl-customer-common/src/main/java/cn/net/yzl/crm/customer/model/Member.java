@@ -65,7 +65,7 @@ public class Member {
     @ApiModelProperty(value = "累计消费金额")
     private Integer total_amount;
     @ApiModelProperty(value = "qq")
-    private Integer qq;
+    private String qq;
     @ApiModelProperty(value = "微信")
     private String wechat;
     @ApiModelProperty(value = "邮箱")
