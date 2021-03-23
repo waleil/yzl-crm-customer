@@ -205,6 +205,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                 memberAmountDetail.setMemberCard(memberCard);
                 memberAmountDetail.setRemark(memberAmountDetailVO.getRemark());
                 memberAmountDetail.setCreateDate(now);
+                memberAmountDetail.setStartDate(now);//记录开始时间
                 memberAmountDetail.setObtainType((byte)obtainType);
                 memberAmountDetail.setOrderNo(orderNo);
                 memberAmountDetail.setDiscountMoney(memberAmountDetailVO.getDiscountMoney());//金额
@@ -218,6 +219,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                     if (consumeDetail!= null) {
                         isAdd = false;
                         consumeDetail.setStatus((byte)2);//作废
+                        consumeDetail.setEndDate(now);//作废时间
 
                         String remark = consumeDetail.getRemark();
                         if (StringUtil.isEmpty(remark)) {
@@ -240,6 +242,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                     else{
                         isAdd = true;
                         memberAmountDetail.setStatus((byte) 1);
+                        memberAmountDetail.setEndDate(now);//退回完成时间
                         //直接增加账户余额
                         memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + discountMoney);
                     }
@@ -255,6 +258,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
                 else if (obtainType == 3) {
                     isAdd = true;
                     memberAmountDetail.setStatus((byte) 1);//直接完成
+                    memberAmountDetail.setEndDate(now);//充值完成时间
                     memberAmount.setTotalMoney(memberAmountDto.getTotalMoney() + discountMoney);
 
                     //计算累计充值金额
@@ -384,6 +388,7 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             }
 
             consumeDetail.setStatus((byte)1);
+            consumeDetail.setEndDate(new Date());//确认消费完成时间
             result = memberAmountDao.updateConsumeDetailStatus(consumeDetail);
             if (result < 1) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

@@ -171,9 +171,14 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateConsumeDetailStatus" parameterType="cn.net.yzl.crm.customer.model.MemberAmountDetail">
-    UPDATE `member_amount_detail` SET
+    UPDATE `member_amount_detail`
+    <set>
       `status` = #{consumeDetail.status},
-      `remark` = #{consumeDetail.remark}
+      `remark` = #{consumeDetail.remark},
+      <if test="consumeDetail.endDate != null">
+        end_date = #{consumeDetail.endDate},
+      </if>
+    </set>
     where `id` =#{consumeDetail.id}
   </update>
 </mapper>
