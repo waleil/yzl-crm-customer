@@ -25,7 +25,7 @@
         <result column="area_code" property="area_code" jdbcType="INTEGER"/>
         <result column="area_name" property="area_name" jdbcType="VARCHAR"/>
         <result column="total_amount" property="total_amount" jdbcType="INTEGER"/>
-        <result column="qq" property="qq" jdbcType="INTEGER"/>
+        <result column="qq" property="qq" jdbcType="VARCHAR"/>
         <result column="wechat" property="wechat" jdbcType="VARCHAR"/>
         <result column="email" property="email" jdbcType="VARCHAR"/>
         <result column="source" property="source" jdbcType="INTEGER"/>
@@ -383,7 +383,7 @@
                 #{total_amount,jdbcType=INTEGER},
             </if>
             <if test="qq != null">
-                #{qq,jdbcType=INTEGER},
+                #{qq,jdbcType=VARCHAR},
             </if>
             <if test="wechat != null">
                 #{wechat,jdbcType=VARCHAR},
@@ -579,7 +579,7 @@
                 total_amount = #{total_amount,jdbcType=INTEGER},
             </if>
             <if test="qq != null">
-                qq = #{qq,jdbcType=INTEGER},
+                qq = #{qq,jdbcType=VARCHAR},
             </if>
             <if test="wechat != null">
                 wechat = #{wechat,jdbcType=VARCHAR},
@@ -705,7 +705,7 @@
       area_code = #{area_code,jdbcType=INTEGER},
       area_name = #{area_name,jdbcType=VARCHAR},
       total_amount = #{total_amount,jdbcType=INTEGER},
-      qq = #{qq,jdbcType=INTEGER},
+      qq = #{qq,jdbcType=VARCHAR},
       wechat = #{wechat,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},
       source = #{source,jdbcType=INTEGER},

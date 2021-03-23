@@ -50,7 +50,7 @@ public class MemeberWorkOrderSubmitVo {
     private String email;
 
     @ApiModelProperty(value = "qq")
-    private Integer qq;
+    private String qq;
 
     @ApiModelProperty(value = "微信")
     private String wechat;
