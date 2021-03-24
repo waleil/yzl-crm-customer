@@ -64,7 +64,7 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
             phoneType = 2;
         }
         if (phoneType == 0) {
-            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号格式不正确!");
+            return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码格式不正确!");
         }
         /**
          * 2.查询member_phone中电话号码是否存在
