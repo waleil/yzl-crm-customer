@@ -220,17 +220,17 @@ public class MemberServiceImpl implements MemberService {
             }
             if (phoneType == 0) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话:"+memberPhone.getPhone_number()+"格式不正确!");
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号码:"+memberPhone.getPhone_number()+"格式不正确!");
             }
             //获取入参的点火类型
             Integer phone_type = memberPhone.getPhone_type();
             if (phone_type != null && phoneType != phone_type.intValue()) {
                 if (phone_type.intValue() == 1) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "手机号:"+memberPhone.getPhone_number()+"格式不正确!");
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "手机号码:"+memberPhone.getPhone_number()+"格式不正确!");
                 }else{
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号:"+memberPhone.getPhone_number()+"格式不正确!");
+                    throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "电话号码:"+memberPhone.getPhone_number()+"格式不正确!");
                 }
             }
 
@@ -242,7 +242,7 @@ public class MemberServiceImpl implements MemberService {
             result = phoneMapper.insert(memberPhone);
             if (result < 1) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员电话"+memberPhone.getPhone_number()+"失败!");
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "保存会员电话号码"+memberPhone.getPhone_number()+"失败!");
             }
         }
 
@@ -1474,14 +1474,16 @@ public class MemberServiceImpl implements MemberService {
         int result;
         String noZeroNumber = "";
         String haveZeroNumber = "";
+        String errStr = "";
         //手机号
-        if (vo.getMemberPhone() != null) {
+        if (StringUtils.isNotEmpty(vo.getMemberPhone())) {
             phoneMapList.put(1,vo.getMemberPhone());
         }
         //座机号
         if (StringUtils.isNotEmpty(vo.getFixedPhoneNum())) {
             phoneMapList.put(2,vo.getFixedPhoneNum());
         }
+
         if (CollectionUtil.isNotEmpty(phoneMapList)) {
             //查询顾客电话信息
             List<MemberPhone> memberPhoneList = phoneMapper.getMemberPhoneByMemberCard(vo.getMemberCard());
@@ -1505,20 +1507,21 @@ public class MemberServiceImpl implements MemberService {
                 if (phoneType == 0 && memberPhoneService.isPhone(phoneNumber)){
                     phoneType = 2;
                 }
+                if (type.intValue() == 1){
+                    errStr = "手机号码";
+                }else {
+                    errStr = "座机号码";
+                }
+
                 if (phoneType != type.intValue()) {
-                    if (type.intValue() == 1) {
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"手机号码格式不正确!",false);
-                    }else{
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"座机号码格式不正确!",false);
-                    }
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),errStr + "格式不正确!",false);
                 }
 
                 String memberCard= phoneMapper.getMemberCardByPhoneNumber(Arrays.asList(haveZeroNumber,noZeroNumber));
                 if (StringUtils.isNotEmpty(memberCard) && !memberCard.equals(vo.getMemberCard())) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"电话号码已经被使用!",false);
+                    return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),errStr + "已经被使用!",false);
                 }
                 MemberPhone memberPhone = new MemberPhone();
                 if (CollectionUtil.isNotEmpty(memberPhoneList)) {
@@ -1546,7 +1549,7 @@ public class MemberServiceImpl implements MemberService {
                     result = phoneMapper.insertSelective(memberPhone);
                     if (result < 1) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"保存电话号:"+phoneNumber+"失败!",false);
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"保存" + errStr + ":"+phoneNumber+"失败!",false);
                     }
                 } else{
                     //更新记录
@@ -1555,7 +1558,7 @@ public class MemberServiceImpl implements MemberService {
                     result = phoneMapper.updateByPrimaryKeySelective(memberPhone);
                     if (result < 1) {
                         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"修改电话号:"+phoneNumber+"失败!",false);
+                        return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"修改 + errStr + :"+phoneNumber+"失败!",false);
                     }
                 }
             }
