@@ -65,15 +65,15 @@ public class MemeberWorkOrderSubmitVo {
     @ApiModelProperty(value = "所属省份名称")
     private String provinceName;
 
-//    @ApiModelProperty(value = "所属城市id")
-//    private Integer cityCode;
-//    @ApiModelProperty(value = "所属城市名称")
-//    private String cityName;
-//
-//    @ApiModelProperty(value = "所属区域编号")
-//    private Integer areaCode;
-//    @ApiModelProperty(value = "所属区域")
-//    private String areaName;
+    @ApiModelProperty(value = "所属城市id")
+    private Integer cityCode;
+    @ApiModelProperty(value = "所属城市名称")
+    private String cityName;
+
+    @ApiModelProperty(value = "所属区域编号")
+    private Integer areaCode;
+    @ApiModelProperty(value = "所属区域")
+    private String areaName;
 
     @ApiModelProperty(value = "联系地址")
     private String address;

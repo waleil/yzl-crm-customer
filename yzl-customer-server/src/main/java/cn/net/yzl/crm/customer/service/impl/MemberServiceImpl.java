@@ -1581,11 +1581,18 @@ public class MemberServiceImpl implements MemberService {
 
         member.setProvince_code(vo.getProvinceCode());
         member.setProvince_name(vo.getProvinceName());
-
-        member.setCity_code(/*vo.getCityCode()*/-9999);
-        member.setCity_name(/*vo.getCityName()*/"");
-        member.setArea_code(/*vo.getAreaCode()*/-9999);
-        member.setArea_name(/*vo.getAreaName()*/"");
+        if(vo.getCityCode()!=null){
+            member.setCity_code(vo.getCityCode());
+        }else{
+            member.setCity_code(-9999);
+        }
+        member.setCity_name(vo.getCityName());
+        if(vo.getAreaCode()!=null){
+            member.setArea_code(vo.getAreaCode());
+        }else{
+            member.setArea_code(-9999);
+        }
+        member.setArea_name(vo.getAreaName());
         member.setUpdator_no(vo.getStaffNo());
         member.setUpdator_name(vo.getStaffName());//修改人
         member.setUpdate_time(new Date());
