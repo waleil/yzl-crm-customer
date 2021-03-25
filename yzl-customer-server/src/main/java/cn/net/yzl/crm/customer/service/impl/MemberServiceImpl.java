@@ -380,11 +380,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(String memberCard) {
-        List<MemberDiseaseCustomerDto> list = memberMapper.getMemberDiseaseDtoByMemberCard(memberCard);
-        if(list==null || list.size()<1){
+        List<MemberDiseaseCustomerDto> memberDiseaseCustomerDtoList = memberMapper.getMemberDiseaseDtoByMemberCard(memberCard);
+        if(CollectionUtils.isEmpty(memberDiseaseCustomerDtoList)){
             return ComResponse.nodata();
         }
-        return ComResponse.success(list);
+        return ComResponse.success(memberDiseaseCustomerDtoList);
     }
 
 //    @Override
