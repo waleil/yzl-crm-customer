@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -58,11 +59,16 @@ public class OrderClientAPI {
                                                            @RequestParam(required = false, value = "endDate") Date endDate){
         DateTime startDateTime = startDate == null ? null : new DateTime(startDate);
         DateTime endDateTime = endDate == null ? null : new DateTime(endDate);
-        ComResponse<List<MemberTotal>> response = orderClientAPI.orderFien.queryMemberTotal(memberCards,startDateTime , endDateTime);
-        if (response.getCode() != 200) {
-            return null;
+        List<MemberTotal> data = Collections.emptyList();
+        try {
+            ComResponse<List<MemberTotal>> response = orderClientAPI.orderFien.queryMemberTotal(memberCards, startDateTime, endDateTime);
+            if (response.getCode() == 200) {
+                data = response.getData();
+            }
+        } catch (Exception e) {
+            log.error("request order service:queryMemberTotalByMemberCards error",e);
         }
-        return response.getData();
+        return data;
     }
 
     /**
