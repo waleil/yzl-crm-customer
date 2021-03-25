@@ -41,4 +41,5 @@ public interface MemberQuestionnaireService {
      */
     MemberQuestionnaire getMemberQuestionnaireById(String primaryKey);
 
+    Boolean saveQuestionnaireList(List<MemberQuestionnaire> memberQuestionnaires);
 }

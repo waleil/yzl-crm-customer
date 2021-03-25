@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
@@ -40,6 +41,21 @@ public class MemberQuestionnaireController {
         }
         return ComResponse.success(Boolean.TRUE);
     }
+
+    @ApiOperation(value = "批量保存调查问卷", notes = "批量保存调查问卷")
+    @RequestMapping(value = "v1/batchSaveQuestionnaire", method = RequestMethod.POST)
+    public ComResponse<Boolean> batchSaveQuestionnaire(@RequestBody @Validated List<MemberQuestionnaire> memberQuestionnaires) throws IllegalAccessException {
+        if (CollectionUtil.isEmpty(memberQuestionnaires)) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        }
+        Boolean result = memberQuestionnaireService.saveQuestionnaireList(memberQuestionnaires);
+
+        if (!result) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        }
+        return ComResponse.success(Boolean.TRUE);
+    }
+
 
 
     @ApiOperation("分页查询顾客调查问卷列表")
