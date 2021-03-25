@@ -185,13 +185,21 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
         query.fields().include("_id").include("memberCard").include("seqNo");
         List<MemberQuestionnaire> list = mongoTemplate.find(query,this.getEntityClass(),COLLECTION_NAME);
         if(!CollectionUtil.isEmpty(list)){
-            Map<String,List<MemberQuestionnaire>> map = new HashMap<>();
-            map = list.stream().collect(Collectors.groupingBy(MemberQuestionnaire::getMemberCard));
+            Map<String,List<MemberQuestionnaire>> map = list.stream().collect(Collectors.groupingBy(MemberQuestionnaire::getMemberCard));
             return map;
         }
         return Collections.EMPTY_MAP;
     }
 
+    /**
+     * 批量插入数据
+     * wangzhe
+     * 2021-03-26
+     * @param list
+     * @param collectionName
+     * @param <T>
+     * @return
+     */
     public <T> Boolean insertAll(List<T> list, String collectionName) {
         BulkOperations bulkOperations= mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,GroupRefMember.class,collectionName);
         bulkOperations.insert(list).execute();
