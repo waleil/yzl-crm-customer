@@ -8,8 +8,10 @@ import cn.net.yzl.crm.customer.collector.model.MemberLastcallin;
 import cn.net.yzl.crm.customer.collector.model.Yixiangcustomer;
 import cn.net.yzl.crm.customer.collector.model.mogo.*;
 import cn.net.yzl.crm.customer.collector.utils.MongoDateHelper;
+import com.mongodb.MongoBulkWriteException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -172,7 +174,7 @@ public class MemberLabelSyncService {
 
                         String memberCard = memberLabel.getMemberCard();
                         //设置会员卡号
-                       // memberLabel.set_id(memberCard);
+                        memberLabel.set_id(memberCard);
 
                         //获取对应会员卡号的顾客的服用效果下信息
                         List<MemberProduct> products = memberProductsMap.get(memberCard);
@@ -326,7 +328,19 @@ public class MemberLabelSyncService {
                         }
                         //memberLabelDao.save(memberLabel);
                     }
-                    memberLabelDao.batchInsert(list,"member_label");
+                    try {
+                        memberLabelDao.batchInsert(list,"member_label");
+                    }catch (Exception  e){
+                       if(e instanceof MongoBulkWriteException || e instanceof DuplicateKeyException){
+                           list.stream().forEach(t->{
+                               memberLabelDao.save(t,"member_label");
+                           });
+                       }else {
+                           throw  e;
+                       }
+
+                    }
+
                     list.clear();
 
                 }
