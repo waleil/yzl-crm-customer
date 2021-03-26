@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 /**
@@ -22,9 +23,11 @@ public class MemberQuestionnaire extends BaseObject {
     private String _id;
 
     @ApiModelProperty(value = "问卷序列号",name = "seqNo",required = true)
+    @NotBlank(message = "问卷序列号不能为空!")
     private String seqNo;
 
     @ApiModelProperty(value = "顾客卡号",name = "memberCard",required = true)
+    @NotBlank(message = "顾客卡号不能为空!")
     private String  memberCard;
 
     @ApiModelProperty(value = "创建人编号")

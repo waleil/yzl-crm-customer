@@ -12,6 +12,7 @@ import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +49,15 @@ public class MemberQuestionnaireController {
         if (CollectionUtil.isEmpty(memberQuestionnaires)) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         }
+        for (MemberQuestionnaire questionnaire : memberQuestionnaires) {
+            if (StringUtils.isEmpty(questionnaire.getMemberCard())) {
+                return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "顾客卡号不能为空!", false);
+            }
+            if (StringUtils.isEmpty(questionnaire.getSeqNo())) {
+                return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "问卷序列号不能为空!", false);
+            }
+        }
+        //保存调查问卷列表
         Boolean result = memberQuestionnaireService.saveQuestionnaireList(memberQuestionnaires);
 
         if (!result) {
