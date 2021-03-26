@@ -7,6 +7,7 @@ import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.MemberQuwarionnireDTO;
 import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
 import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaire;
+import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaireDTO;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.logger.annotate.SysAccessLog;
@@ -112,7 +113,7 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
      * @param searchDTO 查询条件对象
      * @return
      */
-    public Page<MemberQuestionnaire> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO) {
+    public Page<MemberQuestionnaireDTO> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO) {
         List<Criteria> criteriaList = new ArrayList<>();
         String memberCard = searchDTO.getMemberCard();
         String memberName = searchDTO.getMemberName();
@@ -156,11 +157,8 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
         //排序
         Sort sort = Sort.by(Sort.Direction.DESC, "updateTime");
         query.with(sort);
-        query.fields().include("_id").include("memberCard").include("memberName").include("sex").include("name").include("questionnaire");
-        List<MemberQuestionnaire> questionnaireList = mongoTemplate.find(query, getEntityClass());
-        for (MemberQuestionnaire item : questionnaireList) {
-            memberCard = item.getMemberCard();
-        }
+        query.fields().include("_id").include("memberCard").include("seqNo").include("formName").include("questionnaire");
+        List<MemberQuestionnaireDTO> questionnaireList = mongoTemplate.find(query, MemberQuestionnaireDTO.class);
         //mongoTemplate.count计算总数
         Page page = new Page();
 

@@ -7,6 +7,7 @@ import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberQuestionnaireDao;
 import cn.net.yzl.crm.customer.dto.MemberQuwarionnireDTO;
 import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaire;
+import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaireDTO;
 import cn.net.yzl.crm.customer.service.MemberQuestionnaireService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
@@ -97,15 +98,47 @@ public class MemberQuestionnaireServiceImpl implements MemberQuestionnaireServic
     }
 
     @Override
-    public Page<MemberQuestionnaire> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO) {
+    public Page<MemberQuestionnaireDTO> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO) {
         if (searchDTO.getCurrentPage() == null || searchDTO.getCurrentPage() == 0) {
             searchDTO.setCurrentPage(1);
         }
         if (searchDTO.getPageSize() == null || searchDTO.getPageSize() == 0) {
             searchDTO.setPageSize(10);
         }
+        Page<MemberQuestionnaireDTO> page = memberQuestionnaireDao.getQuestionnaireByPage(searchDTO);
+        List<MemberQuestionnaireDTO> items = page.getItems();
+        if (CollectionUtil.isNotEmpty(items)) {
+            Map<String,List<MemberQuestionnaireDTO>> map = items.stream().collect(Collectors.groupingBy(MemberQuestionnaireDTO::getMemberCard));
 
-        return memberQuestionnaireDao.getQuestionnaireByPage(searchDTO);
+            Set<String> memberCardSet = map.keySet();
+            ArrayList<String> memberCardList = new ArrayList<>(memberCardSet);
+            List<MemberOrderStatViewModel> memberList = memberMapper.getMemberList(memberCardList);
+
+            Map<String, MemberOrderStatViewModel> memberMap = new HashMap<>();
+            if (CollectionUtil.isNotEmpty(memberList)){
+                for (MemberOrderStatViewModel member : memberList) {
+                    memberMap.put(member.getMember_card(), member);
+                }
+            }
+            for (MemberQuestionnaireDTO item : items) {
+                MemberOrderStatViewModel model = memberMap.get(item.getMemberCard());
+                if (model == null) {
+                    continue;
+                }
+                item.setSex(model.getSex());
+                if (item.getSex() == 0) {
+                    item.setSexName("男");
+                } else if (item.getSex() == 1) {
+                    item.setSexName("女");
+                }else{
+                    item.setSexName("未知");
+                }
+                item.setGradeId(model.getM_grade_id());
+                item.setGradeName(model.getM_grade_name());
+                item.setMemberName(model.getMember_name());
+            }
+        }
+        return page;
 
     }
 

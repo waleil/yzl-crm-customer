@@ -18,7 +18,7 @@ import java.util.Date;
 @Data
 @ApiModel(value="MemberQuestionnaire",description="顾客调查问卷记录" )
 @Document(collection="member_questionnaire")
-public class MemberQuestionnaire extends BaseObject {
+public class MemberQuestionnaireDTO extends BaseObject {
     @ApiModelProperty(value = "主键")
     private String _id;
 
@@ -29,6 +29,16 @@ public class MemberQuestionnaire extends BaseObject {
     @ApiModelProperty(value = "问卷名称",name = "formName",required = true)
     @NotBlank(message = "问卷序列号不能为空!")
     private String formName;
+    @ApiModelProperty(value = "性别：0代表男，1代表女,2代表未知",name = "sex")
+    private Integer sex;
+    @ApiModelProperty(value = "性别",name = "sex")
+    private String sexName;
+    @ApiModelProperty(value = "会员级别id",name = "gradeId",required = true)
+    private Integer gradeId;
+    @ApiModelProperty(value = "会员级别名称",name = "gradeName",required = true)
+    private String gradeName;
+    @ApiModelProperty(value = "顾客姓名",name = "memberName")
+    private String  memberName;
 
     @ApiModelProperty(value = "顾客卡号",name = "memberCard",required = true)
     @NotBlank(message = "顾客卡号不能为空!")

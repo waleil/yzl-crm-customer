@@ -6,6 +6,7 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.MemberQuwarionnireDTO;
 import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaire;
+import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaireDTO;
 import cn.net.yzl.crm.customer.service.MemberQuestionnaireService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import io.netty.util.internal.StringUtil;
@@ -70,11 +71,11 @@ public class MemberQuestionnaireController {
 
     @ApiOperation("分页查询顾客调查问卷列表")
     @PostMapping("/v1/getMemberQuestionnaireByPage")
-    public ComResponse<Page<MemberQuestionnaire>> getMemberQuestionnaireByPage(@RequestBody @Validated MemberQuwarionnireDTO searchDTO) {
+    public ComResponse<Page<MemberQuestionnaireDTO>> getMemberQuestionnaireByPage(@RequestBody @Validated MemberQuwarionnireDTO searchDTO) {
         if (searchDTO == null) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         }
-        Page<MemberQuestionnaire> page = memberQuestionnaireService.getQuestionnaireByPage(searchDTO);
+        Page<MemberQuestionnaireDTO> page = memberQuestionnaireService.getQuestionnaireByPage(searchDTO);
         return ComResponse.success(page);
     }
 
