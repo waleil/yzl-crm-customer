@@ -419,4 +419,13 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         return detail;
     }
 
+    @Override
+    public List<MemberAmountDetailDto> getMemberAmountDetailsBymemberCardAndOrderList(String memberCard, List<String> orderList) {
+        List<MemberAmountDetailDto> list = memberAmountDetailDao.getMemberAmountDetailsBymemberCardAndOrderList(memberCard, orderList);
+        if (list == null) {
+            list = Collections.emptyList();
+        }
+        return list;
+    }
+
 }

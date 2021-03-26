@@ -70,7 +70,29 @@
     group by obtain_type
 
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <select id="getMemberAmountDetailsBymemberCardAndOrderList"
+            resultType="cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto">
+      SELECT
+        member_card memberCard,
+        create_date createDate,
+        discount_money discountMoney,
+        obtain_type obtainType,
+        `status`,
+        remark
+      FROM
+        member_amount_detail
+      WHERE
+        member_card = #{memberCard}
+      and `order_no` in
+      <foreach item="item" index="index" collection="orderList" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+
+
+
+
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from member_amount_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>

@@ -6,10 +6,7 @@ import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
 
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
 import cn.net.yzl.crm.customer.vo.MemberAmountDetailVO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
@@ -48,6 +45,14 @@ public class MemberAmountController {
     })
     ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(@RequestParam("memberCard") String  memberCard,@RequestParam("timeFlag") Integer timeFlag) throws ParseException {
         return memberAmountService.getMemberAmountDetailList(memberCard,timeFlag);
+    }
+
+
+    @ApiOperation(value = "顾客账户-通过顾客卡号和订单号集合获取余额明细", notes = "顾客账户-通过顾客卡号和订单号集合获取余额明细")
+    @RequestMapping(value = "/getMemberAmountDetailsBymemberCardAndOrderList", method = RequestMethod.GET)
+    ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailsBymemberCardAndOrderList(@RequestParam("memberCard") String  memberCard,@RequestParam("orderList") List<String> orderList) throws ParseException {
+        List<MemberAmountDetailDto> list = memberAmountService.getMemberAmountDetailsBymemberCardAndOrderList(memberCard, orderList);
+        return ComResponse.success(list);
     }
 
 

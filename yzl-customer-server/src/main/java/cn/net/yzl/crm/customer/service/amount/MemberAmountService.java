@@ -21,4 +21,6 @@ public interface MemberAmountService {
     ComResponse<String> operationConfirm(int obtainType, String orderNo);
 
     public MemberAmountDetail getFrozenDetailByOrder(String orderNo, Integer obtainType);
+
+    List<MemberAmountDetailDto> getMemberAmountDetailsBymemberCardAndOrderList(String memberCard, List<String> orderList);
 }
