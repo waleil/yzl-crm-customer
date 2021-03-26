@@ -42,6 +42,11 @@ public class QuestionnaireURJ extends BaseObject {
     @ApiModelProperty(value = "家庭住址")
     private String address;
 
+    @ApiModelProperty(value = "症状")
+    private String diseaseName;
+    @ApiModelProperty(value = "症状持续时间")
+    private String diseaseDuration;
+
     @ApiModelProperty(value = "是否有医院诊断证明(是否)")
     private Boolean hasCertificateDiagnosis;
 
