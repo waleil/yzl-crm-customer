@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.dao;
 
+import cn.net.yzl.crm.customer.dto.PageDTO;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.model.MemberAmountDetail;
 import org.apache.ibatis.annotations.MapKey;
@@ -35,4 +36,8 @@ public interface MemberAmountDetailDao {
 
 
     List<MemberAmountDetailDto> getMemberAmountDetailsBymemberCardAndOrderList(@Param("memberCard") String memberCard,@Param("orderList") List<String> orderList);
+
+    Integer getMemberAmountDetailListCount(@Param("memberCard") String memberCard,@Param("timeFlag") Integer timeFlag,@Param("now") Date now);
+
+    List<MemberAmountDetailDto> getMemberAmountDetailListByPage(@Param("memberCard") String memberCard,@Param("timeFlag") Integer timeFlag,@Param("now") Date now,@Param("pageDTO") PageDTO pageDTO);
 }

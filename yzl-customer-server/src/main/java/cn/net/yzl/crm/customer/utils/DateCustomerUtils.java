@@ -15,7 +15,7 @@ public class DateCustomerUtils {
         calendar.setTime(time);//把当前时间赋给日历
         calendar.add(Calendar.MONTH, -3);  //设置为前3月
         time = calendar.getTime();   //得到前3月的时间
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM"); //设置时间格式
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
         String defaultStartDate = sdf.format(time);    //格式化前3月的时间
 
         return sdf.parse(defaultStartDate);
