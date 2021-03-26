@@ -325,6 +325,21 @@ public class CustomerController {
         return ComResponse.success(list);
     }
 
+
+    @ApiOperation("顾客一批顾客卡号获取顾客病症id(卡号用英文逗号分隔)")
+    @GetMapping("/v1/getMemberDiseaseIdsByMemberCards")
+    public ComResponse<List<String>> getMemberDiseaseIdsByMemberCards(
+            @RequestParam("memberCards")
+            @NotBlank(message = "memberCards不能为空")
+            @ApiParam(name = "memberCards", value = "一批顾客卡号", required = true)
+                    String memberCards) {
+
+        if (StringUtil.isNullOrEmpty(memberCards)) throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        List<String> memberCardList = Arrays.asList(memberCards.split(","));
+        List<String> list = memberService.getMemberDiseaseIdByMemberCards(memberCardList);
+        return ComResponse.success(list);
+    }
+
     @ApiOperation("syncMemberToMongo")
     @GetMapping("syncMemberToMongo")
     public void syncMemberToMongo() throws Exception {

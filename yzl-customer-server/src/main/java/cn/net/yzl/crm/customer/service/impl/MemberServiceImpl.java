@@ -1463,6 +1463,12 @@ public class MemberServiceImpl implements MemberService {
         return true;
     }
 
+    @Override
+    public List<String> getMemberDiseaseIdByMemberCards(List<String> memberCardList) {
+
+        return memberMapper.getMemberDiseaseIdByMemberCards(memberCardList);
+    }
+
     /**
      *
      * @param vo

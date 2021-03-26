@@ -1589,4 +1589,13 @@
 
         </where>
     </select>
+    <select id="getMemberDiseaseIdByMemberCards" resultType="java.lang.String">
+        select DISTINCT `disease_id` diseaseId
+        from member_disease
+        where  del_flag=0 and member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
 </mapper>
