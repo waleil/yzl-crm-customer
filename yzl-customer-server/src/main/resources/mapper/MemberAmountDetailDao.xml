@@ -74,6 +74,7 @@
             resultType="cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto">
       SELECT
         member_card memberCard,
+        order_no orderNo,
         create_date createDate,
         discount_money discountMoney,
         obtain_type obtainType,
@@ -87,6 +88,7 @@
       <foreach item="item" index="index" collection="orderList" open="(" separator="," close=")">
         #{item}
       </foreach>
+        and `status` in (1,3)
 
 
 

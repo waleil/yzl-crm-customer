@@ -19,6 +19,9 @@ public class MemberAmountDetailDto implements Serializable {
     @ApiModelProperty(value = "顾客卡号",name = "memberCard")
     private String memberCard;
 
+    @ApiModelProperty(value = "订单号",name = "orderNo")
+    private String orderNo;
+
     @ApiModelProperty(value = "创建时间",name = "createDate")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createDate;
