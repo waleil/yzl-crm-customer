@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.service.amount;
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
 import cn.net.yzl.crm.customer.model.MemberAmountDetail;
@@ -23,4 +24,7 @@ public interface MemberAmountService {
     public MemberAmountDetail getFrozenDetailByOrder(String orderNo, Integer obtainType);
 
     List<MemberAmountDetailDto> getMemberAmountDetailsBymemberCardAndOrderList(String memberCard, List<String> orderList);
+
+    public Page<MemberAmountDetailDto> getMemberAmountDetailListByPage(String memberCard, Integer pageNo, Integer pageSize, Integer timeFlag) throws ParseException;
+
 }

@@ -4,11 +4,13 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dao.MemberAmountDao;
 import cn.net.yzl.crm.customer.dao.MemberAmountDetailDao;
 import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.MemberOrderStatMapper;
+import cn.net.yzl.crm.customer.dto.PageDTO;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
 import cn.net.yzl.crm.customer.model.Member;
@@ -426,6 +428,24 @@ public class MemberAmountServiceImpl implements MemberAmountService {
             list = Collections.emptyList();
         }
         return list;
+    }
+
+    @Override
+    public Page<MemberAmountDetailDto> getMemberAmountDetailListByPage(String memberCard, Integer pageNo, Integer pageSize, Integer timeFlag) throws ParseException {
+
+        PageDTO pageDTO = new PageDTO();
+
+        pageDTO.setCurrentPage(pageNo);
+        pageDTO.setPageSize(pageSize);
+
+        Date now = new Date();
+        now = DateCustomerUtils.beforeMonth(now, 2);
+        Integer count = memberAmountDetailDao.getMemberAmountDetailListCount(memberCard, timeFlag,now);
+        List<MemberAmountDetailDto> list = memberAmountDetailDao.getMemberAmountDetailListByPage(memberCard, timeFlag,now,pageDTO);
+
+        Page<MemberAmountDetailDto> page = pageDTO.toPage(list, count);
+        return page;
+
     }
 
 }

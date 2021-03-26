@@ -94,7 +94,57 @@
 
 
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <select id="getMemberAmountDetailListCount" resultType="java.lang.Integer">
+    SELECT
+      count(1)
+    FROM
+        member_amount_detail
+    WHERE
+        member_card = #{memberCard}
+
+        <choose>
+          <when test="timeFlag == 1">
+            and create_date &gt;= #{now}
+          </when>
+          <otherwise>
+            and create_date &gt; #{now}
+          </otherwise>
+        </choose>
+        and status in (1,3);
+
+  </select>
+
+  <select id="getMemberAmountDetailListByPage" resultType="cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto">
+    SELECT
+      member_card memberCard,
+      order_no orderNo,
+      create_date createDate,
+      discount_money discountMoney,
+      obtain_type obtainType,`status`,
+      remark
+    FROM
+        member_amount_detail
+    WHERE
+        member_card = #{memberCard}
+
+        <choose>
+          <when test="timeFlag == 1">
+            and create_date &gt;= #{now}
+          </when>
+          <otherwise>
+            and create_date &lt; #{now}
+          </otherwise>
+        </choose>
+        and status in (1,3)
+
+    ORDER BY create_date DESC
+    limit #{pageDTO.fromLine},#{pageDTO.pageSize}
+
+  </select>
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from member_amount_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>

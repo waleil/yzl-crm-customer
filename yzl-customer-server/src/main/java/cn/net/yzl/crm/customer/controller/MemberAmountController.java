@@ -1,10 +1,13 @@
 package cn.net.yzl.crm.customer.controller;
 
 import cn.net.yzl.common.entity.ComResponse;
+import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDetailDto;
 import cn.net.yzl.crm.customer.dto.amount.MemberAmountDto;
 
 import cn.net.yzl.crm.customer.service.amount.MemberAmountService;
+import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.vo.MemberAmountDetailVO;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,27 @@ public class MemberAmountController {
     })
     ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(@RequestParam("memberCard") String  memberCard,@RequestParam("timeFlag") Integer timeFlag) throws ParseException {
         return memberAmountService.getMemberAmountDetailList(memberCard,timeFlag);
+    }
+
+    @ApiOperation(value = "顾客账户-获取余额明细(分页)", notes = "顾客账户-获取余额明细(分页)")
+    @RequestMapping(value = "v1/getMemberAmountDetailListByPage", method = RequestMethod.GET)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "memberCard", value = "顾客卡号", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "pageNo", value = "当前页", required = true, dataType = "Int", paramType = "query"),
+            @ApiImplicitParam(name = "pageSize", value = "每页显示的条数", required = true, dataType = "Int", paramType = "query"),
+            @ApiImplicitParam(name = "timeFlag", value = "时间标识(1:最近三个月,2:三个月以前的)", required = true, dataType = "Int", paramType = "query"),
+    })
+    ComResponse<Page<MemberAmountDetailDto>> getMemberAmountDetailListByPage(@RequestParam("memberCard") String  memberCard,
+                                                                             @RequestParam("pageNo") Integer  pageNo,
+                                                                             @RequestParam("pageSize") Integer  pageSize,
+                                                                             @RequestParam("timeFlag") Integer timeFlag) throws ParseException {
+
+        if (timeFlag == null || (timeFlag != 1 && timeFlag != 2)){
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "timeFlag 参数错误!");
+        }
+        Page<MemberAmountDetailDto> page = memberAmountService.getMemberAmountDetailListByPage(memberCard, pageNo, pageSize, timeFlag);
+
+        return ComResponse.success(page);
     }
 
 
