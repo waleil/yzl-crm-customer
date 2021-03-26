@@ -380,11 +380,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(String memberCard) {
-        List<MemberDiseaseCustomerDto> list = memberMapper.getMemberDiseaseDtoByMemberCard(memberCard);
-        if(list==null || list.size()<1){
+        List<MemberDiseaseCustomerDto> memberDiseaseCustomerDtoList = memberMapper.getMemberDiseaseDtoByMemberCard(memberCard);
+        if(CollectionUtils.isEmpty(memberDiseaseCustomerDtoList)){
             return ComResponse.nodata();
         }
-        return ComResponse.success(list);
+        return ComResponse.success(memberDiseaseCustomerDtoList);
     }
 
 //    @Override
@@ -1835,6 +1835,10 @@ public class MemberServiceImpl implements MemberService {
                 MemberLevelPagesResponse level = null;
                 //遍历DMC会员级别信息，判断顾客当前属于那个级别
                 for (MemberLevelPagesResponse levelData : levelList) {
+                    //必须是开启状态的
+                    if (levelData.getIsOpen() != 1) {
+                        continue;
+                    }
                     //注:DMC返回的数据的单位是元
                     if (levelData.getYearTotalSpendMoney() != null && levelData.getYearTotalSpendMoney().compareTo(BigDecimal.ZERO) > 0 && totalSpend -levelData.getYearTotalSpendMoney().multiply(new BigDecimal(100)).intValue() >= 0) {//一年累计消费满
                         level = levelData;
