@@ -1,16 +1,19 @@
 package cn.net.yzl.crm.customer.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.MemberQuwarionnireDTO;
 import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaire;
+import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaireDTO;
 import cn.net.yzl.crm.customer.service.MemberQuestionnaireService;
 import cn.net.yzl.crm.customer.sys.BizException;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,20 +38,44 @@ public class MemberQuestionnaireController {
         }
         Boolean result = memberQuestionnaireService.saveQuestionnaire(memberQuestionnaire);
 
-        if (!result) {
+//        if (!result) {
+//
+//        }
+        return ComResponse.success(Boolean.TRUE);
+    }
 
+    @ApiOperation(value = "批量保存调查问卷", notes = "批量保存调查问卷")
+    @RequestMapping(value = "v1/batchSaveQuestionnaire", method = RequestMethod.POST)
+    public ComResponse<Boolean> batchSaveQuestionnaire(@RequestBody @Validated List<MemberQuestionnaire> memberQuestionnaires) throws IllegalAccessException {
+        if (CollectionUtil.isEmpty(memberQuestionnaires)) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
+        }
+        for (MemberQuestionnaire questionnaire : memberQuestionnaires) {
+            if (StringUtils.isEmpty(questionnaire.getMemberCard())) {
+                return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "顾客卡号不能为空!", false);
+            }
+            if (StringUtils.isEmpty(questionnaire.getSeqNo())) {
+                return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "问卷序列号不能为空!", false);
+            }
+        }
+        //保存调查问卷列表
+        Boolean result = memberQuestionnaireService.saveQuestionnaireList(memberQuestionnaires);
+
+        if (!result) {
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         }
         return ComResponse.success(Boolean.TRUE);
     }
 
 
+
     @ApiOperation("分页查询顾客调查问卷列表")
     @PostMapping("/v1/getMemberQuestionnaireByPage")
-    public ComResponse<Page<MemberQuestionnaire>> getMemberQuestionnaireByPage(@RequestBody @Validated MemberQuwarionnireDTO searchDTO) {
+    public ComResponse<Page<MemberQuestionnaireDTO>> getMemberQuestionnaireByPage(@RequestBody @Validated MemberQuwarionnireDTO searchDTO) {
         if (searchDTO == null) {
             throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE);
         }
-        Page<MemberQuestionnaire> page = memberQuestionnaireService.getQuestionnaireByPage(searchDTO);
+        Page<MemberQuestionnaireDTO> page = memberQuestionnaireService.getQuestionnaireByPage(searchDTO);
         return ComResponse.success(page);
     }
 

@@ -10,6 +10,9 @@ public class DiseaseImprove {
     //对于URJ症状类型(1.腰背疼痛 2.腰膝酸软 3.下肢疼痛 4.下肢瘘弱 5.步履艰难 6.目眩)")
     private Integer diseaseType;
 
+    @ApiModelProperty(value = "病症名称")
+    private String diseaseName;
+
     @ApiModelProperty(value = "服用前(1.加重 2.减轻 3.不变)")
     private Integer userBefore;
 

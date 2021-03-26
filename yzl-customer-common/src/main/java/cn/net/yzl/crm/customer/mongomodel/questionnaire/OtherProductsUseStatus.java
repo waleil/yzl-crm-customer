@@ -9,8 +9,13 @@ import java.util.List;
 @ApiModel(value="OtherProductsUseStatus",description="其他产品使用情况(药品,保健食品)" )
 @Data
 public class OtherProductsUseStatus {
-    @ApiModelProperty(value = "产品类型: 0.其他 1.骨关节 2.肠胃 3.心血管 4.呼吸 5.神经系统 6.皮肤 7.滋补 8.泌尿系统 9.肿瘤")
-    private Integer productType;
+
+    @ApiModelProperty(value = "病症类型: 0.其他 1.骨关节 2.肠胃 3.心血管 4.呼吸 5.神经系统 6.皮肤 7.滋补 8.泌尿系统 9.肿瘤")
+    private Integer diseaseType;
+
+    @ApiModelProperty(value = "病症名称")
+    private String diseaseName;
+
 //    @ApiModelProperty(value = "产品名称01")
 //    private Boolean productName1;
 //    @ApiModelProperty(value = "产品名称02")

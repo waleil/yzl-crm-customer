@@ -198,7 +198,7 @@ public class MemberLabelService {
                     if(Objects.nonNull(memberLabel.getLastOrderTime())){
                         memberLabel.setLastOrderTime(MongoDateHelper.getMongoDate(memberLabel.getLastOrderTime()));
                     }
-                    memberLabelDao.save(memberLabel);
+                    //memberLabelDao.save(memberLabel);
 
 
                 }
@@ -382,7 +382,7 @@ public class MemberLabelService {
                         if(Objects.nonNull(memberLabel.getLastOrderTime())){
                             memberLabel.setLastOrderTime(MongoDateHelper.getMongoDate(memberLabel.getLastOrderTime()));
                         }
-                        memberLabelDao.save(memberLabel);
+                       // memberLabelDao.save(memberLabel);
 
 
                     }

@@ -380,11 +380,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public ComResponse<List<MemberDiseaseCustomerDto>> getMemberDisease(String memberCard) {
-        List<MemberDiseaseCustomerDto> list = memberMapper.getMemberDiseaseDtoByMemberCard(memberCard);
-        if(list==null || list.size()<1){
+        List<MemberDiseaseCustomerDto> memberDiseaseCustomerDtoList = memberMapper.getMemberDiseaseDtoByMemberCard(memberCard);
+        if(CollectionUtils.isEmpty(memberDiseaseCustomerDtoList)){
             return ComResponse.nodata();
         }
-        return ComResponse.success(list);
+        return ComResponse.success(memberDiseaseCustomerDtoList);
     }
 
 //    @Override
@@ -1461,6 +1461,12 @@ public class MemberServiceImpl implements MemberService {
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
         return true;
+    }
+
+    @Override
+    public List<String> getMemberDiseaseIdByMemberCards(List<String> memberCardList) {
+
+        return memberMapper.getMemberDiseaseIdByMemberCards(memberCardList);
     }
 
     /**

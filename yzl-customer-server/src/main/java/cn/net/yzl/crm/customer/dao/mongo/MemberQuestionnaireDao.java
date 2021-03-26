@@ -5,7 +5,9 @@ import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.entity.PageParam;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.MemberQuwarionnireDTO;
+import cn.net.yzl.crm.customer.dto.crowdgroup.GroupRefMember;
 import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaire;
+import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaireDTO;
 import cn.net.yzl.crm.customer.sys.BizException;
 import cn.net.yzl.crm.customer.utils.MongoDateHelper;
 import cn.net.yzl.logger.annotate.SysAccessLog;
@@ -14,14 +16,15 @@ import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -110,7 +113,7 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
      * @param searchDTO 查询条件对象
      * @return
      */
-    public Page<MemberQuestionnaire> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO) {
+    public Page<MemberQuestionnaireDTO> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO) {
         List<Criteria> criteriaList = new ArrayList<>();
         String memberCard = searchDTO.getMemberCard();
         String memberName = searchDTO.getMemberName();
@@ -154,13 +157,8 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
         //排序
         Sort sort = Sort.by(Sort.Direction.DESC, "updateTime");
         query.with(sort);
-        query.fields().include("_id")
-                .include("memberCard").include("memberName").include("sex")
-                .include("name").include("questionnaire");
-        List<MemberQuestionnaire> questionnaireList = mongoTemplate.find(query, getEntityClass());
-        for (MemberQuestionnaire item : questionnaireList) {
-            memberCard = item.getMemberCard();
-        }
+        query.fields().include("_id").include("memberCard").include("seqNo").include("formName").include("questionnaire");
+        List<MemberQuestionnaireDTO> questionnaireList = mongoTemplate.find(query, MemberQuestionnaireDTO.class);
         //mongoTemplate.count计算总数
         Page page = new Page();
 
@@ -172,5 +170,37 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
         page.setPageParam(pageParam);
         page.setItems(questionnaireList);
         return page;
+    }
+
+    public Map<String,List<MemberQuestionnaire>> getMemberQuestionnairesByOld(List<String> memberCards) {
+        if (CollectionUtil.isEmpty(memberCards)) {
+            return Collections.EMPTY_MAP;
+        }
+
+        //查询条件
+        Query query = new Query();
+        query.addCriteria(Criteria.where("memberCard").in(memberCards));
+        query.fields().include("_id").include("memberCard").include("seqNo");
+        List<MemberQuestionnaire> list = mongoTemplate.find(query,this.getEntityClass(),COLLECTION_NAME);
+        if(!CollectionUtil.isEmpty(list)){
+            Map<String,List<MemberQuestionnaire>> map = list.stream().collect(Collectors.groupingBy(MemberQuestionnaire::getMemberCard));
+            return map;
+        }
+        return Collections.EMPTY_MAP;
+    }
+
+    /**
+     * 批量插入数据
+     * wangzhe
+     * 2021-03-26
+     * @param list
+     * @param collectionName
+     * @param <T>
+     * @return
+     */
+    public <T> Boolean insertAll(List<T> list, String collectionName) {
+        BulkOperations bulkOperations= mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED,GroupRefMember.class,collectionName);
+        bulkOperations.insert(list).execute();
+        return true;
     }
 }

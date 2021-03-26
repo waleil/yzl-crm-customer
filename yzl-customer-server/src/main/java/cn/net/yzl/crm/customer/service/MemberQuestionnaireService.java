@@ -3,6 +3,7 @@ package cn.net.yzl.crm.customer.service;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.crm.customer.dto.MemberQuwarionnireDTO;
 import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaire;
+import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaireDTO;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface MemberQuestionnaireService {
      * @param searchDTO
      * @return
      */
-    Page<MemberQuestionnaire> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO);
+    Page<MemberQuestionnaireDTO> getQuestionnaireByPage(MemberQuwarionnireDTO searchDTO);
 
     /**
      * 根据顾客卡号查询顾客的调查问卷
@@ -41,4 +42,5 @@ public interface MemberQuestionnaireService {
      */
     MemberQuestionnaire getMemberQuestionnaireById(String primaryKey);
 
+    Boolean saveQuestionnaireList(List<MemberQuestionnaire> memberQuestionnaires);
 }

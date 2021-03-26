@@ -10,6 +10,8 @@ public class DiseaseItem {
             "5.胃肠是否出现异常(便秘、腹泻、小便减少)" +
             "6.口腔是否出现异常(牙龈肿胀、口干) 7.睡眠是否出现异常(失眠等症状)")
     private Boolean diseaseType;
+    @ApiModelProperty(value = "病症名称")
+    private String diseaseName;
 
     @ApiModelProperty(value = "是否有对应病症")
     private Boolean hasDisease;

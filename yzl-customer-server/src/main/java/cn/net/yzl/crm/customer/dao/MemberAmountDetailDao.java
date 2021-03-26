@@ -34,5 +34,5 @@ public interface MemberAmountDetailDao {
     int updateAmountDetailStatus(@Param("oldStatus") int i,@Param("newStatus") int i1,@Param("orderNo")  String orderNo);
 
 
-
+    List<MemberAmountDetailDto> getMemberAmountDetailsBymemberCardAndOrderList(@Param("memberCard") String memberCard,@Param("orderList") List<String> orderList);
 }

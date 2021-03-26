@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Data
 @ApiModel("顾客宽表实体类")
-@Document(collection="member_label")
+@Document(collection="member_label_dev")
 public class MemberLabel extends BaseObject {
     @ApiModelProperty(value = "主键")
     private String _id;
