@@ -55,10 +55,12 @@ public class MemberQuestionnaire extends BaseObject {
 
 
 
-//    @ApiModelProperty(value = "优韧集调查问卷内容",name = "questionnaireURJ")
-//    private QuestionnaireURJ questionnaireURJ;
-//    @ApiModelProperty(value = "臻通集调查问卷内容",name = "questionnaireZTJ")
-//    private QuestionnaireZTJ questionnaireZTJ;
+    @Deprecated
+    @ApiModelProperty(value = "优韧集调查问卷内容",name = "questionnaireURJ")
+    private QuestionnaireURJ questionnaireURJ;
+    @Deprecated
+    @ApiModelProperty(value = "臻通集调查问卷内容",name = "questionnaireZTJ")
+    private QuestionnaireZTJ questionnaireZTJ;
 
 
 }

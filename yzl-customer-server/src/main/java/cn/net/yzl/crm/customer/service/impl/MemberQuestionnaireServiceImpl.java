@@ -2,11 +2,14 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.Page;
+import cn.net.yzl.common.enums.ResponseCodeEnums;
+import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.mongo.MemberQuestionnaireDao;
 import cn.net.yzl.crm.customer.dto.MemberQuwarionnireDTO;
-import cn.net.yzl.crm.customer.model.mogo.MemberLabel;
 import cn.net.yzl.crm.customer.mongomodel.questionnaire.MemberQuestionnaire;
 import cn.net.yzl.crm.customer.service.MemberQuestionnaireService;
+import cn.net.yzl.crm.customer.sys.BizException;
+import cn.net.yzl.crm.customer.viewmodel.MemberOrderStatViewModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,17 +21,20 @@ import java.util.stream.Collectors;
 @Service
 public class MemberQuestionnaireServiceImpl implements MemberQuestionnaireService {
 
+    //集合名称
+    private String COLLECTION_NAME = "member_questionnaire";
+
+    @Autowired
+    MemberMapper memberMapper;
     @Autowired
     MemberQuestionnaireDao memberQuestionnaireDao;
 
     @Override
     public Boolean saveQuestionnaire(MemberQuestionnaire memberQuestionnaire) {
-        Integer result = memberQuestionnaireDao.saveQuestionnaire(memberQuestionnaire);
-        return Boolean.TRUE;
+        //保存数据
+        Boolean result = this.saveQuestionnaireList(Arrays.asList(memberQuestionnaire));
+        return result;
     }
-
-    //集合名称
-    private String COLLECTION_NAME = "member_questionnaire";
 
     /**
      * 批量保存调查问卷
@@ -48,8 +54,15 @@ public class MemberQuestionnaireServiceImpl implements MemberQuestionnaireServic
 
         //按顾客卡号分组
         Set<String> memberCardSet = requestMemberMap.keySet();
+        ArrayList<String> memberCardList = new ArrayList<>(memberCardSet);
+        //查询是否包含不存在的顾客
+        List<MemberOrderStatViewModel> memberList = memberMapper.getMemberList(memberCardList);
+        if (CollectionUtil.isEmpty(memberList) || memberList.size() != memberCardList.size()){
+            throw new BizException(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "顾客卡号不存在!");
+        }
+
         ////按顾客卡号分组查询之前的顾客问卷
-        Map<String, List<MemberQuestionnaire>> beforeMemberMap = memberQuestionnaireDao.getMemberQuestionnairesByOld(new ArrayList<>(memberCardSet));
+        Map<String, List<MemberQuestionnaire>> beforeMemberMap = memberQuestionnaireDao.getMemberQuestionnairesByOld(memberCardList);
 
         //遍历需要保存的问卷
         for (Map.Entry<String, List<MemberQuestionnaire>> entry : requestMemberMap.entrySet()) {
@@ -67,7 +80,10 @@ public class MemberQuestionnaireServiceImpl implements MemberQuestionnaireServic
             for (MemberQuestionnaire questionnaire : questionnaireList) {
                 //对应序列号的上次问卷
                 MemberQuestionnaire memberBeforeQuestionnaire = groupBySeqNoMap.get(questionnaire.getSeqNo());
-                if (memberBeforeQuestionnaire != null) {
+                if (memberBeforeQuestionnaire == null) {
+                    //设置创建时间
+                    questionnaire.setCreateTime(now);
+                }else{
                     questionnaire.set_id(memberBeforeQuestionnaire.get_id());
                 }
                 //设置更新时间
@@ -102,4 +118,5 @@ public class MemberQuestionnaireServiceImpl implements MemberQuestionnaireServic
     public MemberQuestionnaire getMemberQuestionnaireById(String primaryKey) {
         return memberQuestionnaireDao.getMemberQuestionnaireById(primaryKey);
     }
+
 }

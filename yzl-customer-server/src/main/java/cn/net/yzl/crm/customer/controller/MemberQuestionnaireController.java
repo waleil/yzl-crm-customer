@@ -36,9 +36,9 @@ public class MemberQuestionnaireController {
         }
         Boolean result = memberQuestionnaireService.saveQuestionnaire(memberQuestionnaire);
 
-        if (!result) {
-
-        }
+//        if (!result) {
+//
+//        }
         return ComResponse.success(Boolean.TRUE);
     }
 
