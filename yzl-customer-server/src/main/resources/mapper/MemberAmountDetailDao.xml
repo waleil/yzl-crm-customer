@@ -107,7 +107,7 @@
             and create_date &gt;= #{now}
           </when>
           <otherwise>
-            and create_date &gt; #{now}
+            and create_date &lt; #{now}
           </otherwise>
         </choose>
         and status in (1,3);
