@@ -79,6 +79,8 @@ import java.util.stream.Collectors;
 @Service
 public class MemberServiceImpl implements MemberService {
 
+    private final static String STR_CLEAR_FLAG = "-999999";
+    private  final static Integer NUM_CLEAR_FLAG = -999999;
     @Autowired
     MemberMapper memberMapper;
     @Autowired
@@ -1582,23 +1584,21 @@ public class MemberServiceImpl implements MemberService {
         member.setQq(vo.getQq());
         member.setWechat(vo.getWechat());
 
-        member.setRegion_code(vo.getRegionCode());
-        member.setRegion_name(vo.getRegionName());
 
-        member.setProvince_code(vo.getProvinceCode());
-        member.setProvince_name(vo.getProvinceName());
-        if(vo.getCityCode()!=null){
-            member.setCity_code(vo.getCityCode());
-        }else{
-            member.setCity_code(-9999);
-        }
-        member.setCity_name(vo.getCityName());
-        if(vo.getAreaCode()!=null){
-            member.setArea_code(vo.getAreaCode());
-        }else{
-            member.setArea_code(-9999);
-        }
-        member.setArea_name(vo.getAreaName());
+
+        //大区
+        member.setRegion_code(StringUtils.isEmpty(vo.getRegionCode()) ? STR_CLEAR_FLAG : vo.getRegionCode());
+        member.setRegion_name(StringUtils.isEmpty(vo.getRegionName()) ? STR_CLEAR_FLAG : vo.getRegionName());
+        //省
+        member.setProvince_code(vo.getProvinceCode() == null ? NUM_CLEAR_FLAG : vo.getProvinceCode());
+        member.setProvince_name(StringUtils.isEmpty(vo.getProvinceName()) ? STR_CLEAR_FLAG : vo.getProvinceName());
+        //市
+        member.setCity_code(vo.getCityCode() == null ? NUM_CLEAR_FLAG : vo.getCityCode());
+        member.setCity_name(StringUtils.isEmpty(vo.getCityName()) ? STR_CLEAR_FLAG : vo.getCityName());
+        //区
+        member.setArea_code(vo.getAreaCode() == null ? NUM_CLEAR_FLAG : vo.getAreaCode());
+        member.setArea_name(StringUtils.isEmpty(vo.getAreaName()) ? STR_CLEAR_FLAG : vo.getAreaName());
+
         member.setUpdator_no(vo.getStaffNo());
         member.setUpdator_name(vo.getStaffName());//修改人
         member.setUpdate_time(new Date());

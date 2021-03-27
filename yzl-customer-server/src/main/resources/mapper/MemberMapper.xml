@@ -538,20 +538,48 @@
                 activity = #{activity,jdbcType=BIT},
             </if>
             <if test="region_code != null">
-                region_code = #{region_code,jdbcType=VARCHAR},
+                <choose>
+                    <when test="region_code == '-999999'">
+                        region_code = null,
+                    </when>
+                    <otherwise>
+                        region_code = #{region_code,jdbcType=VARCHAR},
+                    </otherwise>
+                </choose>
             </if>
             <if test="region_name != null">
-                region_name = #{region_name,jdbcType=VARCHAR},
+                <choose>
+                    <when test="region_name == '-999999'">
+                        region_name = null,
+                    </when>
+                    <otherwise>
+                        region_name = #{region_name,jdbcType=VARCHAR},
+                    </otherwise>
+                </choose>
             </if>
             <if test="province_code != null">
-                province_code = #{province_code,jdbcType=INTEGER},
+                <choose>
+                    <when test="province_code == -999999">
+                        province_code = null,
+                    </when>
+                    <otherwise>
+                        province_code = #{province_code,jdbcType=INTEGER},
+                    </otherwise>
+                </choose>
             </if>
             <if test="province_name != null">
-                province_name = #{province_name,jdbcType=VARCHAR},
+                <choose>
+                    <when test="province_name == '-999999'">
+                        province_name = null,
+                    </when>
+                    <otherwise>
+                        province_name = #{province_name,jdbcType=VARCHAR},
+                    </otherwise>
+                </choose>
             </if>
             <if test="city_code != null">
                 <choose>
-                    <when test="city_code == -9999">
+                    <when test="city_code == -999999">
                         city_code = null,
                     </when>
                     <otherwise>
@@ -560,11 +588,18 @@
                 </choose>
             </if>
             <if test="city_name != null">
-                city_name = #{city_name,jdbcType=VARCHAR},
+                <choose>
+                    <when test="city_name == '-999999'">
+                        city_name = null,
+                    </when>
+                    <otherwise>
+                        city_name = #{city_name,jdbcType=VARCHAR},
+                    </otherwise>
+                </choose>
             </if>
             <if test="area_code != null">
                 <choose>
-                    <when test="area_code == -9999">
+                    <when test="area_code == -999999">
                         area_code = null,
                     </when>
                     <otherwise>
@@ -573,7 +608,14 @@
                 </choose>
             </if>
             <if test="area_name != null">
-                area_name = #{area_name,jdbcType=VARCHAR},
+                <choose>
+                    <when test="area_name == '-999999'">
+                        area_name = null,
+                    </when>
+                    <otherwise>
+                        area_name = #{area_name,jdbcType=VARCHAR},
+                    </otherwise>
+                </choose>
             </if>
             <if test="total_amount != null">
                 total_amount = #{total_amount,jdbcType=INTEGER},
