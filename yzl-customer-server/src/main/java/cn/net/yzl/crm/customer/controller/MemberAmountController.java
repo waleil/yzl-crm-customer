@@ -40,15 +40,15 @@ public class MemberAmountController {
         return memberAmountService.getMemberAmount(memberCard);
     }
 
-    @ApiOperation(value = "顾客账户-获取余额明细", notes = "顾客账户-获取余额明细")
-    @RequestMapping(value = "/getMemberAmountDetailList", method = RequestMethod.GET)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "memberCard", value = "顾客卡号", required = true, dataType = "string", paramType = "query"),
-            @ApiImplicitParam(name = "timeFlag", value = "时间标识(1:最近三个月,2:三个月以前的)", required = true, dataType = "Int", paramType = "query"),
-    })
-    ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(@RequestParam("memberCard") String  memberCard,@RequestParam("timeFlag") Integer timeFlag) throws ParseException {
-        return memberAmountService.getMemberAmountDetailList(memberCard,timeFlag);
-    }
+//    @ApiOperation(value = "顾客账户-获取余额明细", notes = "顾客账户-获取余额明细")
+//    @RequestMapping(value = "/getMemberAmountDetailList", method = RequestMethod.GET)
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "memberCard", value = "顾客卡号", required = true, dataType = "string", paramType = "query"),
+//            @ApiImplicitParam(name = "timeFlag", value = "时间标识(1:最近三个月,2:三个月以前的)", required = true, dataType = "Int", paramType = "query"),
+//    })
+//    ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(@RequestParam("memberCard") String  memberCard,@RequestParam("timeFlag") Integer timeFlag) throws ParseException {
+//        return memberAmountService.getMemberAmountDetailList(memberCard,timeFlag);
+//    }
 
     @ApiOperation(value = "顾客账户-获取余额明细(分页)", notes = "顾客账户-获取余额明细(分页)")
     @RequestMapping(value = "v1/getMemberAmountDetailListByPage", method = RequestMethod.GET)

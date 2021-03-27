@@ -1120,6 +1120,13 @@ public class MemberServiceImpl implements MemberService {
             }
         }
 
+        //会员升级[已经按级别倒叙排序](DMC)
+        List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
+        //获取DMC的会员到期时间
+        MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
+
+        //会员升级[已经按级别倒叙排序](DMC)
+        boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
         return ComResponse.success(true);
@@ -1696,14 +1703,14 @@ public class MemberServiceImpl implements MemberService {
         /**
          * 从其他模块同步数据
          */
-        List<MemberLevelPagesResponse> levelList = null;
+        /*List<MemberLevelPagesResponse> levelList = null;
         MemberGradeValidDate validDateObj = null;
         if (type == 1 || type == 3) {
             //会员升级[已经按级别倒叙排序](DMC)
             levelList = ActivityClientAPI.getMemberLevelList();
             //获取DMC的会员到期时间
             validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
-        }
+        }*/
 
         boolean result = true;
         String memberCard,_id;
@@ -1738,8 +1745,9 @@ public class MemberServiceImpl implements MemberService {
                 result = dealMemberOrder(memberCard, memberLabel);
                 //处理最后一次进线、最后一次通话
                 result = dealLastCallData(memberCard, memberLabel);
+                //订单签收的时候进行会员升级
                 //会员升级[已经按级别倒叙排序](DMC)
-                result = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
+                //result = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
             }
 
             //判断是否操作成功
