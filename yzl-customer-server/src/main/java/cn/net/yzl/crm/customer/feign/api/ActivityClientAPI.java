@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
+import cn.net.yzl.activity.model.requestModel.SendCouponByMemberLevelRequest;
 import cn.net.yzl.activity.model.responseModel.ActivityDetailResponse;
 import cn.net.yzl.activity.model.responseModel.MemberAccountResponse;
 import cn.net.yzl.activity.model.responseModel.MemberLevelPagesResponse;
@@ -275,6 +276,32 @@ public class ActivityClientAPI {
             e.printStackTrace();
         }
         return data;
+    }
+
+
+    /**
+     *
+     * @param memberCard 顾客卡号
+     * @param mGradeId 会员级别id
+     * wangzhe
+     * 2021-03-27
+     * @return
+     */
+    public static Boolean sendCouponByMemberLevel(String memberCard,Integer mGradeId){
+        Boolean result = false;
+        try {
+            SendCouponByMemberLevelRequest request = new SendCouponByMemberLevelRequest();
+            request.setMemberCard(memberCard);
+            request.setMemberLevelGrade(mGradeId);
+            ComResponse<Boolean> response = activityClientAPI.activityFien.sendCouponByMemberLevel(request);
+            if (response != null && response.getCode() == 200) {
+                result = true;
+            }
+        } catch (Exception e) {
+            //e.printStackTrace();
+            log.error(e.getMessage(), e);
+        }
+        return result;
     }
 
 

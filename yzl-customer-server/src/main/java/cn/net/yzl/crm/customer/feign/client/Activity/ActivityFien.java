@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.feign.client.Activity;
 
+import cn.net.yzl.activity.model.requestModel.SendCouponByMemberLevelRequest;
 import cn.net.yzl.activity.model.responseModel.*;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -42,5 +44,9 @@ public interface ActivityFien {
     @ApiOperation(value = "会员管理-会员级别管理-查看会员等级有效期限详情")
     @GetMapping("/db/v1/memberLevelManager/getMemberSysParamByType")
     public ComResponse<MemberSysParamDetailResponse> getMemberSysParamByType(@RequestParam("type") Integer type);
+
+    @ApiOperation(value = "优惠券-会员级别升级送优惠券")
+    @GetMapping("/db/v1/memberCoupon/sendCouponByMemberLevel")
+    public ComResponse<Boolean> sendCouponByMemberLevel(@RequestBody SendCouponByMemberLevelRequest request);
 
 }
