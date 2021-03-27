@@ -12,6 +12,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.DateHelper;
+import cn.net.yzl.crm.customer.config.NacosValue;
 import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
@@ -62,6 +63,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -78,7 +80,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class MemberServiceImpl implements MemberService {
-
+    @Autowired
+    NacosValue nacosValue;
     private final static String STR_CLEAR_FLAG = "-999999";
     private  final static Integer NUM_CLEAR_FLAG = -999999;
     @Autowired
@@ -1120,13 +1123,25 @@ public class MemberServiceImpl implements MemberService {
             }
         }
 
-        //会员升级[已经按级别倒叙排序](DMC)
-        List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
-        //获取DMC的会员到期时间
-        MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
+        boolean needUpgraded = true;
+        //专享用户
+        if (nacosValue.getExclusiveCustomer()){
+            //查询会员是不是在升级里
+            Integer count = memberMapper.findMemberDevByMemberCard(memberCard);
+            if (count < 1) {
+                needUpgraded = false;
+            }
+        }
+        if (needUpgraded) {
+            //会员升级[已经按级别倒叙排序](DMC)
+            List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
+            //获取DMC的会员到期时间
+            MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
 
-        //会员升级[已经按级别倒叙排序](DMC)
-        boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
+            //会员升级[已经按级别倒叙排序](DMC)
+            boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
+        }
+
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
         return ComResponse.success(true);

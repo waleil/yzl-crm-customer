@@ -19,7 +19,6 @@ import java.util.List;
  */
 @Data
 @ApiModel(value="QuestionnaireURJ",description="臻通集调查问卷内容" )
-@Document(collection="member_label")
 public class QuestionnaireZTJ extends BaseObject {
 //    @ApiModelProperty(value = "主键")
 //    private String _id;

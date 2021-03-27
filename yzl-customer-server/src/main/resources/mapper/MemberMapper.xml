@@ -1648,4 +1648,7 @@
             #{item}
         </foreach>
     </select>
+    <select id="findMemberDevByMemberCard" resultType="java.lang.Integer">
+        select count(1) from member_dev where member_card = #{memberCard,jdbcType=VARCHAR};
+    </select>
 </mapper>
