@@ -1,8 +1,8 @@
 spring:
   application:
-    name: yzl-customer
+    name: yzl-crm-customer-api
   profiles:
-    active: dev
+    active: test
 logging:
   level:
     cn:
