@@ -1125,7 +1125,7 @@ public class MemberServiceImpl implements MemberService {
 
         boolean needUpgraded = true;
         //专享用户
-        if (nacosValue.getExclusiveCustomer()){
+        if (nacosValue.getExclusiveCustomer() != null && nacosValue.getExclusiveCustomer()){
             //查询会员是不是在升级里
             Integer count = memberMapper.findMemberDevByMemberCard(memberCard);
             if (count < 1) {
