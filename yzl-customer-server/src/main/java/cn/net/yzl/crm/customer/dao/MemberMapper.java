@@ -170,7 +170,6 @@ public interface MemberMapper {
 
     Integer getMemberCardCount(@Param("list") List<String> memberCardList);
 
-    Integer findMemberDevByMemberCard(String memberCard);
 }
 
 

@@ -1117,30 +1117,19 @@ public class MemberServiceImpl implements MemberService {
             } catch (Exception e) {
                 log.error("订单:{}签收时,预存金额操作异常,",orderInfo4MqVo.getOrderNo(),e);
             }
-            if (response == null || response.getCode() != 200) {
+            if (response == null || response.getCode() == null || response.getCode() != 200) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ComResponse.fail(response.getCode(),response.getMessage());
             }
         }
 
-        boolean needUpgraded = true;
-        //专享用户
-        if (nacosValue.getExclusiveCustomer() != null && nacosValue.getExclusiveCustomer()){
-            //查询会员是不是在升级里
-            Integer count = memberMapper.findMemberDevByMemberCard(memberCard);
-            if (count < 1) {
-                needUpgraded = false;
-            }
-        }
-        if (needUpgraded) {
-            //会员升级[已经按级别倒叙排序](DMC)
-            List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
-            //获取DMC的会员到期时间
-            MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
+        //会员升级[已经按级别倒叙排序](DMC)
+        List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
+        //获取DMC的会员到期时间
+        MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
 
-            //会员升级[已经按级别倒叙排序](DMC)
-            boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
-        }
+        //会员升级[已经按级别倒叙排序](DMC)
+        boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
 
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);

@@ -22,8 +22,4 @@ public class NacosValue {
     @Value("${appId:}")
     private String appId;
 
-    @Value("${exclusive_customer:}")
-    private Boolean exclusiveCustomer;
-
-
 }
