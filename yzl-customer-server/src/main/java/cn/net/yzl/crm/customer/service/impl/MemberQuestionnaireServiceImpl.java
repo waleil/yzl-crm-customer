@@ -86,6 +86,8 @@ public class MemberQuestionnaireServiceImpl implements MemberQuestionnaireServic
                     questionnaire.setCreateTime(now);
                 }else{
                     questionnaire.set_id(memberBeforeQuestionnaire.get_id());
+                    questionnaire.setCreateCode(memberBeforeQuestionnaire.getCreateCode());
+                    questionnaire.setCreateTime(memberBeforeQuestionnaire.getCreateTime());
                 }
                 //设置更新时间
                 questionnaire.setUpdateTime(now);
