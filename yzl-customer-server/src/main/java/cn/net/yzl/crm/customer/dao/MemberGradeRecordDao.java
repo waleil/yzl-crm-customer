@@ -23,4 +23,6 @@ public interface MemberGradeRecordDao {
     List<MemberGradeRecordDto> getMemberGradeRecordList(@Param("memberCard") String memberCard);
 
     List<MemberGradeRecordDto> getMemberGradeRecordListByTimeRange(@Param("memberCard")String memberCard, @Param("startTime") Date startTime, @Param("endTime")Date endTime);
+
+    MemberGradeRecordDto getLastMemberGradeRecord(@Param("memberCard") String memberCard);
 }

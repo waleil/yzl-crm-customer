@@ -12,6 +12,7 @@ import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.entity.Page;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.common.util.DateHelper;
+import cn.net.yzl.crm.customer.config.NacosValue;
 import cn.net.yzl.crm.customer.dao.*;
 import cn.net.yzl.crm.customer.dao.mongo.MemberCrowdGroupDao;
 import cn.net.yzl.crm.customer.dao.mongo.MemberLabelDao;
@@ -62,6 +63,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -78,7 +80,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class MemberServiceImpl implements MemberService {
-
+    @Autowired
+    NacosValue nacosValue;
+    private final static String STR_CLEAR_FLAG = "-999999";
+    private  final static Integer NUM_CLEAR_FLAG = -999999;
     @Autowired
     MemberMapper memberMapper;
     @Autowired
@@ -1112,11 +1117,19 @@ public class MemberServiceImpl implements MemberService {
             } catch (Exception e) {
                 log.error("订单:{}签收时,预存金额操作异常,",orderInfo4MqVo.getOrderNo(),e);
             }
-            if (response == null || response.getCode() != 200) {
+            if (response == null || response.getCode() == null || response.getCode() != 200) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return ComResponse.fail(response.getCode(),response.getMessage());
             }
         }
+
+        //会员升级[已经按级别倒叙排序](DMC)
+        List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
+        //获取DMC的会员到期时间
+        MemberGradeValidDate validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
+
+        //会员升级[已经按级别倒叙排序](DMC)
+        boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
 
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
@@ -1310,6 +1323,10 @@ public class MemberServiceImpl implements MemberService {
                 break;
             }
             for (Member member : list) {
+                //当前级别为无卡的不用处理
+                if (member.getMGradeId() == 1) {
+                    continue;
+                }
                 //当前顾客的会员级别信息
                 MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
                 memberGradeRecord = new MemberGradeRecordPo();
@@ -1470,6 +1487,63 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
+     * 发送会员升级福利优惠券
+     * wangzhe
+     * 2021-03-27
+     * @return
+     */
+    @Override
+    public Boolean sendCouponForMemberTimedTask() {
+        //会员升级[已经按级别倒叙排序](DMC)
+        List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
+        //判断每个级别是否赠送
+        if (CollectionUtil.isEmpty(levelList)) {
+            log.error("sendCouponForMemberTimedTask:没有获取DMC到会员级别列表信息!");
+            return true;
+        }
+        //获取每一个会员级别可以赠送优惠券的次数
+        Map<Integer, Integer> levelSendCouponCountMap = ActivityClientAPI.getEachLevelSendCouponCount();
+        MemberGradeRecordDto memberGradeRecordDto;
+        Date now = new Date();//系统当前时间
+        int pageNo = 1,pageSize = 1_000;
+        MemberSerchConditionDTO dto = new MemberSerchConditionDTO();
+        dto.setPageSize(pageSize);
+        List<Member> list = null;
+        do {
+            dto.setCurrentPage(pageNo);
+            PageHelper.startPage(pageNo,pageSize);
+
+            list = memberMapper.scanMemberByPage(dto);
+            if (CollectionUtil.isEmpty(list)) {
+                break;
+            }
+            Integer count;
+            for (Member member : list) {
+                String memberCard = member.getMember_card();
+                //获取当前会员罪行的一条会员级别记录
+                memberGradeRecordDto = memberGradeRecordDao.getLastMemberGradeRecord(memberCard);
+                if (memberGradeRecordDto == null) {
+                    continue;
+                }
+                //获取会员升级的时间和当前时间的月份差
+                long betweenMs = DateUtil.betweenMs(memberGradeRecordDto.getCreateTime(),now);
+                count = levelSendCouponCountMap.get(memberGradeRecordDto.getMGradeId());
+                if (count != null && betweenMs < count){
+                    ActivityClientAPI.sendCouponByMemberLevel(memberCard, memberGradeRecordDto.getMGradeId());
+                    log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                }
+            }
+            if (list.size() < pageSize) {
+                list.clear();
+                break;
+            }
+            list.clear();
+            pageNo++;
+        } while (true);
+        return Boolean.TRUE;
+    }
+
+    /**
      *
      * @param vo
      * @return
@@ -1582,23 +1656,21 @@ public class MemberServiceImpl implements MemberService {
         member.setQq(vo.getQq());
         member.setWechat(vo.getWechat());
 
-        member.setRegion_code(vo.getRegionCode());
-        member.setRegion_name(vo.getRegionName());
 
-        member.setProvince_code(vo.getProvinceCode());
-        member.setProvince_name(vo.getProvinceName());
-        if(vo.getCityCode()!=null){
-            member.setCity_code(vo.getCityCode());
-        }else{
-            member.setCity_code(-9999);
-        }
-        member.setCity_name(vo.getCityName());
-        if(vo.getAreaCode()!=null){
-            member.setArea_code(vo.getAreaCode());
-        }else{
-            member.setArea_code(-9999);
-        }
-        member.setArea_name(vo.getAreaName());
+
+        //大区
+        member.setRegion_code(StringUtils.isEmpty(vo.getRegionCode()) ? STR_CLEAR_FLAG : vo.getRegionCode());
+        member.setRegion_name(StringUtils.isEmpty(vo.getRegionName()) ? STR_CLEAR_FLAG : vo.getRegionName());
+        //省
+        member.setProvince_code(vo.getProvinceCode() == null ? NUM_CLEAR_FLAG : vo.getProvinceCode());
+        member.setProvince_name(StringUtils.isEmpty(vo.getProvinceName()) ? STR_CLEAR_FLAG : vo.getProvinceName());
+        //市
+        member.setCity_code(vo.getCityCode() == null ? NUM_CLEAR_FLAG : vo.getCityCode());
+        member.setCity_name(StringUtils.isEmpty(vo.getCityName()) ? STR_CLEAR_FLAG : vo.getCityName());
+        //区
+        member.setArea_code(vo.getAreaCode() == null ? NUM_CLEAR_FLAG : vo.getAreaCode());
+        member.setArea_name(StringUtils.isEmpty(vo.getAreaName()) ? STR_CLEAR_FLAG : vo.getAreaName());
+
         member.setUpdator_no(vo.getStaffNo());
         member.setUpdator_name(vo.getStaffName());//修改人
         member.setUpdate_time(new Date());
@@ -1696,14 +1768,14 @@ public class MemberServiceImpl implements MemberService {
         /**
          * 从其他模块同步数据
          */
-        List<MemberLevelPagesResponse> levelList = null;
+        /*List<MemberLevelPagesResponse> levelList = null;
         MemberGradeValidDate validDateObj = null;
         if (type == 1 || type == 3) {
             //会员升级[已经按级别倒叙排序](DMC)
             levelList = ActivityClientAPI.getMemberLevelList();
             //获取DMC的会员到期时间
             validDateObj = ActivityClientAPI.getMemberGradeValidDateObj();
-        }
+        }*/
 
         boolean result = true;
         String memberCard,_id;
@@ -1734,12 +1806,13 @@ public class MemberServiceImpl implements MemberService {
             if (type == 1 || type == 3) {
                 //获取顾客的红包 积分 优惠券记录(DMC)
                 result = dealMemberAmountRedbagIntegral(memberCard, memberLabel);
-                //会员升级[已经按级别倒叙排序](DMC)
-                result = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
                 //处理会员订单
                 result = dealMemberOrder(memberCard, memberLabel);
                 //处理最后一次进线、最后一次通话
                 result = dealLastCallData(memberCard, memberLabel);
+                //订单签收的时候进行会员升级
+                //会员升级[已经按级别倒叙排序](DMC)
+                //result = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
             }
 
             //判断是否操作成功
@@ -1882,6 +1955,28 @@ public class MemberServiceImpl implements MemberService {
                         if (result < 1) {
                             return false;
                         }
+                        //判断是否需要送优惠券
+                        //获取当前级别的信息
+                        log.info("顾客卡号:{}升级后的会员级别为:{},优惠卷赠送方式为:{},持续月:{}",memberCard,level.getMemberLevelGrade(),level.getCouponGiveType(),level.getCouponDuration());
+                        if (level.getIsGiveCoupon() != null && level.getIsGiveCoupon() && level.getCouponGiveType() != null) {
+                            //是否需要赠送
+                            boolean isGive = false;
+                            //优惠卷赠送方式为：赠送一次
+                            if (level.getCouponGiveType() == 0) {
+                                isGive = true;
+                            }
+                            //优惠卷赠送方式为：每月赠送一次时，持续月要 > 0
+                            else if (level.getCouponGiveType() == 1) {
+                                if (level.getCouponDuration() != null || level.getCouponDuration() > 0) {
+                                    isGive = true;
+                                }
+                            }
+                            if (isGive) {
+                                ActivityClientAPI.sendCouponByMemberLevel(memberCard, level.getMemberLevelGrade());
+                                log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                            }
+                        }
+
                     }
                 }
             }

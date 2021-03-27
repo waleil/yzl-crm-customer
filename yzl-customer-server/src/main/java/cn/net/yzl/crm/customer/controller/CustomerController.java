@@ -481,6 +481,16 @@ public class CustomerController {
 
 
     @Deprecated
+    @ApiOperation("根据DMC会员等级配置给会员升级后的顾客发送优惠券")
+    @PostMapping("/v1/sendCouponForMemberTimedTask")
+    public ComResponse<Boolean> sendCouponForMemberTimedTask() {
+        Boolean reulst = memberService.sendCouponForMemberTimedTask();
+        return ComResponse.success(true);
+    }
+
+
+
+    @Deprecated
     @ApiOperation("测试静态方法")
     @PostMapping("/v1/testStaticMethod")
     public ComResponse<Boolean> testStaticMethod(String memberCard) throws IOException {

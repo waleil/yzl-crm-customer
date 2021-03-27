@@ -88,23 +88,23 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         return ComResponse.success(memberAmountDto);
     }
 
-    @Override
-    public ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(String memberCard, Integer timeFlag) throws ParseException {
-        Date now = new Date();
-        if (timeFlag == 1) { // 最近三个月
-            now = DateCustomerUtils.beforeMonth(now, 2);
-        } else if (timeFlag == 2) { // 三个月以前的
-            now = null;
-        } else {
-            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "timeFlag 参数错误!");
-        }
-        List<MemberAmountDetailDto> list = memberAmountDetailDao.getMemberAmountDetailList(memberCard, now);
-
-        if (list == null || list.size() < 1) {
-            return ComResponse.nodata();
-        }
-        return ComResponse.success(list);
-    }
+//    @Override
+//    public ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(String memberCard, Integer timeFlag) throws ParseException {
+//        Date now = new Date();
+//        if (timeFlag == 1) { // 最近三个月
+//            now = DateCustomerUtils.beforeMonth(now, 2);
+//        } else if (timeFlag == 2) { // 三个月以前的
+//            now = null;
+//        } else {
+//            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "timeFlag 参数错误!");
+//        }
+//        List<MemberAmountDetailDto> list = memberAmountDetailDao.getMemberAmountDetailList(memberCard, now);
+//
+//        if (list == null || list.size() < 1) {
+//            return ComResponse.nodata();
+//        }
+//        return ComResponse.success(list);
+//    }
 
     @Autowired
     private RedissonClient redisson;

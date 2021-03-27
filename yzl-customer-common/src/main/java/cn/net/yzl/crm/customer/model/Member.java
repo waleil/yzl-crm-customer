@@ -43,12 +43,17 @@ public class Member {
     private Integer member_status;
     @ApiModelProperty(value = "活跃度 1 活跃 2 冷淡 3 一般")
     private Integer activity;
+
     @ApiModelProperty(value = "所属区")
     private String region_code;
+    @ApiModelProperty("所属区")
+    private String region_name;
+
     @ApiModelProperty(value = "所属省份")
     private Integer province_code;
     @ApiModelProperty(value = "所属省份名称")
     private String province_name;
+
     @ApiModelProperty(value = "所属城市id")
     private Integer city_code;
     @ApiModelProperty(value = "所属城市名称")
@@ -58,6 +63,7 @@ public class Member {
     private Integer area_code;
     @ApiModelProperty(value = "所属区域")
     private String area_name;
+
     @ApiModelProperty(value = "媒体id")
     private Integer media_id;
     @ApiModelProperty(value = "媒体名称")
@@ -113,9 +119,6 @@ public class Member {
     private String intro_name;
     @ApiModelProperty(value = "介绍人类型，1员工，2顾客")
     private int intro_type;
-
-    @ApiModelProperty("所属区")
-    private String region_name;
 
     @ApiModelProperty("广告名称")
     private String adver_name;

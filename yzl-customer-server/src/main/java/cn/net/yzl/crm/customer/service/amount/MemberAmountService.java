@@ -15,7 +15,7 @@ public interface MemberAmountService {
     // 获取 会员账户信息
     ComResponse<MemberAmountDto> getMemberAmount(String memberCard);
     // 获取账户明细
-    ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(String memberCard, Integer timeFlag) throws ParseException;
+//    ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailList(String memberCard, Integer timeFlag) throws ParseException;
 
     ComResponse<String> operation(MemberAmountDetailVO memberAmountDetailVO);
 

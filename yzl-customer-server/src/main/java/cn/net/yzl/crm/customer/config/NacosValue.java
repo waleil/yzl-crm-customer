@@ -21,4 +21,5 @@ public class NacosValue {
 
     @Value("${appId:}")
     private String appId;
+
 }
