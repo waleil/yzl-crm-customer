@@ -27,7 +27,7 @@ public class MemberQuestionnaire extends BaseObject {
     private String seqNo;
 
     @ApiModelProperty(value = "问卷名称",name = "formName",required = true)
-    @NotBlank(message = "问卷序列号不能为空!")
+    @NotBlank(message = "问卷名称不能为空!")
     private String formName;
 
     @ApiModelProperty(value = "顾客卡号",name = "memberCard",required = true)
