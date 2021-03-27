@@ -180,7 +180,7 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
         //查询条件
         Query query = new Query();
         query.addCriteria(Criteria.where("memberCard").in(memberCards));
-        query.fields().include("_id").include("memberCard").include("seqNo");
+        query.fields().include("_id").include("memberCard").include("seqNo").include("createCode").include("createTime");
         List<MemberQuestionnaire> list = mongoTemplate.find(query,this.getEntityClass(),COLLECTION_NAME);
         if(!CollectionUtil.isEmpty(list)){
             Map<String,List<MemberQuestionnaire>> map = list.stream().collect(Collectors.groupingBy(MemberQuestionnaire::getMemberCard));
