@@ -1734,12 +1734,12 @@ public class MemberServiceImpl implements MemberService {
             if (type == 1 || type == 3) {
                 //获取顾客的红包 积分 优惠券记录(DMC)
                 result = dealMemberAmountRedbagIntegral(memberCard, memberLabel);
-                //会员升级[已经按级别倒叙排序](DMC)
-                result = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
                 //处理会员订单
                 result = dealMemberOrder(memberCard, memberLabel);
                 //处理最后一次进线、最后一次通话
                 result = dealLastCallData(memberCard, memberLabel);
+                //会员升级[已经按级别倒叙排序](DMC)
+                result = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
             }
 
             //判断是否操作成功
@@ -1882,6 +1882,28 @@ public class MemberServiceImpl implements MemberService {
                         if (result < 1) {
                             return false;
                         }
+                        //判断是否需要送优惠券
+                        //获取当前级别的信息
+                        log.info("顾客卡号:{}升级后的会员级别为:{},优惠卷赠送方式为:{},持续月:{}",memberCard,level.getMemberLevelGrade(),level.getCouponGiveType(),level.getCouponDuration());
+                        if (level.getIsGiveCoupon() != null && level.getIsGiveCoupon() && level.getCouponGiveType() != null) {
+                            //是否需要赠送
+                            boolean isGive = false;
+                            //优惠卷赠送方式为：赠送一次
+                            if (level.getCouponGiveType() == 0) {
+                                isGive = true;
+                            }
+                            //优惠卷赠送方式为：每月赠送一次时，持续月要 > 0
+                            else if (level.getCouponGiveType() == 1) {
+                                if (level.getCouponDuration() != null || level.getCouponDuration() > 0) {
+                                    isGive = true;
+                                }
+                            }
+                            if (isGive) {
+                                ActivityClientAPI.sendCouponByMemberLevel(memberCard, level.getMemberLevelGrade());
+                                log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                            }
+                        }
+
                     }
                 }
             }

@@ -56,7 +56,7 @@ public class WorkOrderClientAPI {
         MemberLastCallInDTO data = null;
         try {
             ComResponse<MemberLastCallInDTO> response = workOrderClientAPI.workOrderClient.getLastCallManageByMemberCard(memberCard);
-            if (response != null && response.getCode() == 200) {
+            if (response != null && response.getCode() != null && response.getCode() == 200) {
                 data = response.getData();
             }
         } catch (Exception e) {
