@@ -57,8 +57,8 @@ public class MemberQuestionnaireServiceImpl implements MemberQuestionnaireServic
         Set<String> memberCardSet = requestMemberMap.keySet();
         ArrayList<String> memberCardList = new ArrayList<>(memberCardSet);
         //查询是否包含不存在的顾客
-        List<MemberOrderStatViewModel> memberList = memberMapper.getMemberList(memberCardList);
-        if (CollectionUtil.isEmpty(memberList) || memberList.size() != memberCardList.size()){
+        int count = memberMapper.getMemberCardCount(memberCardList);
+        if (memberCardList.size() != count){
             throw new BizException(ResponseCodeEnums.NO_MATCHING_RESULT_CODE.getCode(), "顾客卡号不存在!");
         }
 

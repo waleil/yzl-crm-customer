@@ -1598,4 +1598,12 @@
         </foreach>
 
     </select>
+    <select id="getMemberCardCount" resultType="java.lang.Integer">
+        select count(1)
+        from member m
+        where m.member_card in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

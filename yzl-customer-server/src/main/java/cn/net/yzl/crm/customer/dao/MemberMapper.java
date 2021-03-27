@@ -167,6 +167,9 @@ public interface MemberMapper {
     int findCountByCondition(MemberSerchConditionDTO dto);
 
     List<String> getMemberDiseaseIdByMemberCards(@Param("list") List<String> memberCardList);
+
+    Integer getMemberCardCount(@Param("list") List<String> memberCardList);
+
 }
 
 
