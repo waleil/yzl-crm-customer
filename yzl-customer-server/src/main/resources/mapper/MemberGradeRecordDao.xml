@@ -133,4 +133,18 @@
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="getLastMemberGradeRecord" resultType="cn.net.yzl.crm.customer.dto.member.MemberGradeRecordDto">
+    SELECT
+      id,
+      member_card memberCard,
+      m_grade_id mGradeId,
+      m_grade_name mGradeName,
+      create_time createTime
+    FROM
+      member_grade_record
+    WHERE
+      member_card = #{memberCard} order by create_time desc limit 1;
+
+  </select>
 </mapper>

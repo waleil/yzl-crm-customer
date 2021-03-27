@@ -305,5 +305,35 @@ public class ActivityClientAPI {
     }
 
 
+    /**
+     * 获取每一个会员级别可以赠送优惠券的次数
+     * wangzhe
+     * 2021-03-27
+     * @return
+     */
+    public static Map<Integer,Integer> getEachLevelSendCouponCount(){
+        List<MemberLevelPagesResponse> levelList = getMemberLevelList();
+        if (CollectionUtil.isEmpty(levelList)) {
+            return Collections.emptyMap();
+        }
+
+        Map<Integer, Integer> sendCouponMap = new HashMap<>();
+        for (MemberLevelPagesResponse level : levelList) {
+            Integer count = 0;//可以赠送的次数
+            if (level.getIsGiveCoupon() != null && level.getIsGiveCoupon() && level.getCouponGiveType() != null) {
+                //优惠卷赠送方式为：每月赠送一次时，持续月要 > 0
+                if (level.getCouponGiveType() == 1) {
+                    if (level.getCouponDuration() != null || level.getCouponDuration() > 0) {
+                        count = level.getCouponDuration();
+                    }
+                }
+
+            }
+            sendCouponMap.put(level.getMemberLevelGrade(), count);
+        }
+        return sendCouponMap;
+    }
+
+
 
 }

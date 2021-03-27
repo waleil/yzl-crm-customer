@@ -209,4 +209,6 @@ public interface MemberService {
     boolean addredis(String memberCard);
 
     List<String> getMemberDiseaseIdByMemberCards(List<String> memberCardList);
+
+    Boolean sendCouponForMemberTimedTask();
 }

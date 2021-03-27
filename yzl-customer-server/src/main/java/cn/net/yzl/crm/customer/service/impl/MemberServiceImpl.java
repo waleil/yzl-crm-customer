@@ -1319,6 +1319,10 @@ public class MemberServiceImpl implements MemberService {
                 break;
             }
             for (Member member : list) {
+                //当前级别为无卡的不用处理
+                if (member.getMGradeId() == 1) {
+                    continue;
+                }
                 //当前顾客的会员级别信息
                 MemberGradeRecordPo memberGradeRecord = new MemberGradeRecordPo();
                 memberGradeRecord = new MemberGradeRecordPo();
@@ -1476,6 +1480,63 @@ public class MemberServiceImpl implements MemberService {
     public List<String> getMemberDiseaseIdByMemberCards(List<String> memberCardList) {
 
         return memberMapper.getMemberDiseaseIdByMemberCards(memberCardList);
+    }
+
+    /**
+     * 发送会员升级福利优惠券
+     * wangzhe
+     * 2021-03-27
+     * @return
+     */
+    @Override
+    public Boolean sendCouponForMemberTimedTask() {
+        //会员升级[已经按级别倒叙排序](DMC)
+        List<MemberLevelPagesResponse> levelList = ActivityClientAPI.getMemberLevelList();
+        //判断每个级别是否赠送
+        if (CollectionUtil.isEmpty(levelList)) {
+            log.error("sendCouponForMemberTimedTask:没有获取DMC到会员级别列表信息!");
+            return true;
+        }
+        //获取每一个会员级别可以赠送优惠券的次数
+        Map<Integer, Integer> levelSendCouponCountMap = ActivityClientAPI.getEachLevelSendCouponCount();
+        MemberGradeRecordDto memberGradeRecordDto;
+        Date now = new Date();//系统当前时间
+        int pageNo = 1,pageSize = 1_000;
+        MemberSerchConditionDTO dto = new MemberSerchConditionDTO();
+        dto.setPageSize(pageSize);
+        List<Member> list = null;
+        do {
+            dto.setCurrentPage(pageNo);
+            PageHelper.startPage(pageNo,pageSize);
+
+            list = memberMapper.scanMemberByPage(dto);
+            if (CollectionUtil.isEmpty(list)) {
+                break;
+            }
+            Integer count;
+            for (Member member : list) {
+                String memberCard = member.getMember_card();
+                //获取当前会员罪行的一条会员级别记录
+                memberGradeRecordDto = memberGradeRecordDao.getLastMemberGradeRecord(memberCard);
+                if (memberGradeRecordDto == null) {
+                    continue;
+                }
+                //获取会员升级的时间和当前时间的月份差
+                long betweenMs = DateUtil.betweenMs(memberGradeRecordDto.getCreateTime(),now);
+                count = levelSendCouponCountMap.get(memberGradeRecordDto.getMGradeId());
+                if (count != null && betweenMs < count){
+                    ActivityClientAPI.sendCouponByMemberLevel(memberCard, memberGradeRecordDto.getMGradeId());
+                    log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                }
+            }
+            if (list.size() < pageSize) {
+                list.clear();
+                break;
+            }
+            list.clear();
+            pageNo++;
+        } while (true);
+        return Boolean.TRUE;
     }
 
     /**

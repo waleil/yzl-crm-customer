@@ -1596,9 +1596,9 @@
         m.m_grade_name mGradeName
 
         FROM
-        member m where m_grade_id &lt;&gt; 1
+        member m where m_grade_id
 
-        order by create_time asc
+        order by id desc;
 
     </select>
     <select id="findCountByCondition" resultType="java.lang.Integer">
