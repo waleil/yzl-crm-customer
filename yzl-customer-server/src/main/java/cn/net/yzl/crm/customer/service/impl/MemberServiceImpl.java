@@ -1529,8 +1529,12 @@ public class MemberServiceImpl implements MemberService {
                 long betweenMs = DateUtil.betweenMs(memberGradeRecordDto.getCreateTime(),now);
                 count = levelSendCouponCountMap.get(memberGradeRecordDto.getMGradeId());
                 if (count != null && betweenMs < count){
-                    ActivityClientAPI.sendCouponByMemberLevel(memberCard, memberGradeRecordDto.getMGradeId());
-                    log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                    boolean res = ActivityClientAPI.sendCouponByMemberLevel(memberCard, memberGradeRecordDto.getMGradeId());
+                    if (res) {
+                        log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                    }else{
+                        log.info("顾客卡号:{},赠送优惠券失败!",memberCard);
+                    }
                 }
             }
             if (list.size() < pageSize) {
@@ -1972,8 +1976,12 @@ public class MemberServiceImpl implements MemberService {
                                 }
                             }
                             if (isGive) {
-                                ActivityClientAPI.sendCouponByMemberLevel(memberCard, level.getMemberLevelGrade());
-                                log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                                boolean res = ActivityClientAPI.sendCouponByMemberLevel(memberCard, level.getMemberLevelGrade());
+                                if (res) {
+                                    log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                                }else{
+                                    log.info("顾客卡号:{},赠送优惠券失败!",memberCard);
+                                }
                             }
                         }
 
