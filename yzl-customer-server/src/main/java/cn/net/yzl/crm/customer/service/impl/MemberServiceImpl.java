@@ -903,6 +903,9 @@ public class MemberServiceImpl implements MemberService {
                 }
             }
 
+            //当前顾客正在服用的所有商品的最小余量
+            Integer minProductLastNum = Integer.MAX_VALUE;
+
             //查询客户对应的商品服用效果
             MemberProductEffectSelectVO effectVo = new MemberProductEffectSelectVO();
             effectVo.setMemberCard(memberCard);
@@ -912,6 +915,11 @@ public class MemberServiceImpl implements MemberService {
             if (productEffectResult != null && CollectionUtil.isNotEmpty(productEffectList)) {
                 for (MemberProductEffectDTO dto : productEffectList) {
                     dtoMap.put(dto.getProductCode(), dto);
+                    if (dto.getTakingState() != null && dto.getTakingState() == 1) {
+                        if (minProductLastNum > dto.getProductLastNum()) {
+                            minProductLastNum = dto.getProductLastNum();
+                        }
+                    }
                 }
             }
 
@@ -940,6 +948,10 @@ public class MemberServiceImpl implements MemberService {
                 if (addVo != null) {
                     if (StringUtils.isNotEmpty(totalUseNum)) {
                         addVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount);//商品剩余量
+                        //获取正在服用的最想商品余量
+                        if (minProductLastNum > addVo.getProductLastNum()) {
+                            minProductLastNum = addVo.getProductLastNum();
+                        }
                     }
                     addVo.setProductCount(productCount);//购买商品数量
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
@@ -960,6 +972,10 @@ public class MemberServiceImpl implements MemberService {
 
                     if (StringUtils.isNotEmpty(totalUseNum)) {
                         upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
+                        //获取正在服用的最想商品余量
+                        if (upVo.getTakingState() == 1 && minProductLastNum > upVo.getProductLastNum()) {
+                            minProductLastNum = addVo.getProductLastNum();
+                        }
                     }
 
                     upVo.setProductName(ProductMainDTO.getName());//商品名称
@@ -1133,6 +1149,12 @@ public class MemberServiceImpl implements MemberService {
 
         //会员升级[已经按级别倒叙排序](DMC)
         boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
+
+        //重新获取顾客信息
+        member = memberMapper.selectMemberByCard(memberCard);
+
+        //订单签收的时候，让工单更新当前顾客的正在服用的商品的最小余量
+        res = WorkOrderClientAPI.updateMinProductLastNum(memberCard, 1, String.valueOf(member.getMGradeId()));
 
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
