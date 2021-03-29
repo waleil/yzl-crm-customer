@@ -290,6 +290,13 @@
             <if test="creator_name != null">
                 creator_name,
             </if>
+            <if test="updator_no != null">
+                updator_no,
+            </if>
+
+            <if test="updator_name != null">
+                updator_name,
+            </if>
             <if test="source_type != null">
                 source_type,
             </if>
@@ -448,6 +455,13 @@
 
             <if test="creator_name != null">
                 #{creator_name,jdbcType=VARCHAR},
+            </if>
+            <if test="updator_no != null">
+                #{updator_no,jdbcType=VARCHAR},
+            </if>
+
+            <if test="updator_name != null">
+                #{updator_name,jdbcType=VARCHAR},
             </if>
             <if test="source_type != null">
                 #{source_type,jdbcType=BIT},
@@ -717,6 +731,13 @@
             <if test="first_order_staff_no != null and first_order_staff_no != ''" >
                 first_order_staff_no = #{first_order_staff_no,jdbcType=VARCHAR},
                 first_order_am = #{first_order_am,jdbcType=INTEGER},
+            </if>
+            <if test="updator_no != null">
+                updator_no = #{updator_no,jdbcType=VARCHAR},
+                <if test="updator_name != null">
+                    updator_name = #{updator_name,jdbcType=VARCHAR},
+                </if>
+                update_time = NOW(),
             </if>
         </set>
         where member_card = #{member_card,jdbcType=VARCHAR}
@@ -1427,23 +1448,29 @@
 
     </select>
     <!--更新顾客最后下单时间-->
-    <update id="updateLastOrderTime" >
+    <!-- <update id="updateLastOrderTime" >
         update member set
             last_order_time = #{now,jdbcType=TIMESTAMP}
         where
             member_card = #{memberCard,jdbcType=VARCHAR}
-    </update>
+    </update> -->
 
     <!--处理下单时：更新顾客 首单下单员工，首单时间，最后下单时间-->
     <update id="updateMemberForOrderCreate" parameterType="cn.net.yzl.crm.customer.model.Member">
-        update member set
+        update member
+        <set>
             <if test="member.first_order_staff_no != null" >
                 first_order_staff_no = #{member.first_order_staff_no},
             </if>
             <if test="member.first_order_time != null" >
                 first_order_time = #{member.first_order_time},
             </if>
-            last_order_time = #{member.last_order_time,jdbcType=TIMESTAMP}
+            last_order_time = #{member.last_order_time,jdbcType=TIMESTAMP},
+            order_num = #{member.order_num,jdbcType=INTEGER},
+            updator_no = #{member.updator_no,jdbcType=VARCHAR},
+            updator_name = #{member.updator_name,jdbcType=VARCHAR},
+            update_time = NOW(),
+        </set>
         where
             member_card = #{member.member_card,jdbcType=VARCHAR}
     </update>

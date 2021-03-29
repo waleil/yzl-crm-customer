@@ -1082,6 +1082,9 @@ public class MemberServiceImpl implements MemberService {
         if (!member.isVip_flag()) {
             memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
         }
+        //设置修改人信息
+        member.setUpdator_no("-1");
+        member.setUpdator_name("SYSTEM");
         result = memberMapper.updateByMemberGradeByMember(member);
         if (result < 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -1192,6 +1195,11 @@ public class MemberServiceImpl implements MemberService {
         //memberMapper.updateLastOrderTime(memberCard,orderCreateInfoVO.getCreateTime());
         //最后一次订单的下单时间 = 当前订单的创建时间
         member.setLast_order_time(orderCreateInfoVO.getCreateTime());
+        //订购次数
+        member.setOrder_num(member.getOrder_num() == null ? 1 : member.getOrder_num() + 1);
+        //设置更新人信息
+        member.setUpdator_no("-1");
+        member.setUpdator_name("SYSTEM");
         //下单时更新顾客信息
         result = memberMapper.updateMemberForOrderCreate(member);
         if (result < 1) {
@@ -1340,6 +1348,9 @@ public class MemberServiceImpl implements MemberService {
                 //更新顾客表的会员信息
                 member.setMGradeId(memberGradeRecord.getMGradeId());
                 member.setMGradeName(memberGradeRecord.getMGradeName());
+                //设置修改人信息
+                member.setUpdator_no("-1");
+                member.setUpdator_name("SYSTEM");
                 int ret = memberMapper.updateByMemberGradeByMember(member);
             }
 
@@ -1548,8 +1559,10 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-     *
-     * @param vo
+     *  提交工单时更新顾客信息
+     *  wangzhe
+     *  2021-02-26
+     * @param vo 工单顾客相关信息
      * @return
      */
     @Transactional
@@ -1659,7 +1672,10 @@ public class MemberServiceImpl implements MemberService {
         member.setEmail(vo.getEmail());
         member.setQq(vo.getQq());
         member.setWechat(vo.getWechat());
-
+        //设置更新人信息为系统更新
+        member.setUpdator_no("-1");
+        member.setUpdator_name("SYSTEM");
+        member.setUpdate_time(new Date());
 
 
         //大区
@@ -1955,6 +1971,9 @@ public class MemberServiceImpl implements MemberService {
                         //更新顾客表的会员信息
                         member.setMGradeId(memberGradeRecord.getMGradeId());
                         member.setMGradeName(memberGradeRecord.getMGradeName());
+                        //设置修改人信息
+                        member.setUpdator_no("-1");
+                        member.setUpdator_name("SYSTEM");
                         result = memberMapper.updateByMemberGradeByMember(member);
                         if (result < 1) {
                             return false;

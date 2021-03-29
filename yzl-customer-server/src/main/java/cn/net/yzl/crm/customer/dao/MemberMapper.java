@@ -148,7 +148,7 @@ public interface MemberMapper {
      * 更新顾客最后下单时间
      * @return
      */
-    int updateLastOrderTime(@Param("memberCard") String memberCard,@Param("now") Date now);
+//    int updateLastOrderTime(@Param("memberCard") String memberCard,@Param("now") Date now);
 
     List<MemberLabel> queryMemberLabelByCodes(List<String> memberCodes);
 
