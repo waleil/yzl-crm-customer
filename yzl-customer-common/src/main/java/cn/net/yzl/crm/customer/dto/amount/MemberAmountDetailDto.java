@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -26,8 +27,10 @@ public class MemberAmountDetailDto implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createDate;
 
-    @ApiModelProperty(value = "金额",name = "discountMoney")
+    @ApiModelProperty(value = "金额(分)",name = "discountMoney")
     private Integer discountMoney;
+    @ApiModelProperty(value = "金额(元)",name = "discountMoneyD")
+    private BigDecimal discountMoneyD;
     @ApiModelProperty(value = "1 退回 2 消费,3:充值",name = "obtainType")
     private Byte obtainType;
     @ApiModelProperty(value = "1正常(完成),2:无效(失败),3:进行中(待确认),4:退回完成,5:冻结时退回",name = "status")
