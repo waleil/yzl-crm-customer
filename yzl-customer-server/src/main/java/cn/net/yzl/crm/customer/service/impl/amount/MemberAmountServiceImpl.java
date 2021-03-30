@@ -442,7 +442,12 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         now = DateCustomerUtils.beforeMonth(now, 2);
         Integer count = memberAmountDetailDao.getMemberAmountDetailListCount(memberCard, timeFlag,now);
         List<MemberAmountDetailDto> list = memberAmountDetailDao.getMemberAmountDetailListByPage(memberCard, timeFlag,now,pageDTO);
-
+        //设置金额分转元
+        if (CollectionUtil.isNotEmpty(list)) {
+            list.forEach(item -> {
+                item.setDiscountMoneyD(CentYuanConvertUtil.cent2Yuan(item.getDiscountMoney()));
+            });
+        }
         Page<MemberAmountDetailDto> page = pageDTO.toPage(list, count);
         return page;
 

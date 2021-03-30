@@ -85,6 +85,14 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
             Member member = new Member();
             member.setCreate_time(new Date());
             member.setUpdate_time(member.getCreate_time());
+            //设置创建人信息
+            member.setCreator_no("-1");
+            member.setCreator_name("SYSTEM");
+            //设置修改人信息
+            member.setUpdator_no("-1");
+            member.setUpdator_name("SYSTEM");
+
+
             member.setSource_type(0);
             int result = memberService.insert(member);
             if (result == 1) {

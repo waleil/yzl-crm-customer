@@ -111,7 +111,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         if (num1 < 1) {
             throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "记录数据保存失败");
         }
-        return ComResponse.success();
+        return ComResponse.success(String.valueOf(reveiverAddress.getId()));
     }
 
     @Override

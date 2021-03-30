@@ -903,6 +903,9 @@ public class MemberServiceImpl implements MemberService {
                 }
             }
 
+            //当前顾客正在服用的所有商品的最小余量
+            Integer minProductLastNum = Integer.MAX_VALUE;
+
             //查询客户对应的商品服用效果
             MemberProductEffectSelectVO effectVo = new MemberProductEffectSelectVO();
             effectVo.setMemberCard(memberCard);
@@ -912,6 +915,11 @@ public class MemberServiceImpl implements MemberService {
             if (productEffectResult != null && CollectionUtil.isNotEmpty(productEffectList)) {
                 for (MemberProductEffectDTO dto : productEffectList) {
                     dtoMap.put(dto.getProductCode(), dto);
+                    if (dto.getTakingState() != null && dto.getTakingState() == 1) {
+                        if (minProductLastNum > dto.getProductLastNum()) {
+                            minProductLastNum = dto.getProductLastNum();
+                        }
+                    }
                 }
             }
 
@@ -940,6 +948,10 @@ public class MemberServiceImpl implements MemberService {
                 if (addVo != null) {
                     if (StringUtils.isNotEmpty(totalUseNum)) {
                         addVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount);//商品剩余量
+                        //获取正在服用的最想商品余量
+                        if (minProductLastNum > addVo.getProductLastNum()) {
+                            minProductLastNum = addVo.getProductLastNum();
+                        }
                     }
                     addVo.setProductCount(productCount);//购买商品数量
                     addVo.setProductName(ProductMainDTO.getName());//商品名称
@@ -960,6 +972,10 @@ public class MemberServiceImpl implements MemberService {
 
                     if (StringUtils.isNotEmpty(totalUseNum)) {
                         upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
+                        //获取正在服用的最想商品余量
+                        if (upVo.getTakingState() == 1 && minProductLastNum > upVo.getProductLastNum()) {
+                            minProductLastNum = addVo.getProductLastNum();
+                        }
                     }
 
                     upVo.setProductName(ProductMainDTO.getName());//商品名称
@@ -1082,6 +1098,9 @@ public class MemberServiceImpl implements MemberService {
         if (!member.isVip_flag()) {
             memberMapper.setMemberToVip(memberCard,orderInfo4MqVo.getSignTime());
         }
+        //设置修改人信息
+        member.setUpdator_no("-1");
+        member.setUpdator_name("SYSTEM");
         result = memberMapper.updateByMemberGradeByMember(member);
         if (result < 1) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -1130,6 +1149,12 @@ public class MemberServiceImpl implements MemberService {
 
         //会员升级[已经按级别倒叙排序](DMC)
         boolean res = upgradedMembarVipLevel(memberCard, levelList, validDateObj);
+
+        //重新获取顾客信息
+        member = memberMapper.selectMemberByCard(memberCard);
+
+        //订单签收的时候，让工单更新当前顾客的正在服用的商品的最小余量
+        res = WorkOrderClientAPI.updateMinProductLastNum(memberCard, 1, String.valueOf(member.getMGradeId()));
 
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
@@ -1192,6 +1217,11 @@ public class MemberServiceImpl implements MemberService {
         //memberMapper.updateLastOrderTime(memberCard,orderCreateInfoVO.getCreateTime());
         //最后一次订单的下单时间 = 当前订单的创建时间
         member.setLast_order_time(orderCreateInfoVO.getCreateTime());
+        //订购次数
+        member.setOrder_num(member.getOrder_num() == null ? 1 : member.getOrder_num() + 1);
+        //设置更新人信息
+        member.setUpdator_no("-1");
+        member.setUpdator_name("SYSTEM");
         //下单时更新顾客信息
         result = memberMapper.updateMemberForOrderCreate(member);
         if (result < 1) {
@@ -1340,6 +1370,9 @@ public class MemberServiceImpl implements MemberService {
                 //更新顾客表的会员信息
                 member.setMGradeId(memberGradeRecord.getMGradeId());
                 member.setMGradeName(memberGradeRecord.getMGradeName());
+                //设置修改人信息
+                member.setUpdator_no("-1");
+                member.setUpdator_name("SYSTEM");
                 int ret = memberMapper.updateByMemberGradeByMember(member);
             }
 
@@ -1529,8 +1562,12 @@ public class MemberServiceImpl implements MemberService {
                 long betweenMs = DateUtil.betweenMs(memberGradeRecordDto.getCreateTime(),now);
                 count = levelSendCouponCountMap.get(memberGradeRecordDto.getMGradeId());
                 if (count != null && betweenMs < count){
-                    ActivityClientAPI.sendCouponByMemberLevel(memberCard, memberGradeRecordDto.getMGradeId());
-                    log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                    boolean res = ActivityClientAPI.sendCouponByMemberLevel(memberCard, memberGradeRecordDto.getMGradeId());
+                    if (res) {
+                        log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                    }else{
+                        log.info("顾客卡号:{},赠送优惠券失败!",memberCard);
+                    }
                 }
             }
             if (list.size() < pageSize) {
@@ -1544,8 +1581,10 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-     *
-     * @param vo
+     *  提交工单时更新顾客信息
+     *  wangzhe
+     *  2021-02-26
+     * @param vo 工单顾客相关信息
      * @return
      */
     @Transactional
@@ -1655,7 +1694,10 @@ public class MemberServiceImpl implements MemberService {
         member.setEmail(vo.getEmail());
         member.setQq(vo.getQq());
         member.setWechat(vo.getWechat());
-
+        //设置更新人信息为系统更新
+        member.setUpdator_no("-1");
+        member.setUpdator_name("SYSTEM");
+        member.setUpdate_time(new Date());
 
 
         //大区
@@ -1951,6 +1993,9 @@ public class MemberServiceImpl implements MemberService {
                         //更新顾客表的会员信息
                         member.setMGradeId(memberGradeRecord.getMGradeId());
                         member.setMGradeName(memberGradeRecord.getMGradeName());
+                        //设置修改人信息
+                        member.setUpdator_no("-1");
+                        member.setUpdator_name("SYSTEM");
                         result = memberMapper.updateByMemberGradeByMember(member);
                         if (result < 1) {
                             return false;
@@ -1972,8 +2017,12 @@ public class MemberServiceImpl implements MemberService {
                                 }
                             }
                             if (isGive) {
-                                ActivityClientAPI.sendCouponByMemberLevel(memberCard, level.getMemberLevelGrade());
-                                log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                                boolean res = ActivityClientAPI.sendCouponByMemberLevel(memberCard, level.getMemberLevelGrade());
+                                if (res) {
+                                    log.info("顾客卡号:{},赠送优惠券成功!",memberCard);
+                                }else{
+                                    log.info("顾客卡号:{},赠送优惠券失败!",memberCard);
+                                }
                             }
                         }
 
