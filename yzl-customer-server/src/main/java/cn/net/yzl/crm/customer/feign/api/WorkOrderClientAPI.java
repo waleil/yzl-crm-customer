@@ -113,10 +113,10 @@ public class WorkOrderClientAPI {
             if (response.getCode() != null && response.getCode() == 200) {
                 return true;
             }else{
-                log.error("更新工单服务顾客正在服用的最小商品余量失败：错误码:{},错误信息:{}",response.getCode(),response.getMessage());
+                log.error("更新工单服务顾客正在服用的最小商品余量失败：顾客卡号:{},productLastNum:{},mGradeCode:{},错误码:{},错误信息:{}",memberCard,productLastNum,mGradeCode,response.getCode(),response.getMessage());
             }
         } catch (Exception e) {
-            log.error("更新工单服务顾客正在服用的最小商品余量失败：异常信息:{}",e.getMessage());
+            log.error("更新工单服务顾客正在服用的最小商品余量失败：顾客卡号:{},productLastNum:{},mGradeCode:{},异常信息:{}",memberCard,productLastNum,mGradeCode,e.getMessage());
         }
         return false;
     }

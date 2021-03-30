@@ -42,7 +42,7 @@ public interface WorkOrderClient {
     @PostMapping(value = "workOrder/v1/add")
     ComResponse<Void> addWorkOrder(@RequestBody WorkOrderBeanVO workOrderBean);
 
-    @GetMapping(value = "api/workorder/updateMinProductLastNum")
+    @GetMapping(value = "/workorder/v1/updateMinProductLastNum")
     ComResponse<Boolean> updateMinProductLastNum(@RequestParam("memberCard") String memberCard,
                                                  @RequestParam("productLastNum") Integer productLastNum,
                                                  @RequestParam("mGradeCode") String mGradeCode);
