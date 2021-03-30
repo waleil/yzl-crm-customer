@@ -145,9 +145,9 @@ public class MemberPhoneServiceImpl implements MemberPhoneService {
      * 电话号码验证
      * 加上区号11位。
      *
-     * 如果区号是3位，电话du号码是8位。例如北京：010-XXXXXXXX。
+     * 如果区号是3位，电话号码是8位。例如北京：010-XXXXXXXX。
      *
-     * 如果区号是dao4位，zhuan电话号码是7位。例如长沙：0731-XXXXXXX。
+     * 如果区号是4位，电话号码是7位。例如长沙：0731-XXXXXXX。
      *
      * @param  str
      * @return 验证通过返回true
