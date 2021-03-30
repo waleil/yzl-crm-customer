@@ -700,6 +700,9 @@
             <if test="updator_name != null">
                 updator_name = #{updator_name,jdbcType=VARCHAR},
             </if>
+            <if test="update_time != null">
+                update_time = #{update_time,jdbcType=TIMESTAMP},
+            </if>
             <if test="source_type != null">
                 source_type = #{source_type,jdbcType=BIT},
             </if>
