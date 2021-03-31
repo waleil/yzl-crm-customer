@@ -1006,7 +1006,7 @@ public class MemberServiceImpl implements MemberService {
             }
             //更新
             if (updateProductVoList.size() > 0) {
-                ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(), updateProductVoList);
+                ComResponse<Boolean> comResponse = memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(), updateProductVoList);
                 if (comResponse.getCode() != 200) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return ComResponse.fail(comResponse.getCode(), comResponse.getMessage());
@@ -1408,7 +1408,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         //更新商品服用效果
-        ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(vo.getStaffNo(), vo.getProductEffectList());
+        ComResponse<Boolean> comResponse = memberProductEffectService.batchModifyProductEffect(vo.getStaffNo(), vo.getProductEffectList());
         if (comResponse.getCode() != 200) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(商品服用效果)记录数据保存失败!");

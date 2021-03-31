@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("memberProductEffect")
-@Api(value = "顾客商品服用效果", tags = {"顾客商品服用效果"})
+@Api(value = "MemberProductEffectController", tags = {"顾客商品服用效果"})
 @Validated
 public class MemberProductEffectController {
 
@@ -40,7 +40,7 @@ public class MemberProductEffectController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "productEffects", value = "商品服用效果", required = true),
     })
-    public ComResponse batchModifyProductEffect(@RequestBody List<MemberProductEffectUpdateVO> productEffects) {
+    public ComResponse<Boolean> batchModifyProductEffect(@RequestBody List<MemberProductEffectUpdateVO> productEffects) {
 
         ComResponse result = memberProductEffectService.batchModifyProductEffect(null,productEffects);
         return result;
@@ -51,7 +51,7 @@ public class MemberProductEffectController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "productEffects", value = "商品服用效果", required = true),
     })
-    public ComResponse batchSaveProductEffect(@RequestBody List<MemberProductEffectInsertVO> productEffects) {
+    public ComResponse<Boolean> batchSaveProductEffect(@RequestBody List<MemberProductEffectInsertVO> productEffects) {
 
         ComResponse result = memberProductEffectService.batchSaveProductEffect(productEffects);
         return result;
@@ -59,12 +59,9 @@ public class MemberProductEffectController {
 
     @ApiOperation(value = "保存商品服用效果", notes = "保存商品服用效果")
     @RequestMapping(value = "/v1/saveProductEffect", method = RequestMethod.POST)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "productEffect", value = "商品服用效果", required = true),
-    })
-    public ComResponse saveProductEffect(@RequestBody MemberProductEffectInsertVO productEffect) {
+    public ComResponse<Boolean> saveProductEffect(@RequestBody MemberProductEffectInsertVO productEffect) {
 
-        ComResponse result = memberProductEffectService.save(productEffect);
+        ComResponse<Boolean> result = memberProductEffectService.save(productEffect);
         return result;
     }
 

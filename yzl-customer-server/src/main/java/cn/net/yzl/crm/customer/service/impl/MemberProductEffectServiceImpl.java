@@ -58,7 +58,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
     @Transactional
     @Override
-    public ComResponse save(MemberProductEffectInsertVO record) {
+    public ComResponse<Boolean> save(MemberProductEffectInsertVO record) {
         //查询客户是否存在
         Member member = memberMapper.selectMemberByCard(record.getMemberCard());
         if (member == null) {
@@ -198,7 +198,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * @return
      */
     @Transactional
-    public ComResponse batchSaveProductEffect(List<MemberProductEffectInsertVO> records) {
+    public ComResponse<Boolean> batchSaveProductEffect(List<MemberProductEffectInsertVO> records) {
         if (CollectionUtil.isEmpty(records)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空!");
         }
@@ -218,7 +218,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * @return
      */
     @Transactional
-    public ComResponse batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> records) {
+    public ComResponse<Boolean> batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> records) {
         if (CollectionUtil.isNotEmpty(records)) {
             for (MemberProductEffectUpdateVO record : records) {
                 //修改人赋值
