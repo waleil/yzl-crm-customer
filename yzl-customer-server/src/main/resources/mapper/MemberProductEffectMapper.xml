@@ -108,6 +108,9 @@
       <if test="unit != null" >
         unit,
       </if>
+      <if test="updator != null" >
+        updator,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -151,6 +154,9 @@
       </if>
       <if test="unit != null" >
         #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="updator != null" >
+        #{updator,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -201,6 +207,12 @@
       <if test="unit != null" >
         unit = #{unit,jdbcType=VARCHAR},
       </if>
+      <if test="updator != null" >
+        updator = #{updator,jdbcType=VARCHAR},
+      </if>
+      <if test="upateTime != null" >
+        upate_time = #{upateTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -232,7 +244,7 @@
     set
         product_last_num = (CASE when (product_last_num - eating_time) &gt; 0 THEN (product_last_num - eating_time) else 0 end),
         taking_state =  (CASE when (product_last_num - eating_time)  &lt;= 0 THEN 2 end), <!-- 商品余量为0时，更新商品的服用状态为停服，订单签收时再更新为 -->
-        updator='SYSTEM',
+        updator='-1',
         upate_time = NOW()
     where
         id in
@@ -246,7 +258,8 @@
     update member_product_effect
     set
     due_date = DATE_FORMAT(DATE_ADD(NOW(),INTERVAL ceil(product_last_num / eating_time) DAY),'%Y-%m-%d 00:00:00'),
-    updator='SYSTEM'
+    updator='-1',
+    upate_time = NOW()
     where
     id in
     <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
