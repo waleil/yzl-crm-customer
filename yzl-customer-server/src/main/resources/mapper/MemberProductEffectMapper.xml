@@ -231,7 +231,7 @@
     update member_product_effect
     set
         product_last_num = (CASE when (product_last_num - eating_time) &gt; 0 THEN (product_last_num - eating_time) else 0 end),
-        taking_state =  (CASE when (product_last_num - eating_time)  &lt;= 0 THEN 2 end), <!-- 商品余量为0时，更新商品的服用状态为停服，订单签收时再更新为 -->
+        taking_state =  (CASE when product_last_num &lt;= 0 THEN 2 end), <!-- 商品余量为0时，更新商品的服用状态为停服，订单签收时再更新为 -->
         updator='SYSTEM',
         upate_time = NOW()
     where
