@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    nacos:
+      server-addr: http://nacospre.staff.yuzhilin.net.cn
+      discovery:
+        username: api-gateway
+        password: Yzl@12345
+        namespace: e2b76f4c-88ef-4d21-ba71-3cb814fdeae3
+      #        register-enabled: false
+      config:
+        username: crm-api
+        password: Yzl@2020
+        namespace: 413a0c70-2606-4fdd-b3d2-9b3a931fe816
+        file-extension: yaml
+        prefix: yzl-customer-server-pre
