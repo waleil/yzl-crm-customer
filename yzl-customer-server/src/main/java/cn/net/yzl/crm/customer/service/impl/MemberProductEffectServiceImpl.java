@@ -73,7 +73,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
         //每天吃几次
         Integer oneToTimes = record.getOneToTimes();
-        //每次吃多少粒
+        //每次吃多少
         Integer oneUseNum = record.getOneUseNum();
         //商品余量
         Integer productLastNum = record.getProductLastNum();
@@ -146,7 +146,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
         //每天吃几次
         Integer oneToTimes = record.getOneToTimes();
-        //每次吃多少粒
+        //每次吃多少
         Integer oneUseNum = record.getOneUseNum();
         //商品余量
         Integer productLastNum = record.getProductLastNum();

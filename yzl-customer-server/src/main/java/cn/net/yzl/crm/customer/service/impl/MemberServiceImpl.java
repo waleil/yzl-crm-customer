@@ -931,11 +931,13 @@ public class MemberServiceImpl implements MemberService {
                 if (dto != null) {
                     upVo = new MemberProductEffectUpdateVO();
                     BeanUtil.copyProperties(dto, upVo);
+                    upVo.setUpdator("-1");//设置修改人
                     updateProductVoList.add(upVo);
                 } else {
                     addVo = new MemberProductEffectInsertVO();
                     addVo.setMemberCard(memberCard);
                     addVo.setProductCode(productVO.getProductCode());
+                    addVo.setUpdator("-1");//设置修改人
                     addProductVoList.add(addVo);
                 }
                 //获取商品的信息(主要是规格)
