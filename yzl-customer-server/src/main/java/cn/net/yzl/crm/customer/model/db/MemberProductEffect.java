@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.model.db;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -128,6 +129,7 @@ public class MemberProductEffect {
     private String updator;
 
     @ApiModelProperty("修改时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date upateTime;
 
 

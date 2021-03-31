@@ -18,9 +18,9 @@ public interface MemberProductEffectService {
      * @param record
      * @return
      */
-    ComResponse save(MemberProductEffectInsertVO record);
+    ComResponse<Boolean> save(MemberProductEffectInsertVO record);
 
-    ComResponse batchSaveProductEffect(List<MemberProductEffectInsertVO> record);
+    ComResponse<Boolean> batchSaveProductEffect(List<MemberProductEffectInsertVO> record);
 
     /**
      * 批量添加记录
@@ -30,7 +30,7 @@ public interface MemberProductEffectService {
      * @param record
      * @return
      */
-    ComResponse batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> record);
+    ComResponse<Boolean> batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> record);
 
     ComResponse<List<MemberProductEffectDTO>> getProductEffects(MemberProductEffectSelectVO productEffect);
 

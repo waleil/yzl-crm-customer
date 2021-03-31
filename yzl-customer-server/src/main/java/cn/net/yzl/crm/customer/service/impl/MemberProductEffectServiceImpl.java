@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
@@ -57,66 +58,56 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
 
     @Transactional
     @Override
-    public ComResponse save(MemberProductEffectInsertVO record) {
+    public ComResponse<Boolean> save(MemberProductEffectInsertVO record) {
         //查询客户是否存在
         Member member = memberMapper.selectMemberByCard(record.getMemberCard());
         if (member == null) {
-            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "会员不存在");
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "会员不存在!");
         }
-
-        //
+        //系统当前时间
+        DateTime now = DateUtil.date();
+        //创建更新对象
         MemberProductEffect memberProductEffect = new MemberProductEffect();
         BeanUtil.copyProperties(record, memberProductEffect);
-        memberProductEffect.setUpateTime(new Date());
+        memberProductEffect.setUpateTime(now);
 
         //每天吃几次
         Integer oneToTimes = record.getOneToTimes();
-        //每次吃多少粒
+        //每次吃多少
         Integer oneUseNum = record.getOneUseNum();
-        //每天吃多少(计算)
-        //Integer eatingTime = record.getEatingTime();
         //商品余量
         Integer productLastNum = record.getProductLastNum();
 
         //每天用量
         Integer oneNum = null;
-        if (oneToTimes != null && oneUseNum != null && oneToTimes > 0 && oneUseNum > 0) {
-            oneNum = oneToTimes*oneUseNum;
+        if (oneToTimes != null && oneUseNum != null) {
+            oneNum = oneToTimes * oneUseNum;
         }
         //每天吃多少(计算)
         memberProductEffect.setEatingTime(oneNum);
-        //商品服用完日期
-        Integer eatDay = null;
-        if (oneNum != null && oneNum > 0 && productLastNum>0) {
-            eatDay = productLastNum % oneNum == 0 ? productLastNum / oneNum : productLastNum / oneNum + 1;
-            //获取当前时间
-            Calendar current = Calendar.getInstance();
-            current.add(Calendar.DATE, eatDay-1);
-            Date date = null;
-            try {
-                date = sdf.parse(sdf.format(current.getTime()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            memberProductEffect.setDueDate(date);
+        //当有日用量和商品余量的时候 ==> 计算可以吃到哪一天
+        if (oneNum != null && productLastNum != null && oneNum > 0  && productLastNum > 0) {
+            //可以吃多少天 = 余量 ➗ 每天吃多少
+            int eatDay = (int)Math.ceil(productLastNum / (float) oneNum);
+            //可以吃到哪一天(截至日期当前的开始时间)
+            Date dueDate = DateUtil.beginOfDay(DateUtil.offsetDay(now, eatDay - 1));
+            memberProductEffect.setDueDate(dueDate);
         }
-
+        //保存数据
         int result = memberProductEffectMapper.insertSelective(memberProductEffect);
         if (result < 1) {
-            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "数据保存失败");
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "数据保存失败!");
         }
-
-        //查询上一步保存的记录
+        //查询更新后的记录(用于保存历史记录表)
         MemberProductEffect memberProductEffectAfter = memberProductEffectMapper.selectByPrimaryKey(memberProductEffect.getId());
 
         // 添加记录
         MemberProductEffectRecord modifyRecord = new MemberProductEffectRecord();
         modifyRecord.setAfterData(JSONUtil.toJsonPrettyStr(memberProductEffectAfter));
         modifyRecord.setModifyNo(record.getUpdator());
-        modifyRecord.setModifyTime(record.getUpateTime());
         modifyRecord.setProductEffectId(memberProductEffect.getId());
 
-        modifyRecord.setModifyTime(new Date());
+        modifyRecord.setModifyTime(now);
 
         //保存
         result =  memberProductEffectRecordMapper.insertSelective(modifyRecord);
@@ -131,64 +122,57 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
     @Transactional
     protected int modify(MemberProductEffectUpdateVO record) {
         if (record.getId() == null) {
-            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "id不能为空");
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "id不能为空!");
         }
         if (StringUtils.isEmpty(record.getMemberCard())) {
-            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "memberCard不能为空");
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "memberCard不能为空!");
         }
         //查询客户是否存在
         Member member = memberMapper.selectMemberByCard(record.getMemberCard());
         if (member == null) {
-            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "会员不存在");
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "会员不存在!");
         }
         //查询之前的数据
         MemberProductEffect memberProductEffectBefore = memberProductEffectMapper.selectByPrimaryKey(record.getId());
         if (memberProductEffectBefore == null) {
-            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "记录不存在");
+            throw new BizException(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(), "记录不存在!");
         }
-
+        //系统当前时间
+        DateTime now = DateUtil.date();
+        //创建更新对象
         MemberProductEffect memberProductEffect = new MemberProductEffect();
         BeanUtil.copyProperties(record, memberProductEffect);
-        memberProductEffect.setUpateTime(new Date());
+        memberProductEffect.setUpateTime(now);
 
         //每天吃几次
         Integer oneToTimes = record.getOneToTimes();
-        //每次吃多少粒
+        //每次吃多少
         Integer oneUseNum = record.getOneUseNum();
-        //每天吃多少(计算)
-        //Integer eatingTime = record.getEatingTime();
         //商品余量
-        Integer productLastNum = memberProductEffectBefore.getProductLastNum();
+        Integer productLastNum = record.getProductLastNum();
 
         //每天用量
         Integer oneNum = null;
-        if (oneToTimes > 0 && oneUseNum > 0) {
-            oneNum = oneToTimes*oneUseNum;
+        if (oneToTimes != null && oneUseNum != null) {
+            oneNum = oneToTimes * oneUseNum;
         }
         //每天吃多少(计算)
         memberProductEffect.setEatingTime(oneNum);
-        //商品服用完日期
-        Integer eatDay = null;
-        if (oneNum != null && oneNum > 0 && productLastNum != null && productLastNum>0) {
-            eatDay = productLastNum % oneNum == 0 ? productLastNum / oneNum : productLastNum / oneNum + 1;
-            //获取当前时间
-            Calendar current = Calendar.getInstance();
-            current.add(Calendar.DATE, eatDay-1);
-            Date date = null;
-            try {
-                date = sdf.parse(sdf.format(current.getTime()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            memberProductEffect.setDueDate(date);
+        //当有日用量和商品余量的时候 ==> 计算可以吃到哪一天
+        if (oneNum != null && productLastNum != null && oneNum > 0  && productLastNum > 0) {
+            //可以吃多少天 = 余量 ➗ 每天吃多少
+            int eatDay = (int)Math.ceil(productLastNum / (float) oneNum);
+            //可以吃到哪一天(截至日期当前的开始时间)
+            Date dueDate = DateUtil.beginOfDay(DateUtil.offsetDay(now, eatDay - 1));
+            memberProductEffect.setDueDate(dueDate);
         }
-
+        //更新数据
         int result = memberProductEffectMapper.updateByPrimaryKeySelective(memberProductEffect);
 
         if (result < 1) {
-            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "数据保存失败");
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "数据保存失败!");
         }
-
+        //查询更新后的记录(用于保存历史记录表)
         MemberProductEffect memberProductEffectAfter = memberProductEffectMapper.selectByPrimaryKey(memberProductEffect.getId());
 
         // 添加记录
@@ -198,12 +182,12 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         modifyRecord.setModifyNo(record.getUpdator());
         modifyRecord.setProductEffectId(memberProductEffect.getId());
 
-        modifyRecord.setModifyTime(new Date());
-
+        modifyRecord.setModifyTime(now);
+        //保存
         result =  memberProductEffectRecordMapper.insertSelective(modifyRecord);
 
         if (result < 1) {
-            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "记录数据保存失败");
+            throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "记录数据保存失败!");
         }
         return result;
     }
@@ -214,7 +198,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * @return
      */
     @Transactional
-    public ComResponse batchSaveProductEffect(List<MemberProductEffectInsertVO> records) {
+    public ComResponse<Boolean> batchSaveProductEffect(List<MemberProductEffectInsertVO> records) {
         if (CollectionUtil.isEmpty(records)) {
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"参数不能为空!");
         }
@@ -234,7 +218,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
      * @return
      */
     @Transactional
-    public ComResponse batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> records) {
+    public ComResponse<Boolean> batchModifyProductEffect(String userNo,List<MemberProductEffectUpdateVO> records) {
         if (CollectionUtil.isNotEmpty(records)) {
             for (MemberProductEffectUpdateVO record : records) {
                 //修改人赋值

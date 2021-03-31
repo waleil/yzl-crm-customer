@@ -1,5 +1,6 @@
 package cn.net.yzl.crm.customer.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -49,8 +50,9 @@ public class MemberProductEffectUpdateVO implements Serializable {
     @ApiModelProperty(value = "修改人编号",name="updator",required = false,hidden = true)
     private String updator;
 
-//    @ApiModelProperty(value = "修改时间",name="upateTime")
-//    private Date upateTime;
+    @ApiModelProperty(value = "修改时间",name="upateTime",required = false,hidden = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date upateTime;
 
     @ApiModelProperty(value = "商品关联的最后一次签收订单编号",name="orderNo",required = false,hidden = true)
     private String orderNo;

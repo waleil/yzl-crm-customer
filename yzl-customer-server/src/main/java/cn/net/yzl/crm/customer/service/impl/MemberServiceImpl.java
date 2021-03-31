@@ -931,11 +931,14 @@ public class MemberServiceImpl implements MemberService {
                 if (dto != null) {
                     upVo = new MemberProductEffectUpdateVO();
                     BeanUtil.copyProperties(dto, upVo);
+                    upVo.setUpdator("-1");//设置修改人
+                    upVo.setUpateTime(new Date());//设置修改时间
                     updateProductVoList.add(upVo);
                 } else {
                     addVo = new MemberProductEffectInsertVO();
                     addVo.setMemberCard(memberCard);
                     addVo.setProductCode(productVO.getProductCode());
+                    addVo.setUpdator("-1");//设置修改人
                     addProductVoList.add(addVo);
                 }
                 //获取商品的信息(主要是规格)
@@ -1006,7 +1009,7 @@ public class MemberServiceImpl implements MemberService {
             }
             //更新
             if (updateProductVoList.size() > 0) {
-                ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(), updateProductVoList);
+                ComResponse<Boolean> comResponse = memberProductEffectService.batchModifyProductEffect(orderInfo4MqVo.getStaffNo(), updateProductVoList);
                 if (comResponse.getCode() != 200) {
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return ComResponse.fail(comResponse.getCode(), comResponse.getMessage());
@@ -1253,7 +1256,7 @@ public class MemberServiceImpl implements MemberService {
             result = this.insert(memberVO);
         } catch (Exception e) {
             if (StringUtils.isNotEmpty(e.getMessage()) && e.getMessage().endsWith("已经被使用!")){
-                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "用户已经存在!");
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "该客户已存在,无法转介绍入库!");
             }else{
                 throw e;
             }
@@ -1408,7 +1411,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         //更新商品服用效果
-        ComResponse comResponse = memberProductEffectService.batchModifyProductEffect(vo.getStaffNo(), vo.getProductEffectList());
+        ComResponse<Boolean> comResponse = memberProductEffectService.batchModifyProductEffect(vo.getStaffNo(), vo.getProductEffectList());
         if (comResponse.getCode() != 200) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ComResponse.fail(ResponseCodeEnums.PARAMS_ERROR_CODE.getCode(),"(商品服用效果)记录数据保存失败!");
