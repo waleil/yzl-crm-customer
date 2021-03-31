@@ -1253,7 +1253,7 @@ public class MemberServiceImpl implements MemberService {
             result = this.insert(memberVO);
         } catch (Exception e) {
             if (StringUtils.isNotEmpty(e.getMessage()) && e.getMessage().endsWith("已经被使用!")){
-                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "用户已经存在!");
+                throw new BizException(ResponseCodeEnums.SAVE_DATA_ERROR_CODE.getCode(), "该客户已存在,无法转介绍入库!");
             }else{
                 throw e;
             }
