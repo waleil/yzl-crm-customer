@@ -932,6 +932,7 @@ public class MemberServiceImpl implements MemberService {
                     upVo = new MemberProductEffectUpdateVO();
                     BeanUtil.copyProperties(dto, upVo);
                     upVo.setUpdator("-1");//设置修改人
+                    upVo.setUpateTime(new Date());//设置修改时间
                     updateProductVoList.add(upVo);
                 } else {
                     addVo = new MemberProductEffectInsertVO();

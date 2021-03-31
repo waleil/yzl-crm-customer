@@ -49,8 +49,8 @@ public class MemberProductEffectUpdateVO implements Serializable {
     @ApiModelProperty(value = "修改人编号",name="updator",required = false,hidden = true)
     private String updator;
 
-//    @ApiModelProperty(value = "修改时间",name="upateTime")
-//    private Date upateTime;
+    @ApiModelProperty(value = "修改时间",name="upateTime",required = false,hidden = true)
+    private Date upateTime;
 
     @ApiModelProperty(value = "商品关联的最后一次签收订单编号",name="orderNo",required = false,hidden = true)
     private String orderNo;
