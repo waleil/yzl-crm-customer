@@ -149,7 +149,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         //每次吃多少粒
         Integer oneUseNum = record.getOneUseNum();
         //商品余量
-        Integer productLastNum = memberProductEffectBefore.getProductLastNum();
+        Integer productLastNum = record.getProductLastNum();
 
         //每天用量
         Integer oneNum = null;
