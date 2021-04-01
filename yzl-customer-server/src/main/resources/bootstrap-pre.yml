@@ -10,6 +10,6 @@ spring:
       config:
         username: crm-api
         password: Yzl@2020
-        namespace: 413a0c70-2606-4fdd-b3d2-9b3a931fe816
+        namespace: bb2ec45d-e685-4015-a9db-03bacd7bb059
         file-extension: yaml
         prefix: yzl-customer-server-pre
