@@ -6,7 +6,7 @@ spring:
         username: api-gateway
         password: Yzl@12345
         namespace: e2b76f4c-88ef-4d21-ba71-3cb814fdeae3
-      #        register-enabled: false
+#        register-enabled: false
       config:
         username: crm-api
         password: Yzl@2020
