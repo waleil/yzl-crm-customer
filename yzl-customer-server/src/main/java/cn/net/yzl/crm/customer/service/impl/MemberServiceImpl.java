@@ -411,6 +411,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderStat getMemberOrderStat(String member_card) {
         MemberOrderStat stat = memberMapper.getMemberOrderStat(member_card);
         if (stat != null) {
+            stat.setTotalOrderAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_order_amount()));//累计订单总金额(元)
             stat.setTotalCounsumAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_counsum_amount()));//累计消费金额(元)
             stat.setTotalInvestAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_invest_amount()));//累计充值金额(元)
             stat.setFirstOrderAmD(CentYuanConvertUtil.cent2Yuan(stat.getFirst_order_am()));//首单金额(元)
@@ -881,6 +882,9 @@ public class MemberServiceImpl implements MemberService {
         List<MemberProductEffectInsertVO> addProductVoList = new ArrayList<>();
         List<MemberProductEffectUpdateVO> updateProductVoList = new ArrayList<>();
         List<MemberProductEffectDTO> productEffectList = null;
+        //当前顾客正在服用的所有商品的最小余量
+        Integer minProductLastNum = Integer.MAX_VALUE;
+
         if (CollectionUtil.isNotEmpty(buyProductList)) {
             for (OrderProductVO productVO : buyProductList) {
                 buyProductCodes.append(productVO.getProductCode()).append(",");
@@ -902,9 +906,6 @@ public class MemberServiceImpl implements MemberService {
                     productMap.put(mainDTO.getProductCode(), mainDTO);
                 }
             }
-
-            //当前顾客正在服用的所有商品的最小余量
-            Integer minProductLastNum = Integer.MAX_VALUE;
 
             //查询客户对应的商品服用效果
             MemberProductEffectSelectVO effectVo = new MemberProductEffectSelectVO();
@@ -1157,7 +1158,9 @@ public class MemberServiceImpl implements MemberService {
         member = memberMapper.selectMemberByCard(memberCard);
 
         //订单签收的时候，让工单更新当前顾客的正在服用的商品的最小余量
-        res = WorkOrderClientAPI.updateMinProductLastNum(memberCard, 1, String.valueOf(member.getMGradeId()));
+        if (!minProductLastNum.equals(Integer.MAX_VALUE)) {
+            res = WorkOrderClientAPI.updateMinProductLastNum(memberCard, minProductLastNum, String.valueOf(member.getMGradeId()));
+        }
 
         //设置缓存
         redisUtil.sSet(CacheKeyUtil.syncMemberLabelCacheKey(),memberCard);
