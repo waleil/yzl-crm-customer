@@ -1029,7 +1029,7 @@
     </select>
 
     <select id="getMemberOrderStat" parameterType="String" resultType="cn.net.yzl.crm.customer.model.MemberOrderStat">
-        select member_card,total_counsum_amount,total_invest_amount,first_order_time,last_order_time,last_buy_product_code,
+        select member_card,total_order_amount,total_counsum_amount,total_invest_amount,first_order_time,last_order_time,last_buy_product_code,
             first_order_staff_no,first_order_no,first_buy_product_code,first_order_am,order_high_am,order_low_am,
             order_avg_am,product_type_cnt,buy_count,day_avg_count,year_avg_count,return_goods_rate
         from member_order_stat

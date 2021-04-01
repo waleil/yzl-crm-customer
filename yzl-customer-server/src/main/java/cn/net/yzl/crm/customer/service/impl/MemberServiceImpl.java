@@ -411,6 +411,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderStat getMemberOrderStat(String member_card) {
         MemberOrderStat stat = memberMapper.getMemberOrderStat(member_card);
         if (stat != null) {
+            stat.setTotalOrderAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_order_amount()));//累计订单总金额(元)
             stat.setTotalCounsumAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_counsum_amount()));//累计消费金额(元)
             stat.setTotalInvestAmountD(CentYuanConvertUtil.cent2Yuan(stat.getTotal_invest_amount()));//累计充值金额(元)
             stat.setFirstOrderAmD(CentYuanConvertUtil.cent2Yuan(stat.getFirst_order_am()));//首单金额(元)
