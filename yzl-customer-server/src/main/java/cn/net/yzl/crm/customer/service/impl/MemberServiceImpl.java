@@ -1100,9 +1100,9 @@ public class MemberServiceImpl implements MemberService {
         member.setTotal_amount(totalCounsumAmount);//累计消费金额
 
 
-        //顾客的首单金额为空或者为0的时候,设置顾客的首单金额
-        if (member.getFirst_order_am() == null || member.getFirst_order_am().intValue() == 0) {
-            member.setFirst_order_am(orderInfo4MqVo.getSpend());//首单正真金额
+        //顾设置顾客的首单金额
+        if (member.getFirst_order_am() == null || !member.getFirst_order_am().equals(memberOrderStat.getFirstOrderAm())) {
+            member.setFirst_order_am(memberOrderStat.getFirstOrderAm());//首单正真金额
         }
         //顾客的会员标识不是会员的时要设置会员标识(这个标识在第一次订单签收的时候更新为1，之后不会再改变，即有第一次订单签收操作就更新为1)
         if (!member.isVip_flag()) {
