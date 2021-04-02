@@ -86,7 +86,7 @@ public class MemberProductEffect {
      *
      * @mbggenerated Mon Jan 25 21:24:38 CST 2021
      */
-    @ApiModelProperty("服用状态: 1 正常，2 非常好，3已停服")
+    @ApiModelProperty("服用状态: 1 正常，2 已停服")
     private Integer takingState;
 
     /**

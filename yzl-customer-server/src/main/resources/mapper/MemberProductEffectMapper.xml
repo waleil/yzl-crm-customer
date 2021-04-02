@@ -239,17 +239,17 @@
   </update>
 
 
-  <update id="updateMemberProductLastNumByPrimaryKeys">
-    update member_product_effect
-    set
-        product_last_num = (CASE when (product_last_num - eating_time) &gt; 0 THEN (product_last_num - eating_time) else 0 end),
-        taking_state =  (CASE when product_last_num = 0 THEN 2 end), <!-- 商品余量为0时，更新商品的服用状态为停服，订单签收时再更新为 -->
-        updator='-1',
-        upate_time = NOW()
-    where
-        id in
-    <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
-      #{item}
+  <!-- 定时器更新商品余量 -->
+  <update id="updateMemberProductLastNumByPrimaryKeys" parameterType="cn.net.yzl.crm.customer.model.db.MemberProductEffect">
+    <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+      update `member_product_effect`
+      <set>
+        `product_last_num`=#{item.productLastNum},
+        `taking_state`=#{item.takingState},
+        `updator`='-11',
+        `upate_time` = NOW()
+      </set>
+      where `id` = #{item.id}
     </foreach>
   </update>
 
@@ -350,9 +350,12 @@
         FROM
             member_product_effect
         WHERE
-            product_last_num > 0 <!-- 商品剩余量>0的 -->
+            id &gt; #{minPrimaryKey}
+            and product_last_num > 0 <!-- 商品剩余量>0的 -->
       <!--  and taking_state in (1,2)  服用状态: 1 正常，2 非常好 -->
         ORDER BY id
+        limit #{pageSize};
+
     </select>
 
 </mapper>
