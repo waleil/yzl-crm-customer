@@ -297,6 +297,7 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
                 }
                 hasNext = false;
             }
+            minPrimaryKey = list.get(selectCount - 1).getId();
             //更新数据
             for (MemberProductEffect item : list) {
                 productLastNum = item.getProductLastNum();
