@@ -260,46 +260,94 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
     public ComResponse<Boolean> updateMemberProductLastNumAndCreateWorkOrder() {
         log.info("update member product last num: start,当前时间{}",new Date());
         //查询配置规则
-        Integer configDay = WorkOrderClientAPI.queryReturnVisitRules();
-        log.info("update member product last num:查询配置规则,当前配置为：{}",configDay);
-        Integer pageNo = 1, pageSize = 2_000;
+        Integer RETURN_VISIT_RULES_CONFIG_DAY = WorkOrderClientAPI.queryReturnVisitRules();
+        log.info("update member product last num:查询配置规则,当前配置为：{}",RETURN_VISIT_RULES_CONFIG_DAY);
+        //系统当前时间
+        DateTime now = DateUtil.date();
+        //系统当前时间0点0分0秒
+        Date currentDateStart = DealDateUtil.getStart(now);
+        int minPrimaryKey = 0;//最小的id从0开始
+        int pageSize = 2_000;//每页查询的条数
+        int selectCount = 0;//实际查询的数量
         boolean hasNext = true;
-        //临时记录要更新余量的商品服用效果的id
-        List<Integer> idList = new ArrayList<>();
+        List<MemberProductEffect> updateLastNumList = new ArrayList<>();
         //停止服用商品效果记录的id
         List<Integer> stoptakingIdList = new ArrayList<>();
-
         //客户编号
         List<String> memberCardList = new ArrayList<>();
         //计算商品服用完日期和当前时间的天数差
         long betweenDay;
-        //获取系统当前时间
-        Date currentDateStart = DealDateUtil.getStart(new Date());
+        //分页查询顾客服用商品
+        List<MemberProductEffect> list;
+
+        Integer oneNum;//每天吃多少
+        Integer productLastNum;//商品余量
+        Date dueDate;//商品服用完日期
+        Integer count = 0;
         while (hasNext) {
             //分页查询顾客的商品服用效果
-            PageHelper.startPage(pageNo, pageSize);
-            List<MemberProductEffect> list = memberProductEffectMapper.selectMemberProductEffectByPage();
-            if (list.size() < pageSize) {
+            list = memberProductEffectMapper.selectMemberProductEffectByPage(minPrimaryKey,pageSize);
+            //获取实际查询的记录条数
+            selectCount = list.size();
+            //查询出来的数据小于pageSize，则当处理完当前的数据后，跳出while循环
+            if (selectCount < pageSize) {
+                //没有查询出数据，直接跳出while循环
+                if (selectCount == 0) {
+                    break;
+                }
                 hasNext = false;
             }
-            pageNo++;
+            minPrimaryKey = list.get(selectCount - 1).getId();
             //更新数据
             for (MemberProductEffect item : list) {
-                if (item.getDueDate() == null) {
+                productLastNum = item.getProductLastNum();
+                oneNum = item.getEatingTime();//获取每天吃多少
+                dueDate = item.getDueDate();
+                //1.没有日用量 或者 没有余量 的不更新 2.没有商品服用完日期
+                if (oneNum == null || productLastNum == null || oneNum <= 0 || productLastNum <= 0 || dueDate == null) {
                     continue;
                 }
-                //已经停服的要重新计算商品的服用完日期
+                //3.[已停服]的要根据商品余量重新计算商品的服用完日期(正常是日期延后一天)
                 if (item.getTakingState() != null && item.getTakingState() == 2){
-                    //有日用量的，则进行更新
-                    if (item.getEatingTime() != null && item.getEatingTime() > 0){
-                        stoptakingIdList.add(item.getId());
-                    }
+                    stoptakingIdList.add(item.getId());
                     continue;
                 }
-                idList.add(item.getId());//用户更新商品的数量
+
+                // 4.处理正常服用的商品
+                //可以吃多少天 = 余量 ➗ 每天吃多少
+                int eatDay = (int)Math.ceil(productLastNum / (float) oneNum);
+                //可以吃到哪一天(截至日期当前的开始时间)
+                Date calculateDueDate = DateUtil.beginOfDay(DateUtil.offsetDay(now, eatDay - 1));
+
+                //计算两个日期差，等于几就减去几天
+                int between = (int)DateUtil.between(calculateDueDate,dueDate, DateUnit.DAY,false);
+                //已经扣减过了，不用重复扣减
+                if (between > 0) {
+                    continue;
+                }
+                //计算扣减后的商品余量
+                productLastNum = productLastNum - oneNum < 0 ? 0 : productLastNum - oneNum;
+                //重新设置商品剩余量(余量-日用量)
+                item.setProductLastNum(productLastNum);
+                //商品余量为0时，更新商品的服用状态为停服，订单签收时再更新为正常服用
+                if (productLastNum == 0) {
+                    item.setTakingState(2);
+                }
+                //记录需要更新余量的商品
+                updateLastNumList.add(item);
+                //更新商品余量
+                if (updateLastNumList.size() == 100) {
+                    count = memberProductEffectMapper.updateMemberProductLastNumByPrimaryKeys(updateLastNumList);
+                    log.info("update member product last num: record count:{}",count);
+                    updateLastNumList.clear();
+                }
+
+                /**
+                 * 判断是否需要生成次日回访的工单
+                 */
                 //小于最小服用天数
                 betweenDay = DateUtil.between(currentDateStart, item.getDueDate(), DateUnit.DAY,false);
-                if (betweenDay >= 0 && betweenDay < configDay){
+                if (betweenDay >= 0 && betweenDay < RETURN_VISIT_RULES_CONFIG_DAY){
                     //判断缓存是否存在(防止重复回访)
                     if (!CacheForProductEffectUtil.getAndSetNx(item.getMemberCard())) {
                         memberCardList.add(item.getMemberCard());
@@ -308,17 +356,17 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
             }
             //更新已经停服的商品的服用完日期
             if (CollectionUtil.isNotEmpty(stoptakingIdList)) {
-                Integer count = memberProductEffectMapper.updateMemberProductDueDateByPrimaryKeys(stoptakingIdList);
+                count = memberProductEffectMapper.updateMemberProductDueDateByPrimaryKeys(stoptakingIdList);
                 log.info("update member product stop taking due date: record count:{}",count);
                 stoptakingIdList.clear();
             }
             //更新商品剩余量
-            if (CollectionUtil.isNotEmpty(idList)) {
-                Integer count = memberProductEffectMapper.updateMemberProductLastNumByPrimaryKeys(idList);
+            if (CollectionUtil.isNotEmpty(updateLastNumList)) {
+                count = memberProductEffectMapper.updateMemberProductLastNumByPrimaryKeys(updateLastNumList);
                 log.info("update member product last num: record count:{}",count);
-                idList.clear();
+                updateLastNumList.clear();
             }
-            //次日回访
+            //生成次日回访的工单
             if (CollectionUtil.isNotEmpty(memberCardList)){
                 boolean result = WorkOrderClientAPI.productDosage(memberCardList);
                 if (!result) {

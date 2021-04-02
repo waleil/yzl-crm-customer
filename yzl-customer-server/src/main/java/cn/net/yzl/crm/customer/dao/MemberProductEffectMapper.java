@@ -59,9 +59,10 @@ public interface MemberProductEffectMapper {
 
     List<MemberProductEffect> checkMemberProductEffect();
 
-    List<MemberProductEffect> selectMemberProductEffectByPage();
+    List<MemberProductEffect> selectMemberProductEffectByPage(@Param("minPrimaryKey") Integer minPrimaryKey,@Param("pageSize") Integer pageSize);
 
-    Integer updateMemberProductLastNumByPrimaryKeys(@Param("ids") List<Integer> memberCardList);
+    //Integer updateMemberProductLastNumByPrimaryKeys(@Param("ids") List<Integer> memberCardList);
+    Integer updateMemberProductLastNumByPrimaryKeys(@Param("list") List<MemberProductEffect> memberCardList);
 
     Integer updateMemberProductDueDateByPrimaryKeys(@Param("ids") List<Integer> stoptakingIdList);
 
