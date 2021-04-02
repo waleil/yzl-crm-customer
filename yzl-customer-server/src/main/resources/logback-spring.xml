@@ -87,7 +87,7 @@
             <appender-ref ref="ASYNC_ERROR_FILE_LOG"/>
         </logger>
     </springProfile>
-    <springProfile name="prod">
+    <springProfile name="pre,prod">
         <root level="info">
             <appender-ref ref="ASYNC_INFO_FILE_LOG"/>
             <appender-ref ref="ASYNC_ERROR_FILE_LOG"/>
