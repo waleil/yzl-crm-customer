@@ -978,7 +978,7 @@ public class MemberServiceImpl implements MemberService {
                         upVo.setProductLastNum(Integer.valueOf(totalUseNum) * productCount + dto.getProductLastNum());//商品剩余量
                         //获取正在服用的最想商品余量
                         if (upVo.getTakingState() == 1 && minProductLastNum > upVo.getProductLastNum()) {
-                            minProductLastNum = addVo.getProductLastNum();
+                            minProductLastNum = upVo.getProductLastNum();
                         }
                     }
 
@@ -1051,25 +1051,31 @@ public class MemberServiceImpl implements MemberService {
         if (StringUtils.isEmpty(memberOrderStat.getFirstBuyProductCode())) {
             memberOrderStat.setFirstBuyProductCode(memberOrderStat.getLastBuyProductCode());
         }
-        if (memberOrderStat.getFirstOrderAm() == null || memberOrderStat.getFirstOrderAm().intValue() == 0) {
-            memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getTotalAll());//真正首单金额
-        }
-        if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getTotalAll()) {
-            memberOrderStat.setOrderHighAm(orderInfo4MqVo.getTotalAll());//订单最高金额
-        }
-
-        if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm().intValue() == 0 || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getTotalAll()) {
-            memberOrderStat.setOrderLowAm(orderInfo4MqVo.getTotalAll());//订单最低金额
+        //购买次数
+        Integer buyCount = memberOrderStat.getBuyCount();
+        if (buyCount == null) {
+            buyCount = 0;
         }
 
-        if (memberOrderStat.getBuyCount() == null) {
-            memberOrderStat.setBuyCount(0);
+        if (buyCount == 0) {
+            memberOrderStat.setFirstOrderAm(orderInfo4MqVo.getSpend());//首单金额
         }
-        memberOrderStat.setBuyCount(memberOrderStat.getBuyCount() + 1);//累计购买次数
-        memberOrderStat.setOrderAvgAm(memberOrderStat.getTotalOrderAmount() / memberOrderStat.getBuyCount());//订单平均金额
+        if (memberOrderStat.getOrderHighAm() == null || memberOrderStat.getOrderHighAm() < orderInfo4MqVo.getSpend()) {
+            memberOrderStat.setOrderHighAm(orderInfo4MqVo.getSpend());//订单最高金额
+        }
+        //没有购买次数的时候,本次金额为最低金额
+        if (buyCount == 0) {
+            memberOrderStat.setOrderLowAm(orderInfo4MqVo.getSpend());//订单最低金额
+        }else if (memberOrderStat.getOrderLowAm() == null || memberOrderStat.getOrderLowAm() > orderInfo4MqVo.getSpend()) {
+            memberOrderStat.setOrderLowAm(orderInfo4MqVo.getSpend());//订单最低金额
+        }
+
+        memberOrderStat.setBuyCount(buyCount + 1);//累计购买次数
+
+        //订单平均金额
+        memberOrderStat.setOrderAvgAm(Math.round(memberOrderStat.getTotalCounsumAmount() / (float)memberOrderStat.getBuyCount()));
         int orgNum = productEffectList == null ? 0 : productEffectList.size();
         memberOrderStat.setProductTypeCnt(addProductVoList.size() + orgNum);//购买产品种类个数
-        //memberOrderStat.setLastOrderTime(orderInfo4MqVo.getSignTime());
 
         //总平均购买天数
         if (memberOrderStat.getLastOrderTime() != null && memberOrderStat.getFirstOrderTime() != null) {
