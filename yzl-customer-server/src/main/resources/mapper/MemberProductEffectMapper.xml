@@ -246,7 +246,7 @@
       <set>
         `product_last_num`=#{item.productLastNum},
         `taking_state`=#{item.takingState},
-        `updator`='-11',
+        `updator`='-1',
         `upate_time` = NOW()
       </set>
       where `id` = #{item.id}
