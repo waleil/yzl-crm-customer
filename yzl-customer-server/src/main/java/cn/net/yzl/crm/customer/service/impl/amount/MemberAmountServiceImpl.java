@@ -426,6 +426,10 @@ public class MemberAmountServiceImpl implements MemberAmountService {
         List<MemberAmountDetailDto> list = memberAmountDetailDao.getMemberAmountDetailsBymemberCardAndOrderList(memberCard, orderList);
         if (list == null) {
             list = Collections.emptyList();
+        }else{
+            list.forEach(item -> {
+                item.setDiscountMoneyD(CentYuanConvertUtil.cent2Yuan(item.getDiscountMoney()));
+            });
         }
         return list;
     }
