@@ -93,7 +93,7 @@
         order_no orderNo,
         end_date createDate,
         discount_money discountMoney,
-        obtain_type obtainType,
+        1 obtainType,
         `status`
       FROM
       member_amount_detail
@@ -175,7 +175,7 @@
       order_no orderNo,
       end_date createDate,
       discount_money discountMoney,
-      obtain_type obtainType,`status`,
+      1 obtainType,`status`,
       remark
       FROM
       member_amount_detail
