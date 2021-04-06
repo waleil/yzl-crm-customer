@@ -56,4 +56,23 @@
 		</plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <url>http://192.168.32.31/nexus/conetent/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+		<repository>
+            <id>releases</id>
+            <url>http://192.168.32.31/nexus/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>
+
 </project>
