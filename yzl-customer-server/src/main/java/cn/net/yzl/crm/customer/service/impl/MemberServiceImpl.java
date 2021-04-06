@@ -2,6 +2,8 @@ package cn.net.yzl.crm.customer.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Pair;
@@ -84,6 +86,7 @@ public class MemberServiceImpl implements MemberService {
     NacosValue nacosValue;
     private final static String STR_CLEAR_FLAG = "-999999";
     private  final static Integer NUM_CLEAR_FLAG = -999999;
+    private final static DateTime INIT_ORDER_TIME = new DateTime("1991-01-01 01:01:00", DatePattern.NORM_DATETIME_FORMAT);
     @Autowired
     MemberMapper memberMapper;
     @Autowired
@@ -299,9 +302,21 @@ public class MemberServiceImpl implements MemberService {
         CompletableFuture<Integer> cfCount=CompletableFuture.supplyAsync(()->this.memberMapper.findCountByCondition(dto));
         CompletableFuture<List<Member>> cfList=CompletableFuture.supplyAsync(()->this.memberMapper.findPageByCondition(dto));
         CompletableFuture.allOf(cfCount,cfList);
-        List<Member> memberList =Collections.emptyList();
+        List<Member> memberList = null ;
         try {
              memberList = cfList.get();
+            if (CollectionUtil.isEmpty(memberList)) {
+                memberList =Collections.emptyList();
+            }else{
+                memberList.forEach(item -> {
+                    if (item.getLast_order_time().compareTo(INIT_ORDER_TIME) == 0) {
+                        item.setLast_order_time(null);
+                    }
+                    if (item.getFirst_order_time().compareTo(INIT_ORDER_TIME) == 0) {
+                        item.setFirst_order_time(null);
+                    }
+                });
+            }
         } catch (InterruptedException | ExecutionException e) {
             log.error(e.getLocalizedMessage(),e);
         }
