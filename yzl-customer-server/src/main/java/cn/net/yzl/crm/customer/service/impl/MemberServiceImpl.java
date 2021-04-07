@@ -309,10 +309,10 @@ public class MemberServiceImpl implements MemberService {
                 memberList =Collections.emptyList();
             }else{
                 memberList.forEach(item -> {
-                    if (item.getLast_order_time().compareTo(INIT_ORDER_TIME) == 0) {
+                    if (item.getLast_order_time() != null && item.getLast_order_time().compareTo(INIT_ORDER_TIME) == 0) {
                         item.setLast_order_time(null);
                     }
-                    if (item.getFirst_order_time().compareTo(INIT_ORDER_TIME) == 0) {
+                    if (item.getFirst_order_time() != null && item.getFirst_order_time().compareTo(INIT_ORDER_TIME) == 0) {
                         item.setFirst_order_time(null);
                     }
                 });

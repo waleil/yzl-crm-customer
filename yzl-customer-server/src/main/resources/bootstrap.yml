@@ -2,7 +2,7 @@ spring:
   application:
     name: yzl-customer
   profiles:
-    active: test
+    active: dev
 logging:
   level:
     cn:
