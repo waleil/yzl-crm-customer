@@ -51,6 +51,9 @@
 			<plugin>
 			    <groupId>pl.project13.maven</groupId>
 			    <artifactId>git-commit-id-plugin</artifactId>
+			    <configuration>
+			    	<useNativeGit>true</useNativeGit>
+			    </configuration>
 			</plugin>
 			<!-- ↑记录git仓库信息↑ -->
 		</plugins>
