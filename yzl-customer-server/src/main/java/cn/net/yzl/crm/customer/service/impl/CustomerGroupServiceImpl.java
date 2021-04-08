@@ -121,7 +121,7 @@ public class CustomerGroupServiceImpl implements CustomerGroupService {
     @Override
     public ComResponse saveCustomerCrowdGroup(member_crowd_group member_crowd_group) {
         Date date = new Date();
-        member_crowd_group.setCreate_time(MongoDateHelper.getMongoDate(date));
+        member_crowd_group.setCreate_time(date/*MongoDateHelper.getMongoDate(date)*/);
         member_crowd_group.setCreateTimeLong(date.getTime());
         member_crowd_group.setUpdate_time(member_crowd_group.getCreate_time());
         memberCrowdGroupDao.saveMemberCrowdGroup(member_crowd_group);
