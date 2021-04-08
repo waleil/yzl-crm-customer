@@ -58,6 +58,8 @@ public class MemberOrderStat {
     private BigDecimal returnGoodsRateD;
 
 
+    @ApiModelProperty("累计订单总金额(分)")
+    private Integer total_order_amount;
     @ApiModelProperty("累计消费金额(分)")
     private Integer total_counsum_amount;
     @ApiModelProperty("累计充值金额(分)")
@@ -71,6 +73,8 @@ public class MemberOrderStat {
     @ApiModelProperty("订单平均金额(分)")
     private Integer order_avg_am;
 
+    @ApiModelProperty("累计订单总金额(元)")
+    private BigDecimal totalOrderAmountD;
     @ApiModelProperty("累计消费金额(元)")
     private BigDecimal totalCounsumAmountD;
     @ApiModelProperty("累计充值金额(元)")

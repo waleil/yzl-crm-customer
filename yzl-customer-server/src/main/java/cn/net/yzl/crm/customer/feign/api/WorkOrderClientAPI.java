@@ -92,10 +92,33 @@ public class WorkOrderClientAPI {
                 log.error("创建工单失败：错误码:{},错误信息:{}",response.getCode(),response.getMessage());
             }
         } catch (Exception e) {
-            log.error("创建工单异常：异常信息:{}",e);
+            log.error("创建工单异常：异常信息:{}",e.getMessage());
         }
         return false;
     }
 
+
+    /**
+     * 订单签收的时候，让工单更新当前顾客的正在服用的商品的最小余量
+     * wangzhe
+     * 2021-03-29
+     * @param memberCard
+     * @param productLastNum
+     * @param mGradeCode
+     * @return
+     */
+    public static boolean updateMinProductLastNum(String memberCard,Integer productLastNum,String mGradeCode){
+        try {
+            ComResponse<Boolean> response = workOrderClientAPI.workOrderClient.updateMinProductLastNum(memberCard,productLastNum,mGradeCode);
+            if (response.getCode() != null && response.getCode() == 200) {
+                return true;
+            }else{
+                log.error("更新工单服务顾客正在服用的最小商品余量失败：顾客卡号:{},productLastNum:{},mGradeCode:{},错误码:{},错误信息:{}",memberCard,productLastNum,mGradeCode,response.getCode(),response.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("更新工单服务顾客正在服用的最小商品余量失败：顾客卡号:{},productLastNum:{},mGradeCode:{},异常信息:{}",memberCard,productLastNum,mGradeCode,e.getMessage());
+        }
+        return false;
+    }
 
 }

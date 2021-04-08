@@ -73,8 +73,8 @@ public class MemberAmountController {
 
 
     @ApiOperation(value = "顾客账户-通过顾客卡号和订单号集合获取余额明细", notes = "顾客账户-通过顾客卡号和订单号集合获取余额明细")
-    @RequestMapping(value = "/getMemberAmountDetailsBymemberCardAndOrderList", method = RequestMethod.GET)
-    ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailsBymemberCardAndOrderList(@RequestParam("memberCard") String  memberCard,@RequestParam("orderList") List<String> orderList) throws ParseException {
+    @RequestMapping(value = "/getMemberAmountDetailsBymemberCardAndOrderList", method = RequestMethod.POST)
+    ComResponse<List<MemberAmountDetailDto>> getMemberAmountDetailsBymemberCardAndOrderList(@RequestParam("memberCard") String  memberCard,@RequestBody List<String> orderList) throws ParseException {
         List<MemberAmountDetailDto> list = memberAmountService.getMemberAmountDetailsBymemberCardAndOrderList(memberCard, orderList);
         return ComResponse.success(list);
     }
