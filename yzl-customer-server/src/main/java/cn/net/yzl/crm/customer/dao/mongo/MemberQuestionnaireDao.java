@@ -157,7 +157,7 @@ public class MemberQuestionnaireDao extends MongoBaseDao<MemberQuestionnaire> {
         //排序
         Sort sort = Sort.by(Sort.Direction.DESC, "updateTime");
         query.with(sort);
-        query.fields().include("_id").include("memberCard").include("seqNo").include("formName").include("questionnaire");
+        query.fields().include("_id").include("memberCard").include("seqNo").include("formName");
         List<MemberQuestionnaireDTO> questionnaireList = mongoTemplate.find(query, MemberQuestionnaireDTO.class);
         //mongoTemplate.count计算总数
         Page page = new Page();
