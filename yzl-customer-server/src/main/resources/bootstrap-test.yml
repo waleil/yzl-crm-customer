@@ -1,7 +1,7 @@
 spring:
   cloud:
     nacos:
-      server-addr: http://nacostest.staff.yuzhilin.net.cn  #.169:8848
+      server-addr: http://nacostest.staff.yuzhilin.net.cn
       discovery:
         username: apigateway
         password: apigateway

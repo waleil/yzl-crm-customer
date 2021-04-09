@@ -2,12 +2,7 @@ spring:
   application:
     name: yzl-customer
   profiles:
-    active: dev
-logging:
-  level:
-    cn:
-      net:
-        yzl: info
+    active: test
 
 ribbon:
   ReadTimeout: 60000
