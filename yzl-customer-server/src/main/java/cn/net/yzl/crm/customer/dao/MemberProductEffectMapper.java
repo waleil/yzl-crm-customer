@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.dao;
 
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberproductMinNumDTO;
 import cn.net.yzl.crm.customer.model.db.MemberProductEffect;
 import cn.net.yzl.crm.customer.model.mogo.MemberProduct;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
@@ -66,4 +67,5 @@ public interface MemberProductEffectMapper {
 
     Integer updateMemberProductDueDateByPrimaryKeys(@Param("ids") List<Integer> stoptakingIdList);
 
+    List<MemberproductMinNumDTO> getMemberproductMinNumByMemberCards(@Param("list") List<String> memberCards);
 }

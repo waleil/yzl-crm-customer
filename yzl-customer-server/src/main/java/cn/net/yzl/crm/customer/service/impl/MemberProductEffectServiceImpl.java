@@ -12,6 +12,7 @@ import cn.net.yzl.crm.customer.dao.MemberMapper;
 import cn.net.yzl.crm.customer.dao.MemberProductEffectMapper;
 import cn.net.yzl.crm.customer.dao.MemberProductEffectRecordMapper;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberproductMinNumDTO;
 import cn.net.yzl.crm.customer.feign.api.WorkOrderClientAPI;
 import cn.net.yzl.crm.customer.feign.client.workorder.WorkOrderClient;
 import cn.net.yzl.crm.customer.model.Member;
@@ -377,6 +378,11 @@ public class MemberProductEffectServiceImpl implements MemberProductEffectServic
         }
         log.info("update member product last num: end,当前时间{}",new Date());
         return ComResponse.success(true);
+    }
+
+    @Override
+    public List<MemberproductMinNumDTO> getMemberproductMinNumByMemberCards(List<String> memberCards) {
+        return memberProductEffectMapper.getMemberproductMinNumByMemberCards(memberCards);
     }
 
 
