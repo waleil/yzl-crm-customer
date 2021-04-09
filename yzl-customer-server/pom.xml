@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>yzl-customer</artifactId>
-        <groupId>cn.net.yzl.crm.customer</groupId>
+        <groupId>cn.net.yzl.customer</groupId>
         <version>1.0-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -141,7 +141,7 @@
 
 
         <dependency>
-            <groupId>cn.net.yzl.crm.customer</groupId>
+            <groupId>cn.net.yzl.customer</groupId>
             <artifactId>yzl-customer-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
