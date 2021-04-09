@@ -1,6 +1,7 @@
 package cn.net.yzl.crm.customer.controller;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -94,7 +96,13 @@ public class MemberProductEffectController {
     @ApiOperation(value = "商品服用效果，根据批量顾客卡号获取顾客正在服用的商品的最小余量", notes = "商品服用效果，根据批量顾客卡号获取顾客正在服用的商品的最小余量")
     @RequestMapping(value = "/v1/getMemberproductMinNumByMemberCards", method = RequestMethod.POST)
     public ComResponse<List<MemberproductMinNumDTO>> getMemberproductMinNumByMemberCards(@RequestBody List<String> memberCards) {
-        List<MemberproductMinNumDTO> list = memberProductEffectService.getMemberproductMinNumByMemberCards(memberCards);
+        List<MemberproductMinNumDTO> list = null;
+        if (CollectionUtil.isNotEmpty(memberCards)) {
+            list = memberProductEffectService.getMemberproductMinNumByMemberCards(memberCards);
+        }
+        if (list == null) {
+            list = Collections.emptyList();
+        }
         return ComResponse.success(list);
     }
 
