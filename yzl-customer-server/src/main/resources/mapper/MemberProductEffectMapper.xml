@@ -357,5 +357,23 @@
         limit #{pageSize};
 
     </select>
+    <select id="getMemberproductMinNumByMemberCards"
+            resultType="cn.net.yzl.crm.customer.dto.member.MemberproductMinNumDTO">
+      SELECT
+        member_card memberCard,
+        min(product_last_num) minNum
+      FROM
+        member_product_effect
+      WHERE
+        member_card IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+        AND taking_state = 1
+
+      GROUP BY member_card
+
+
+    </select>
 
 </mapper>

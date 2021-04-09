@@ -2,6 +2,7 @@ package cn.net.yzl.crm.customer.service;
 
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberproductMinNumDTO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectUpdateVO;
@@ -35,5 +36,7 @@ public interface MemberProductEffectService {
     ComResponse<List<MemberProductEffectDTO>> getProductEffects(MemberProductEffectSelectVO productEffect);
 
     ComResponse<Boolean> updateMemberProductLastNumAndCreateWorkOrder();
+
+    List<MemberproductMinNumDTO> getMemberproductMinNumByMemberCards(List<String> memberCards);
 }
 

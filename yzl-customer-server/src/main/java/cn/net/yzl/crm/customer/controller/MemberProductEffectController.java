@@ -4,6 +4,7 @@ package cn.net.yzl.crm.customer.controller;
 import cn.net.yzl.common.entity.ComResponse;
 import cn.net.yzl.common.enums.ResponseCodeEnums;
 import cn.net.yzl.crm.customer.dto.member.MemberProductEffectDTO;
+import cn.net.yzl.crm.customer.dto.member.MemberproductMinNumDTO;
 import cn.net.yzl.crm.customer.service.MemberProductEffectService;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectInsertVO;
 import cn.net.yzl.crm.customer.vo.MemberProductEffectSelectVO;
@@ -90,5 +91,11 @@ public class MemberProductEffectController {
         return result;
     }
 
+    @ApiOperation(value = "商品服用效果，根据批量顾客卡号获取顾客正在服用的商品的最小余量", notes = "商品服用效果，根据批量顾客卡号获取顾客正在服用的商品的最小余量")
+    @RequestMapping(value = "/v1/getMemberproductMinNumByMemberCards", method = RequestMethod.POST)
+    public ComResponse<List<MemberproductMinNumDTO>> getMemberproductMinNumByMemberCards(@RequestBody List<String> memberCards) {
+        List<MemberproductMinNumDTO> list = memberProductEffectService.getMemberproductMinNumByMemberCards(memberCards);
+        return ComResponse.success(list);
+    }
 
 }
