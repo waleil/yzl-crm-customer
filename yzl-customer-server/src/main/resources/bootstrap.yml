@@ -3,11 +3,6 @@ spring:
     name: yzl-customer
   profiles:
     active: test
-logging:
-  level:
-    cn:
-      net:
-        yzl: info
 
 ribbon:
   ReadTimeout: 60000

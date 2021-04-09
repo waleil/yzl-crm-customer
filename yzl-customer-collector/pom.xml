@@ -105,6 +105,15 @@
           <includeSystemScope>true</includeSystemScope>
         </configuration>
       </plugin>
+      <!-- ↓deploy时跳过当前工程↓ -->
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-deploy-plugin</artifactId>
+      	<configuration>
+      		<skip>true</skip>
+      	</configuration>
+      </plugin>
+      <!-- ↑deploy时跳过当前工程↑ -->
     </plugins>
 
     <!--  配置打包 -->
