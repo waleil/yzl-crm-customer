@@ -5,41 +5,40 @@
     <parent>
         <artifactId>yzl-customer</artifactId>
         <groupId>cn.net.yzl.crm.customer</groupId>
-        <version>1.0-RELEASE</version>
+        <version>1.0.0-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yzl-customer-server</artifactId>
     <packaging>jar</packaging>
     <description>crm客户服务</description>
-<!--    <version>1.0-SNAPSHOT</version>-->
     <dependencies>
         <!--智能工单服务common依赖-->
         <dependency>
             <groupId>cn.net.yzl.workorder</groupId>
             <artifactId>yzl-workorder-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0-RELEASE</version>
         </dependency>
 
         <!--common依赖-->
         <dependency>
             <groupId>cn.net.yzl.activity</groupId>
             <artifactId>yzl-activity-model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-RELEASE</version>
         </dependency>
 
         <!-- 公共订单服务 -->
         <dependency>
             <groupId>cn.net.yzl.order</groupId>
             <artifactId>yzl-order-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0-RELEASE</version>
         </dependency>
 
         <!--商品服务common依赖-->
         <dependency>
             <groupId>cn.net.yzl.product</groupId>
             <artifactId>yzl-product-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-RELEASE</version>
         </dependency>
 
         <dependency>
@@ -108,7 +107,6 @@
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
-            <!--            <version>5.1.8</version>-->
             <version>4.1.6</version>
         </dependency>
         <dependency>
@@ -124,7 +122,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <!--            <version>2.9.7</version>-->
         </dependency>
 
         <dependency>
@@ -143,7 +140,7 @@
         <dependency>
             <groupId>cn.net.yzl.crm.customer</groupId>
             <artifactId>yzl-customer-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0-RELEASE</version>
         </dependency>
 
 
@@ -161,7 +158,7 @@
         <dependency>
             <groupId>cn.net.yzl</groupId>
             <artifactId>yzl-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-RELEASE</version>
         </dependency>
 
         <dependency>
@@ -184,45 +181,22 @@
     <build>
         <finalName>yzl-customer-server</finalName>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.mybatis.generator</groupId>-->
-<!--                <artifactId>mybatis-generator-maven-plugin</artifactId>-->
-<!--                <version>1.3.2</version>-->
-<!--                <configuration>-->
-<!--                    &lt;!&ndash;配置文件的位置&ndash;&gt;-->
-<!--                    <configurationFile>src/main/resources/generatorConfig.xml</configurationFile>-->
-<!--                    <verbose>true</verbose>-->
-<!--                    <overwrite>true</overwrite>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>Generate MyBatis Artifacts</id>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <dependencies>-->
-<!--                    <dependency>-->
-<!--                        <groupId>org.mybatis.generator</groupId>-->
-<!--                        <artifactId>mybatis-generator-core</artifactId>-->
-<!--                        <version>1.3.2</version>-->
-<!--                    </dependency>-->
-<!--                </dependencies>-->
-<!--            </plugin>-->
             <plugin>
-                <!--                <groupId>org.apache.maven.plugins</groupId>-->
-                <!--                <artifactId>maven-compiler-plugin</artifactId>-->
-                <!--                <configuration>-->
-                <!--                    <skip>true</skip>-->
-                <!--                </configuration>-->
-
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <includeSystemScope>true</includeSystemScope>
                 </configuration>
             </plugin>
+		      <!-- ↓deploy时跳过当前工程↓ -->
+		      <plugin>
+		      	<groupId>org.apache.maven.plugins</groupId>
+		      	<artifactId>maven-deploy-plugin</artifactId>
+		      	<configuration>
+		      		<skip>true</skip>
+		      	</configuration>
+		      </plugin>
+		      <!-- ↑deploy时跳过当前工程↑ -->
         </plugins>
 
         <!--  配置打包 -->
